@@ -1,22 +1,15 @@
-﻿using System;
-using System.Linq;
+﻿using HeavenlyArsenal.Common.utils;
+using HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
 using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using System;
+using System.Linq;
 using Terraria;
-using Terraria.Audio;
-using static HeavenlyArsenal.Common.utils.AssetUtilities;
 using Terraria.GameContent;
 using Terraria.Graphics;
-using Terraria.ID;
 using Terraria.ModLoader;
-using HeavenlyArsenal.Common.utils;
-using HeavenlyArsenal.Content.Items.Weapons.Summon;
-using HeavenlyArsenal.Content.Projectiles.Magic;
-using CalamityMod.Systems;
-using System.Runtime.InteropServices;
-using Humanizer;
 
 namespace HeavenlyArsenal.Content.Projectiles.Magic;
 
@@ -71,30 +64,30 @@ public class Succ : ModProjectile
         if (Time % (5 + (int)(Owner.itemAnimationMax)) == 1)
         {
 
-            
-            int firingInterval = Math.Max(5, (int)(Owner.itemAnimationMax / (10- Charge / 100)));
+
+            int firingInterval = Math.Max(5, (int)(Owner.itemAnimationMax / (10 - Charge / 100)));
 
             if (Time % firingInterval == 0)
             {
-                
+
                 Owner.CheckMana(15, true);
 
-                
+
                 for (int i = 0; i < numberOfProjectiles; i++)
                 {
                     // Calculate a slight spread for each projectile
                     float spread = MathHelper.ToRadians(10) * (i - (numberOfProjectiles - 1) / 2f); // Spread based on the number of projectiles
                     Vector2 sparklePos = Projectile.Center + new Vector2(12, 0).RotatedBy(Projectile.rotation);
 
-                   Projectile.NewProjectile(
-                       Projectile.GetSource_FromThis(),
-                       sparklePos,
-                       Projectile.velocity * 1,
-                       ModContent.ProjectileType<Succ_Blood>(),
-                       (int)(Projectile.damage), /// 1.75f + Charge / 50f), // Increase damage based on charge
-                       Projectile.knockBack + (Charge / 500f),          // Adjust knockback based on charge
-                        Main.myPlayer = Projectile.owner,0
-                   );
+                    Projectile.NewProjectile(
+                        Projectile.GetSource_FromThis(),
+                        sparklePos,
+                        Projectile.velocity * 1,
+                        ModContent.ProjectileType<Succ_Blood>(),
+                        (int)(Projectile.damage), /// 1.75f + Charge / 50f), // Increase damage based on charge
+                        Projectile.knockBack + (Charge / 500f),          // Adjust knockback based on charge
+                         Main.myPlayer = Projectile.owner, 0
+                    );
                 }
 
             }
@@ -117,7 +110,7 @@ public class Succ : ModProjectile
         {
             if ((Charge < 1000) && (Charge != 0)) // Prevent Charge from exceeding the max value
             {
-                Charge+=1+Charge/1000;
+                Charge += 1 + Charge / 1000;
             }
             else if (Charge == 0)
             {
@@ -134,7 +127,7 @@ public class Succ : ModProjectile
         }
 
 
-            if ((!Owner.channel || !Owner.CheckMana(15)))
+        if ((!Owner.channel || !Owner.CheckMana(15)))
         {
             canKill = true;
         }
@@ -143,7 +136,7 @@ public class Succ : ModProjectile
         {
             Projectile.timeLeft = 10000;
         }
-        
+
         if (canKill && Projectile.timeLeft > 30)
         {
             Projectile.timeLeft = 30;
@@ -161,7 +154,7 @@ public class Succ : ModProjectile
 
         if (Time < 10)
         {
-            
+
             newRot = Projectile.rotation;
         }
 
@@ -239,8 +232,8 @@ public class Succ : ModProjectile
 
         //Color glowColor = new GradientColor(SlimeUtils.GoozOilColors, 0.2f, 0.2f).ValueAt(Time + 10);
 
-       Vector2 inward = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(0.5f) * Main.rand.NextFloat(Size * Projectile.ai[2] * 1.5f);
-        ShadowEffect(Projectile.Center-Main.screenPosition, inward, new Vector2(40, 40));
+        Vector2 inward = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(0.5f) * Main.rand.NextFloat(Size * Projectile.ai[2] * 1.5f);
+        ShadowEffect(Projectile.Center - Main.screenPosition, inward, new Vector2(40, 40));
         //
         //     CalamityHunt.particles.Add(Particle.Create<ChromaticEnergyDust>(particle => {
         //            particle.position = Projectile.Center + inward;
@@ -258,41 +251,41 @@ public class Succ : ModProjectile
 
         //for (int i = 0; i < 5; i++)
         //{
-         //   CalamityHunt.particles.Add(Particle.Create<ChromaticEnergyDust>(particle => {
-         //       particle.position = Projectile.Center;
-          //      particle.velocity = Main.rand.NextVector2Circular(3, 3);
-          //      particle.scale = 2;
-          //      particle.color = glowColor;
-          //  }));
-       // }
+        //   CalamityHunt.particles.Add(Particle.Create<ChromaticEnergyDust>(particle => {
+        //       particle.position = Projectile.Center;
+        //      particle.velocity = Main.rand.NextVector2Circular(3, 3);
+        //      particle.scale = 2;
+        //      particle.color = glowColor;
+        //  }));
+        // }
     }
 
-  //  private Vector2[] ribbonPoints;
-  //  private Vector2[] ribbonVels;
+    //  private Vector2[] ribbonPoints;
+    //  private Vector2[] ribbonVels;
 
-    
+
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
 
         //Dust.NewDustPerfect(Projectile.Center+new Vector2(targetHitbox.Width + Projectile.ai[2]*(Size*(Charge/10000)),0), DustID.Adamantite, Vector2.Zero, 100,Color.AntiqueWhite,1);
 
-        return Utils.IntersectsConeFastInaccurate(targetHitbox, Projectile.Center, (Size*(Charge/1000)) * Projectile.ai[2], Projectile.rotation, MathHelper.Pi / 7f);
+        return Utils.IntersectsConeFastInaccurate(targetHitbox, Projectile.Center, (Size * (Charge / 1000)) * Projectile.ai[2], Projectile.rotation, MathHelper.Pi / 7f);
 
     }
 
     //public LoopingSound windSoundLoop;
-    
 
-   // public void HandleSound()
-  //  {
-  //      if (windSoundLoop == null)
-  //      {
-  //          windSoundLoop = new LoopingSound(AssetDirectory.Sounds.Weapons.GoomoireWindLoop, new ProjectileAudioTracker(Projectile).IsActiveAndInGame);
-  //      }
 
-   //     windSoundLoop.PlaySound(() => Projectile.Center, () => Projectile.ai[2] * 0.5f, () => Projectile.ai[2] - 0.9f);
-  //  }
+    // public void HandleSound()
+    //  {
+    //      if (windSoundLoop == null)
+    //      {
+    //          windSoundLoop = new LoopingSound(AssetDirectory.Sounds.Weapons.GoomoireWindLoop, new ProjectileAudioTracker(Projectile).IsActiveAndInGame);
+    //      }
+
+    //     windSoundLoop.PlaySound(() => Projectile.Center, () => Projectile.ai[2] * 0.5f, () => Projectile.ai[2] - 0.9f);
+    //  }
 
     //public static Asset<Texture2D> ribbonTexture;
     public static Asset<Texture2D> laserTexture;
@@ -301,8 +294,8 @@ public class Succ : ModProjectile
     public static Asset<Texture2D> laserTexture3;
     public override void Load()
     {
-       // ribbonTexture = AssetUtilities.RequestImmediate<Texture2D>(Texture + "Ribbon");
-       laserTexture = AssetUtilities.RequestImmediate<Texture2D>(Texture + "_Laser" + 0);
+        // ribbonTexture = AssetUtilities.RequestImmediate<Texture2D>(Texture + "Ribbon");
+        laserTexture = AssetUtilities.RequestImmediate<Texture2D>(Texture + "_Laser" + 0);
         laserTexture1 = AssetUtilities.RequestImmediate<Texture2D>(Texture + "_Laser" + 1);
         laserTexture2 = AssetUtilities.RequestImmediate<Texture2D>(Texture + "_Laser" + 3);
         laserTexture3 = AssetUtilities.RequestImmediate<Texture2D>(Texture + "_Laser" + 5);
@@ -332,7 +325,7 @@ public class Succ : ModProjectile
     //        for (int i = 0; i < ribbonPoints.Length - 1; i++)
     //        {
     //            int style = 0;
-     //           if (i == ribbonPoints.Length - 3)
+    //           if (i == ribbonPoints.Length - 3)
     //            {
     //                style = 1;
     //            }
@@ -347,7 +340,7 @@ public class Succ : ModProjectile
     //            Vector2 stretch = new Vector2(0.5f + Utils.GetLerpValue(0, ribbonPoints.Length - 2, i, true) * 0.4f, ribbonPoints[i].Distance(ribbonPoints[i + 1]) / (frame.Height - 5));
     //           Main.EntitySpriteDraw(ribbonTexture.Value, ribbonPoints[i] - Main.screenPosition, frame, lightColor.MultiplyRGBA(Color.Lerp(Color.DimGray, Color.White, (float)i / ribbonPoints.Length)), rotation - MathHelper.PiOver2, frame.Size() * new Vector2(0.5f, 0f), stretch, 0, 0);
     //        }
-     //   }
+    //   }
     //}
 
     private float newRot;
@@ -360,7 +353,7 @@ public class Succ : ModProjectile
         Color fireColor = new Color(fireBrightness, fireBrightness, fireBrightness);
         Color bigColorColor = fireColor;
         //AntishadowSmokeParticleSystemManager.ParticleSystem.CreateNew(new Vector2(Projectile.Center.X, Projectile.Center.Y + Projectile.height / 2), Main.rand.NextVector2Circular(60f, 60f), Vector2.One * Main.rand.NextFloat(20f, 90f) * 3f, bigColorColor);
-        AntishadowSmokeParticleSystemManager.ParticleSystem.CreateNew(pos, Velocity, Scale, bigColorColor);
+        AntishadowFireParticleSystemManager.ParticleSystem.CreateNew(pos, Velocity, Scale, bigColorColor);
     }
 
 
@@ -382,8 +375,8 @@ public class Succ : ModProjectile
         for (int i = 0; i < 500; i++)
         {
             rotations[i] = Utils.AngleLerp(newRot, Projectile.rotation, MathF.Sqrt(i / 500f)) + MathF.Sin(Time * 0.2f - i / 50f) * 0.1f * (1f - i / 500f) * Projectile.ai[2];
-            positions[i] = sparklePos + new Vector2((Size * Charge/500) * (i / 500f) * Projectile.ai[2], 0).RotatedBy(rotations[i]);
-            
+            positions[i] = sparklePos + new Vector2((Size * Charge / 500) * (i / 500f) * Projectile.ai[2], 0).RotatedBy(rotations[i]);
+
 
         }
 
@@ -391,7 +384,7 @@ public class Succ : ModProjectile
         strip.PrepareStripWithProceduralPadding(positions, rotations, StripColor, StripWidth, -Main.screenPosition, true);
         VertexStrip Agony = new VertexStrip();
         Agony.PrepareStripWithProceduralPadding(positions, rotations, StripColor2, StripWidth, -Main.screenPosition, true);
-       
+
 
         Effect lightningEffect = AssetDirectory.Effects.GoomoireWindR.Value;
         lightningEffect.Parameters["uTransformMatrix"].SetValue(Main.GameViewMatrix.NormalizedTransformationmatrix);
@@ -406,7 +399,7 @@ public class Succ : ModProjectile
         lightningEffect.Parameters["uBackPhaseShift"].SetValue(0.5f);
         lightningEffect.Parameters["uSlant"].SetValue(0f);
         lightningEffect.CurrentTechnique.Passes[0].Apply();
-        
+
         strip.DrawTrail();
         Main.pixelShader.CurrentTechnique.Passes[0].Apply();
 
@@ -440,7 +433,7 @@ public class Succ : ModProjectile
 
     public Color StripColor(float progress)
     {
-        Color color = new Color(0,0,255);// GradientColor(SlimeUtils.GoozColors, 0.2f, 0.2f).ValueAt(Time + 10 + progress * 40f) * 0.45f;
+        Color color = new Color(0, 0, 255);// GradientColor(SlimeUtils.GoozColors, 0.2f, 0.2f).ValueAt(Time + 10 + progress * 40f) * 0.45f;
         //color.A /= 2;
         return color; //* Projectile.ai[2];
     }
@@ -458,12 +451,12 @@ public class Succ : ModProjectile
     {
 
         // controls how bunched up it is, hard to describe but essentially the smaller the number the wider the start point will be
-        float start = MathHelper.SmoothStep(MathF.Pow(progress, 0.6f) * 
-            
+        float start = MathHelper.SmoothStep(MathF.Pow(progress, 0.6f) *
+
             //its complicated but esentially this controls how twisted the distortion is
-            -1f, 
+            -1f,
             2, progress);
         float grow = (float)Math.Pow(Projectile.ai[2], 3f);
-        return start * grow * Size * Math.Clamp( Charge/500,0,3);
+        return start * grow * Size * Math.Clamp(Charge / 500, 0, 3);
     }
 }

@@ -3,6 +3,9 @@ sampler slashOpacityTexture : register(s2);
 
 float globalTime;
 float lifetimeRatio;
+float noiseSlant;
+float noiseInfluenceFactor;
+float opacityFadeExponent;
 float4 sheenEdgeColorWeak;
 float4 sheenEdgeColorStrong;
 matrix uWorldViewProjection;
@@ -39,19 +42,19 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float2 coords = input.TextureCoordinates;
     coords.y = (coords.y - 0.5) / input.TextureCoordinates.z + 0.5;
     
-    // Apply some noise to the results, to add texturing.
-    color.rgb += (tex2D(noiseTexture, coords + float2(globalTime * -1.3, 0)) - 0.5) * coords.y * 2;
-    
     // Make the top of the slash have two-toned color variances.
-    color = lerp(color, sheenEdgeColorWeak, smoothstep(0.55, 1, coords.y));
+    color = lerp(color, sheenEdgeColorWeak, smoothstep(0.56, 1, coords.y));
     color = lerp(color, sheenEdgeColorStrong, smoothstep(0.85, 1, coords.y));
     
+    // Apply some noise to the results, to add texturing.
+    color.rgb += (tex2D(noiseTexture, coords + float2(globalTime * -1.3, coords.x * noiseSlant)) - 0.5) * coords.y * noiseInfluenceFactor;
+    
     // Make the top and bottom of the slash fade out.
-    color *= smoothstep(0, 0.4, coords.y) * smoothstep(1, 0.95, coords.y);
-    color *= tex2D(slashOpacityTexture, coords).r*2;
+    color *= pow(smoothstep(0, 0.4, coords.y) * smoothstep(1, 0.95, coords.y), opacityFadeExponent);
+    color *= tex2D(slashOpacityTexture, coords).r;
     
     // Make the front of the slash fade out, so that it doesn't have a noticeable harsh edge.
-    color *= pow(smoothstep(0, 0.4, coords.x), 2);
+    color *= pow(smoothstep(0, 0.1, coords.x), 2);
     
     return saturate(color) * input.Color.a;
 }

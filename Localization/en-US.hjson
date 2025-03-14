@@ -13,7 +13,8 @@ Mods: {
 
 			AntishadowAssassinBuff: {
 				DisplayName: Forgotten Warrior of Madder Crimson
-				Description: As He rises from the shadows around you, you hear a faint whisper... 'Shuuren...'
+				Description: As He rises from the shadows, faint whispers echo:
+				NameText: "'Shuuren...'"
 			}
 		}
 
@@ -134,10 +135,11 @@ Mods: {
 
 			Succ.DisplayName: Succ
 			AntishadowAssassin.DisplayName: Antishadow Assassin
-			AntishadowAssassinSlash.DisplayName: Antishadow Assassin Slash
+			AntishadowAssassinSlash.DisplayName: Antishadow Slash
 			BloodBlob.DisplayName: Blood Blob
 			Succ_Blood.DisplayName: Succ_ Blood
 			CircularSawProjectile.DisplayName: Circular Saw Projectile
+			AntishadowUnidirectionalAssassinSlash.DisplayName: Antishadow Slash
 		}
 	}
 }

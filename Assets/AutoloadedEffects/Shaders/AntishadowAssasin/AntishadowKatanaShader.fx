@@ -56,7 +56,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     // Cut off the prims based on the appearance interpolant, to help make it look like the sword is being unsheathed at first.
     clip(tex2D(noiseTexture, coords * 0.75) * 0.25 + appearanceInterpolant - coords.x);
     
-    return color * appearanceInterpolant;
+    return color;
 }
 
 technique Technique1

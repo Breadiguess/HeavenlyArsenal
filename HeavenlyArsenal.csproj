@@ -21,20 +21,20 @@
 	  <None Remove="Shaders\shittyshader.fx" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Reference Include="CalamityMod">
-	    <HintPath>..\ModAssemblies\CalamityMod_v2.0.4.6.dll</HintPath>
-	  </Reference>
-	  <Reference Include="Luminance">
-	    <HintPath>..\ModAssemblies\Luminance_v1.0.9.dll</HintPath>
-	  </Reference>
-	  <Reference Include="NoxusBoss">
-	    <HintPath>..\..\ModReader\NoxusBoss\NoxusBoss.dll</HintPath>
-	  </Reference>
-	</ItemGroup>
-	<ItemGroup>
 	  <Folder Include="Assets\Textures\Backpacks\" />
 	  <Folder Include="Content\Items\Weapons\Ranged\NewFolder\" />
 	  <Folder Include="Sounds\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="CalamityMod">
+	    <HintPath>ModReferences\CalamityMod.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Luminance">
+	    <HintPath>ModReferences\Luminance.dll</HintPath>
+	  </Reference>
+	  <Reference Include="NoxusBoss">
+	    <HintPath>ModReferences\NoxusBoss.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 	<!-- References -->
