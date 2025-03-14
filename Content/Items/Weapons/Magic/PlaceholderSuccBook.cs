@@ -18,6 +18,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Magic
             Item.height = 48;
             Item.damage = 1750;
             Item.DamageType = DamageClass.Magic;
+            Item.rare = ModContent.RarityType<AvatarRarity>();
             //Item.rare = ModContent.RarityType<VioletRarity>();
             Item.useStyle = ItemUseStyleID.Thrust;
             Item.mana = 15;

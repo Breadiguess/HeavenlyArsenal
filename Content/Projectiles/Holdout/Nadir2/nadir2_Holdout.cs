@@ -112,7 +112,8 @@ public class nadir2_Holdout : ModProjectile
         
         if (isThrusting)
         {
-          //  Projectile.damage = Projectile.GetSource_FromThis(Item.dam;
+            //  Projectile.damage = Projectile.GetSource_FromThis(Item.dam;
+            Projectile.damage = 10000;
             thrustOffset = Projectile.velocity * thrustDistance * thrustProgress;
         }
         else
@@ -307,13 +308,13 @@ public class nadir2_Holdout : ModProjectile
     private void PerformCrescentSwing()
     {
         float swingAmount = MathHelper.ToRadians(45f);
-        Projectile.rotation += swingAmount; // Rotate the spear for a crescent motion
+        Projectile.rotation += swingAmount;
     }
 
     private void PerformLargeSlash()
     {
         float slashAmount = MathHelper.ToRadians(90f);
-        Projectile.rotation += slashAmount; // Rotate for a large slash motion
+        Projectile.rotation += slashAmount; 
     }
 
 

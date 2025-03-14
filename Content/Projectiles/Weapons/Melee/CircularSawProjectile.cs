@@ -2,7 +2,6 @@
 using System.IO;
 
 using HeavenlyArsenal.Common.utils;
-using HeavenlyArsenal;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -240,7 +239,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Melee
             const float c1 = 1.70158f;
             const float c2 = c1 * 1.525f;
             return x < 0.5f
-              ? (MathF.Pow(2f * x, 2f) * ((c2 + 1) * 2f * x - c2)) / 2f
+              ? MathF.Pow(2f * x, 2f) * ((c2 + 1) * 2f * x - c2) / 2f
               : (MathF.Pow(2f * x - 2f, 2f) * ((c2 + 1f) * (x * 2f - 2f) + c2) + 2f) / 2f;
         }
 

@@ -35,7 +35,7 @@ Mods: {
 
 			Auric_Catalyst: {
 				DisplayName: Auric Catalyst
-				Tooltip: ""
+				Tooltip: Perhaps its waiting for something?
 			}
 
 			shadowspec_GunParts: {
@@ -55,11 +55,6 @@ Mods: {
 
 			nadir2: {
 				DisplayName: Ossified Needle
-				Tooltip: ""
-			}
-
-			testsword: {
-				DisplayName: testsword
 				Tooltip: ""
 			}
 
@@ -97,7 +92,7 @@ Mods: {
 			}
 
 			PlaceholderSuccBook: {
-				DisplayName: Placeholder Succ Book
+				DisplayName: Goretex
 				Tooltip: ""
 			}
 
@@ -113,17 +108,21 @@ Mods: {
 
 			StupidFuckYouSword: {
 				DisplayName: Stupid Fuck You Sword
+				Tooltip: I HATE !!!
+			}
+
+			TestWhip: {
+				DisplayName: Test Whip
 				Tooltip: ""
 			}
 		}
 
 		Projectiles: {
-			fusionrifleHoldout.DisplayName: fusionrifle Holdout
 			incomplete_gunHoldout.DisplayName: incomplete_gun Holdout
 			nadir2_Holdout.DisplayName: nadir2_ Holdout
 			nadir2Lantern.DisplayName: nadir2 Lantern
 			ParasiteParadiseProjectile.DisplayName: Parasite Paradise Projectile
-			TheBlackBell_Projectile.DisplayName: The Black Bell_ Projectile
+			TheBlackBell_Projectile.DisplayName: The Black Bell Projectile
 			FusionRifleHoldout.DisplayName: Fusion Rifle Holdout
 			AvatarRifle_Holdout.DisplayName: Avatar Rifle_ Holdout
 
@@ -138,6 +137,7 @@ Mods: {
 			BloodBlob.DisplayName: Blood Blob
 			Succ_Blood.DisplayName: Succ_ Blood
 			CircularSawProjectile.DisplayName: Circular Saw Projectile
+			TestWhipProjectile.DisplayName: Test Whip Projectile
 		}
 	}
 }
