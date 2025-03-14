@@ -76,7 +76,7 @@ public class Succ : ModProjectile
 
             if (Time % firingInterval == 0)
             {
-
+                
                 Owner.CheckMana(15, true);
 
                 
