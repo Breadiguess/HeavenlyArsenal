@@ -22,7 +22,7 @@ public class MusicKiller : ModSystem
     {
         MuffleFactor = MathHelper.Clamp(MuffleFactor + 0.03f, 0f, 1f);
 
-        if (Main.musicFade[Main.curMusic] != MuffleFactor && MuffleFactor < 1)
+         if (Main.musicFade[Main.curMusic] != MuffleFactor && MuffleFactor < 1)
             Main.musicFade[Main.curMusic] = MuffleFactor;
 
 

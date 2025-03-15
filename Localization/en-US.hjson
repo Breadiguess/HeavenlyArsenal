@@ -2,7 +2,7 @@ Mods: {
 	HeavenlyArsenal: {
 		Buffs: {
 			TheBlackBell_Buff: {
-				DisplayName: The Black Bell_ Buff
+				DisplayName: Eerie Instrument
 				Description: Mods.HeavenlyArsenal.Buffs.TheBlackBell_Buff.Description
 			}
 
@@ -20,18 +20,23 @@ Mods: {
 
 		Items: {
 			ExampleWings: {
-				DisplayName: Example Wings
+				DisplayName: Wings of a Forgetful God
 				Tooltip: ""
 			}
 
 			avatar_FishingRod: {
-				DisplayName: avatar_ Fishing Rod
+				DisplayName: FlyRift
 				Tooltip: ""
 			}
 
 			AvatarRifle: {
 				DisplayName: Funeral Dirge of a Dead World
-				Tooltip: ""
+				Tooltip: 
+				'''
+				The last remnant of a civilization once favored by the Idol.
+				You get the sense that it might be older than the universe.
+
+				'''
 			}
 
 			Auric_Catalyst: {
@@ -45,13 +50,13 @@ Mods: {
 			}
 
 			Incomplete_gun: {
-				DisplayName: Incomplete_gun
+				DisplayName: Incomplete Reactor
 				Tooltip:
 					'''
-					something tells you it's missing parts...
+					Something tells you it's missing parts...
 					Perhaps there's something you can do with this later?
 					'''
-				TooltipPostNamelessDeity: ascend.
+				TooltipPostNamelessDeity: A s c e n d.
 			}
 
 			nadir2: {
@@ -94,12 +99,16 @@ Mods: {
 
 			PlaceholderSuccBook: {
 				DisplayName: Goretex
-				Tooltip: ""
+				Tooltip: "S u c c "
 			}
 
 			AntishadowBead: {
-				DisplayName: Antishadow Bead
-				Tooltip: ""
+				DisplayName: Scroll of Brightest Shadow
+				Tooltip:
+				'''
+				Bound by blood and seal, it shall always be by your side.
+				There may be only one.
+				'''
 			}
 
 			CircularSaw: {
@@ -133,11 +142,13 @@ Mods: {
 			}
 
 			Succ.DisplayName: Succ
-			AntishadowAssassin.DisplayName: Antishadow Assassin
+			AntishadowAssassin.DisplayName: Shuuren
 			AntishadowAssassinSlash.DisplayName: Antishadow Slash
 			BloodBlob.DisplayName: Blood Blob
 			Succ_Blood.DisplayName: Succ_ Blood
 			CircularSawProjectile.DisplayName: Circular Saw Projectile
+			AntishadowUnidirectionalAssassinSlash.DisplayName: Un-Dimensional Slash
+			TestWhipProjectile.DisplayName: Test Whip Projectile
 		}
 	}
 }

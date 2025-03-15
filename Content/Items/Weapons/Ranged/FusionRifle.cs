@@ -24,6 +24,8 @@ using Terraria.DataStructures;
 using ReLogic.Content;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Common.Utilities;
+using ReLogic.Graphics;
+using Terraria.GameContent;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
 {
@@ -69,9 +71,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
         // The Display Name and Tooltip of this item can be edited in the 'Localization/en-US_Mods.HeavenlyArsenal.hjson' file.
         public override void SetDefaults()
         {
-            //ModPlayer modPlayer;
-            //FusionRifle_Backpack = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Extra/Sparkle").Value;
-            //EquipLoader.AddEquipTexture(HeavenlyArsenal,FusionRifle_Backpack,)
+            
             Item.rare = ModContent.RarityType<NamelessDeityRarity>();
 
             Item.damage = 50000;
@@ -136,8 +136,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             }
         }
 
+       
 
-  
         public override bool CanShoot(Player player) => false;
 
       

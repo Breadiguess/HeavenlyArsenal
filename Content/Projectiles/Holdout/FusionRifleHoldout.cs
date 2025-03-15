@@ -111,6 +111,9 @@ namespace HeavenlyArsenal.Content.Projectiles.Holdout
             {
                 if (ChargeTimer < CurrentChargeTime)
                     ChargeTimer++;
+                     
+
+
 
                 // Handle the charging sound
                 if (chargingSoundInstance == null) // If no sound is currently playing
