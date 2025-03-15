@@ -551,7 +551,7 @@ public class AntishadowAssassin : ModProjectile
         NPC target = Main.npc[TargetIndex];
         ref float dashCounter = ref AIData;
         int dashDuration = Utils.Clamp(20 - (int)dashCounter * 3, 5, 1000);
-        int dashCycleHit = dashCounter == 0f ? 1 : (int)(dashDuration * 0.5f); // Done to ensure that the slash always plays even if the target before the dash duration midway point is reached.
+        int dashCycleHit = dashCounter == 0f ? 1 : (int)(dashDuration * 0.5f); // Done to ensure that the slash sound always plays even if the target dies before the dash duration midway point is reached.
         if (Time == dashCycleHit)
         {
             SoundEngine.PlaySound((target.Organic() ? Murasama.OrganicHit : Murasama.InorganicHit) with { MaxInstances = 9 });
