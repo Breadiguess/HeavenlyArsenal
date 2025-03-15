@@ -172,7 +172,7 @@ public class AntishadowAssassin : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
 
     /// <summary>
-    /// The rope for the assassin's first rope.
+    /// The rope for the assassin's first bead.
     /// </summary>
     public VerletSimulatedRope BeadRopeA
     {
@@ -181,9 +181,27 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// The rope for the assassin's first rope.
+    /// The rope for the assassin's second bead.
     /// </summary>
     public VerletSimulatedRope BeadRopeB
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// The rope for the assassin's third bead.
+    /// </summary>
+    public VerletSimulatedRope BeadRopeC
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// The rope for the assassin's fourth bead.
+    /// </summary>
+    public VerletSimulatedRope BeadRopeD
     {
         get;
         set;
@@ -423,10 +441,12 @@ public class AntishadowAssassin : ModProjectile
     public override void AI()
     {
         // Initialize beads if necessary.
-        if (BeadRopeA is null || BeadRopeB is null)
+        if (BeadRopeA is null || BeadRopeB is null || BeadRopeC is null || BeadRopeD is null)
         {
             BeadRopeA = new VerletSimulatedRope(Projectile.Center, Vector2.Zero, 6, 12.5f);
             BeadRopeB = new VerletSimulatedRope(Projectile.Center, Vector2.Zero, 6, 18.5f);
+            BeadRopeC = new VerletSimulatedRope(Projectile.Center, Vector2.Zero, 6, 11.1f);
+            BeadRopeD = new VerletSimulatedRope(Projectile.Center, Vector2.Zero, 6, 11.3f);
         }
         AmbientLoop ??= LoopedSoundManager.CreateNew(AntishadowAmbientLoopSound, () => !Projectile.active);
         AttackLoop ??= LoopedSoundManager.CreateNew(AntishadowAttackLoopSound, () => !Projectile.active);
@@ -963,6 +983,12 @@ public class AntishadowAssassin : ModProjectile
 
         force = Vector2.UnitX * (LumUtils.AperiodicSin(Time * 0.024f + 5.1f) * 0.4f + windSpeed);
         BeadRopeB.Update(Projectile.Center + new Vector2(Projectile.spriteDirection * 26f, -114f).RotatedBy(Projectile.rotation + BowRotation * Projectile.spriteDirection) * Projectile.scale, ropeGravity, force);
+
+        force = Vector2.UnitX * (LumUtils.AperiodicSin(Time * 0.024f + 3.7f) * 0.4f + windSpeed);
+        BeadRopeC.Update(Projectile.Center + new Vector2(Projectile.spriteDirection * -20f, -114f).RotatedBy(Projectile.rotation + BowRotation * Projectile.spriteDirection) * Projectile.scale, ropeGravity, force);
+
+        force = Vector2.UnitX * (LumUtils.AperiodicSin(Time * 0.024f + 1.5f) * 0.4f + windSpeed);
+        BeadRopeD.Update(Projectile.Center + new Vector2(Projectile.spriteDirection * 15f, -114f).RotatedBy(Projectile.rotation + BowRotation * Projectile.spriteDirection) * Projectile.scale, ropeGravity, force);
     }
 
     /// <summary>
@@ -1171,10 +1197,14 @@ public class AntishadowAssassin : ModProjectile
         Texture2D whitePixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
         Texture2D beadTextureA = GennedAssets.Textures.SecondPhaseForm.Beads3;
         Texture2D beadTextureB = GennedAssets.Textures.SecondPhaseForm.Beads2;
+        Texture2D beadTextureC = GennedAssets.Textures.SecondPhaseForm.Bell;
+        Texture2D beadTextureD = GennedAssets.Textures.SecondPhaseForm.Beads1;
         Color ropeColor = new Color(210, 13, 16) * Projectile.Opacity;
         Vector2 drawOffset = center - Projectile.Center;
         BeadRopeA?.DrawProjection(whitePixel, drawOffset, false, _ => ropeColor, widthFactor: Projectile.scale, projectionWidth: (int)WotGUtils.ViewportSize.X, projectionHeight: (int)WotGUtils.ViewportSize.Y, unscaledMatrix: true);
         BeadRopeB?.DrawProjection(whitePixel, drawOffset, false, _ => ropeColor, widthFactor: Projectile.scale, projectionWidth: (int)WotGUtils.ViewportSize.X, projectionHeight: (int)WotGUtils.ViewportSize.Y, unscaledMatrix: true);
+        BeadRopeC?.DrawProjection(whitePixel, drawOffset, false, _ => ropeColor, widthFactor: Projectile.scale, projectionWidth: (int)WotGUtils.ViewportSize.X, projectionHeight: (int)WotGUtils.ViewportSize.Y, unscaledMatrix: true);
+        BeadRopeD?.DrawProjection(whitePixel, drawOffset, false, _ => ropeColor, widthFactor: Projectile.scale, projectionWidth: (int)WotGUtils.ViewportSize.X, projectionHeight: (int)WotGUtils.ViewportSize.Y, unscaledMatrix: true);
 
         if (BeadRopeA is not null)
         {
@@ -1185,6 +1215,16 @@ public class AntishadowAssassin : ModProjectile
         {
             float beadRotation = (BeadRopeB.Rope[^2].Position - BeadRopeB.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
             Main.spriteBatch.Draw(beadTextureB, BeadRopeB.Rope[^4].Position + drawOffset, null, Color.White * Projectile.Opacity, beadRotation, new Vector2(30f, 243f), Projectile.scale * 0.1f, 0, 0f);
+        }
+        if (BeadRopeC is not null)
+        {
+            float beadRotation = (BeadRopeC.Rope[^2].Position - BeadRopeC.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
+            Main.spriteBatch.Draw(beadTextureC, BeadRopeC.Rope[^4].Position + drawOffset, null, Color.White * Projectile.Opacity, beadRotation, new Vector2(45f, 41f), Projectile.scale * 0.1f, 0, 0f);
+        }
+        if (BeadRopeD is not null)
+        {
+            float beadRotation = (BeadRopeD.Rope[^2].Position - BeadRopeD.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
+            Main.spriteBatch.Draw(beadTextureD, BeadRopeD.Rope[^4].Position + drawOffset, null, Color.White * Projectile.Opacity, beadRotation, new Vector2(17f, 46f), Projectile.scale * 0.1f, 0, 0f);
         }
     }
 
