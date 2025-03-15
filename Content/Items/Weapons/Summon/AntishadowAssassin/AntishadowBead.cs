@@ -1,7 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HeavenlyArsenal.Core.Globals;
+using Microsoft.Xna.Framework;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Rarities;
+using NoxusBoss.Core.GlobalInstances;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -18,7 +22,28 @@ public class AntishadowBead : ModItem
     /// </summary>
     public static string GetAssetPath(string prefix, string name) =>
         $"HeavenlyArsenal/{prefix}/{name}";
+
     public override string Texture => GetAssetPath("Content/Items/Weapons/Summon/AntishadowAssassin", Name);
+
+    public override void SetStaticDefaults()
+    {
+        GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>
+        {
+            if (npc.type == ModContent.NPCType<AvatarOfEmptiness>())
+            {
+                LeadingConditionRule normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+                {
+                    normalOnly.OnSuccess(ItemDropRule.Common(Type));
+                }
+                npcLoot.Add(normalOnly);
+            }
+        };
+        ArsenalGlobalItem.ModifyItemLootEvent += (Item item, ItemLoot loot) =>
+        {
+            if (item.type == AvatarOfEmptiness.TreasureBagID)
+                loot.Add(ItemDropRule.Common(Type));
+        };
+    }
 
     public override void SetDefaults()
     {
