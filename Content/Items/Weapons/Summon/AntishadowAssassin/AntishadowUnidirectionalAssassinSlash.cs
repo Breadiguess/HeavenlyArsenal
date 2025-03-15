@@ -47,7 +47,7 @@ public class AntishadowUnidirectionalAssassinSlash : ModProjectile
         Projectile.timeLeft = Lifetime;
         Projectile.penetrate = -1;
         Projectile.usesIDStaticNPCImmunity = true;
-        Projectile.idStaticNPCHitCooldown = 2;
+        Projectile.idStaticNPCHitCooldown = 1;
         Projectile.tileCollide = false;
         Projectile.hide = true;
         Projectile.minion = true;
