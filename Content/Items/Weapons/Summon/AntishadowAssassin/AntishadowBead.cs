@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Items.Weapons.Summon;
+using HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
 using Microsoft.Xna.Framework;
 using NoxusBoss.Content.Rarities;
 using Terraria;
