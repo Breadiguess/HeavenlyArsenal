@@ -61,8 +61,8 @@ public class AntishadowAssassinSlash : ModProjectile
         Projectile.ignoreWater = true;
         Projectile.timeLeft = Lifetime;
         Projectile.penetrate = -1;
-        Projectile.usesLocalNPCImmunity = true;
-        Projectile.localNPCHitCooldown = 3;
+        Projectile.usesIDStaticNPCImmunity = true;
+        Projectile.idStaticNPCHitCooldown = 2;
         Projectile.tileCollide = false;
         Projectile.hide = true;
         Projectile.minion = true;

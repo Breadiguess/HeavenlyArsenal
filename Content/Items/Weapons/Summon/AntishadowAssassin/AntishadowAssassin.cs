@@ -416,6 +416,8 @@ public class AntishadowAssassin : ModProjectile
         Projectile.friendly = true;
         Projectile.ignoreWater = true;
         Projectile.minionSlots = AntishadowBead.MinionSlotRequirement;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = 8;
         Projectile.timeLeft = 90000;
         Projectile.penetrate = -1;
         Projectile.tileCollide = false;
@@ -731,6 +733,9 @@ public class AntishadowAssassin : ModProjectile
         DisappearanceInterpolant = LumUtils.InverseLerp(0f, disappearTime, Time - bowDelay - bowTime - disappearDelay);
         ArmOutlineOpacity = LumUtils.InverseLerp(0f, 0.25f, bowInterpolant);
 
+        Projectile.spriteDirection = (int)Projectile.HorizontalDirectionTo(Owner.Center);
+        Projectile.velocity *= 0.8f;
+        Projectile.Opacity = Projectile.Opacity.StepTowards(1f, 0.2f);
         Projectile.scale = 1f;
 
         // Create fre particles when disappearing.
