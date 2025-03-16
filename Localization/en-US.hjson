@@ -19,11 +19,6 @@ Mods: {
 		}
 
 		Items: {
-			ExampleWings: {
-				DisplayName: Wings of a Forgetful God
-				Tooltip: ""
-			}
-
 			avatar_FishingRod: {
 				DisplayName: FlyRift
 				Tooltip: ""
@@ -84,12 +79,15 @@ Mods: {
 
 			FusionRifle: {
 				DisplayName: Evanescent Keepsake
-				Tooltip:
+				Tooltip: ""
+				ShiftTooltip:
 					'''
 					Teeth, sharper than your own.
 
 					"This is my destiny too!"
+
 					'''
+				Tooltip1: silly!
 			}
 
 			UncannyDye: {
@@ -125,6 +123,11 @@ Mods: {
 				DisplayName: Test Whip
 				Tooltip: ""
 			}
+
+			DevWing: {
+				DisplayName: Wings of a Forgetful God
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -149,6 +152,7 @@ Mods: {
 			CircularSawProjectile.DisplayName: Circular Saw Projectile
 			AntishadowUnidirectionalAssassinSlash.DisplayName: Antishadow Slash
 			TestWhipProjectile.DisplayName: Test Whip Projectile
+			Magic.RancorMagicCircle.DisplayName: Rancor Magic Circle
 		}
 	}
 }

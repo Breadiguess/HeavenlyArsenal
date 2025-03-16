@@ -26,6 +26,11 @@ using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Common.Utilities;
 using ReLogic.Graphics;
 using Terraria.GameContent;
+using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
+using NoxusBoss.Core.Graphics;
+using NoxusBoss.Core.World.WorldSaving;
+using System.Linq;
+using Terraria.Localization;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
 {
@@ -42,24 +47,26 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
 
         public const int ArrowsPerBurst = 5;
 
+        public static int CurrentCharge = CurrentCharge;
+
         public const int ArrowShootRate = 4;
 
         public const int ArrowShootTime = ArrowsPerBurst * ArrowShootRate;
 
         public const int MaxChargeTime = 120;
 
-        public const float ArrowTargetingRange = 1100f;
+       // public const float ArrowTargetingRange = 1100f;
 
-        public const float MaxChargeDamageBoost = 3.5f;
+       // public const float MaxChargeDamageBoost = 3.5f;
 
-        public const float LightningDamageFactor = 0.36f;
+      //  public const float LightningDamageFactor = 0.36f;
 
-        public const float ChargeLightningCreationThreshold = 0.8f;
+      //  public const float ChargeLightningCreationThreshold = 0.8f;
 
-        public static readonly SoundStyle ChargeSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_charge3");
-            
-        public static readonly SoundStyle FireSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_fire");
-
+       // public static readonly SoundStyle ChargeSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_charge3");
+       //     
+       // public static readonly SoundStyle FireSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_fire");
+       //
         public static readonly SoundStyle FullyChargedSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_FullyCharged");
 
 
@@ -98,7 +105,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             
             //Item.UseSound = SoundID.Item1;
             Item.autoReuse = true;
-            //Item.shoot = ModContent.ProjectileType<ParasiteParadiseProjectile>();
+            
             Item.shoot = ModContent.ProjectileType<FusionRifleHoldout>();
             Item.ChangePlayerDirectionOnShoot = true;
             Item.crit = 662;
@@ -150,39 +157,33 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
                 Register();
         }
 
-        internal static void DrawHeldShiftTooltip(List<TooltipLine> tooltips, TooltipLine[] holdShiftTooltips, bool hideNormalTooltip = false)
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            // Do not override anything if the Left Shift key is not being held.
-            if (!Main.keyState.IsKeyDown(Keys.LeftShift))
+            
+            if (Main.keyState.PressingShift())
+            {
+                // Remove the default tooltips.
+                tooltips.RemoveAll(t => t.Name.Contains("Tooltip"));
+
+                // Generate and use custom tooltips.
+                string specialTooltip = this.GetLocalizedValue("ShiftTooltip");
+                TooltipLine[] tooltipLines = specialTooltip.Split('\n').Select((t, index) =>
+                {
+                    Item.rare = ModContent.RarityType<AvatarRarity>();
+                    return new TooltipLine(Mod, $"ShiftTooltip{index + 1}", t);
+                }).ToArray();
+
+                // Color the last tooltip line.
+                tooltipLines.Last().OverrideColor = DialogColorRegistry.NamelessDeityTextColor;
+                tooltips.AddRange(tooltipLines);
                 return;
-
-            // Acquire base tooltip data.
-            int firstTooltipIndex = -1;
-            int lastTooltipIndex = -1;
-            int standardTooltipCount = 0;
-            for (int i = 0; i < tooltips.Count; i++)
-            {
-                if (tooltips[i].Name.StartsWith("Tooltip"))
-                {
-                    if (firstTooltipIndex == -1)
-                    {
-                        firstTooltipIndex = i;
-                    }
-                    lastTooltipIndex = i;
-                    standardTooltipCount++;
-                }
             }
 
-            // Replace tooltips.
-            if (firstTooltipIndex != -1)
-            {
-                if (hideNormalTooltip)
-                {
-                    tooltips.RemoveRange(firstTooltipIndex, standardTooltipCount);
-                    lastTooltipIndex -= standardTooltipCount;
-                }
-                tooltips.InsertRange(lastTooltipIndex + 1, holdShiftTooltips);
-            }
+            // Make the final tooltip line about needing to pass the test use Nameless' dialog.
+            TooltipLine tooltip = tooltips.FirstOrDefault(t => t.Name == "Tooltip1");
+            if (tooltip is not null)
+                
+                tooltip.OverrideColor = DialogColorRegistry.NamelessDeityTextColor;
         }
 
 
@@ -238,5 +239,79 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             drawInfo.DrawDataCache.Add(item);
         }
     }
+
+
+
+    public class FusionRifle_ShiftText : ModSystem
+    {
+       // private static ulong textID
+       // {
+       //     get
+       //     {
+       //         ulong result = 0uL;
+
+       //         for (int i = 0; i < Main.LocalPlayer.name.Length; i++)
+       //         {
+       //             char nameCharacter = Main.LocalPlayer.name[i];
+       //             unchecked
+       //             {
+       //                 result += (ulong)nameCharacter << i * 4;
+       //             }
+       //         }
+
+       //         return result;
+       //     }
+       // }
+
+        public static bool LookingAtItem
+        {
+            get;
+            set;
+        }
+
+        public static float SeedTimer
+        {
+            get;
+            private set;
+        }
+
+        public static int Seed1 => (int)(SeedTimer % 100000f);
+
+        public static int Seed2 => Seed1 + 1;
+
+        public static float SeedInterpolant => SeedTimer % 1f;
+
+        // When enabled, lore is "personalized", with the Nameless Deity lore entry, varying based on the player's steam ID and only changing across long timespans.
+        // When disabled, lore text slowly shifts and becomes something completely different if the player stops reading the text and then starts reading again later.
+        
+
+        // There is an exceedingly rare chance for a given lore text line to be manually replaced with special text.
+        // Text affected by this is colored separately from everything else.
+       // public const int EasterEggLineChance = 10000;
+
+        
+
+        public override void UpdateUI(GameTime gameTime)
+        {
+            // Lock the seeds in place if trolling mode is enabled.
+            
+          
+            // Ensure that the seed timer cycles naturally otherwise.
+            
+                SeedTimer += LookingAtItem ? 0.003f : 1f;
+                if (SeedTimer >= 2000f)
+                    SeedTimer = 0f;
+            
+
+            // If the lore item isn't being looked at, reset the seed interpolant to zero by removing the fractional part.
+            // This way, if the player looks at the lore text again it won't be in the middle of blending between two dialog sets.
+            if (!LookingAtItem)
+                SeedTimer = (int)SeedTimer;
+
+            // Reset the looking at Nameless Deity lore item bool for the next frame.
+            LookingAtItem = false;
+        }
+    }
+
 
 }

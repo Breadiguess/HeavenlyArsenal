@@ -75,7 +75,7 @@ VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
 float sineCoord(float x)
 {
     if (x > 0.5)
-        return 1 - sqrt(2 - x * 2);
+        return 0; //1 - sqrt(2 - x * 2);
     else
         return sqrt(x * 2);
 }

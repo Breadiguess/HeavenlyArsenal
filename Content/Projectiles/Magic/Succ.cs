@@ -36,8 +36,11 @@ public class Succ : ModProjectile
 
 
 
-    public float Charge = 0f;
+    public static float Charge = 0f;
     public ref Player Owner => ref Main.player[Projectile.owner];
+
+
+    public int numberOfProjectiles = 1 + ((int)Charge / 200);
 
     public override void AI()
     {
@@ -57,8 +60,7 @@ public class Succ : ModProjectile
         Projectile.Center = Owner.MountedCenter + Projectile.velocity.SafeNormalize(Vector2.Zero) * 25 + new Vector2(0, Owner.gfxOffY) + Main.rand.NextVector2Circular(2, 2) * Projectile.ai[2];
         Projectile.rotation = Projectile.velocity.ToRotation();
 
-        int numberOfProjectiles = 1 + ((int)Charge / 200);
-
+        
 
 
         if (Time % (5 + (int)(Owner.itemAnimationMax)) == 1)
@@ -78,16 +80,30 @@ public class Succ : ModProjectile
                     // Calculate a slight spread for each projectile
                     float spread = MathHelper.ToRadians(10) * (i - (numberOfProjectiles - 1) / 2f); // Spread based on the number of projectiles
                     Vector2 sparklePos = Projectile.Center + new Vector2(12, 0).RotatedBy(Projectile.rotation);
-
-                    Projectile.NewProjectile(
+                    if (i % 2 == 0)
+                    {
+                        Projectile.NewProjectile(
                         Projectile.GetSource_FromThis(),
                         sparklePos,
                         Projectile.velocity * 1,
                         ModContent.ProjectileType<Succ_Blood>(),
                         (int)(Projectile.damage), /// 1.75f + Charge / 50f), // Increase damage based on charge
                         Projectile.knockBack + (Charge / 500f),          // Adjust knockback based on charge
-                         Main.myPlayer = Projectile.owner, 0
-                    );
+                         Main.myPlayer = Projectile.owner,
+                         0);
+                    }
+                    else
+                    {
+                        Projectile.NewProjectile(
+                        Projectile.GetSource_FromThis(),
+                        sparklePos,
+                        Projectile.velocity * 1,
+                        ModContent.ProjectileType<Succ_Blood>(),
+                        (int)(Projectile.damage), /// 1.75f + Charge / 50f), // Increase damage based on charge
+                        Projectile.knockBack + (Charge / 500f),          // Adjust knockback based on charge
+                         Main.myPlayer = Projectile.owner,
+                         1);
+                    }
                 }
 
             }

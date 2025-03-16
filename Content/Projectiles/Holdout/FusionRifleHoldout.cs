@@ -22,6 +22,8 @@ using HeavenlyArsenal.Common.utils;
 using Luminance.Core.Graphics;
 using Particle = Luminance.Core.Graphics.Particle;
 using HeavenlyArsenal.Content.Projectiles.Misc;
+using HeavenlyArsenal.Content.Projectiles.Ranged;
+using System.Linq;
 
 
 
@@ -46,7 +48,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Holdout
         public override int IntendedProjectileType => ModContent.ProjectileType<ParasiteParadiseProjectile>();
 
 
-        private float CurrentChargeTime = FusionRifle.MaxChargeTime; // Default to MaxChargeTime
+        public static float CurrentChargeTime = FusionRifle.MaxChargeTime; // Default to MaxChargeTime
 
         public override void SetDefaults()
         {
@@ -107,11 +109,29 @@ namespace HeavenlyArsenal.Content.Projectiles.Holdout
         private SoundEffect firingSoundEffect;
         private void HandleCharging()
         {
+
+            bool rancorCircleExists = Main.projectile.Any(p =>
+            p.active &&
+            p.type == ModContent.ProjectileType<RancorMagicCircle>() &&
+            p.owner == Projectile.owner);
+
             if (Main.mouseLeft && Owner.channel)
             {
                 if (ChargeTimer < CurrentChargeTime)
                     ChargeTimer++;
-                     
+                if (!rancorCircleExists) // Only spawn if it doesn't already exist
+                {
+                    Projectile.NewProjectile(
+                        Projectile.GetSource_FromThis(),
+                        Projectile.Center,
+                        Vector2.Zero,
+                        ModContent.ProjectileType<RancorMagicCircle>(),
+                        -1,
+                        Projectile.knockBack,
+                        Projectile.owner
+                    );
+                }
+
 
 
 

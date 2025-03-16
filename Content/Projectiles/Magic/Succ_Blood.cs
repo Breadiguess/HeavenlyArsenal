@@ -8,6 +8,7 @@ using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Terraria;
 using Terraria.DataStructures;
@@ -22,6 +23,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Magic;
 
 public class Succ_Blood : ModProjectile, IPixelatedPrimitiveRenderer
 {
+    
+
     public PixelationPrimitiveLayer LayerToRenderTo => PixelationPrimitiveLayer.AfterProjectiles;
 
     /// <summary>
@@ -44,21 +47,11 @@ public class Succ_Blood : ModProjectile, IPixelatedPrimitiveRenderer
 
     /// <summary>
     /// Whether this blob can do damage when moving upward or not.
+    /// no lmao
     /// </summary>
-    public bool CanDoDamageWhenMovingUp
-    {
-        get => Projectile.ai[0] == 1f;
-        set => Projectile.ai[0] = value.ToInt();
-    }
+    
 
-    /// <summary>
-    /// How much the max fall speed of this blob should be boosted.
-    /// </summary>
-    public ref float MaxFallSpeedBoost => ref Projectile.ai[1];
-
-    /// <summary>
-    /// How much the acceleration of this blob should be boosted.
-    /// </summary>
+   
     public ref float AccelerationBoost => ref Projectile.ai[2];
 
     public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
@@ -85,7 +78,7 @@ public class Succ_Blood : ModProjectile, IPixelatedPrimitiveRenderer
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 10;
 
-        CooldownSlot = ImmunityCooldownID.Bosses;
+        CooldownSlot = ImmunityCooldownID.General;
     }
 
     public override void SendExtraAI(BinaryWriter writer)
@@ -108,33 +101,42 @@ public class Succ_Blood : ModProjectile, IPixelatedPrimitiveRenderer
 
     public override void AI()
     {
+        // Base amplitude and frequency for sine wave motion
+        float baseAmplitude = 10f;
+        float frequency = 0.2f;
 
-        float baseAmplitude = 10f; // Base amplitude
-        float frequency = 0.1f; // How fast the sine wave oscillates
-
-        // Normalize the velocity vector to get direction
+        // Normalize the velocity vector to get the direction
         Vector2 direction = Projectile.velocity.SafeNormalize(Vector2.Zero);
 
-        // Calculate the wave
-        Vector2 perpendicular = new Vector2(-direction.Y, direction.X);      
-        int waveDirection = (Projectile.ai[0] % 2 == 0) ? 1 : -1; 
+        // Calculate a perpendicular vector for sine wave movement
+        Vector2 perpendicular = new Vector2(-direction.Y, direction.X);
 
-        
-        float amplitude = baseAmplitude + (Projectile.ai[1] * 0.2f); 
+        // Determine if this projectile moves in the normal or inverted wave
+        int waveDirection = (Projectile.ai[0] % 2 == 0) ? 1 : -1;
 
-        float sineOffset = waveDirection * amplitude * MathF.Sin(Time * frequency);
+        // Calculate the sine wave offset using ai[1] as a time tracker
+        float sineOffset = waveDirection * baseAmplitude * MathF.Sin(Projectile.ai[1] * frequency);
+
+        // Apply the sine wave movement perpendicular to the velocity
         Projectile.position += perpendicular * sineOffset;
 
-       
+        // Maintain forward motion
+        Projectile.position += Projectile.velocity;
 
-        // Increment time for sine wave calculation
-        Time++;
+        // Increment time for this projectile
+        Projectile.ai[1] += 1f;
+
+        // Ensure multiplayer sync
+        Projectile.netUpdate = true;
     }
 
 
 
 
-    public override bool? CanDamage() => CanDoDamageWhenMovingUp || Projectile.velocity.Y >= 0f;
+
+
+
+   
 
     public float BloodWidthFunction(float completionRatio)
     {
@@ -185,14 +187,23 @@ public class Succ_Blood : ModProjectile, IPixelatedPrimitiveRenderer
 
         float lifetimeRatio = Time / 240f;
         float dissolveThreshold = InverseLerp(0.67f, 1f, lifetimeRatio) * 0.5f;
-        ManagedShader bloodShader = ShaderManager.GetShader("NoxusBoss.BloodBlobShader");
-        bloodShader.TrySetParameter("localTime", Main.GlobalTimeWrappedHourly + Projectile.identity * 72.113f);
-        bloodShader.TrySetParameter("dissolveThreshold", dissolveThreshold);
-        bloodShader.TrySetParameter("accentColor", new Vector4(0.6f, 0.02f, -0.1f, 0f));
-        bloodShader.SetTexture(BubblyNoise, 1, SamplerState.LinearWrap);
-        bloodShader.SetTexture(DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);
+       
+        ManagedShader BloodShader = ShaderManager.GetShader("HeavenlyArsenal.BloodBlobShader");
+        BloodShader.TrySetParameter("localTime", Main.GlobalTimeWrappedHourly + Projectile.identity * 72.113f);
+        BloodShader.TrySetParameter("dissolveThreshold", dissolveThreshold);
+        BloodShader.TrySetParameter("accentColor", new Vector4(0.6f, 0.02f, -0.1f, 0f));
+        BloodShader.SetTexture(BubblyNoise, 1, SamplerState.LinearWrap);
+        BloodShader.SetTexture(DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);
 
-        PrimitiveSettings settings = new PrimitiveSettings(BloodWidthFunction, BloodColorFunction, _ => Projectile.Size * 0.5f + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * 0.56f, Pixelate: true, Shader: bloodShader);
+
+       
+
+        
+        
+
+
+
+        PrimitiveSettings settings = new PrimitiveSettings(BloodWidthFunction, BloodColorFunction, _ => Projectile.Size * 0.5f + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * 0.56f, Pixelate: true, Shader: BloodShader);
         PrimitiveRenderer.RenderTrail(Projectile.oldPos, settings, 9);
     }
 }

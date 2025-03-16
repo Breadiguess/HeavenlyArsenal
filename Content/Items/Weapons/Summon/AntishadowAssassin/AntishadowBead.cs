@@ -16,9 +16,9 @@ public class AntishadowBead : ModItem
     /// <summary>
     /// Return a shorthand path for a given texture content prefix and name.
     /// </summary>
-    public static string GetAssetPath(string prefix, string name) =>
-        $"HeavenlyArsenal/{prefix}/{name}";
-    public override string Texture => GetAssetPath("Content/Items/Weapons/Summon", Name);
+    //public static string GetAssetPath(string prefix, string name) =>
+     //   $"HeavenlyArsenal/{prefix}/{name}";
+    //public override string Texture => GetAssetPath("Content/Items/Weapons/Summon", Name);
 
     public override void SetDefaults()
     {

@@ -135,7 +135,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc
             return false;
         }
 
-        // The bow itself should not do contact damage.
+        // No damage for u stupid
         public override bool? CanDamage() => false;
     }
 }
