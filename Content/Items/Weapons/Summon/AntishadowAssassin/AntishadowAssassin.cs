@@ -57,6 +57,15 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
+    /// Whether this assassin can do damage.
+    /// </summary>
+    public bool DoesDamage
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
     /// The state of this assassin.
     /// </summary>
     public AssassinState State
@@ -639,6 +648,7 @@ public class AntishadowAssassin : ModProjectile
         Projectile.MaxUpdates = 2;
 
         KatanaUnsheathInterpolant = 1f;
+        DoesDamage = true;
 
         int dashCount = 14;
         NPC target = Main.npc[TargetIndex];
@@ -731,6 +741,7 @@ public class AntishadowAssassin : ModProjectile
         }
 
         KatanaUnsheathInterpolant = 1f;
+        DoesDamage = true;
 
         int slashTime = 180;
         NPC target = Main.npc[TargetIndex];
@@ -901,6 +912,7 @@ public class AntishadowAssassin : ModProjectile
     /// </summary>
     private void PreUpdateResets()
     {
+        DoesDamage = false;
         Projectile.MaxUpdates = 1;
         ArmOutlineOpacity = 0f;
         AttackLoopActivationInterpolant = AttackLoopActivationInterpolant.StepTowards(0f, 0.02f);
@@ -1463,5 +1475,5 @@ public class AntishadowAssassin : ModProjectile
         }
     }
 
-    public override bool? CanDamage() => Projectile.scale >= 0.56f;
+    public override bool? CanDamage() => Projectile.scale >= 0.56f && DoesDamage;
 }
