@@ -44,7 +44,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     // Calculate the eye color based on noise offset by the red channel, and faded in opacity by the blue channel.
     float eyeOffsetNoise = tex2D(noiseTexture, coords * 0.2 + colorData.r + globalTime) * eyeInUse;
     float eyeCenterFade = smoothstep(0.1, 0.67, colorData.b) * smoothstep(1, 0.5, colorData.b * eyeScale);
-    float4 eyeColor = float4(PaletteLerp(cos(globalTime * 4 + eyeOffsetNoise * 2.5) * 0.5 + 0.5), 1) * colorData.a * 2;
+    float4 eyeColor = float4(PaletteLerp(cos(globalTime * 4 + eyeOffsetNoise * 2.5) * 0.5 + 0.5), 1) * colorData.a * sampleColor.a * 2;
     result += tex2D(noiseTexture, coords + eyeOffsetNoise * 0.03) * eyeInUse * eyeCenterFade * eyeColor;
     
     // Make the edges a distinct color.
