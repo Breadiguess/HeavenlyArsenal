@@ -164,6 +164,7 @@ Mods: {
 			}
 
 			ClothProjectile.DisplayName: Cloth Projectile
+			avatar_FishingRodProjectile.DisplayName: avatar_ Fishing Rod Projectile
 		}
 	}
 }
