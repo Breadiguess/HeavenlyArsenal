@@ -269,6 +269,11 @@ public class AntishadowAssassin : ModProjectile
     public static float TargetingRange => 756f;
 
     /// <summary>
+    /// The scale of this assassin's arms.
+    /// </summary>
+    public static float ArmScale => 0.76f;
+
+    /// <summary>
     /// The render target that holds the contents of this assassin's body and arms.
     /// </summary>
     public static InstancedRequestableTarget BodyTarget
@@ -1254,9 +1259,8 @@ public class AntishadowAssassin : ModProjectile
         }
 
         // Draw the right arm behind the body.
-        float armScale = 0.76f;
         Vector2 rightArmDrawPosition = drawPosition + new Vector2(6f, -80f).RotatedBy(BowRotation);
-        Main.spriteBatch.Draw(arm, rightArmDrawPosition, null, Color.White, RightArmRotation, new Vector2(arm.Width - armXOrigin, 10f), armScale, SpriteEffects.FlipHorizontally, 0f);
+        Main.spriteBatch.Draw(arm, rightArmDrawPosition, null, Color.White, RightArmRotation, new Vector2(arm.Width - armXOrigin, 10f), ArmScale, SpriteEffects.FlipHorizontally, 0f);
 
         // Draw the body.
         Main.spriteBatch.Draw(body, drawPosition, null, Color.White, BowRotation, body.Size() * new Vector2(0.5f, 1f), 1f, 0, 0f);
@@ -1266,7 +1270,7 @@ public class AntishadowAssassin : ModProjectile
 
         // Draw the left arm.
         Vector2 leftArmDrawPosition = drawPosition + new Vector2(-14f, -80f).RotatedBy(BowRotation);
-        Main.spriteBatch.Draw(arm, leftArmDrawPosition, null, Color.White, LeftArmRotation, new Vector2(armXOrigin, 10f), armScale, 0, 0f);
+        Main.spriteBatch.Draw(arm, leftArmDrawPosition, null, Color.White, LeftArmRotation, new Vector2(armXOrigin, 10f), ArmScale, 0, 0f);
 
         Main.spriteBatch.End();
     }
@@ -1289,13 +1293,12 @@ public class AntishadowAssassin : ModProjectile
         }
 
         // Draw the right arm behind the body.
-        float armScale = 0.76f;
         Vector2 rightArmDrawPosition = drawPosition + new Vector2(6f, -80f).RotatedBy(BowRotation);
-        Main.spriteBatch.Draw(arm, rightArmDrawPosition, null, Color.White, RightArmRotation, new Vector2(arm.Width - armXOrigin, 10f), armScale, SpriteEffects.FlipHorizontally, 0f);
+        Main.spriteBatch.Draw(arm, rightArmDrawPosition, null, Color.White, RightArmRotation, new Vector2(arm.Width - armXOrigin, 10f), ArmScale, SpriteEffects.FlipHorizontally, 0f);
 
         // Draw the left arm.
         Vector2 leftArmDrawPosition = drawPosition + new Vector2(-14f, -80f).RotatedBy(BowRotation);
-        Main.spriteBatch.Draw(arm, leftArmDrawPosition, null, Color.White, LeftArmRotation, new Vector2(armXOrigin, 10f), armScale, 0, 0f);
+        Main.spriteBatch.Draw(arm, leftArmDrawPosition, null, Color.White, LeftArmRotation, new Vector2(armXOrigin, 10f), ArmScale, 0, 0f);
 
         Main.spriteBatch.End();
     }
@@ -1402,9 +1405,9 @@ public class AntishadowAssassin : ModProjectile
                 leftKatanaAngle -= 0.3f;
 
             Vector2 rightShoulderPosition = center + new Vector2(6f, -80f).RotatedBy(baseRotation + BowRotation * Projectile.spriteDirection) * Projectile.scale;
-            Vector2 rightHandEnd = rightShoulderPosition + new Vector2(12f, 84f).RotatedBy(baseRotation + RightArmRotation) * Projectile.scale;
+            Vector2 rightHandEnd = rightShoulderPosition + new Vector2(16f, 110f).RotatedBy(baseRotation + RightArmRotation) * Projectile.scale * ArmScale;
             Vector2 leftShoulderPosition = center + new Vector2(-14f, -80f).RotatedBy(baseRotation + BowRotation * Projectile.spriteDirection) * Projectile.scale;
-            Vector2 leftHandEnd = leftShoulderPosition + new Vector2(-4f, 84f).RotatedBy(baseRotation + LeftArmRotation) * Projectile.scale;
+            Vector2 leftHandEnd = leftShoulderPosition + new Vector2(-5f, 110f).RotatedBy(baseRotation + LeftArmRotation) * Projectile.scale * ArmScale;
 
             float katanaRotationOffset = Projectile.spriteDirection * KatanaRotation;
             DrawKatana(rightHandEnd, true, rightKatanaAngle + katanaRotationOffset);
