@@ -85,7 +85,7 @@ public class AntishadowAssassinDyeRenderer : ModSystem
         {
             int dyeShader = Main.player[playerIndex].cMinion;
             GameShaders.Armor.Apply(dyeShader, null, new DrawData(Main.screenTarget, Vector2.Zero, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White));
-            Main.spriteBatch.Draw(target, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
+            Main.spriteBatch.Draw(target, Main.screenLastPosition - Main.screenPosition, null, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
         }
     }
 }
