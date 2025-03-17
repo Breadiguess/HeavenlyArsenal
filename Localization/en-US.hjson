@@ -79,7 +79,7 @@ Mods: {
 
 			FusionRifle: {
 				DisplayName: Evanescent Keepsake
-				Tooltip: ""
+				Tooltip: A jurry-rigged weapon that opens portals to the avatar's domain.
 				ShiftTooltip:
 					'''
 					Teeth, sharper than your own.
@@ -133,6 +133,13 @@ Mods: {
 				DisplayName: Cloth Spawner
 				Tooltip: ""
 			}
+
+			Accessories: {
+				ElectricVambrace: {
+					DisplayName: Electric Vambrace
+					Tooltip: ""
+				}
+			}
 		}
 
 		Projectiles: {
@@ -157,13 +164,13 @@ Mods: {
 			CircularSawProjectile.DisplayName: Circular Saw Projectile
 			AntishadowUnidirectionalAssassinSlash.DisplayName: Antishadow Slash
 			TestWhipProjectile.DisplayName: Test Whip Projectile
-
-			Magic: {
-				RancorMagicCircle.DisplayName: Rancor Magic Circle
-				FusionRifle_Circle.DisplayName: Fusion Rifle_ Circle
-			}
-
+			Magic.FusionRifle_Circle.DisplayName: Fusion Rifle_ Circle
 			ClothProjectile.DisplayName: Cloth Projectile
+
+			Typeless: {
+				VambraceDash.DisplayName: Vambrace Dash
+				VambraceDischarge.DisplayName: Vambrace Discharge
+			}
 		}
 	}
 }
