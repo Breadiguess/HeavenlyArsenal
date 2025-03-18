@@ -21,7 +21,12 @@ Mods: {
 		Items: {
 			avatar_FishingRod: {
 				DisplayName: FlyRift
-				Tooltip: ""
+				Tooltip:
+					'''
+					Incomprehensible% Fishing Power
+					Upon Sufficient Ringing of the bell, A rift will open beneath you.
+					Cast the bell into the rift to Cause God to lash out, Shredding your foes.
+					'''
 			}
 
 			AvatarRifle: {

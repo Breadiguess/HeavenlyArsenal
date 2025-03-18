@@ -46,7 +46,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
                 if (Player.miscCounter % 3 == 2 && Player.dashDelay > 0) // Reduced dash cooldown by 33%
                     Player.dashDelay--;
 
-                Console.WriteLine(Player.dashDelay);
+                //Console.WriteLine(Player.dashDelay);
                 
                 if (Player.dashDelay == -1)// TODO: prevent working with special dashes, this was inconsitent with my old solution so I didn't keep it. not huge deal)
                 {
