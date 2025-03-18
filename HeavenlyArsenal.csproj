@@ -27,7 +27,6 @@
 	  <None Remove="Shaders\shittyshader.fx" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Assets\Sounds\Items\Ranged\AvatarRifle\" />
 	  <Folder Include="Assets\Textures\Backpacks\" />
 	  <Folder Include="Content\Items\Debug\" />
 	  <Folder Include="Content\Items\Weapons\Ranged\NewFolder\" />

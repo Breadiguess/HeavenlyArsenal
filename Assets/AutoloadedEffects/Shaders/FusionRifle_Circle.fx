@@ -17,65 +17,34 @@ float2 overallImageSize;
 matrix uWorldViewProjection;
 float4 uShaderSpecificData;
 
-struct VertexShaderInput
-{
-    float4 Position : POSITION0;
-    float2 Coordinates : TEXCOORD0;
-    float4 Color : COLOR0;
-};
+bool TrimLeft;
 
-struct VertexShaderOutput
-{
-    float4 Position : POSITION0;
-    float2 Coordinates : TEXCOORD0;
-    float4 Color : COLOR0;
-};
 
-VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
+
+
+float4 PixelFunction(float2 coords : TEXCOORD0) : COLOR0
 {
-    VertexShaderOutput output = (VertexShaderOutput) 0;
-    float2 coords = input.Coordinates - 0.5;
-    float rotationSine = sin(uSaturation);
-    float rotationCosine = sin(uSaturation + 1.57);
-    float rotationOriginSine = sin(uCircularRotation);
-    float rotationOriginCosine = sin(uCircularRotation + 1.57);
-    float2x2 rotationMatrix = float2x2(rotationCosine, -rotationSine, rotationSine, rotationCosine);
-    float2x2 circularRotationMatrix = float2x2(rotationOriginCosine, -rotationOriginSine, rotationOriginSine, rotationOriginCosine);
-    float2x2 scalingMatrix = float2x2(2, 0, 0, 1);
+    // Center the coordinates
+    float2 centeredCoords = coords - 0.5;
     
-    output.Color = input.Color;
+    // Make the rotation matrix we learned in linear algebra
+    float2x2 rotationMatrix = float2x2(cos(uCircularRotation), sin(uCircularRotation), -sin(uCircularRotation), cos(uCircularRotation));
     
-    // Rotate based on direction, squash the result, and then rotate the squashed result by the circular rotation.
-    output.Coordinates = mul(input.Coordinates - 0.5, rotationMatrix) + 0.5;
-    output.Coordinates = mul(output.Coordinates - 0.5, scalingMatrix) + 0.5;
-    output.Coordinates = mul(output.Coordinates - 0.5, circularRotationMatrix) + 0.5;
-    output.Position = mul(input.Position, uWorldViewProjection);
-
-    return output;
+    // Multiply the centered coordinates by the matrix to rotate the coordinates
+    // We add 0.5 back so the coordinates go back to being 0 to 1 instead of -0.5 to 0.5
+    // These are your new "default" coordinates,
+    float2 rotatedCoords = mul(centeredCoords, rotationMatrix) + 0.5;
+    float uCircularRotation = uTime;
+    // This is basic texture sampling, anything from here can be done like a regular shader
+    // You would also do your side trimming here, using the original coords instead of hte rotated ones
+    float4 finalImage = tex2D(uImage0, rotatedCoords);
+    
 }
-
-float4 PixelFunction(VertexShaderOutput input) : COLOR0
-{
-    float2 updatedCoords = input.Coordinates;
-    
-    // Adjust for horizontal rotation.
-    if (uDirection == -1)
-        updatedCoords.y = 1 - updatedCoords.y;
-    
-    float overallAdjustedYCoord = 0.5 + lerp(-uImageSize0.y / overallImageSize.y, uImageSize0.y / overallImageSize.y, updatedCoords.y) * 0.5;
-    float4 baseColor = tex2D(uImage0, updatedCoords);
-    float colorFade = abs(sin(overallAdjustedYCoord + uTime * 0.5));
-    float luminosity = (baseColor.r + baseColor.g + baseColor.b) / 3;
-    float4 endColor = baseColor * float4(lerp(uColor, uSecondaryColor, colorFade), 1);
-    endColor *= 1 + luminosity * 0.5;
-    return (endColor * 0.7 + baseColor * 0.5) * baseColor.a * uOpacity;
-}
-
 technique Technique1
 {
     pass ShieldPass
     {
-        VertexShader = compile vs_2_0 VertexShaderFunction();
+        //VertexShader = compile vs_2_0 VertexShaderFunction();
         PixelShader = compile ps_2_0 PixelFunction();
     }
 }

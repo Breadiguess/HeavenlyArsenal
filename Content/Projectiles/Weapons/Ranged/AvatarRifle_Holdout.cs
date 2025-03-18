@@ -56,10 +56,10 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         {
             get;
             set;
-        } = new ClothSimulation(Vector3.Zero, 
-            
+        } = new ClothSimulation(Vector3.Zero,
+
             //Width
-            22, 
+            22,
             //Height
             21,
             //spacing?
@@ -85,8 +85,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         private int AmmoCount = 7; // Total shots before reload
         public int ReloadDuration = AvatarRifle.ReloadTime; // Duration for reload (in frames)
-        public Vector2 origin= new Vector2(50,50);
-        
+        public Vector2 origin = new Vector2(50, 50);
+
         private enum AvatarRifleState
         {
             Firing,  // Firing a shot
@@ -102,10 +102,10 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         public override void SetDefaults()
         {
-            firingSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle_FireWIP2").Value;
-            reloadSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle_Cycle").Value; // Add your reload sound here
-            CycleSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle_Cycle").Value;
-            MagEmptySoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle_ClipEject").Value;
+            firingSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_FireWIP2").Value;
+            reloadSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Reload").Value; // Add your reload sound here
+            CycleSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle").Value;
+            MagEmptySoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_ClipEject").Value;
 
 
             Projectile.width = Projectile.height = 60;
@@ -122,12 +122,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         private Rope rope;
 
 
-        
+
         public override void OnSpawn(IEntitySource source)
         {
             //Vector2 RopeStart = new Vector2((origin.X)+Main.screenPosition.X, (origin.Y - Main.screenPosition.Y)- 40 * Projectile.direction * Player.gravDir);
             Vector2 RopeStart = Projectile.Center + new Vector2(-20, 10); // Adjust offsets as needed
-            Vector2 endPoint = Projectile.Center + new Vector2(90*Projectile.direction, 10);
+            Vector2 endPoint = Projectile.Center + new Vector2(90 * Projectile.direction, 10);
 
             rope = new Rope(RopeStart, endPoint, segmentCount: 30, segmentLength: 5f, gravity: new Vector2(0, 10f));
             rope.tileCollide = false; // Disable tile collision if unnecessary
@@ -140,8 +140,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
             Vector2 dustPosition = Projectile.Center;
             Dust dust = Dust.NewDustDirect(dustPosition, 1, 1, DustID.Smoke, 0f, 0f, 150, Color.White, 1f);
-            dust.velocity *= 0.3f; 
-            dust.noGravity = true; 
+            dust.velocity *= 0.3f;
+            dust.noGravity = true;
         }
 
 
@@ -155,7 +155,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public override void SafeAI()
         {
 
-            
+
 
 
 
@@ -163,7 +163,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Vector2 armPosition = Owner.RotatedRelativePoint(
                 Owner.MountedCenter);
 
-                //(Vector2)Owner.HandPosition, true);
+            //(Vector2)Owner.HandPosition, true);
             UpdateProjectileHeldVariables(armPosition);
             ManipulatePlayerVariables();
 
@@ -202,6 +202,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             rope.segments[^1].position = endPoint;
             rope.gravity = new Vector2(0f, 0.5f);
             rope.Update();
+            ApplyWindToRope();
         }
 
         private void UpdateCloth()
@@ -213,7 +214,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             float windSpeed = Math.Clamp(Main.WindForVisuals * Projectile.spriteDirection * 8f, -1.3f, 0f);
 
             Vector2 ShroudPosition = Projectile.Center - Main.screenPosition;
-            
+
 
             //actually implement wind into the cloth
             Vector3 wind = Vector3.UnitX * (AperiodicSin(ExistenceTimer * 0.029f) * 0.67f + windSpeed) * 1.74f;
@@ -229,13 +230,13 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                     //deltaTime
                     0.051f,
                     //Has collision
-                    false, 
+                    false,
                     //Gravity!!
                     Vector3.UnitY * 3.2f + wind);
             }
         }
 
-        
+
         private void ConstrainParticle(Vector2 anchor, ClothPoint point, float angleOffset)
         {
             if (point is null)
@@ -253,25 +254,25 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         private void HandleFiring()
         {
-            if (Owner.channel&& Owner.HasAmmo(Owner.HeldItem))
+            if (Owner.channel && Owner.HasAmmo(Owner.HeldItem))
             {
                 Main.NewText($"Firing! AmmoCount: {AmmoCount}", Color.Red);
-               
-                    
-                    // Play firing sound
-                    firingSoundInstance = firingSoundEffect.CreateInstance();
-                    firingSoundInstance.Play();
 
-                    // Decrement ammo count
-                    AmmoCount--;
-                    FireProjectile();
 
-                    // Transition to Cycle state for cycling the bolt
-                    Cycled = false;
-                    CurrentState = AvatarRifleState.PostFire;
-                    StateTimer = AvatarRifle.CycleTime/2; // Adjust delay duration for bolt cycle
-                
-                
+                // Play firing sound
+                firingSoundInstance = firingSoundEffect.CreateInstance();
+                firingSoundInstance.Play();
+
+                // Decrement ammo count
+                AmmoCount--;
+                FireProjectile();
+
+                // Transition to Cycle state for cycling the bolt
+                Cycled = false;
+                CurrentState = AvatarRifleState.PostFire;
+                StateTimer = AvatarRifle.CycleTime / 2; // Adjust delay duration for bolt cycle
+
+
 
             }
         }
@@ -301,7 +302,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                     Main.NewText($"Mag not Empty, Cycle {AmmoCount}", Color.Chocolate);
                     CurrentState = AvatarRifleState.Cycle;
                     StateTimer = AvatarRifle.CycleTime;
-                    
+
                 }
                 else
                 {
@@ -310,18 +311,18 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                     Main.NewText($"Mag Empty, Begin Reload", Color.Chocolate);
                     CurrentState = AvatarRifleState.Reload;
                     StateTimer = ReloadDuration;
-                    
+
                 }
-                
+
             }
-            
-            
+
+
         }
 
 
 
         public bool Cycled = false;
-        private float CycleOffset =0f;
+        private float CycleOffset = 0f;
         public bool HasShellToEject = true;
         private void HandleCycle()
         {
@@ -332,12 +333,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             if (!Cycled)
             {
                 // Initiate cycling
-                CycleOffset = MathHelper.ToRadians(15f); // Initial "dip" angle
+               // Initial "dip" angle
                 CycleSoundInstance = CycleSoundEffect.CreateInstance();
                 CycleSoundEffect.Play();
                 Cycled = true;
                 Main.NewText($"Cycling!", Color.Coral);
-                
+
                 Projectile.frame = 0; // Start animation from the first frame
                 Projectile.frameCounter = 0; // Reset frame counter
             }
@@ -345,16 +346,17 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             if (StateTimer > holdCyclePosition)
             {
                 // Hold the cycling position
-                CycleOffset = Projectile.spriteDirection * MathHelper.ToRadians(15f); // Keep the offset fixed during hold phase
+               
+                    CycleOffset = Projectile.spriteDirection*MathHelper.ToRadians(15f);
+                //CycleOffset = Utils.AngleLerp(Projectile.rotation, Projectile.spriteDirection * MathHelper.ToRadians(15f), 0.5f);
 
 
-                
                 if (Projectile.frameCounter == 4)
                 {
                     if (HasShellToEject)
                     {
                         HasShellToEject = false;
-                        EjectShell(2039, origin, 0, 10);
+                        EjectShell(2039, origin, -40, 40);
                     }
                 }
                 // Update frame based on frame duration
@@ -364,13 +366,17 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                     Projectile.frame++; // Move to the next frame
 
                     if (Projectile.frame >= totalFrames)
-                        Projectile.frame = 9; // Loop back to the first frame if we exceed the total
+                        Projectile.frame = 9; //stay here.
                 }
             }
             else if (StateTimer > 0)
             {
-                // Smoothly return CycleOffset to 0 in the second phase
-                CycleOffset = MathHelper.Lerp(CycleOffset, 0, 0.1f); // Adjust 0.1f for the speed of the transition
+                if (StateTimer > 0)
+                {
+                    StateTimer--;
+                    CycleOffset *= 0.87f;
+                }
+                
             }
             else
             {
@@ -388,17 +394,17 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
 
 
-        private void EjectShell(int SparkCount, Vector2 ShellPosition,float ShellVelocityMin, float ShellVelocityMax)
+        private void EjectShell(int SparkCount, Vector2 ShellPosition, float ShellVelocityMin, float ShellVelocityMax)
         {
             Main.NewText($"EjectShell!", Color.GhostWhite);
             int BulletVariation = (int)Main.rand.NextFloat(ShellVelocityMin, ShellVelocityMax);
 
             Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Left, new Vector2(Projectile.direction * -5f, -10f), ModContent.GoreType<BulletGore>(), 1);
-            for (int i = 0; i <= SparkCount; i ++)
+            for (int i = 0; i <= SparkCount; i++)
             {
                 float CasingVariation = Main.rand.NextFloat(ShellVelocityMin, ShellVelocityMax);
 
-                Dust.NewDust(ShellPosition, 1, 1, DustID.GoldFlame, Projectile.velocity.X+CasingVariation, Projectile.velocity.Y+CasingVariation, 150, default, 1);
+                Dust.NewDust(ShellPosition, 1, 1, DustID.GoldFlame, Projectile.velocity.X + CasingVariation, Projectile.velocity.Y + CasingVariation, 150, default, 1);
             }
         }
 
@@ -406,15 +412,20 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         {
             if (StateTimer == ReloadDuration)
             {
+                Projectile.frame = 10;
                 // Play reload sound once at the start of reload
-                reloadSoundInstance = reloadSoundEffect.CreateInstance();
-                reloadSoundInstance.Play();
+                
                 //new Vector2 GoreDirection = (-1f, 1f);
                 //Gore.NewGore(Projectile.GetSource_FromThis,Projectile.Left, new Vector2(1*Projectile.direction,-1f), ModContent.GoreType<MagEjectGore>,1);
-                Gore.NewGore(Projectile.GetSource_FromThis(),Projectile.Left, new Vector2(Projectile.direction * -4f, 0f), ModContent.GoreType<MagEjectGore>(), 4);
+                Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Left, new Vector2(Projectile.direction * -4f, 0f), ModContent.GoreType<MagEjectGore>(), 4);
                 Main.NewText($"Reloading", Color.AntiqueWhite);
             }
 
+            if (StateTimer == ReloadDuration/2)
+            {
+                reloadSoundInstance = reloadSoundEffect.CreateInstance();
+                reloadSoundInstance.Play();
+            }
             if (StateTimer > 0)
             {
                 StateTimer--; // Count down the reload
@@ -423,6 +434,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             }
             else
             {
+                Projectile.frame = 0;
                 CycleOffset = 0f;
                 SoundEngine.PlaySound(SoundID.DD2_BallistaTowerShot.WithVolumeScale(0.5f).WithPitchOffset(0.8f), Projectile.position);
                 // Reset ammo and transition back to Firing state
@@ -442,16 +454,16 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         {
             int bulletAMMO = ProjectileID.Bullet;
             Owner.PickAmmo(Owner.ActiveItem(), out bulletAMMO, out float SpeedNoUse, out int bulletDamage, out float kBackNoUse, out int _);
-            
+
             Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
             // Logic for spawning the projectile
             Owner.PickAmmo(Owner.HeldItem, out int projToShoot, out _, out _, out _, out _);
 
 
-            Vector2 tipPosition = armPosition + Projectile.velocity * Projectile.width * 0.85f + new Vector2(0, 3.8f);
+            Vector2 tipPosition = armPosition + Projectile.velocity * Projectile.width * 1.55f + new Vector2(3, -3);
             CreateMuzzleFlash(tipPosition, Projectile.velocity);
 
-            RecoilRotation +=  Projectile.spriteDirection*MathHelper.ToRadians(35f); // Spread angle for the muzzle flash particles
+            RecoilRotation += Projectile.spriteDirection * MathHelper.ToRadians(34f); // Spread angle for the muzzle flash particles
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity * 14, bulletAMMO, Projectile.damage, Projectile.knockBack, Projectile.owner);
             //SoundEngine.PlaySound(SoundID.Item41 with { Volume = 0.75f }, Projectile.Center);
             //Dust.NewDust(tipPosition, 1, 1, DustID.Firefly, Projectile.spriteDirection*5, 0, 100, default, 1);
@@ -464,16 +476,16 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             }
         }
 
-        
+
 
 
         private void CreateMuzzleFlash(Vector2 muzzlePosition, Vector2 projectileVelocity)
         {
-            int numParticles = 10; // Number of particles in the muzzle flash
-            float angleVariance = MathHelper.ToRadians(15f); // Spread angle for the muzzle flash particles
-            float particleSpeed = 6f; // Speed of particles moving outward
+            int numParticles = 40; // Number of particles in the muzzle flash
+            float angleVariance = MathHelper.ToRadians(30f); // Spread angle for the muzzle flash particles
+            float particleSpeed = 6f+ Main.rand.NextFloat(-2f,4f); // Speed of particles moving outward
 
-            for(int i = 0; i < numParticles; i++)
+            for (int i = 0; i < numParticles; i++)
             {
                 // Randomize particle direction within a cone based on the projectile's direction
                 float randomAngle = Main.rand.NextFloat(-angleVariance, angleVariance);
@@ -481,9 +493,9 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 Vector2 velocity = direction * particleSpeed * Main.rand.NextFloat(0.7f, 1.2f); // Randomize speed slightly
 
                 // Create the dust at the muzzle position
-                
 
-                Dust dust = Dust.NewDustPerfect(muzzlePosition, DustID.Torch, velocity, 100, GetRandomFlashColor(), Main.rand.NextFloat(1.5f, 2f));
+
+                Dust dust = Dust.NewDustPerfect(muzzlePosition, DustID.AncientLight, velocity, 100, GetRandomFlashColor(), Main.rand.NextFloat(1.5f, 2f));
                 dust.noGravity = true; // Floaty effect for the flash
                 dust.fadeIn = 1f; // Makes the flash brighter initially
             }
@@ -493,9 +505,9 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             // Randomize between white, yellow, and orange
             switch (Main.rand.Next(3))
             {
-                case 0: return Color.White;
-                case 1: return Color.Yellow;
-                case 2: return Color.Orange;
+                case 0: return Color.DarkCyan;//Colors(178, 255, 254);
+                case 1: return Color.Blue;
+                case 2: return Color.LightSkyBlue;
                 default: return Color.White; // Default fallback
             }
         }
@@ -506,18 +518,28 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         public void UpdateProjectileHeldVariables(Vector2 armPosition)
         {
+            Vector2 recoilOffset = -Projectile.velocity.SafeNormalize(Vector2.Zero) * recoilIntensity;
+            //COmment so that i can push again
+            Projectile.position = armPosition +
+                      Projectile.velocity.SafeNormalize(Vector2.UnitX) * -3f +
+                      recoilOffset;
+            Projectile.Center = armPosition + recoilOffset;
+
+
+
             if (Main.myPlayer == Projectile.owner)
             {
+                Vector2 tipPosition = armPosition + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * 0.85f + new Vector2(0, -3);
                 float aimInterpolant = Utils.GetLerpValue(10f, 40f, Projectile.Distance(Main.MouseWorld), true);
                 Vector2 oldVelocity = Projectile.velocity;
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Main.MouseWorld), aimInterpolant);
+                Projectile.velocity = Vector2.Lerp(tipPosition, Projectile.SafeDirectionTo(Main.MouseWorld), aimInterpolant);
                 if (Projectile.velocity != oldVelocity)
                 {
                     Projectile.netSpam = 0;
                     Projectile.netUpdate = true;
                 }
             }
-            
+
             if (recoilIntensity > 0f)
             {
                 recoilIntensity -= recoilRecoverySpeed;
@@ -525,22 +547,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                     recoilIntensity = 0f; // Clamp to prevent negative values
             }
             Vector2 origin = new Vector2(50, 5);
-            Vector2 recoilOffset = -Projectile.velocity.SafeNormalize(Vector2.Zero) * recoilIntensity;
 
 
 
-            //Dust.NewDust(armPosition, 3, 3, DustID.Adamantite, 0, 0, 150, default, 1);
-            //Dust.NewDustPerfect(armPosition, DustID.BorealWood, Vector2.Zero, 100, default, 1);
-
-            //COmment so that i can push again
-            Projectile.position = armPosition + 
-                      Projectile.velocity.SafeNormalize(Vector2.UnitX) * -3f +
-                      recoilOffset;
-            Projectile.Center = armPosition;
 
 
-
-            Projectile.rotation = Projectile.velocity.ToRotation() -RecoilRotation+CycleOffset;//-RecoilRotation;
+            Projectile.rotation = Projectile.velocity.ToRotation() - RecoilRotation + CycleOffset;
             Projectile.spriteDirection = Projectile.direction;
             Projectile.timeLeft = 2;
         }
@@ -550,17 +562,17 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Owner.ChangeDir(Projectile.direction);
             Owner.heldProj = Projectile.whoAmI;
 
-            
-           // float frontArmRotation = Projectile.rotation;
-           // if (Owner.direction == -1)
-           //     frontArmRotation += MathHelper.PiOver2;
-           // else
-           //     frontArmRotation -= MathHelper.PiOver2 - frontArmRotation;
+
+            // float frontArmRotation = Projectile.rotation;
+            // if (Owner.direction == -1)
+            //     frontArmRotation += MathHelper.PiOver2;
+            // else
+            //     frontArmRotation -= MathHelper.PiOver2 - frontArmRotation;
             //frontArmRotation = 0;
             //frontArmRotation += Projectile.rotation + MathHelper.Pi + Owner.direction * MathHelper.PiOver2 + 0.12f;
-            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Projectile.rotation-MathHelper.PiOver2);
+            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Projectile.rotation - MathHelper.PiOver2);
             Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, Projectile.rotation + MathHelper.PiOver2);
-            
+
         }
 
 
@@ -592,14 +604,14 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 
-            Rectangle frame = texture.Frame(1, 10, 0, Projectile.frame);
+            Rectangle frame = texture.Frame(1, 11, 0, Projectile.frame);
 
 
             float rotation = Projectile.rotation;
             //SpriteEffects direction = SpriteEffects.None;
-            
+
             SpriteEffects spriteEffects = Projectile.direction * Player.gravDir < 0 ? SpriteEffects.FlipVertically : 0;
-            Vector2 origin = new Vector2(frame.Width / 2 - 24, frame.Height / 2 -7 * Projectile.direction * Player.gravDir);
+            Vector2 origin = new Vector2(frame.Width / 2 - 24, frame.Height / 2 - 7 * Projectile.direction * Player.gravDir);
 
             Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation, origin, Projectile.scale, spriteEffects, 0);
             //Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
@@ -607,7 +619,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
             //DrawShroud();
 
-           
+
 
 
             return false;

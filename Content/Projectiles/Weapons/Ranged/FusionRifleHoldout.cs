@@ -542,7 +542,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Texture2D innerCircleTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/FusionRifle_CircleGlow").Value;
             //Texture2D innerCircleGlowmask = ModContent.Request<Texture2D>(Texture + "InnerGlowmask").Value;
             Vector2 CircledrawPosition = Projectile.Center - Main.screenPosition - FusionRifleHoldout.RecoilOffset;
-
+            
             float directionRotation = Projectile.velocity.ToRotation();
             Color startingColor = Color.Red;
             Color endingColor = Color.Blue;
@@ -550,8 +550,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             float timeFactor = Main.GlobalTimeWrappedHourly * 2f; // Adjust speed here
             float Circlerotation = timeFactor;
 
-
-            void restartShader(Texture2D texture, float opacity, float circularRotation, BlendState blendMode)
+             //startingColor.ToVector3()= startingColor;
+            void restartShader(Texture2D texture, float opacity, float circularRotation, BlendState blendMode, bool TrimLeft)
             {
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, blendMode, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -560,40 +560,45 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
                 
                 Effect lightningEffect = AssetDirectory.Effects.FusionRifleCircle.Value;
-                //lightningEffect.Parameters["uColor"].SetValue((bool)startingColor);
-                lightningEffect.Parameters["uuSaturation"].SetValue(directionRotation);
-                //lightningEffect.Parameters["uSecondaryColor"].SetValue(endingColor);
+                lightningEffect.Parameters["uColor"].SetValue(startingColor.ToVector3());
+                lightningEffect.Parameters["uSaturation"].SetValue(directionRotation);
+                lightningEffect.Parameters["uSecondaryColor"].SetValue(endingColor.ToVector3());
                 lightningEffect.Parameters["uOpacity"].SetValue(opacity);
                 lightningEffect.Parameters["uDirection"].SetValue((float)Projectile.direction);
                 lightningEffect.Parameters["uCircularRotation"].SetValue(circularRotation);
                 lightningEffect.Parameters["uImageSize0"].SetValue(texture.Size());
                 lightningEffect.Parameters["overallImageSize"].SetValue(outerCircleTexture.Size());
                 lightningEffect.Parameters["uWorldViewProjection"].SetValue(viewMatrix * projectionMatrix);
-
+                lightningEffect.Parameters["TrimLeft"].SetValue(TrimLeft);
 
 
                 lightningEffect.CurrentTechnique.Passes[0].Apply();
 
-                //Main.pixelShader.CurrentTechnique.Passes[0].Apply();
+                Main.pixelShader.CurrentTechnique.Passes[0].Apply();
 
 
             }
-
-
-
-           
-
             // Restart shader for glowmask
-            restartShader(outerCircleGlowmask, Projectile.Opacity, Circlerotation, BlendState.Additive);
+            restartShader(outerCircleGlowmask, Projectile.Opacity, Circlerotation, BlendState.Additive,false);
             Main.EntitySpriteDraw(outerCircleGlowmask, CircledrawPosition, null, Color.White, 0f,
                                  outerCircleGlowmask.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
 
             // Restart shader for the main circle
-            restartShader(outerCircleTexture, Projectile.Opacity * 0.7f, Circlerotation, BlendState.AlphaBlend);
+            restartShader(outerCircleTexture, Projectile.Opacity * 0.7f, Circlerotation, BlendState.AlphaBlend,false);
             Main.EntitySpriteDraw(outerCircleTexture, CircledrawPosition, null, Color.White, 0f,
                                  outerCircleTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
 
             Main.spriteBatch.ExitShaderRegion();
+
+            //restartShader(outerCircleGlowmask, Projectile.Opacity, Circlerotation, BlendState.Additive, false);
+            //Main.EntitySpriteDraw(outerCircleGlowmask, CircledrawPosition, null, Color.White, 0f,
+               //                  outerCircleGlowmask.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
+
+            // Restart shader for the main circle
+            //restartShader(outerCircleTexture, Projectile.Opacity * 0.7f, Circlerotation, BlendState.AlphaBlend, false);
+           // Main.EntitySpriteDraw(outerCircleTexture, CircledrawPosition, null, Color.White, 0f,
+              //                   outerCircleTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+
 
             //restartShader(innerCircleTexture, Projectile.Opacity * 0.5f, 0f, BlendState.Additive);
             //Main.EntitySpriteDraw(innerCircleTexture, drawPosition, null, Color.White, 0f, innerCircleTexture.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
