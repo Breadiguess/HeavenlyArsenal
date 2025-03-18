@@ -23,14 +23,12 @@ public class avatar_FishingRodProjectile : ModProjectile
         Projectile.height = 32;
         Projectile.friendly = true;
         Projectile.ignoreWater = true;
-        Projectile.usesLocalNPCImmunity = true;
-        Projectile.localNPCHitCooldown = 8;
-        Projectile.timeLeft = 10;
+        Projectile.timeLeft = 40;
         Projectile.penetrate = -1;
         Projectile.tileCollide = false;
-        Projectile.minion = true;
         Projectile.hide = true;
         Projectile.manualDirectionChange = true;
+        Projectile.minion = true;
     }
 
     public ref Player Player => ref Main.player[Projectile.owner];
@@ -46,10 +44,11 @@ public class avatar_FishingRodProjectile : ModProjectile
 
     public const int SwingTime = 12;
     public const int RetractTime = 40;
+    public const int RiftMaxTime = 240;
 
     public override void AI()
     {
-        if (Player.channel)
+        if (Player.channel && RiftTime < RiftMaxTime)
             Projectile.timeLeft = RetractTime + 15;
         else
         {
@@ -70,15 +69,18 @@ public class avatar_FishingRodProjectile : ModProjectile
             Vector2 targetPosition = Main.MouseWorld;
 
             // Setting a distance limit
-            float maxDistance = 500 * Utils.GetLerpValue(2, 40, Projectile.timeLeft, true);
+            float maxDistance = 500 * Utils.GetLerpValue(2, RetractTime, Projectile.timeLeft, true);
             if (targetPosition.Distance(Player.MountedCenter) > maxDistance)
                 targetPosition = Player.MountedCenter + Player.DirectionTo(Main.MouseWorld).SafeNormalize(Vector2.Zero) * maxDistance;
+
+            if (RiftTime > 0 && targetPosition.Y > Player.MountedCenter.Y + RiftHeight)
+                targetPosition.Y = Player.MountedCenter.Y + RiftHeight;
 
             Player.LimitPointToPlayerReachableArea(ref targetPosition);
             Vector2 spoolOffset = new Vector2(MathF.Sin(Projectile.localAI[0] * 0.05f) * 5f, MathF.Cos(Projectile.localAI[0] * 0.025f) * 5f);
             targetPosition += spoolOffset + Player.velocity;
             Vector2 targetVelocity = (targetPosition - Projectile.Center).SafeNormalize(Vector2.Zero) * Projectile.Distance(targetPosition) * 0.6f;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, targetVelocity, Utils.GetLerpValue(SwingTime / 3, SwingTime + 40, Time, true) * 0.1f);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, targetVelocity, Utils.GetLerpValue(SwingTime / 3, SwingTime + 40, Time, true) * 0.3f);
             Projectile.velocity *= 0.8f;
             Projectile.netUpdate = true;
 
@@ -95,6 +97,7 @@ public class avatar_FishingRodProjectile : ModProjectile
         if (riftOpen)
         {
             UpdateRift();
+
             riftApparitionInterpolant = Math.Min(riftApparitionInterpolant + 0.2f, 1f);
         }
         else
@@ -159,8 +162,8 @@ public class avatar_FishingRodProjectile : ModProjectile
 
     public void UpdateBellString()
     {
-        const int segmentCount = 16;
-        float segmentLength = 10f;
+        const int segmentCount = 24;
+        float segmentLength = 8f;
 
         // Initialize the segments
         if (bellRope == null)
@@ -176,7 +179,7 @@ public class avatar_FishingRodProjectile : ModProjectile
         bellRope.Update();
 
         // Setting gravity after so changes that happen after can take effect on the next update
-        bellRope.gravity = Vector2.UnitY * (Utils.GetLerpValue(40, 10, BellRingCooldown, true) + 0.05f);
+        bellRope.gravity = Vector2.UnitY * (Utils.GetLerpValue(RetractTime, RetractTime / 4, BellRingCooldown, true) + 0.05f);
     }
 
     public void UpdateBellRinging()
@@ -248,18 +251,20 @@ public class avatar_FishingRodProjectile : ModProjectile
         else if (RiftTime < 40)
             RiftTime = 0;
         else if (RiftTime > 30)
-            RiftTime = 241;
+            RiftTime = RiftMaxTime + 1;
 
         // If the rift has been in use for some time, close it and disable the bell for some time
-        if (RiftTime > 240)
+        if (RiftTime > RiftMaxTime)
         {
-            RiftTime = 0;
+            RiftTime = RiftMaxTime + 1;
             bellRope.gravity = -Vector2.UnitY * 20;
             BellRingCooldown = 240;
             riftOpen = false;
-            SoundEngine.PlaySound(NoxusBoss.Assets.GennedAssets.Sounds.Avatar.RiftEject with { MaxInstances = 0 }, bellRope.segments[^1].position);
+            SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.RiftEject with { MaxInstances = 0 }, bellRope.segments[^1].position);
         }
     }
+
+    public override bool? CanCutTiles() => false;
 
     // Don't do damage directly
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => false;
@@ -281,9 +286,9 @@ public class avatar_FishingRodProjectile : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        riftLakeTargets.Request(400, 400, Projectile.whoAmI, () =>
+        riftLakeTargets.Request(900, 400, Projectile.whoAmI, () =>
         {
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null);
 
             Color color = new Color(77, 0, 2);
             Color edgeColor = new Color(1f, 0.06f, 0.06f);
@@ -303,15 +308,15 @@ public class avatar_FishingRodProjectile : ModProjectile
             riftShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 2, SamplerState.AnisotropicWrap);
             riftShader.Apply();
 
-            Main.spriteBatch.Draw(innerRiftTexture, new Vector2(200), innerRiftTexture.Frame(), Color.White, 0, innerRiftTexture.Size() * 0.5f, textureArea, 0, 0);
+            Main.spriteBatch.Draw(innerRiftTexture, new Vector2(450, 200), null, Color.White, 0, innerRiftTexture.Size() * 0.5f, new Vector2(2.5f, 0.4f), 0, 0);
             Main.spriteBatch.End();
         });
 
         if (riftLakeTargets.TryGetTarget(Projectile.whoAmI, out RenderTarget2D riftTarget) && riftApparitionInterpolant > 0)
         {
             Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
-            Main.EntitySpriteDraw(riftTarget, Player.MountedCenter + new Vector2(0, RiftHeight) - Main.screenPosition, riftTarget.Frame(), Color.White, 0, riftTarget.Size() * 0.5f, new Vector2(3f, 0.3f), 0, 0);
-            Main.EntitySpriteDraw(glow, Player.MountedCenter + new Vector2(0, RiftHeight - 20) - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 150 } * riftApparitionInterpolant * 0.5f, 0, glow.Size() * 0.5f, new Vector2(1.5f, 0.3f), 0, 0);
+            Main.EntitySpriteDraw(riftTarget, Player.MountedCenter + new Vector2(0, RiftHeight) - Main.screenPosition, riftTarget.Frame(), Color.White, 0, riftTarget.Size() * 0.5f, 1f, 0, 0);
+            Main.EntitySpriteDraw(glow, Player.MountedCenter + new Vector2(0, RiftHeight - 20) - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 150 } * riftApparitionInterpolant * 0.5f, 0, glow.Size() * 0.5f, new Vector2(2f, 0.4f), 0, 0);
         }
 
         DrawStrings();
@@ -359,30 +364,33 @@ public class avatar_FishingRodProjectile : ModProjectile
         if (miscRope == null || bellRope == null)
             return;
 
-        DrawString(miscRope.GetPoints());
-        DrawBellString(bellRope.GetPoints());
+        DrawString();
+        DrawBellString();
     }
 
-    private void DrawString(Vector2[] positions)
+    private void DrawString()
     {
         Texture2D stringTexture = TextureAssets.FishingLine.Value;
 
-        Color stringBaseColor = new Color(45, 0, 35, 120);
+        Vector2[] positions = miscRope.GetPoints();
         Vector2 stringOrigin = new Vector2(stringTexture.Width / 2, 0);
 
         for (int i = 0; i < positions.Length - 1; i++)
         {
             Vector2 stretch = new Vector2(1f, positions[i].Distance(positions[i + 1]) / stringTexture.Height);
             float stringRotation = positions[i].AngleTo(positions[i + 1]) - MathHelper.PiOver2;
+            Color stringBaseColor = Color.Lerp(new Color(255, 0, 35, 120), Color.Black, 1f - (float)i / (positions.Length - 1));
             Main.EntitySpriteDraw(stringTexture, positions[i] - Main.screenPosition, stringTexture.Frame(), stringBaseColor, stringRotation, stringOrigin, stretch, 0, 0);
         }
     }
 
-    private void DrawBellString(Vector2[] positions)
+    private void DrawBellString()
     {
         Texture2D stringTexture = TextureAssets.FishingLine.Value;
 
+        Vector2[] positions = bellRope.GetPoints();
         Vector2 stringOrigin = new Vector2(stringTexture.Width / 2, 0);
+        Color stringBaseColor = new Color(255, 0, 35, 120);
         float riftPosY = Player.MountedCenter.Y + RiftHeight;
 
         for (int i = 0; i < positions.Length - 1; i++)
@@ -390,9 +398,10 @@ public class avatar_FishingRodProjectile : ModProjectile
             Vector2 stretch = new Vector2(1f, positions[i].Distance(positions[i + 1]) / stringTexture.Height);
             float stringRotation = positions[i].AngleTo(positions[i + 1]) - MathHelper.PiOver2;
 
-            Color stringBaseColor = Color.Lerp(new Color(45, 0, 35, 120), Color.Black, (float)i / (positions.Length - 1));
-            Color stringColor = Color.Lerp(stringBaseColor, Color.Transparent, Utils.GetLerpValue(0, RiftHeight / 3, positions[i].Y - riftPosY + RiftHeight / 3, true));
-            
+            Color stringColor = stringBaseColor;
+            if (RiftTime > 0)
+                stringColor = Color.Lerp(stringBaseColor, Color.Transparent, Utils.GetLerpValue(0, RiftHeight / 3, positions[i].Y - riftPosY + RiftHeight / 3, true));
+
             Main.EntitySpriteDraw(stringTexture, positions[i] - Main.screenPosition, stringTexture.Frame(), stringColor, stringRotation, stringOrigin, stretch, 0, 0);
         }
     }

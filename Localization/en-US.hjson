@@ -186,6 +186,7 @@ Mods: {
 			}
 
 			avatar_FishingRodProjectile.DisplayName: avatar_ Fishing Rod Projectile
+			avatar_FishingRodVoid.DisplayName: avatar_ Fishing Rod Void
 		}
 	}
 }
