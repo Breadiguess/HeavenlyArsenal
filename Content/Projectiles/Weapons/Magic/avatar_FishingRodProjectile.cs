@@ -11,6 +11,7 @@ using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Magic;
@@ -29,13 +30,23 @@ public class avatar_FishingRodProjectile : ModProjectile
         Projectile.hide = true;
         Projectile.manualDirectionChange = true;
         Projectile.minion = true;
+        Projectile.DamageType = DamageClass.Magic;
     }
 
     public ref Player Player => ref Main.player[Projectile.owner];
 
     public ref float Time => ref Projectile.ai[0];
     public ref float BellRingCooldown => ref Projectile.ai[1];
-    public ref float RiftTime => ref Projectile.ai[2];
+    public ref float CurrentRiftState => ref Projectile.ai[2];
+
+    public enum RiftState
+    {
+        Closed,
+        OpenButAboveBellAndNeedsToWait,
+        Open,
+        Dunking,
+        Disabled
+    }
 
     public Vector2 bellPosition;
     private Vector2 oldBellVelocity;
@@ -44,17 +55,13 @@ public class avatar_FishingRodProjectile : ModProjectile
 
     public const int SwingTime = 12;
     public const int RetractTime = 40;
-    public const int RiftMaxTime = 240;
 
     public override void AI()
     {
-        if (Player.channel && RiftTime < RiftMaxTime)
+        if (Player.channel && CurrentRiftState != (int)RiftState.Disabled)
             Projectile.timeLeft = RetractTime + 15;
         else
-        {
-            RiftTime = 241;
             Player.itemTime = 0;
-        }
 
         SetPlayerItemAnimations();
 
@@ -73,7 +80,7 @@ public class avatar_FishingRodProjectile : ModProjectile
             if (targetPosition.Distance(Player.MountedCenter) > maxDistance)
                 targetPosition = Player.MountedCenter + Player.DirectionTo(Main.MouseWorld).SafeNormalize(Vector2.Zero) * maxDistance;
 
-            if (RiftTime > 0 && targetPosition.Y > Player.MountedCenter.Y + RiftHeight)
+            if (CurrentRiftState == (int)RiftState.Dunking && targetPosition.Y > Player.MountedCenter.Y + RiftHeight)
                 targetPosition.Y = Player.MountedCenter.Y + RiftHeight;
 
             Player.LimitPointToPlayerReachableArea(ref targetPosition);
@@ -91,13 +98,12 @@ public class avatar_FishingRodProjectile : ModProjectile
         UpdateFishingString();
         UpdateBellString();
 
-        if (Time > SwingTime * 4)
+        if (Time > SwingTime * 4 && CurrentRiftState != (int)RiftState.Disabled)
             UpdateBellRinging();
 
-        if (riftOpen)
+        if (CurrentRiftState != (int)RiftState.Closed && Projectile.timeLeft > RetractTime)
         {
             UpdateRift();
-
             riftApparitionInterpolant = Math.Min(riftApparitionInterpolant + 0.2f, 1f);
         }
         else
@@ -186,17 +192,18 @@ public class avatar_FishingRodProjectile : ModProjectile
     {
         Vector2 bellPosition = bellRope.segments[^1].position;
         Vector2 currentBellVelocity = bellRope.segments[^1].velocity;
+
         if (oldBellVelocity.Distance(currentBellVelocity) > 16 && currentBellVelocity.Length() > 10) // Finding large accelerations, indicating sudden movements that would ring the bell
         {
             if (BellRingCooldown <= 0)
             {
                 BellRingCooldown = 20;
                 bellRope.segments[^1].velocity *= 0.1f;
-                SoundEngine.PlaySound(NoxusBoss.Assets.GennedAssets.Sounds.NamelessDeity.ClockStrike with { Pitch = 1f, MaxInstances = 0 }, bellPosition);
+                SoundEngine.PlaySound(SoundID.AbigailAttack with { Pitch = 1f, MaxInstances = 0 }, bellPosition);
 
-                if (!riftOpen)
+                if (CurrentRiftState == (int)RiftState.Closed)
                 {
-                    riftOpen = true;
+                    CurrentRiftState = (int)RiftState.Open;
                     SoundEngine.PlaySound(NoxusBoss.Assets.GennedAssets.Sounds.Avatar.RiftOpen with { MaxInstances = 0 }, Player.MountedCenter);
                 }
             }
@@ -216,29 +223,44 @@ public class avatar_FishingRodProjectile : ModProjectile
 
     public void UpdateRift()
     {
-        float riftPositionY = Player.MountedCenter.Y + RiftHeight;
+        if (CurrentRiftState == (int)RiftState.Disabled)
+            return;
+
+        Rope.RopeSegment bell = bellRope.segments[^1];
+        float riftPositionY = Player.MountedCenter.Y + RiftHeight - 10;
+
+        bool inBox = bell.position.Y > riftPositionY && Math.Abs(Player.MountedCenter.X - Projectile.Center.X) < 300;
+
+        bool canUse = true;
+        bool canDunk = (inBox && bell.velocity.Y > 0 && CurrentRiftState == (int)RiftState.Open) || CurrentRiftState == (int)RiftState.Dunking;
+
+        // Preventing the bell from being dunked from below somehow
+        if (bell.position.Y > riftPositionY && CurrentRiftState != (int)RiftState.Dunking && !canDunk)
+            CurrentRiftState = (int)RiftState.OpenButAboveBellAndNeedsToWait;
+        else if (CurrentRiftState == (int)RiftState.OpenButAboveBellAndNeedsToWait)
+            CurrentRiftState = (int)RiftState.Open;
 
         // Essentially creating an infinitely deep box that begins below the player
-
-        if (bellRope.segments[^1].position.Y > riftPositionY && RiftTime < 1)
-            RiftTime = -1;
-
-        if (bellRope.segments[^1].position.Y > riftPositionY - 20 && Math.Abs(Player.MountedCenter.X - Projectile.Center.X) < 300 && RiftTime > -1)
+        if (canDunk)
         {
-            bellRope.segments[^1].velocity *= 0.1f;
-            bellRope.gravity = Vector2.UnitY * 2f;
+            bell.velocity *= 0.1f;
+            bellRope.gravity = Vector2.UnitY * 4f;
 
-            if (bellRope.segments[^1].position.Y < riftPositionY + 40)
-                bellRope.segments[^1].position.Y = MathHelper.Lerp(bellRope.segments[^1].position.Y, riftPositionY + 40, 0.2f);
+            if (bell.position.Y < riftPositionY + 40)
+                bell.position.Y = MathHelper.Lerp(bell.position.Y, riftPositionY + 40, 0.3f);
 
             BellRingCooldown = 50;
             Projectile.timeLeft = 50;
 
-            RiftTime++;
+            CurrentRiftState = (int)RiftState.Dunking;
+
+            canUse = Player.CheckMana(Player.HeldItem.mana, true);
+            if (!Player.channel || !inBox)
+                canUse = false;
 
             if (Main.myPlayer == Projectile.owner)
             {
-                if (RiftTime % 5 == 0)
+                if (Time % 5 == 0)
                 {
                     foreach (NPC npc in Main.ActiveNPCs)
                     {
@@ -248,19 +270,14 @@ public class avatar_FishingRodProjectile : ModProjectile
                 }
             }
         }
-        else if (RiftTime < 40)
-            RiftTime = 0;
-        else if (RiftTime > 30)
-            RiftTime = RiftMaxTime + 1;
 
-        // If the rift has been in use for some time, close it and disable the bell for some time
-        if (RiftTime > RiftMaxTime)
+        if (!canUse)
         {
-            RiftTime = RiftMaxTime + 1;
+            CurrentRiftState = (int)RiftState.Disabled;
+            bell.position.Y = riftPositionY;
             bellRope.gravity = -Vector2.UnitY * 20;
             BellRingCooldown = 240;
-            riftOpen = false;
-            SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.RiftEject with { MaxInstances = 0 }, bellRope.segments[^1].position);
+            SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.RiftEject with { MaxInstances = 0 }, bell.position);
         }
     }
 
@@ -286,7 +303,7 @@ public class avatar_FishingRodProjectile : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        riftLakeTargets.Request(900, 400, Projectile.whoAmI, () =>
+        riftLakeTargets.Request(900, 900, Projectile.whoAmI, () =>
         {
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null);
 
@@ -308,14 +325,14 @@ public class avatar_FishingRodProjectile : ModProjectile
             riftShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 2, SamplerState.AnisotropicWrap);
             riftShader.Apply();
 
-            Main.spriteBatch.Draw(innerRiftTexture, new Vector2(450, 200), null, Color.White, 0, innerRiftTexture.Size() * 0.5f, new Vector2(2.5f, 0.4f), 0, 0);
+            Main.spriteBatch.Draw(innerRiftTexture, new Vector2(450, RiftHeight), null, Color.White, 0, innerRiftTexture.Size() * 0.5f, new Vector2(2.5f, 0.4f), 0, 0);
             Main.spriteBatch.End();
         });
 
         if (riftLakeTargets.TryGetTarget(Projectile.whoAmI, out RenderTarget2D riftTarget) && riftApparitionInterpolant > 0)
         {
             Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
-            Main.EntitySpriteDraw(riftTarget, Player.MountedCenter + new Vector2(0, RiftHeight) - Main.screenPosition, riftTarget.Frame(), Color.White, 0, riftTarget.Size() * 0.5f, 1f, 0, 0);
+            Main.EntitySpriteDraw(riftTarget, Player.MountedCenter - Main.screenPosition, riftTarget.Frame(), Color.White, 0, new Vector2(riftTarget.Width / 2, 0), 1f, 0, 0);
             Main.EntitySpriteDraw(glow, Player.MountedCenter + new Vector2(0, RiftHeight - 20) - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 150 } * riftApparitionInterpolant * 0.5f, 0, glow.Size() * 0.5f, new Vector2(2f, 0.4f), 0, 0);
         }
 
@@ -348,7 +365,7 @@ public class avatar_FishingRodProjectile : ModProjectile
     private void DrawBell()
     {
         // We need that last segment, and others to draw extra stuff
-        if (bellRope == null || RiftTime > 0)
+        if (bellRope == null || CurrentRiftState == (int)RiftState.Dunking || CurrentRiftState == (int)RiftState.Disabled)
             return;
 
         Vector2 bellPosition = bellRope.segments[^1].position; // First index from the end
@@ -399,7 +416,7 @@ public class avatar_FishingRodProjectile : ModProjectile
             float stringRotation = positions[i].AngleTo(positions[i + 1]) - MathHelper.PiOver2;
 
             Color stringColor = stringBaseColor;
-            if (RiftTime > 0)
+            if (CurrentRiftState == (int)RiftState.Dunking)
                 stringColor = Color.Lerp(stringBaseColor, Color.Transparent, Utils.GetLerpValue(0, RiftHeight / 3, positions[i].Y - riftPosY + RiftHeight / 3, true));
 
             Main.EntitySpriteDraw(stringTexture, positions[i] - Main.screenPosition, stringTexture.Frame(), stringColor, stringRotation, stringOrigin, stretch, 0, 0);
