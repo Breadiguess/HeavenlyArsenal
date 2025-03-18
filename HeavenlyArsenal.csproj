@@ -8,6 +8,12 @@
 	  <OutputType>Library</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <AdditionalFiles Remove="Sounds\**" />
+	  <Compile Remove="Sounds\**" />
+	  <EmbeddedResource Remove="Sounds\**" />
+	  <None Remove="Sounds\**" />
+	</ItemGroup>
+	<ItemGroup>
 	  <None Remove="Content\Items\auric_catalyst.png" />
 	  <None Remove="Content\Items\avatar_fishingRod.png" />
 	  <None Remove="Content\Items\fusionrifle.png" />
@@ -25,7 +31,6 @@
 	  <Folder Include="Assets\Textures\Backpacks\" />
 	  <Folder Include="Content\Items\Debug\" />
 	  <Folder Include="Content\Items\Weapons\Ranged\NewFolder\" />
-	  <Folder Include="Sounds\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Reference Include="CalamityMod">

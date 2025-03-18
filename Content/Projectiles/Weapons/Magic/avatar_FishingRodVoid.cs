@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework;
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons;
+namespace HeavenlyArsenal.Content.Projectiles.Weapons.Magic;
 
 public class avatar_FishingRodVoid : ModProjectile
 {

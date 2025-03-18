@@ -22,6 +22,9 @@ using Luminance.Core.Graphics;
 using Particle = Luminance.Core.Graphics.Particle;
 using HeavenlyArsenal.Content.Projectiles.Misc;
 using System.Linq;
+using Terraria.Graphics.Shaders;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Runtime.InteropServices;
 
 
 
@@ -45,6 +48,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public override int AssociatedItemID => ModContent.ItemType<FusionRifle>();
         public override int IntendedProjectileType => ModContent.ProjectileType<ParasiteParadiseProjectile>();
 
+        public float Time { get; private set; }
 
         public static float CurrentChargeTime = FusionRifle.MaxChargeTime; // Default to MaxChargeTime
 
@@ -97,6 +101,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
             UpdateProjectileHeldVariables(armPosition);
             ManipulatePlayerVariables();
+            Time++;
         }
 
 
@@ -117,19 +122,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             {
                 if (ChargeTimer < CurrentChargeTime)
                     ChargeTimer++;
-                if (!rancorCircleExists) // Only spawn if it doesn't already exist
-                {
-                    Projectile.NewProjectile(
-                        Projectile.GetSource_FromThis(),
-                        Projectile.Center,
-                        Vector2.Zero,
-                        ModContent.ProjectileType<FusionRifle_Circle>(),
-                        -1,
-                        Projectile.knockBack,
-                        Projectile.owner
-                    );
-                }
-
+                
 
 
 
@@ -203,10 +196,10 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             // Stop the charging sound when charge is complete or interrupted
             if (ChargeTimer >= FusionRifle.MaxChargeTime)
             {
-                SoundEngine.PlaySound(FusionRifle.FullyChargedSound, Projectile.Center);
+                //SoundEngine.PlaySound(FusionRifle.FullyChargedSound, Projectile.Center);
                 CurrentState = FusionRifleState.Firing; // Transition to firing state
                 StateTimer = 0;
-                BurstCount = FusionRifle.ArrowsPerBurst;
+                BurstCount = FusionRifle.BoltsPerBurst;
 
                 if (chargingSoundInstance != null)
                 {
@@ -239,7 +232,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         private void HandleFiring()
         {
             Owner.itemAnimation = Owner.itemAnimationMax;
-            if (BurstCount == FusionRifle.ArrowsPerBurst)
+            if (BurstCount == FusionRifle.BoltsPerBurst)
             {
                 firingSoundInstance = firingSoundEffect.CreateInstance();
                 firingSoundInstance.Play();
@@ -494,6 +487,17 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, Projectile.velocity.ToRotation() - MathHelper.PiOver2);
         }
 
+
+        
+        public void AdjustVisualValues(ref float scale, ref float opacity, ref float rotation, float time)
+        {
+            scale = Utils.GetLerpValue(0.1f, 35f, time, true) * 1.4f;
+            opacity = (float)Math.Pow(scale / 1.4f, 2D);
+            rotation -= MathHelper.ToRadians(scale * 4f);
+        }
+
+
+
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
@@ -505,7 +509,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
           
             float chargeOffset = ChargeupInterpolant * Projectile.scale * 5f;
-            Color chargeColor = Color.Lerp(Color.Red, Color.DarkRed, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 7.1f) * 0.5f + 0.5f) * ChargeupInterpolant * 0.6f;
+            Color chargeColor = Color.Lerp(Color.Crimson, Color.Gold, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 7.1f) * 0.5f + 0.5f) * ChargeupInterpolant * 0.6f;
             chargeColor.A = 0;
 
             float rotation = Projectile.rotation;
@@ -526,7 +530,89 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 Main.spriteBatch.Draw(texture, drawPosition + drawOffset, null, chargeColor, rotation, origin, Projectile.scale, direction, 0f);
             }
             Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
-            
+
+
+
+
+
+
+            //Texture2D outerCircleTexture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
+            Texture2D outerCircleTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/FusionRifle_Circle").Value;
+            Texture2D outerCircleGlowmask = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/FusionRifle_CircleGlowmask").Value;
+            Texture2D innerCircleTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/FusionRifle_CircleGlow").Value;
+            //Texture2D innerCircleGlowmask = ModContent.Request<Texture2D>(Texture + "InnerGlowmask").Value;
+            Vector2 CircledrawPosition = Projectile.Center - Main.screenPosition - FusionRifleHoldout.RecoilOffset;
+
+            float directionRotation = Projectile.velocity.ToRotation();
+            Color startingColor = Color.Red;
+            Color endingColor = Color.Blue;
+            // Add a time-based rotation to make the circle spin
+            float timeFactor = Main.GlobalTimeWrappedHourly * 2f; // Adjust speed here
+            float Circlerotation = timeFactor;
+
+
+            void restartShader(Texture2D texture, float opacity, float circularRotation, BlendState blendMode)
+            {
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, blendMode, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                CalamityUtils.CalculatePerspectiveMatricies(out Matrix viewMatrix, out Matrix projectionMatrix);
+
+                
+                Effect lightningEffect = AssetDirectory.Effects.FusionRifleCircle.Value;
+                //lightningEffect.Parameters["uColor"].SetValue((bool)startingColor);
+                lightningEffect.Parameters["uuSaturation"].SetValue(directionRotation);
+                //lightningEffect.Parameters["uSecondaryColor"].SetValue(endingColor);
+                lightningEffect.Parameters["uOpacity"].SetValue(opacity);
+                lightningEffect.Parameters["uDirection"].SetValue((float)Projectile.direction);
+                lightningEffect.Parameters["uCircularRotation"].SetValue(circularRotation);
+                lightningEffect.Parameters["uImageSize0"].SetValue(texture.Size());
+                lightningEffect.Parameters["overallImageSize"].SetValue(outerCircleTexture.Size());
+                lightningEffect.Parameters["uWorldViewProjection"].SetValue(viewMatrix * projectionMatrix);
+
+
+
+                lightningEffect.CurrentTechnique.Passes[0].Apply();
+
+                //Main.pixelShader.CurrentTechnique.Passes[0].Apply();
+
+
+            }
+
+
+
+           
+
+            // Restart shader for glowmask
+            restartShader(outerCircleGlowmask, Projectile.Opacity, Circlerotation, BlendState.Additive);
+            Main.EntitySpriteDraw(outerCircleGlowmask, CircledrawPosition, null, Color.White, 0f,
+                                 outerCircleGlowmask.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
+
+            // Restart shader for the main circle
+            restartShader(outerCircleTexture, Projectile.Opacity * 0.7f, Circlerotation, BlendState.AlphaBlend);
+            Main.EntitySpriteDraw(outerCircleTexture, CircledrawPosition, null, Color.White, 0f,
+                                 outerCircleTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+
+            Main.spriteBatch.ExitShaderRegion();
+
+            //restartShader(innerCircleTexture, Projectile.Opacity * 0.5f, 0f, BlendState.Additive);
+            //Main.EntitySpriteDraw(innerCircleTexture, drawPosition, null, Color.White, 0f, innerCircleTexture.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
+
+            //restartShader(innerCircleTexture, Projectile.Opacity * 0.7f, 0f, BlendState.AlphaBlend);
+            //Main.EntitySpriteDraw(innerCircleTexture, drawPosition, null, Color.White, 0f, innerCircleTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+            Main.spriteBatch.ExitShaderRegion();
+
+
+
+
+
+
+
+
+
+
+
+
             return false;
         }
 

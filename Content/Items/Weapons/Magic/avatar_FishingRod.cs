@@ -14,7 +14,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Magic
 {
     public class avatar_FishingRod : ModItem
     {
-        public override string Texture => "HeavenlyArsenal/Content/Items/avatar_FishingRod";
+        public override string Texture => "HeavenlyArsenal/Content/Items/Weapons/Magic/avatar_FishingRod";
 
         public override void SetDefaults()
         {

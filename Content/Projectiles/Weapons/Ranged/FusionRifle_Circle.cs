@@ -144,11 +144,11 @@ public class FusionRifle_Circle : ModProjectile, ILocalizedModType
     public override bool PreDraw(ref Color lightColor)
     {
         //Texture2D outerCircleTexture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
-        Texture2D outerCircleTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Ranged/FusionRifle_Circle").Value;
-        Texture2D outerCircleGlowmask = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Ranged/FusionRifle_CircleGlowmask").Value;
-        Texture2D innerCircleTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Ranged/FusionRifle_CircleGlow").Value;
+        Texture2D outerCircleTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/FusionRifle_Circle").Value;
+        Texture2D outerCircleGlowmask = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/FusionRifle_CircleGlowmask").Value;
+        Texture2D innerCircleTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/FusionRifle_CircleGlow").Value;
         //Texture2D innerCircleGlowmask = ModContent.Request<Texture2D>(Texture + "InnerGlowmask").Value;
-        Vector2 drawPosition = Projectile.Center - Main.screenPosition-FusionRifleHoldout.RecoilOffset;
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition;// -RecoilOffset;
 
         float directionRotation = Projectile.velocity.ToRotation();
         Color startingColor = Color.Red;
@@ -179,8 +179,8 @@ public class FusionRifle_Circle : ModProjectile, ILocalizedModType
         restartShader(outerCircleTexture, Projectile.Opacity * 0.7f, Projectile.rotation, BlendState.AlphaBlend);
         Main.EntitySpriteDraw(outerCircleTexture, drawPosition, null, Color.White, 0f, outerCircleTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
 
-        restartShader(innerCircleTexture, Projectile.Opacity * 0.5f, 0f, BlendState.Additive);
-        Main.EntitySpriteDraw(innerCircleTexture, drawPosition, null, Color.White, 0f, innerCircleTexture.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
+        //restartShader(innerCircleTexture, Projectile.Opacity * 0.5f, 0f, BlendState.Additive);
+        //Main.EntitySpriteDraw(innerCircleTexture, drawPosition, null, Color.White, 0f, innerCircleTexture.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
 
         //restartShader(innerCircleTexture, Projectile.Opacity * 0.7f, 0f, BlendState.AlphaBlend);
         //Main.EntitySpriteDraw(innerCircleTexture, drawPosition, null, Color.White, 0f, innerCircleTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);

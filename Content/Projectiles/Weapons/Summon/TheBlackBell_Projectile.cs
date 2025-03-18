@@ -142,7 +142,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Summon
         //foreach (Projectile otherProjectile in Main.ActiveProjectiles)
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D Instrument = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Summon/TheBlackBell_Projectile").Value;           
+            Texture2D Instrument = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Summon/TheBlackBell_Projectile").Value;           
             // Ensure the rope exists
             if (rope != null)
             {

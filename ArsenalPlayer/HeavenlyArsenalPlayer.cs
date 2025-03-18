@@ -37,6 +37,11 @@ namespace HeavenlyArsenal.ArsenalPlayer
             get;
             set;
         }
+        public bool hasAvatarRifle { 
+            get; 
+            private set; 
+        }
+
         public override void PostUpdate()
 
         {
@@ -64,8 +69,8 @@ namespace HeavenlyArsenal.ArsenalPlayer
                         Console.WriteLine("ElectricVambrace spawned a projectile (VambraceDash)!");
 
                     }
-                    float numberOfDusts = 10f;
-                    float rotFactor = 180f / numberOfDusts;
+                   // float numberOfDusts = 10f;
+                   // float rotFactor = 180f / numberOfDusts;
                     
                     //float sparkscale = MathF.Min(Player.velocity.X * Player.direction * 0.08f, 1.2f);
                     //Vector2 SparkVelocity1 = Player.velocity.RotatedBy(Player.direction * -3, default) * 0.1f - Player.velocity / 2f;
@@ -75,11 +80,11 @@ namespace HeavenlyArsenal.ArsenalPlayer
                     //SparkParticle spark2 = new SparkParticle(Player.Center + Player.velocity.RotatedBy(-2f * Player.direction) * 1.5f, SparkVelocity2, false, Main.rand.Next(11, 13), sparkscale, Main.rand.NextBool() ? Color.DarkOrange : Color.OrangeRed);
                     //GeneralParticleHandler.SpawnParticle(spark2);
 
-                    if (Player.miscCounter % 6 == 0 && Player.velocity != Vector2.Zero)
-                    {
-                        int damage = Player.ApplyArmorAccDamageBonusesTo(Player.GetBestClassDamage().ApplyTo(170));
-                        Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center + Player.velocity * 1.5f, Vector2.Zero, ModContent.ProjectileType<PauldronDash>(), damage, 10f, Player.whoAmI);
-                    }
+                    //if (Player.miscCounter % 6 == 0 && Player.velocity != Vector2.Zero)
+                   // {
+                     //   int damage = Player.ApplyArmorAccDamageBonusesTo(Player.GetBestClassDamage().ApplyTo(170));
+                     //   Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center + Player.velocity * 1.5f, Vector2.Zero, ModContent.ProjectileType<PauldronDash>(), damage, 10f, Player.whoAmI);
+                   // }
 
 
 
@@ -90,12 +95,18 @@ namespace HeavenlyArsenal.ArsenalPlayer
                         isVambraceDashing = false;
                 }
             }   
+
+            if (hasAvatarRifle)
+            {
+
+            }
         }
 
 
         public override void ResetEffects()
         {
             ElectricVambrace = false;
+            hasAvatarRifle = false;
         }
     }
 }

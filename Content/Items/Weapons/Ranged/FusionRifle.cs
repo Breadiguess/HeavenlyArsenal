@@ -45,32 +45,16 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
 
         public const int ShootDelay = 32;
 
-        public const int ArrowsPerBurst = 5;
+        public const int BoltsPerBurst= 5;
 
         public static int CurrentCharge = CurrentCharge;
 
         public const int ArrowShootRate = 4;
 
-        public const int ArrowShootTime = ArrowsPerBurst * ArrowShootRate;
+        //public const int ArrowShootTime = ArrowsPerBurst * ArrowShootRate;
 
         public const int MaxChargeTime = 120;
-
-       // public const float ArrowTargetingRange = 1100f;
-
-       // public const float MaxChargeDamageBoost = 3.5f;
-
-      //  public const float LightningDamageFactor = 0.36f;
-
-      //  public const float ChargeLightningCreationThreshold = 0.8f;
-
-       // public static readonly SoundStyle ChargeSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_charge3");
-       //     
-       // public static readonly SoundStyle FireSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_fire");
-       //
-        public static readonly SoundStyle FullyChargedSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_FullyCharged");
-
-
-        //public readonly new Texture2D FusionRifle_Backpack = 
+ 
 
         public override void SetStaticDefaults()
         { 

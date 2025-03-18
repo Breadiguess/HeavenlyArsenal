@@ -64,7 +64,7 @@ namespace HeavenlyArsenal.Projectiles.Misc
             Time++;
             if ((Main.myPlayer == Projectile.owner) && modPlayer.isVambraceDashing)
             {
-                Console.WriteLine("VambraceDash!!!");
+                //Console.WriteLine("VambraceDash!!!");
                 //Projectile.oldPos = 
                 Projectile.timeLeft += 4;
                 Projectile.position = new Vector2(Owner.MountedCenter.X+player.velocity.X
