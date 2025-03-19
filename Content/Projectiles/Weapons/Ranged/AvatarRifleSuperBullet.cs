@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Luminance.Core.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -18,23 +22,42 @@ public class AvatarRifleSuperBullet : GlobalProjectile
     public bool hasEmpowerment;
     public int empowerment;
 
+    private Vector2[] oldPos;
 
     public override bool PreAI(Projectile projectile)
     {
-        int t = Main.projectile[0].type;
-
         if (hasEmpowerment)
         {
+            if (oldPos == null)
+                oldPos = Enumerable.Repeat(projectile.Center, 20).ToArray();
 
+            for (int i = oldPos.Length - 2; i > 0; i--)
+            {
+                oldPos[i] = oldPos[i - 1];
+            }
+
+            oldPos[0] = projectile.Center + projectile.velocity * 2;
         }
+
         return base.PreAI(projectile);
     }
 
     public override void PostDraw(Projectile projectile, Color lightColor)
     {
-        if (hasEmpowerment)
+        if (hasEmpowerment && oldPos != null)
         {
+            float WidthFunction(float p) => 50f * MathF.Pow(p, 0.66f) * (1f - p * 0.5f);
+            Color ColorFunction(float p) => new Color(215, 30, 35, 200);
 
+            ManagedShader trailShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleBulletAuroraEffect");
+            trailShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * projectile.velocity.Length() / 8f + projectile.identity * 72.113f);
+            trailShader.TrySetParameter("spin", 2f * Math.Sign(projectile.velocity.X));
+            trailShader.TrySetParameter("brightness", 1.5f);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 0, SamplerState.LinearWrap);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoiseDetailed, 1, SamplerState.LinearWrap);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);
+
+            PrimitiveRenderer.RenderTrail(oldPos, new PrimitiveSettings(WidthFunction, ColorFunction, _ => Vector2.Zero, Shader: trailShader, Smoothen: false), oldPos.Length);
         }
     }
 }

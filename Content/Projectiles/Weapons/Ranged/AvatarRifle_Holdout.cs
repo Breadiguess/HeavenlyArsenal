@@ -505,7 +505,9 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Main.NewText($"{Projectile.damage} + {(int)(MathF.Pow(AmmoDifference, MaxAmmo))} Damage", Color.AntiqueWhite);
 
             RecoilRotation += Projectile.spriteDirection * MathHelper.ToRadians(34f); // Spread angle for the muzzle flash particles
-            Projectile.NewProjectile(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity * 14, bulletAMMO, Projectile.damage + (int)(MathF.Pow(AmmoDifference,MaxAmmo)), Projectile.knockBack, Projectile.owner);
+            Projectile shot = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity * 14, bulletAMMO, Projectile.damage + (int)(MathF.Pow(AmmoDifference,MaxAmmo)), Projectile.knockBack, Projectile.owner);
+            shot.GetGlobalProjectile<AvatarRifleSuperBullet>().hasEmpowerment = true;
+            shot.GetGlobalProjectile<AvatarRifleSuperBullet>().empowerment = 2;
             //SoundEngine.PlaySound(SoundID.Item41 with { Volume = 0.75f }, Projectile.Center);
             //Dust.NewDust(tipPosition, 1, 1, DustID.Firefly, Projectile.spriteDirection*5, 0, 100, default, 1);
 

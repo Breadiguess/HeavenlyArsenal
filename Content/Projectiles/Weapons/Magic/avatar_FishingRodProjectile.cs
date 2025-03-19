@@ -261,6 +261,14 @@ public class avatar_FishingRodProjectile : ModProjectile
             if (CurrentRiftState != (int)RiftState.Dunking)
             {
                 SoundEngine.PlaySound(SoundID.Shimmer2, bell.position);
+
+                Vector2 bellSplashVelocity = new Vector2(bell.velocity.X, Math.Abs(bell.velocity.Y));
+                for (int i = 0; i < 12; i++)
+                {
+                    Dust.NewDustPerfect(bell.position + Main.rand.NextVector2Circular(5, 2), DustID.RedTorch, bellSplashVelocity + Main.rand.NextVector2Circular(3, 1) - Vector2.UnitY * 3, 0, Color.Red);
+                    if (!Main.rand.NextBool(5))
+                        Dust.NewDustPerfect(bell.position + Main.rand.NextVector2Circular(5, 2), DustID.Wraith, bellSplashVelocity + Main.rand.NextVector2Circular(3, 1) - Vector2.UnitY, 0, Color.Black);
+                }
             }
 
             CurrentRiftState = (int)RiftState.Dunking;
@@ -318,7 +326,7 @@ public class avatar_FishingRodProjectile : ModProjectile
 
         riftLakeTargets.Request(900, 1000, Projectile.whoAmI, () =>
         {
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
 
             Color color = new Color(77, 0, 2);
             Color edgeColor = new Color(1f, 0.06f, 0.06f);
@@ -356,8 +364,9 @@ public class avatar_FishingRodProjectile : ModProjectile
 
         if (riftLakeTargets.TryGetTarget(Projectile.whoAmI, out RenderTarget2D riftTarget) && riftApparitionInterpolant > 0)
         {
+            SpriteEffects flip = Main.LocalPlayer.gravDir < 0 ? SpriteEffects.FlipVertically : 0;
             Main.EntitySpriteDraw(glow, Player.MountedCenter + new Vector2(0, RiftHeight - 30) - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 200 } * riftApparitionInterpolant, 0, glow.Size() * 0.5f, new Vector2(1.2f, 0.3f), 0, 0);
-            Main.EntitySpriteDraw(riftTarget, Player.MountedCenter - Main.screenPosition, riftTarget.Frame(), Color.White, 0, new Vector2(riftTarget.Width / 2, 0), 1f, 0, 0);
+            Main.EntitySpriteDraw(riftTarget, Player.MountedCenter - Main.screenPosition, riftTarget.Frame(), Color.White, 0, new Vector2(riftTarget.Width / 2, 0), 1f, flip, 0);
             Main.EntitySpriteDraw(glow, Player.MountedCenter + new Vector2(0, RiftHeight + 20) - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 150 } * riftApparitionInterpolant * 0.4f, 0, glow.Size() * 0.5f, new Vector2(1.5f, 0.7f) * riftApparitionInterpolant, 0, 0);
             Main.EntitySpriteDraw(glow, Player.MountedCenter + new Vector2(0, RiftHeight + 14) - Main.screenPosition, glow.Frame(), Color.Black * riftApparitionInterpolant, 0, glow.Size() * 0.5f, new Vector2(0.6f, 0.1f) * riftApparitionInterpolant, 0, 0);
         }
