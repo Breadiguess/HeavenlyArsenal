@@ -103,11 +103,11 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public override void SetDefaults()
         {
             firingSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_FireWIP2").Value;
-            reloadSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Reload").Value; // Add your reload sound here
+            reloadSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle").Value; // Add your reload sound here
             CycleSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle").Value;
             MagEmptySoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_ClipEject").Value;
-
-
+            firingSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_FireWIP2").Value;
+            
             Projectile.width = Projectile.height = 60;
             Projectile.friendly = true;
             Projectile.penetrate = -1;

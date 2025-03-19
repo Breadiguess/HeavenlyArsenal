@@ -44,7 +44,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
         {
             Item.rare = ModContent.RarityType<NamelessDeityRarity>();
 
-            Item.damage = 44445;
+            Item.damage = 9600;
             Item.DamageType = DamageClass.Ranged;
             Item.shootSpeed = 40f;
             Item.width = 40;
@@ -77,7 +77,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             //Item.shoot = ProjectileID<t>
             Item.shoot = AmmoID.Bullet;
             Item.ChangePlayerDirectionOnShoot = true;
-            //Item.crit = 666;
+            Item.crit = 87;
             Item.noMelee = true;
             Item.Calamity().devItem = true;
         }
