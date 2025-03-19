@@ -61,9 +61,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             //Item.consumeAmmoOnFirstShotOnly = true;
             Item.useAnimation = 5;
 
-            //when i make the held projecitle, remember to re-enable this
-            //Item.noUseGraphic = true;
-
+            
             Item.noUseGraphic = true;
 
             Item.useTurn = true;

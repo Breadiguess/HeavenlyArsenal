@@ -28,6 +28,10 @@ namespace HeavenlyArsenal.ArsenalPlayer
     public partial class HeavenlyArsenalPlayer : ModPlayer
     {
         internal bool ElectricVambrace;
+        public int AvatarRifleCounter = 7;
+
+
+
 
         public bool HasReducedDashFirstFrame { get; private set; }
 
@@ -47,7 +51,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         {
             if (ElectricVambrace)
             {
-                
+               
                 if (Player.miscCounter % 3 == 2 && Player.dashDelay > 0) // Reduced dash cooldown by 33%
                     Player.dashDelay--;
 
