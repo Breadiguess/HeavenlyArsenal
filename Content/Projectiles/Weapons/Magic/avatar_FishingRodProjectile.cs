@@ -87,8 +87,8 @@ public class avatar_FishingRodProjectile : ModProjectile
 
             Player.LimitPointToPlayerReachableArea(ref targetPosition);
             Vector2 spoolOffset = new Vector2(MathF.Sin(Projectile.localAI[0] * 0.05f) * 5f, MathF.Cos(Projectile.localAI[0] * 0.025f) * 5f);
-            targetPosition += spoolOffset + Player.velocity;
-            Vector2 targetVelocity = (targetPosition - Projectile.Center).SafeNormalize(Vector2.Zero) * Projectile.Distance(targetPosition) * 0.6f;
+            targetPosition += spoolOffset + Player.velocity * 2;
+            Vector2 targetVelocity = (targetPosition - Projectile.Center).SafeNormalize(Vector2.Zero) * Projectile.Distance(targetPosition) * 0.8f;
             Projectile.velocity = Vector2.Lerp(Projectile.velocity, targetVelocity, Utils.GetLerpValue(SwingTime / 3, SwingTime + 40, Time, true) * 0.3f);
             Projectile.velocity *= 0.8f;
             Projectile.netUpdate = true;
@@ -138,8 +138,12 @@ public class avatar_FishingRodProjectile : ModProjectile
 
         // RotatedRelativePoint automatically adds gfxOffY for us
         Player.itemLocation = Player.RotatedRelativePoint(Player.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, handRotation));
+
+        float velocityRotation = Player.velocity.Y * 0.015f + Player.velocity.X * 0.015f * Player.direction;
         // Specifically not using AngleLerp because we want to go from negative to positive
-        Player.itemRotation = MathHelper.Lerp(-MathHelper.PiOver2, 1f, swingProgress) * Player.direction;
+        float targetRotation = MathHelper.Lerp(-MathHelper.PiOver2, 0.9f - velocityRotation, swingProgress) * Player.direction;
+        // Using it here for some smoothing on the velocity rotation
+        Player.itemRotation = Utils.AngleLerp(Player.itemRotation, targetRotation, 0.5f);
     }
 
     public Rope miscRope;
