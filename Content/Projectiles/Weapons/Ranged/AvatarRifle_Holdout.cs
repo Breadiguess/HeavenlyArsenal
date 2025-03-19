@@ -27,6 +27,7 @@ using Luminance.Core.Graphics;
 using CalamityMod.Items.Weapons.Ranged;
 using Terraria.Localization;
 using Terraria.DataStructures;
+using Microsoft.Build.ObjectModelRemoting;
 
 
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
@@ -83,7 +84,9 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         private AvatarRifleState CurrentState = AvatarRifleState.Firing;
         private int StateTimer = 0;
 
-        private int AmmoCount = 7; // Total shots before reload
+
+        public const float MaxAmmo = 7;
+        public int AmmoCount = 7; // Total shots before reload
         public int ReloadDuration = AvatarRifle.ReloadTime; // Duration for reload (in frames)
         public Vector2 origin = new Vector2(50, 50);
 
@@ -104,7 +107,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         {
             firingSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_FireWIP2").Value;
             reloadSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle").Value; // Add your reload sound here
-            CycleSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle").Value;
+            CycleSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle_Dronnor1").Value;
             MagEmptySoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_ClipEject").Value;
             firingSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_FireWIP2").Value;
             
@@ -196,7 +199,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
 
             Vector2 RopeStart = Projectile.Center + new Vector2(-40, Projectile.direction * 10).RotatedBy(Projectile.rotation);
-            Vector2 endPoint = Projectile.Center + new Vector2(90, Projectile.direction * 2).RotatedBy(Projectile.rotation);
+            Vector2 endPoint = Projectile.Center + new Vector2(83, Projectile.direction * 2).RotatedBy(Projectile.rotation);
 
             rope.segments[0].position = RopeStart;
             rope.segments[^1].position = endPoint;
@@ -282,9 +285,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         private void HandlePostFire()
         {
-            Main.NewText($"Recoiling!", Color.Chocolate);
 
 
+            if (StateTimer == AvatarRifle.CycleTime / 2)
+            {
+                Main.NewText($"Recoiling!", Color.Chocolate);
+            }
             if (StateTimer > 0)
             {
                 StateTimer--;
@@ -301,8 +307,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 {
                     Main.NewText($"Mag not Empty, Cycle {AmmoCount}", Color.Chocolate);
                     CurrentState = AvatarRifleState.Cycle;
-                    StateTimer = AvatarRifle.CycleTime;
-
+                    StateTimer = AvatarRifle.CycleTime;//AvatarRifle.RPM;
+                    
                 }
                 else
                 {
@@ -327,9 +333,10 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         private void HandleCycle()
         {
             int holdCyclePosition = 50; // How long to stay in cycle position (ticks)
-            int frameDuration = 5; // How many ticks each frame lasts
+             
             int totalFrames = 10; // Total frames for the projectile
-
+            int frameDuration = holdCyclePosition / totalFrames; // How many ticks each frame lasts
+            //float AnimationSpeedMulti = 0.50f;
             if (!Cycled)
             {
                 // Initiate cycling
@@ -360,7 +367,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                     }
                 }
                 // Update frame based on frame duration
-                if (++Projectile.frameCounter >= frameDuration)
+                if (++Projectile.frameCounter > frameDuration) //*AnimationSpeedMulti)
                 {
                     Projectile.frameCounter = 0; // Reset the counter
                     Projectile.frame++; // Move to the next frame
@@ -417,7 +424,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 
                 //new Vector2 GoreDirection = (-1f, 1f);
                 //Gore.NewGore(Projectile.GetSource_FromThis,Projectile.Left, new Vector2(1*Projectile.direction,-1f), ModContent.GoreType<MagEjectGore>,1);
-                Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Left, new Vector2(Projectile.direction * -4f, 0f), ModContent.GoreType<MagEjectGore>(), 4);
+                Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Center-new Vector2(30*Projectile.direction,0), new Vector2(Projectile.direction * -4f, 0f), ModContent.GoreType<MagEjectGore>(), 1);
                 Main.NewText($"Reloading", Color.AntiqueWhite);
             }
 
@@ -448,7 +455,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         private float recoilIntensity = 0f; // Tracks the current recoil intensity
         private float RecoilRotation = 0f;
-        private const float maxRecoil = 10f; // Maximum recoil amount
+        private const float maxRecoil = 20f; // Maximum recoil amount
         private float recoilRecoverySpeed = 0.5f; // Speed at which recoil eases out
         private void FireProjectile()
         {
@@ -456,15 +463,17 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Owner.PickAmmo(Owner.ActiveItem(), out bulletAMMO, out float SpeedNoUse, out int bulletDamage, out float kBackNoUse, out int _);
 
             Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
-            // Logic for spawning the projectile
-            Owner.PickAmmo(Owner.HeldItem, out int projToShoot, out _, out _, out _, out _);
+            
 
 
             Vector2 tipPosition = armPosition + Projectile.velocity * Projectile.width * 1.55f + new Vector2(3, -3);
             CreateMuzzleFlash(tipPosition, Projectile.velocity);
 
+            float AmmoDifference = (MaxAmmo - AmmoCount);
+            Main.NewText($"{Projectile.damage} + {(int)(MathF.Pow(AmmoDifference, MaxAmmo))} Damage", Color.AntiqueWhite);
+
             RecoilRotation += Projectile.spriteDirection * MathHelper.ToRadians(34f); // Spread angle for the muzzle flash particles
-            Projectile.NewProjectile(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity * 14, bulletAMMO, Projectile.damage, Projectile.knockBack, Projectile.owner);
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity * 14, bulletAMMO, Projectile.damage + (int)(MathF.Pow(AmmoDifference,MaxAmmo)), Projectile.knockBack, Projectile.owner);
             //SoundEngine.PlaySound(SoundID.Item41 with { Volume = 0.75f }, Projectile.Center);
             //Dust.NewDust(tipPosition, 1, 1, DustID.Firefly, Projectile.spriteDirection*5, 0, 100, default, 1);
 
@@ -521,18 +530,27 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Vector2 recoilOffset = -Projectile.velocity.SafeNormalize(Vector2.Zero) * recoilIntensity;
             //COmment so that i can push again
             Projectile.position = armPosition +
+
                       Projectile.velocity.SafeNormalize(Vector2.UnitX) * -3f +
                       recoilOffset;
+
             Projectile.Center = armPosition + recoilOffset;
 
 
 
             if (Main.myPlayer == Projectile.owner)
             {
-                Vector2 tipPosition = armPosition + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * 0.85f + new Vector2(0, -3);
-                float aimInterpolant = Utils.GetLerpValue(10f, 40f, Projectile.Distance(Main.MouseWorld), true);
                 Vector2 oldVelocity = Projectile.velocity;
-                Projectile.velocity = Vector2.Lerp(tipPosition, Projectile.SafeDirectionTo(Main.MouseWorld), aimInterpolant);
+                
+                
+                float aimInterpolant = Utils.GetLerpValue(10f, 40f, Projectile.Distance(Main.MouseWorld), true);
+                Vector2 tipPosition = armPosition + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * 0.85f + new Vector2(0, -3);
+
+
+
+                Projectile.velocity = Vector2.Lerp(tipPosition.SafeDirectionTo(Main.MouseWorld), Projectile.SafeDirectionTo(Main.MouseWorld), aimInterpolant);
+                
+
                 if (Projectile.velocity != oldVelocity)
                 {
                     Projectile.netSpam = 0;

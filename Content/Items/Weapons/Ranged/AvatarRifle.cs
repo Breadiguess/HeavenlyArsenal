@@ -29,11 +29,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
 
         public const int BulletsPerShot = 1;
 
-        public const int RPM = 40;
+        public static int RPM = 20;
 
         public const int CycleTimeDelay = 40;
         public const int CycleTime = 120;
         public const int ReloadTime = 360;
+        
 
         public static readonly SoundStyle FireSound = new("CalamityMod/Sounds/Item/HeavenlyGaleFire");
 
