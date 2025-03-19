@@ -303,19 +303,27 @@ public class avatar_FishingRodProjectile : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        riftLakeTargets.Request(900, 900, Projectile.whoAmI, () =>
+        riftApparitionInterpolant = 1f;
+
+        riftLakeTargets.Request(900, 1000, Projectile.whoAmI, () =>
         {
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null);
 
             Color color = new Color(77, 0, 2);
             Color edgeColor = new Color(1f, 0.06f, 0.06f);
-
             Texture2D innerRiftTexture = GennedAssets.Textures.FirstPhaseForm.RiftInnerTexture.Value;
-            Vector2 textureArea = Vector2.One;
+
+            ManagedShader dripShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRodVoidEffect");
+            dripShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 0.1f);
+            dripShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 0, SamplerState.AnisotropicWrap);
+            dripShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 1, SamplerState.AnisotropicWrap);
+            //dripShader.Apply();
+
+            Main.spriteBatch.Draw(innerRiftTexture, new Vector2(450, RiftHeight), null, Color.White, 0, new Vector2(innerRiftTexture.Width / 2, 0), new Vector2(1.33f, 0.5f), 0, 0);
 
             ManagedShader riftShader = ShaderManager.GetShader("NoxusBoss.DarkPortalShader");
             riftShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 0.1f);
-            riftShader.TrySetParameter("baseCutoffRadius", 0.12f);
+            riftShader.TrySetParameter("baseCutoffRadius", 0.11f);
             riftShader.TrySetParameter("swirlOutwardnessExponent", 0.11f);
             riftShader.TrySetParameter("swirlOutwardnessFactor", 5f);
             riftShader.TrySetParameter("vanishInterpolant", 1f - riftApparitionInterpolant);
@@ -325,7 +333,8 @@ public class avatar_FishingRodProjectile : ModProjectile
             riftShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 2, SamplerState.AnisotropicWrap);
             riftShader.Apply();
 
-            Main.spriteBatch.Draw(innerRiftTexture, new Vector2(450, RiftHeight), null, Color.White, 0, innerRiftTexture.Size() * 0.5f, new Vector2(2.5f, 0.4f), 0, 0);
+            //Main.spriteBatch.Draw(innerRiftTexture, new Vector2(450, RiftHeight), null, Color.White, 0, innerRiftTexture.Size() * 0.5f, new Vector2(2.5f, 0.4f), 0, 0);
+           
             Main.spriteBatch.End();
         });
 
@@ -333,7 +342,7 @@ public class avatar_FishingRodProjectile : ModProjectile
         {
             Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
             Main.EntitySpriteDraw(riftTarget, Player.MountedCenter - Main.screenPosition, riftTarget.Frame(), Color.White, 0, new Vector2(riftTarget.Width / 2, 0), 1f, 0, 0);
-            Main.EntitySpriteDraw(glow, Player.MountedCenter + new Vector2(0, RiftHeight - 20) - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 150 } * riftApparitionInterpolant * 0.5f, 0, glow.Size() * 0.5f, new Vector2(2f, 0.4f), 0, 0);
+            Main.EntitySpriteDraw(glow, Player.MountedCenter + new Vector2(0, RiftHeight - 20) - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 150 } * riftApparitionInterpolant * 0.7f, 0, glow.Size() * 0.5f, new Vector2(2f, 0.4f), 0, 0);
         }
 
         DrawStrings();
