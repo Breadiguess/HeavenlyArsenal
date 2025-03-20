@@ -673,7 +673,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                         stringRopeTexture,
                         ribbonPoints[i] - Main.screenPosition,
                         null, // Full texture
-                        lightColor,
+                        lightColor.MultiplyRGB(Color.Crimson),
                         rotation - MathHelper.PiOver2, // Adjust rotation for vertical texture alignment
                         new Vector2(stringRopeTexture.Width / 2, 0), // Origin at the texture's center-top
                         stretch,
@@ -793,7 +793,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             }
 
 
-            DrawRibbon(lightColor.MultiplyRGB(Color.Crimson));
+            DrawRibbon(lightColor);
 
 
             Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
