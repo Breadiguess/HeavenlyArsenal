@@ -154,6 +154,11 @@ Mods: {
 				}
 			}
 
+			BrutalForgiveness: {
+				DisplayName: Brutal Forgiveness
+				Tooltip: ""
+			}
+
 			Nadir2: {
 				DisplayName: Nadir2
 				Tooltip: ""
@@ -192,6 +197,9 @@ Mods: {
 
 			avatar_FishingRodProjectile.DisplayName: avatar_ Fishing Rod Projectile
 			avatar_FishingRodVoid.DisplayName: avatar_ Fishing Rod Void
+			BrutalForgivenessProjectile.DisplayName: Brutal Forgiveness
+			BrutalVine.DisplayName: Brutal Vine
+			Mercy.DisplayName: Mercy
 		}
 	}
 }
