@@ -6,7 +6,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Holdout.Nadir2;
+namespace HeavenlyArsenal.Content.Projectiles.Weapons.Melee.Nadir2;
 public class nadir2_Holdout : ModProjectile
 {
     private int attackState = 0; // Tracks the current attack state

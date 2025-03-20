@@ -52,7 +52,7 @@ public class AvatarRifleSuperBullet : GlobalProjectile
             ManagedShader trailShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleBulletAuroraEffect");
             trailShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * projectile.velocity.Length() / 8f + projectile.identity * 72.113f);
             trailShader.TrySetParameter("spin", 2f * Math.Sign(projectile.velocity.X));
-            trailShader.TrySetParameter("brightness", 1.5f);
+            trailShader.TrySetParameter("brightness", empowerment/1.5f);
             trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 0, SamplerState.LinearWrap);
             trailShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoiseDetailed, 1, SamplerState.LinearWrap);
             trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);

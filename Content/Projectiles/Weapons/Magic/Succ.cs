@@ -303,14 +303,14 @@ public class Succ : ModProjectile
     //     windSoundLoop.PlaySound(() => Projectile.Center, () => Projectile.ai[2] * 0.5f, () => Projectile.ai[2] - 0.9f);
     //  }
 
-    //public static Asset<Texture2D> ribbonTexture;
+    //public static Asset<Texture2D> BeadRopeTexture;
     public static Asset<Texture2D> laserTexture;
     public static Asset<Texture2D> laserTexture1;
     public static Asset<Texture2D> laserTexture2;
     public static Asset<Texture2D> laserTexture3;
     public override void Load()
     {
-        // ribbonTexture = AssetUtilities.RequestImmediate<Texture2D>(Texture + "Ribbon");
+        // BeadRopeTexture = AssetUtilities.RequestImmediate<Texture2D>(Texture + "Ribbon");
         laserTexture = AssetUtilities.RequestImmediate<Texture2D>(Texture + "_Laser" + 0);
         laserTexture1 = AssetUtilities.RequestImmediate<Texture2D>(Texture + "_Laser" + 1);
         laserTexture2 = AssetUtilities.RequestImmediate<Texture2D>(Texture + "_Laser" + 3);
@@ -351,10 +351,10 @@ public class Succ : ModProjectile
     //                style = 2;
     //            }
 
-    //            Rectangle frame = ribbonTexture.Value.Frame(1, 3, 0, style);
+    //            Rectangle frame = BeadRopeTexture.Value.Frame(1, 3, 0, style);
     //           float rotation = ribbonPoints[i].AngleTo(ribbonPoints[i + 1]);
     //            Vector2 stretch = new Vector2(0.5f + Utils.GetLerpValue(0, ribbonPoints.Length - 2, i, true) * 0.4f, ribbonPoints[i].Distance(ribbonPoints[i + 1]) / (frame.Height - 5));
-    //           Main.EntitySpriteDraw(ribbonTexture.Value, ribbonPoints[i] - Main.screenPosition, frame, lightColor.MultiplyRGBA(Color.Lerp(Color.DimGray, Color.White, (float)i / ribbonPoints.Length)), rotation - MathHelper.PiOver2, frame.Size() * new Vector2(0.5f, 0f), stretch, 0, 0);
+    //           Main.EntitySpriteDraw(BeadRopeTexture.Value, ribbonPoints[i] - Main.screenPosition, frame, lightColor.MultiplyRGBA(Color.Lerp(Color.DimGray, Color.White, (float)i / ribbonPoints.Length)), rotation - MathHelper.PiOver2, frame.Size() * new Vector2(0.5f, 0f), stretch, 0, 0);
     //        }
     //   }
     //}

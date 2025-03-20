@@ -1,5 +1,5 @@
 ﻿using CalamityMod.Rarities;
-using HeavenlyArsenal.Content.Projectiles.Weapons.Holdout.Nadir2;
+using HeavenlyArsenal.Content.Projectiles.Weapons.Melee.Nadir2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Melee
 {
-    internal class nadir2 : ModItem
+    internal class Nadir2 : ModItem
     {
         public override void SetDefaults()
         {
@@ -32,7 +32,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee
             Item.channel = true;
 
 
-          //Item.useStyle = 3;
+            //Item.useStyle = 3;
             Item.knockBack = 6;
 
 
