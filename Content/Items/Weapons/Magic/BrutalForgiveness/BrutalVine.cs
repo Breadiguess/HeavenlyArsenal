@@ -318,7 +318,7 @@ public class BrutalVine : ModProjectile
         }
 
         Matrix matrix = view * projection;
-        Vector3 lightPosition = new Vector3(SunMoonPositionRecorder.SunPosition / Main.ScreenSize.ToVector2(), -0.4f);
+        Vector3 lightPosition = new Vector3(SunMoonPositionRecorder.SunPosition / Main.ScreenSize.ToVector2(), -0.51f);
 
         ManagedShader vineShader = ShaderManager.GetShader("HeavenlyArsenal.BrutalForgivenessVineShader");
         vineShader.TrySetParameter("uWorldViewProjection", matrix);
