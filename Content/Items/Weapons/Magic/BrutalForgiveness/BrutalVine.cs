@@ -90,7 +90,8 @@ public class BrutalVine : ModProjectile
 
     public override void SetDefaults()
     {
-        Projectile.width = Main.rand?.Next(17, 32) ?? 20;
+        float vineSize = Main.rand?.NextFloat().Cubed() ?? 0f;
+        Projectile.width = (int)MathHelper.Lerp(16f, 54f, vineSize);
         Projectile.height = Projectile.width;
         Projectile.friendly = true;
         Projectile.ignoreWater = true;
@@ -107,7 +108,7 @@ public class BrutalVine : ModProjectile
 
     public override void AI()
     {
-        if (appendages.Count < 30 && Main.rand.NextBool() && Time >= 5f)
+        if (appendages.Count < 30 && Main.rand.NextBool(3) && Time >= 4f)
             GenerateAppendage();
 
         // Grow!
@@ -116,12 +117,7 @@ public class BrutalVine : ModProjectile
         NPC? target = Projectile.FindTargetWithinRange(800f);
         if (target is not null)
             AttackTarget(target);
-
-        // Swirl the end of the vine around.
-        float swirlTime = MathHelper.TwoPi * Time / 35f + Projectile.identity * 1.1f;
-        float swirlAngle = LumUtils.AperiodicSin(swirlTime) * 0.8f + MathF.Cos(swirlTime) * 0.9f;
-        Vector2 swirl = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(swirlAngle);
-        Projectile.Center += swirl * Projectile.scale * 15f;
+        SwirlAround();
 
         Z = (1f - LumUtils.Cos01(MathHelper.TwoPi * Time / 60f)) * 100f + 600f;
 
@@ -132,11 +128,26 @@ public class BrutalVine : ModProjectile
         Time++;
     }
 
+    /// <summary>
+    /// Makes this vine twist around at its front, giving winding shapes as it travels.
+    /// </summary>
+    private void SwirlAround()
+    {
+        float swirlTime = MathHelper.TwoPi * Time / 35f + Projectile.identity * 1.1f;
+        float swirlAngle = LumUtils.AperiodicSin(swirlTime) * 0.8f + MathF.Cos(swirlTime) * 0.9f;
+        Vector2 swirl = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(swirlAngle);
+        Projectile.Center += swirl * Projectile.scale * 15f;
+    }
+
+    /// <summary>
+    /// Makes this vine impale a given NPC target.
+    /// </summary>
     private void AttackTarget(NPC target)
     {
+        float speedFactor = LumUtils.InverseLerp(0f, 30f, Time);
         Vector2 directionToTarget = Projectile.SafeDirectionTo(target.Center);
-        Projectile.velocity = Vector2.Lerp(Projectile.velocity, directionToTarget * 20f, 0.033f / Projectile.MaxUpdates);
-        Projectile.velocity += directionToTarget * 2f;
+        Projectile.velocity = Vector2.Lerp(Projectile.velocity, directionToTarget * speedFactor * 20f, 0.033f / Projectile.MaxUpdates);
+        Projectile.velocity += directionToTarget * speedFactor * 2f;
 
         if (Vector2.Dot(Projectile.velocity, directionToTarget) < 0f)
             Projectile.velocity *= 0.98f;
@@ -221,7 +232,7 @@ public class BrutalVine : ModProjectile
 
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
-        behindNPCs.Add(index);
+        overPlayers.Add(index);
     }
 
     public override bool PreDraw(ref Color lightColor)
