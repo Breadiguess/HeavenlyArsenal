@@ -153,6 +153,11 @@ Mods: {
 						'''
 				}
 			}
+
+			Nadir2: {
+				DisplayName: Nadir2
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {

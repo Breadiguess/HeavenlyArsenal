@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using NoxusBoss.Content.Dusts;
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Holdout.Nadir2
+namespace HeavenlyArsenal.Content.Projectiles.Weapons.Melee.Nadir2
 {
     public class nadir2Lantern : ModProjectile
     {
