@@ -7,6 +7,7 @@ float diffuseLightExponent;
 float2 textureLookupZoom;
 float2 screenSize;
 float2 gameZoom;
+float3 lightPosition;
 matrix uWorldViewProjection;
 
 struct VertexShaderInput
@@ -41,17 +42,20 @@ VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
     float2 coords = input.TextureCoordinates * textureLookupZoom;
-    float4 color = input.Color * pow(tex2D(baseTexture, coords), 0.75) * 1.7;
+    float3 color = input.Color.rgb * pow(tex2D(baseTexture, coords).rgb, 0.75);
     float3 normal = tex2D(normalMapTexture, coords).xyz;
     
-    // Calculate light based on two normals: The normal map and the normals generated on the vertices.
-    float4 lightData = tex2D(lightMapTexture, (input.Position.xy / screenSize - 0.5) / gameZoom + 0.5);
-    float diffuse = saturate(dot(normal, float3(0, 0, 1)) * dot(input.Normal, float3(0, 0, -1)));
-    float3 light = pow(diffuse, diffuseLightExponent) * lightData.rgb;
+    // Calculate light based on the normal map.
+    float2 screenCoords = (input.Position.xy / screenSize - 0.5) / gameZoom + 0.5;
+    float3 ambientLight = tex2D(lightMapTexture, screenCoords).rgb;
     
-    // Combine the base color with light.
-    float4 result = float4(light, 1) * color;    
-    return result;
+    float diffuseInterpolant = smoothstep(0, 1, dot(input.Normal, float3(0, 0, -1)));
+    float3 lightDirection = normalize(float3(screenCoords, 0) - lightPosition);
+    float3 diffuse = pow(saturate(dot(normal, lightDirection) * lerp(0.5, 1, diffuseInterpolant)), diffuseLightExponent);
+    
+    float3 result = min(color * ambientLight + color * diffuse, ambientLight);
+    
+    return float4(result, 1);
 }
 
 technique Technique1

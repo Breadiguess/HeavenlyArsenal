@@ -5,6 +5,7 @@ using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Core.Graphics;
 using NoxusBoss.Core.Graphics.LightingMask;
 using NoxusBoss.Core.Graphics.Meshes;
 using NoxusBoss.Core.Graphics.RenderTargets;
@@ -317,13 +318,16 @@ public class BrutalVine : ModProjectile
         }
 
         Matrix matrix = view * projection;
+        Vector3 lightPosition = new Vector3(SunMoonPositionRecorder.SunPosition / Main.ScreenSize.ToVector2(), -0.4f);
 
         ManagedShader vineShader = ShaderManager.GetShader("HeavenlyArsenal.BrutalForgivenessVineShader");
         vineShader.TrySetParameter("uWorldViewProjection", matrix);
         vineShader.TrySetParameter("screenSize", WotGUtils.ViewportSize);
         vineShader.TrySetParameter("gameZoom", Main.GameViewMatrix.Zoom);
-        vineShader.TrySetParameter("textureLookupZoom", new Vector2(0.3f, 2f));
-        vineShader.TrySetParameter("diffuseLightExponent", 1.25f);
+        vineShader.TrySetParameter("textureLookupZoom", new Vector2(0.3f, 6f));
+        vineShader.TrySetParameter("diffuseLightExponent", 2.85f);
+        vineShader.TrySetParameter("ambientLight", Vector3.One);
+        vineShader.TrySetParameter("lightPosition", lightPosition);
         vineShader.SetTexture(TextureAssets.Projectile[Type].Value, 1, SamplerState.LinearWrap);
         vineShader.SetTexture(normalMapTexture.Value, 2, SamplerState.LinearWrap);
         vineShader.SetTexture(LightingMaskTargetManager.LightTarget, 3);
