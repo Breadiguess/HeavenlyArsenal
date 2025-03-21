@@ -293,16 +293,9 @@ public class BrutalVine : ModProjectile
             }
         }
 
-        bool orthographic = true;
         Vector3 cameraPosition = new Vector3(Main.screenPosition + WotGUtils.ViewportSize * 0.5f, 0f);
-        Matrix view = Matrix.CreateLookAt(cameraPosition, cameraPosition + Vector3.UnitZ, Vector3.UnitY * -Main.LocalPlayer.gravDir);
-        Matrix projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2 / Main.GameViewMatrix.Zoom.X, Main.instance.GraphicsDevice.Viewport.AspectRatio, 0.01f, 6400f);
-        if (orthographic)
-        {
-            view = Matrix.CreateTranslation(-Main.screenPosition.X, -Main.screenPosition.Y, 0f) * Main.GameViewMatrix.TransformationMatrix;
-            projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -2000f, 2000f);
-        }
-
+        Matrix view = Matrix.CreateTranslation(-Main.screenPosition.X, -Main.screenPosition.Y, 0f) * Main.GameViewMatrix.TransformationMatrix;
+        Matrix projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -2000f, 2000f);
         Matrix matrix = view * projection;
         Vector3 lightPosition = new Vector3(SunMoonPositionRecorder.SunPosition / Main.ScreenSize.ToVector2(), -0.51f);
 
