@@ -7,7 +7,6 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.Utilities;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
 
@@ -109,8 +108,6 @@ public class AntishadowAssassinSlash : ModProjectile
         trailShader.TrySetParameter("opacityFadeExponent", 2f);
         trailShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
         trailShader.SetTexture(TextureAssets.Projectile[Type], 2, SamplerState.LinearWrap);
-
-        UnifiedRandom rng = new UnifiedRandom(Projectile.identity);
 
         float swingArc = lifetimeRatio * -MathHelper.Pi + Projectile.rotation;
         Vector2[] points = new Vector2[26];
