@@ -65,18 +65,22 @@ public class BrutalVine : ModProjectile
         normalMapTexture = ModContent.Request<Texture2D>($"{Texture}NormalMap");
         appendageTextures =
         [
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage1"), new Vector2(0f, 203f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage2"), new Vector2(12f, 520f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage3"), new Vector2(18f, 1f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage4"), new Vector2(42f, 174f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage5"), new Vector2(84f, 118f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage6"), new Vector2(72f, 216f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage7"), new Vector2(4f, 354f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage8"), new Vector2(30f, 36f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage9"), new Vector2(90f, 419f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage10"), new Vector2(78f, 334f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage11"), new Vector2(62f, 326f)),
-            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage12"), new Vector2(12f, 85f)),
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage1"), new Vector2(0f, 203f)), // Oak tree.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage2"), new Vector2(12f, 520f)), // Sakura branch.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage3"), new Vector2(18f, 1f)), // Biblical fruit branch.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage4"), new Vector2(42f, 174f)), // Plumeria flower.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage5"), new Vector2(84f, 118f)), // Sunflower.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage6"), new Vector2(72f, 216f)), // Lotus.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage7"), new Vector2(4f, 354f)), // Ivy vine.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage8"), new Vector2(30f, 36f)), // Pine tree branch.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage9"), new Vector2(90f, 419f)), // White rose bush.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage10"), new Vector2(78f, 334f)), // Lavender vine.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage11"), new Vector2(62f, 326f)), // Hibiscus flowers.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage12"), new Vector2(12f, 85f)), // Camellia flower.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage13"), new Vector2(2f, 100f)), // Peacock feather.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage14"), new Vector2(3f, 300f)), // Oyster mushroom.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage15"), new Vector2(3f, 93f)), // Pomegranate branch.
+            new AppendangeData(ModContent.Request<Texture2D>($"{Texture}Appendage16"), new Vector2(8f, 416f)), // Willow tree.
         ];
 
         ProjectileID.Sets.TrailingMode[Type] = 2;
