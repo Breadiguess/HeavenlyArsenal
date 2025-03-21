@@ -30,12 +30,14 @@ Mods: {
 			}
 
 			AvatarRifle: {
-				DisplayName: Funeral Dirge of a Dead World
+				DisplayName: Funeral Dirge from a Dead World
 				Tooltip:
 					'''
 					The last remnant of a civilization once favored by the Idol.
-					You get the sense that it might be older than the universe.
+					The magazine holds seven bullets, and needs to cycle in between firing.
+					Each round in the magazine is exponentially more powerful than the last.
 
+					CRACK THE [HEAVENS]
 					'''
 			}
 
@@ -156,11 +158,22 @@ Mods: {
 
 			BrutalForgiveness: {
 				DisplayName: Brutal Forgiveness
-				Tooltip: ""
+				Tooltip:
+					'''
+					and thus [god] said to me,
+					"Take this, and [grow] your own garden."
+
+					now with 90% more flower!!
+					'''
 			}
 
 			Nadir2: {
 				DisplayName: Nadir2
+				Tooltip: ""
+			}
+
+			CosmicWatergun: {
+				DisplayName: Cosmic Watergun
 				Tooltip: ""
 			}
 		}

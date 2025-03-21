@@ -46,7 +46,15 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public override int AssociatedItemID => ModContent.ItemType<AvatarRifle>();
         public override int IntendedProjectileType => ModContent.ProjectileType<ParasiteParadiseProjectile>();
 
-        public static readonly SoundStyle FireSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_FireWIP2");
+
+         
+        public static readonly SoundStyle FireSoundNormal = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/New/avatar rifle shot normal ",3);
+        
+        public static readonly SoundStyle FireSoundStrong = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/New/avatar rifle shot strong ",3);
+       
+        public static readonly SoundStyle FireSoundSuper = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/New/avatar rifle shot super ",2);
+
+
         public static readonly SoundStyle ReloadSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle");
 
         public static readonly SoundStyle CycleSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle_Dronnor1");
@@ -259,10 +267,22 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 //SoundEngine.PlaySound(FireSound,Projectile.Center).WithVolumeBoost(1.2f);
                 //firingSoundInstance = firingSoundEffect.CreateInstance();
                 //firingSoundInstance.Play();
-                SoundEngine.PlaySound(FireSound.WithVolumeScale(1).WithPitchOffset((float)(MaxAmmo-AmmoCount)/10), Projectile.position);
+                if (AmmoCount >= 5)
+                {
+                    SoundEngine.PlaySound(FireSoundNormal.WithVolumeScale(1).WithPitchOffset(1), Projectile.position);
 
+                }
+                else if (AmmoCount <5 && AmmoCount >1)
+                { 
+                    SoundEngine.PlaySound(FireSoundStrong.WithVolumeScale(1).WithPitchOffset(1), Projectile.position);
 
-               
+                }
+                else if (AmmoCount == 1)
+                {
+                    SoundEngine.PlaySound(FireSoundSuper.WithVolumeScale(2).WithPitchOffset(0), Projectile.position);
+
+                }
+
                 Owner.GetModPlayer<HeavenlyArsenalPlayer>().AvatarRifleCounter -= 1;
                 AmmoCount--;
                 FireProjectile();

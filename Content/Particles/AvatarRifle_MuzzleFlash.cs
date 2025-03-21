@@ -49,7 +49,8 @@ public class AvatarRifle_MuzzleFlash : BaseParticle
     public override void Update(ref ParticleRendererSettings settings)
     {
         Position += Velocity;
-        Velocity *= 0.85f;
+        Velocity += new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), Main.rand.NextFloat(-0.1f, 0.1f));
+        Velocity *= 1.1f;
 
         TimeLeft++;
         if (TimeLeft > MaxTime)
