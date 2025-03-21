@@ -89,7 +89,7 @@ public class BrutalVine : ModProjectile
 
         target = new();
         Main.ContentThatNeedsRenderTargets.Add(target);
-        On_Main.DrawProjectiles += DrawVinesSeparately;
+        On_Main.DrawPlayers_AfterProjectiles += DrawVinesSeparately;
     }
 
     public override void SetDefaults()
@@ -351,22 +351,22 @@ public class BrutalVine : ModProjectile
         }
     }
 
-    private void DrawVinesSeparately(On_Main.orig_DrawProjectiles orig, Main self)
+    private void DrawVinesSeparately(On_Main.orig_DrawPlayers_AfterProjectiles orig, Main self)
     {
+        orig(self);
+
         // Not doing this results in frustrating layering artifacts on the vines, with back vertices rendering over front vertices.
         if (LumUtils.AnyProjectiles(Type))
         {
             target.Request(Main.screenWidth, Main.screenHeight, 0, () =>
             {
-                Main.spriteBatch.ResetToDefault(false);
+                Main.instance.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
                 foreach (Projectile vine in Main.ActiveProjectiles)
                 {
                     if (vine.type == Type)
                         vine.As<BrutalVine>().RenderVine();
                 }
-
-                Main.spriteBatch.End();
             });
             if (target.TryGetTarget(0, out RenderTarget2D? rt) && rt is not null)
             {
@@ -375,6 +375,5 @@ public class BrutalVine : ModProjectile
                 Main.spriteBatch.End();
             }
         }
-        orig(self);
     }
 }
