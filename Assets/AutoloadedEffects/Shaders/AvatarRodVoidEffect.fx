@@ -13,7 +13,7 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0, float4 baseColor : COLOR0)
     float noise2 = tex2D(uImage1, float2(coords.x * 2, coords.y * 2 + frac(time * 2) / noiseScale.y + noise * 0.4) * noiseScale);
     
     float offset = (coords.y + (noise2 - 0.5) * noiseStrength + pow(coords.y, 3)) * sin(coords.x * 3.14);
-    float curve = (coords.y + sin(coords.x * 3.14) - 1) * smoothstep(1.0, 0.89, coords.y);
+    float curve = (coords.y - abs(coords.x * 2 - 1)) * smoothstep(1.05, 0.89, coords.y + (1 - sin(coords.x * 3.14)) * 0.1);
 
     float image = offset > 1 - curve + outlineThickness;
     float outline = offset > 1 - curve;
