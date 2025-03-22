@@ -115,7 +115,7 @@ public class RocheLimitBlackHole : ModProjectile
     /// <summary>
     /// How long it takes for this black hole to reach its maximum radius after spawning in.
     /// </summary>
-    public static int GrowthTime => LumUtils.SecondsToFrames(0.45f);
+    public static int GrowthTime => LumUtils.SecondsToFrames(0.6f);
 
     /// <summary>
     /// The maximum diameter of the star before it collapses.
@@ -228,7 +228,7 @@ public class RocheLimitBlackHole : ModProjectile
         float growthInterpolant = LumUtils.InverseLerp(0f, GrowthTime, Time);
         float easedGrowthInterpolant = EasingCurves.Cubic.Evaluate(EasingType.InOut, growthInterpolant);
         BlackHoleDiameter = easedGrowthInterpolant * MaxBlackHoleDiameter + MathF.Cos(MathHelper.TwoPi * Time / 120f) * 10f;
-        SunDiameter = LumUtils.InverseLerp(0.2f, 0f, easedGrowthInterpolant) * MaxSunDiameter * CollapsedSunDiameterFactor;
+        SunDiameter = LumUtils.InverseLerp(0.37f, 0f, easedGrowthInterpolant) * MaxSunDiameter * CollapsedSunDiameterFactor;
         DistortionDiameter = MathF.Max(DistortionDiameter, BlackHoleDiameter * 0.275f);
 
         ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, LumUtils.Convert01To010(growthInterpolant) * 12.5f, shakeStrengthDissipationIncrement: 1.1f);
