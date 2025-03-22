@@ -48,7 +48,7 @@ public class RocheLimit : ModItem
         Item.noUseGraphic = true;
         Item.noMelee = true;
 
-        Item.shoot = ModContent.ProjectileType<RocheLimitProjectile>();
+        Item.shoot = ModContent.ProjectileType<RocheLimitBlackHole>();
         Item.shootSpeed = 10f;
         Item.rare = ModContent.RarityType<NamelessDeityRarity>();
         Item.value = Item.buyPrice(gold: 2);

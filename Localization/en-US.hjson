@@ -223,7 +223,7 @@ Mods: {
 			BrutalForgivenessProjectile.DisplayName: Brutal Forgiveness
 			BrutalVine.DisplayName: Brutal Vine
 			Mercy.DisplayName: mercy
-			RocheLimitProjectile.DisplayName: The Roche Limit
+			RocheLimitBlackHole.DisplayName: The Roche Limit
 			SolynWhip_Projectile.DisplayName: Solyn Whip_ Projectile
 		}
 	}

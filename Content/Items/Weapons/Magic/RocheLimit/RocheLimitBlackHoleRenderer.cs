@@ -23,13 +23,13 @@ public class RocheLimitBlackHoleRenderer : ModSystem
 
     private static void RenderBlackHoles()
     {
-        int blackHoleID = ModContent.ProjectileType<RocheLimitProjectile>();
+        int blackHoleID = ModContent.ProjectileType<RocheLimitBlackHole>();
         foreach (Projectile blackHole in Main.ActiveProjectiles)
         {
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 
             if (blackHole.type == blackHoleID)
-                blackHole.As<RocheLimitProjectile>().RenderBlackHole();
+                blackHole.As<RocheLimitBlackHole>().RenderBlackHole();
 
             Main.spriteBatch.End();
         }
@@ -39,7 +39,7 @@ public class RocheLimitBlackHoleRenderer : ModSystem
     {
         orig(self);
 
-        int blackHoleID = ModContent.ProjectileType<RocheLimitProjectile>();
+        int blackHoleID = ModContent.ProjectileType<RocheLimitBlackHole>();
         if (!LumUtils.AnyProjectiles(blackHoleID))
             return;
 
@@ -56,7 +56,7 @@ public class RocheLimitBlackHoleRenderer : ModSystem
                 {
                     if (index < blackHoleRadii.Length - 1)
                     {
-                        blackHoleRadii[index] = blackHole.As<RocheLimitProjectile>().BlackHoleDiameter / WotGUtils.ViewportSize.X * Main.GameViewMatrix.Zoom.X * 0.275f;
+                        blackHoleRadii[index] = blackHole.As<RocheLimitBlackHole>().BlackHoleDiameter / WotGUtils.ViewportSize.X * Main.GameViewMatrix.Zoom.X * 0.275f;
 
                         Vector2 positionCoords = (blackHole.Center - Main.screenPosition) / WotGUtils.ViewportSize;
                         blackHolePositions[index] = (positionCoords - Vector2.One * 0.5f) * aspectRatioCorrectionFactor * Main.GameViewMatrix.Zoom + Vector2.One * 0.5f;

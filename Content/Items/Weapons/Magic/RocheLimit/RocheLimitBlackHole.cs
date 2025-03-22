@@ -14,8 +14,7 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 
-// TODO -- This projectile name is generic and not representative of what it actually is. Rename it to RocheLimitBlackHole or something instead at some point.
-public class RocheLimitProjectile : ModProjectile, IDrawsWithShader
+public class RocheLimitBlackHole : ModProjectile, IDrawsWithShader
 {
     public enum BlackHoleState
     {
@@ -34,7 +33,7 @@ public class RocheLimitProjectile : ModProjectile, IDrawsWithShader
 
     // TODO list:
     // 1. Set up usage animations, make the player cast energy that gets sucked into the black hole.
-    // 2. Make item use mana and die if the player doesn't have anymore to use.
+    // 2. Make item use mana and die if the player doesn't have any more to use.
     // 3. Add spaghettification/disintegration effects (Dear god I hope RTs work for this).
     // 4. Add burst ejections.
     // 5. Make a natural black hole dissipation effect instead of having the projectile get instantly deleted if casting conditions are not met.
@@ -103,6 +102,7 @@ public class RocheLimitProjectile : ModProjectile, IDrawsWithShader
     /// </summary>
     public static float MaxBlackHoleDiameter => 325f;
 
+    // Red -> orange -> yellow -> white -> bright blue.
     /// <summary>
     /// The color gradient used to color the sun based on its temperature.
     /// </summary>
@@ -132,7 +132,7 @@ public class RocheLimitProjectile : ModProjectile, IDrawsWithShader
 
     public override void AI()
     {
-        // Begin dying if no longer holding the click button or otherwise cannot use the item.
+        // Begin dying if no longer holding the click button or otherwise unable to use the item.
         if ((!Owner.channel || Owner.dead || !Owner.active || Owner.noItems || Owner.CCed) && State != BlackHoleState.Vanish)
             SwitchState(BlackHoleState.Vanish);
 
@@ -174,9 +174,6 @@ public class RocheLimitProjectile : ModProjectile, IDrawsWithShader
         SunSpinTime += Owner.HorizontalDirectionTo(Projectile.Center) * sunSpinSpeedFactor * -0.009f + extraSpin;
 
         SunTemperature = MathHelper.Lerp(1200f, 12000f, 1f - LumUtils.Cos01(MathHelper.TwoPi * Time / 300f));
-
-        if (Time % 20f == 0f)
-            Main.NewText($"Temperature: {SunTemperature}K");
     }
 
     private void DoBehavior_StabilizeNearMouse()
@@ -286,24 +283,14 @@ public class RocheLimitProjectile : ModProjectile, IDrawsWithShader
         Main.spriteBatch.Draw(invisiblePixel, drawPosition, null, Color.Transparent, Projectile.rotation, invisiblePixel.Size() * 0.5f, BlackHoleDiameter, 0, 0f);
     }
 
-    private void RenderShineGlow(Vector2 drawPosition, Color shineColor)
-    {
-        Texture2D noise = GennedAssets.Textures.Noise.FireNoiseA;
-        ManagedShader shineShader = ShaderManager.GetShader("NoxusBoss.RadialShineShader");
-        shineShader.Apply();
-
-        Vector2 shineScale = Vector2.One * SunDiameter * 1.6f / noise.Size();
-        Main.spriteBatch.Draw(noise, drawPosition, null, shineColor * 0.45f, Projectile.rotation, noise.Size() * 0.5f, shineScale, 0, 0f);
-    }
-
-    public void DrawWithShader(SpriteBatch spriteBatch)
+    private void RenderSun()
     {
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Vector2 scale = Vector2.One * SunDiameter / GennedAssets.Textures.Noise.DendriticNoiseZoomedOut.Value.Size();
 
         // Calculate sun colors.
         float temperatureInterpolant = MathF.Pow(1f - MathF.Exp(-SunTemperature / 4000f), 2.3f);
-        float coronaExponent = 1.2f;
+        float coronaExponent = 1.23f;
         Vector3 mainColor = TemperatureGradient.SampleColor(temperatureInterpolant).ToVector3();
         Vector3 coronaColor = new Vector3(MathF.Pow(mainColor.X, coronaExponent), MathF.Pow(mainColor.Y, coronaExponent), MathF.Pow(mainColor.Z, coronaExponent));
 
@@ -320,7 +307,7 @@ public class RocheLimitProjectile : ModProjectile, IDrawsWithShader
         RenderShineGlow(drawPosition, new Color(coronaColor));
 
         // Supply information to the sun shader.
-        var sunShader = ShaderManager.GetShader("HeavenlyArsenal.RocheLimitSunShader");
+        ManagedShader sunShader = ShaderManager.GetShader("HeavenlyArsenal.RocheLimitSunShader");
         sunShader.TrySetParameter("coronaIntensityFactor", 0.23f);
         sunShader.TrySetParameter("mainColor", mainColor);
         sunShader.TrySetParameter("darkerColor", mainColor);
@@ -335,6 +322,20 @@ public class RocheLimitProjectile : ModProjectile, IDrawsWithShader
         Texture2D fireNoise = GennedAssets.Textures.Noise.FireNoiseA;
         Main.spriteBatch.Draw(fireNoise, drawPosition, null, new Color(mainColor), Projectile.rotation, fireNoise.Size() * 0.5f, scale, 0, 0f);
     }
+
+    private void RenderShineGlow(Vector2 drawPosition, Color shineColor)
+    {
+        Texture2D noise = GennedAssets.Textures.Noise.FireNoiseA;
+        ManagedShader shineShader = ShaderManager.GetShader("NoxusBoss.RadialShineShader");
+        shineShader.Apply();
+
+        Vector2 shineScale = Vector2.One * SunDiameter * 1.6f / noise.Size();
+        Main.spriteBatch.Draw(noise, drawPosition, null, shineColor * 0.45f, Projectile.rotation, noise.Size() * 0.5f, shineScale, 0, 0f);
+    }
+
+    public void DrawWithShader(SpriteBatch spriteBatch) => RenderSun();
+
+    public override bool? CanDamage() => State == BlackHoleState.StabilizeNearMouse;
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => LumUtils.CircularHitboxCollision(Projectile.Center, BlackHoleDiameter * 0.27f, targetHitbox);
 }
