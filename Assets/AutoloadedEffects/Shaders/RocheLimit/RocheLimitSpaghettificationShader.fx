@@ -14,7 +14,6 @@ float2 ModifyForZoom(float2 coords)
 
 float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
 {
-    float lensingAngles[5];
     float redshift = 0;
     float disappearance = 0;
     float2 distortedCoords = coords;
