@@ -16,6 +16,11 @@ Mods: {
 				Description: As He rises from the shadows, faint whispers echo:
 				NameText: "'Shuuren...'"
 			}
+
+			SolynWhip_Onhit_Buff: {
+				DisplayName: Solyn Whip_ Onhit_ Buff
+				Description: Mods.HeavenlyArsenal.Buffs.SolynWhip_Onhit_Buff.Description
+			}
 		}
 
 		Items: {
@@ -219,6 +224,7 @@ Mods: {
 			BrutalVine.DisplayName: Brutal Vine
 			Mercy.DisplayName: mercy
 			RocheLimitProjectile.DisplayName: The Roche Limit
+			SolynWhip_Projectile.DisplayName: Solyn Whip_ Projectile
 		}
 	}
 }

@@ -74,7 +74,7 @@ public class avatar_FishingRodVoid : ModProjectile
         }
     }
 
-    public const float DistanceFromTarget = 120;
+    public const float DistanceFromTarget = 160;
 
     public override void AI()
     {
@@ -131,7 +131,7 @@ public class avatar_FishingRodVoid : ModProjectile
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI) => overPlayers.Add(index);
 
     public override bool PreDraw(ref Color lightColor)
-    {        
+    {
         Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
 
         float vanishTime = Utils.GetLerpValue(0, 20, Time, true) * Utils.GetLerpValue(0, 20, Projectile.timeLeft, true);
@@ -179,9 +179,15 @@ public class avatar_FishingRodVoid : ModProjectile
 
     private void DrawShadowHand(Vector2 center, float rotation, float scale, int index, int direction)
     {
+       
+        if (shadowHands == null )
+            return; 
+
         float extensionTime = MathF.Sqrt(Utils.GetLerpValue(15, 25, Time - Projectile.localNPCHitCooldown * index, true) * Utils.GetLerpValue(35, 60, Projectile.timeLeft + Projectile.localNPCHitCooldown * index, true));
         Vector2 offsetForHands = new Vector2(0, 10 * (index - 1)).RotatedBy(Projectile.rotation);
         float wobble = MathF.Sin(((Main.GlobalTimeWrappedHourly * 1.67f + index * 0.2f) % 1f) * MathHelper.TwoPi) * 0.03f;
+
+        
         shadowHands[index].Draw(center + offsetForHands - Main.screenPosition, extensionTime, scale, rotation + wobble, direction);
     }
 }

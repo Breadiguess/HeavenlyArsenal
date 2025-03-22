@@ -1,30 +1,21 @@
-﻿using System;
-using CalamityMod;
-using CalamityMod.Dusts;
-using CalamityMod.Items.Weapons.Ranged;
-using CalamityMod.Particles;
+﻿using CalamityMod;
 using CalamityMod.Projectiles.BaseProjectiles;
-using CalamityMod.Projectiles.Ranged;
-using CalamityMod.Sounds;
 using HeavenlyArsenal.Content.Items.Weapons.Ranged;
+using HeavenlyArsenal.Content.Projectiles.Misc;
+using HeavenlyArsenal.Core.Physics.ClothManagement;
+using Luminance.Common.Utilities;
+using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Content.Particles;
+using NoxusBoss.Core.Graphics.RenderTargets;
+using System;
+using System.Linq;
 using Terraria;
-using Terraria.Audio;
-using Terraria.Graphics.CameraModifiers;
 using Terraria.ID;
 using Terraria.ModLoader;
-using NoxusBoss.Content.Particles;
-using HeavenlyArsenal.Common.utils;
-
-using Luminance.Core.Graphics;
 using Particle = Luminance.Core.Graphics.Particle;
-using HeavenlyArsenal.Content.Projectiles.Misc;
-using System.Linq;
-using Terraria.Graphics.Shaders;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Runtime.InteropServices;
 
 
 
@@ -32,13 +23,29 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 {
     public class FusionRifleHoldout : BaseIdleHoldoutProjectile
     {
-        
-       
+        /// <summary>
+        /// The cloth simulation attached to the front of this rifle.
+        /// </summary>
+        public ClothSimulation Cloth
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// The render target responsible for the rendering of this cloth.
+        /// </summary>
+        public static InstancedRequestableTarget ClothTarget
+        {
+            get;
+            private set;
+        }
+
         public new string LocalizationCategory => "Projectiles.Ranged";
         public bool OwnerCanShoot => Owner.HasAmmo(Owner.ActiveItem()) && !Owner.noItems && !Owner.CCed;
 
-        
-       
+
+
         public float ChargeupInterpolant => Utils.GetLerpValue(FusionRifle.ShootDelay, FusionRifle.MaxChargeTime, ChargeTimer, true);
         public ref float CurrentChargingFrames => ref Projectile.ai[0];
         public ref float ChargeTimer => ref Projectile.ai[1];
@@ -51,6 +58,16 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public float Time { get; private set; }
 
         public static float CurrentChargeTime = FusionRifle.MaxChargeTime; // Default to MaxChargeTime
+
+        public override void SetStaticDefaults()
+        {
+            ClothTarget = new InstancedRequestableTarget();
+            Main.ContentThatNeedsRenderTargets.Add(ClothTarget);
+            ProjectileID.Sets.TrailingMode[Type] = 2;
+            ProjectileID.Sets.TrailCacheLength[Type] = 10;
+
+            base.SetStaticDefaults();
+        }
 
         public override void SetDefaults()
         {
@@ -67,7 +84,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         }
 
         private int BurstCount = 0; // Tracks how many projectiles are left in the burst
-       
+
         private enum FusionRifleState
         {
             Charging,  // Charging up
@@ -82,6 +99,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         public override void SafeAI()
         {
+            Cloth ??= new ClothSimulation(new Vector3(Projectile.Center, 0f), 11, 15, 3f, 60f, 0.02f);
+
             Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
 
             switch (CurrentState)
@@ -101,6 +120,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
             UpdateProjectileHeldVariables(armPosition);
             ManipulatePlayerVariables();
+            UpdateCloth();
             Time++;
         }
 
@@ -122,7 +142,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             {
                 if (ChargeTimer < CurrentChargeTime)
                     ChargeTimer++;
-                
+
 
 
 
@@ -138,7 +158,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 {
                     chargingSoundInstance.Play(); // Restart if it’s stopped
                 }
-               
+
                 // Add gun shake effect as the rifle charges
                 float shakeIntensity = 2f * ChargeupInterpolant;
                 Projectile.position += new Vector2(
@@ -152,7 +172,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 float dustRadius = MathHelper.Lerp(initialDustRadius, finalDustRadius, ChargeTimer / CurrentChargeTime);
 
                 // Adjustable offset for the barrel (change these values to position the swirl effect)
-                Vector2 barrelOffset = new Vector2(45f, Projectile.direction*-7f); // Customize the base position of the dust effect
+                Vector2 barrelOffset = new Vector2(45f, Projectile.direction * -7f); // Customize the base position of the dust effect
                 barrelOffset = barrelOffset.RotatedBy(Projectile.rotation); // Rotate the offset based on the projectile's rotation
 
                 // Define rotation angle for Y-axis tilt (in radians)
@@ -219,7 +239,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 if (ChargeTimer > 0) // Rapidly drain the charge
                 {
                     float intensity = ChargeupInterpolant * 0.5f; // Reduce glow intensity
-                    Dust dust = Dust.NewDustPerfect(Projectile.Center, DustID.RuneWizard, Vector2.Zero, 100, Color.Cyan, intensity*10);
+                    Dust dust = Dust.NewDustPerfect(Projectile.Center, DustID.RuneWizard, Vector2.Zero, 100, Color.Cyan, intensity * 10);
                     dust.noGravity = false;
                     ChargeTimer -= 10; // Decrease charge timer
                     if (ChargeTimer < 0)
@@ -228,6 +248,48 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             }
         }
 
+        private void ConstrainParticle(Vector2 anchor, ClothPoint? point, float angleOffset)
+        {
+            if (point is null)
+                return;
+
+            float xInterpolant = point.X / (float)Cloth.Width;
+            float angle = MathHelper.Lerp(MathHelper.PiOver2, MathHelper.TwoPi - MathHelper.PiOver2, xInterpolant);
+
+            Vector2 offset = new Vector2(MathF.Cos(angle + angleOffset) * 10f, 0f).RotatedBy(Projectile.rotation);
+            Vector3 ring = new Vector3(offset.X, offset.Y, MathF.Sin(angle - MathHelper.PiOver2) * 10f);
+            ring.Y += point.Y * 6f;
+
+            point.Position = new Vector3(anchor, 0f) + ring;
+            point.IsFixed = true;
+        }
+
+        private void UpdateCloth()
+        {
+            int steps = 24;
+            float windSpeed = Math.Clamp(Main.WindForVisuals * Projectile.spriteDirection * 8f, -1.3f, 1.3f);
+            Vector2 clothPosition = Projectile.Center + new Vector2(26f, Projectile.velocity.X.NonZeroSign() * -3f).RotatedBy(Projectile.rotation) * Projectile.scale;
+
+            Vector2 previousBarrelEnd = Projectile.Center + Projectile.oldRot[1].ToRotationVector2() * Projectile.scale * 30f;
+            Vector2 barrelEnd = Projectile.Center + Projectile.oldRot[0].ToRotationVector2() * Projectile.scale * 30f;
+            Vector3 rotationalForce = new Vector3(barrelEnd - previousBarrelEnd, 0f) * -4f;
+
+            for (int i = 0; i < steps; i++)
+            {
+                for (int x = 0; x < Cloth.Width; x += 2)
+                {
+                    for (int y = 0; y < 2; y++)
+                        ConstrainParticle(clothPosition, Cloth.particleGrid[x, y], 0f);
+                    for (int y = 0; y < Cloth.Height; y++)
+                    {
+                        Vector3 localWind = Vector3.UnitX * (LumUtils.AperiodicSin(Time * 0.01f + y * 0.05f) * windSpeed) * 1.2f;
+                        Cloth.particleGrid[x, y].AddForce(localWind + rotationalForce);
+                    }
+                }
+
+                Cloth.Simulate(0.051f, false, Vector3.UnitY * 4f);
+            }
+        }
 
         private void HandleFiring()
         {
@@ -244,7 +306,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 {
                     FireBurstProjectile();
                     BurstCount--;
-                    
+
                     StateTimer = 5; // Cycle between burst projectiles (adjust as needed)
                 }
                 else
@@ -267,7 +329,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             {
                 StateTimer--; // Count down the delay
                 DisipateHeat(false);
-                
+
             }
             else
             {
@@ -284,7 +346,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Vector2 initialOffset = new Vector2(10f, Projectile.direction * -5f); // Initial offset for the vent system (adjust as needed)
 
             // Adjust exhaust velocity based on the base projectile's velocity and rotation
-            Vector2 baseExhaustDirection = Projectile.velocity.SafeNormalize(Vector2.UnitX)*-Projectile.direction; // Base direction opposite of projectile's movement
+            Vector2 baseExhaustDirection = Projectile.velocity.SafeNormalize(Vector2.UnitX) * -Projectile.direction; // Base direction opposite of projectile's movement
             baseExhaustDirection = baseExhaustDirection.RotatedBy(Projectile.rotation); // Align with the projectile's rotation
 
 
@@ -304,8 +366,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 {
                     TopExhaust = false;
                 }
-                    // Calculate the vent position relative to the projectile
-                    Vector2 ventOffset = new Vector2(i * ventSpacing, 0); // Iterate over X position
+                // Calculate the vent position relative to the projectile
+                Vector2 ventOffset = new Vector2(i * ventSpacing, 0); // Iterate over X position
                 ventOffset = ventOffset.RotatedBy(Projectile.rotation); // Rotate the offset by the projectile's rotation
 
                 Vector2 ventPosition = Projectile.Center + initialOffset.RotatedBy(Projectile.rotation) + ventOffset;
@@ -328,7 +390,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                         0, // No knockback
                         Projectile.owner);
                 }
-              
+
 
                 // Only create dust at intervals determined by the loop
                 if (StateTimer % numberOfVents == i) // Stagger the dust creation
@@ -399,8 +461,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             float knockback = Projectile.knockBack;
             Vector2 spawnPosition = armPosition + Projectile.velocity.SafeNormalize(Vector2.Zero) * 50f;
 
-            
-            float angleVariance = MathHelper.ToRadians(2f); 
+
+            float angleVariance = MathHelper.ToRadians(2f);
             float randomAngle = Main.rand.NextFloat(-angleVariance, angleVariance); // Randomize the angle within the variance
             Vector2 adjustedVelocity = Projectile.velocity.RotatedBy(randomAngle); // Apply the random angle to the velocity
 
@@ -420,15 +482,15 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
 
 
-            DeltaruneExplosionParticle deltaruneExplosionParticle = new DeltaruneExplosionParticle(spawnPosition, Vector2.Zero, Color.AntiqueWhite, 48,1);
-                
+            DeltaruneExplosionParticle deltaruneExplosionParticle = new DeltaruneExplosionParticle(spawnPosition, Vector2.Zero, Color.AntiqueWhite, 48, 1);
+
 
 
 
             // Trigger the recoil effect
             recoilIntensity = maxRecoil; // Set the recoil to its maximum value
 
-            
+
             //PunchCameraModifier = new Vector2(Main.rand.NextFloat(-50f, 50f), Main.rand.NextFloat(-50f, 50f));
             //replace recoilVector with something else later
 
@@ -440,7 +502,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         private const float maxRecoil = 10f; // Maximum recoil amount
         private const float recoilRecoverySpeed = 0.1f; // Speed at which recoil eases out
 
-        public static Vector2 RecoilOffset =new Vector2(-recoilIntensity,0);
+        public static Vector2 RecoilOffset = new Vector2(-recoilIntensity, 0);
 
 
         public void UpdateProjectileHeldVariables(Vector2 armPosition)
@@ -465,7 +527,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             }
 
             Vector2 recoilOffset = -Projectile.velocity.SafeNormalize(Vector2.Zero) * recoilIntensity;
-            Projectile.position = armPosition - Projectile.Size * 0.5f + Projectile.velocity.SafeNormalize(Vector2.UnitY) * 34f  + recoilOffset;
+            Projectile.position = armPosition - Projectile.Size * 0.5f + Projectile.velocity.SafeNormalize(Vector2.UnitY) * 34f + recoilOffset;
             Projectile.rotation = Projectile.velocity.ToRotation();
             Projectile.spriteDirection = Projectile.direction;
             Projectile.timeLeft = 2;
@@ -476,8 +538,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Owner.ChangeDir(Projectile.direction);
             Owner.heldProj = Projectile.whoAmI;
 
-            
-            float frontArmRotation =Projectile.rotation * 0.5f;
+
+            float frontArmRotation = Projectile.rotation * 0.5f;
             if (Owner.direction == -1)
                 frontArmRotation += MathHelper.PiOver2;
             else
@@ -488,7 +550,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         }
 
 
-        
+
         public void AdjustVisualValues(ref float scale, ref float opacity, ref float rotation, float time)
         {
             scale = Utils.GetLerpValue(0.1f, 35f, time, true) * 1.4f;
@@ -496,18 +558,45 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             rotation -= MathHelper.ToRadians(scale * 4f);
         }
 
+        private void DrawCloth()
+        {
+            Matrix world = Matrix.CreateTranslation(-Projectile.Center.X + WotGUtils.ViewportSize.X * 0.5f, -Projectile.Center.Y + WotGUtils.ViewportSize.Y * 0.5f, 0f);
+            Matrix projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -1000f, 1000f);
+            Matrix matrix = world * projection;
 
+            ManagedShader clothShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleClothShader");
+            clothShader.TrySetParameter("opacity", Projectile.Opacity);
+            clothShader.TrySetParameter("transform", matrix);
+            clothShader.Apply();
+
+            Cloth.Render();
+        }
 
         public override bool PreDraw(ref Color lightColor)
         {
+            ClothTarget.Request(350, 350, Projectile.whoAmI, DrawCloth);
+            if (ClothTarget.TryGetTarget(Projectile.whoAmI, out RenderTarget2D? clothTarget) && clothTarget is not null)
+            {
+                Main.spriteBatch.PrepareForShaders();
+
+                ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleClothPostProcessingShader");
+                postProcessingShader.TrySetParameter("textureSize", clothTarget.Size());
+                postProcessingShader.TrySetParameter("edgeColor", new Color(208, 37, 40).ToVector4());
+                postProcessingShader.Apply();
+
+                Main.spriteBatch.Draw(clothTarget, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(Color.White), 0f, clothTarget.Size() * 0.5f, 1f, 0, 0f);
+                Main.spriteBatch.ResetToDefault();
+
+            }
+
             Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
             //Texture2D textureGlow = ModContent.Request<Texture2D>("CalamityMod/Projectiles/Ranged/HeavenlyGaleProjGlow").Value;
             Vector2 origin = texture.Size() * 0.5f;
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 
-            
 
-          
+
+
             float chargeOffset = ChargeupInterpolant * Projectile.scale * 5f;
             Color chargeColor = Color.Lerp(Color.Crimson, Color.Gold, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 7.1f) * 0.5f + 0.5f) * ChargeupInterpolant * 0.6f;
             chargeColor.A = 0;
@@ -521,7 +610,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             }
 
             Color stringColor = new(129, 18, 42);
-           
+
 
             // Draw a backglow effect as an indicator of charge.
             for (int i = 0; i < 5; i++)
@@ -585,12 +674,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
             //restartShader(outerCircleGlowmask, Projectile.Opacity, Circlerotation, BlendState.Additive, false);
             //Main.EntitySpriteDraw(outerCircleGlowmask, CircledrawPosition, null, Color.White, 0f,
-               //                  outerCircleGlowmask.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
+            //                  outerCircleGlowmask.Size() * 0.5f, Projectile.scale * 1.075f, SpriteEffects.None, 0);
 
             // Restart shader for the main circle
             //restartShader(outerCircleTexture, Projectile.Opacity * 0.7f, Circlerotation, BlendState.AlphaBlend, false);
-           // Main.EntitySpriteDraw(outerCircleTexture, CircledrawPosition, null, Color.White, 0f,
-              //                   outerCircleTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
+            // Main.EntitySpriteDraw(outerCircleTexture, CircledrawPosition, null, Color.White, 0f,
+            //                   outerCircleTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0);
 
 
             //restartShader(innerCircleTexture, Projectile.Opacity * 0.5f, 0f, BlendState.Additive);

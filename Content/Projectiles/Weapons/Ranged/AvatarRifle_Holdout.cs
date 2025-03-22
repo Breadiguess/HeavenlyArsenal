@@ -33,6 +33,7 @@ using NoxusBoss.Core.Utilities;
 using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Content.Particles;
 using NoxusBoss.Assets;
+using NoxusBoss.Core.Graphics.RenderTargets;
 
 
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
@@ -55,7 +56,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public static readonly SoundStyle FireSoundSuper = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/New/avatar rifle shot super ",2);
 
 
-        public static readonly SoundStyle ReloadSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle");
+        public static readonly SoundStyle ReloadSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/New/avatar rifle reload ",2);
 
         public static readonly SoundStyle CycleSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle_Dronnor1");
         public static readonly SoundStyle CycleEmptySound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle");
@@ -64,33 +65,30 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public static readonly SoundStyle StrongFireSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_ClipEject");
         public static readonly SoundStyle RealityFireSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_ClipEject");
 
-        
-        public ClothSimulation Shroud
-        {
-            get;
-            set;
-        } = new ClothSimulation(Vector3.Zero,
 
-            //Width
-            22,
-            //Height
-            21,
-            //spacing?
-            4.4f,
-            // stiffness
-            60f,
-            // dampening coeficcient
-            0.019f);
+        /// <summary>
+        /// The cloth simulation attached to the front of this rifle.
+        /// </summary>
+       
+
+        public float Time 
+        { 
+          get;
+          private set;
+        }
+
 
         public int ExistenceTimer
         {
             get;
             set;
         }
-
+        private Rope rope;
         //private readonly List<SlotId> attachedSounds = [];
 
         public ref Player Player => ref Main.player[Projectile.owner];
+
+
 
 
         private AvatarRifleState CurrentState = AvatarRifleState.Firing;
@@ -112,7 +110,11 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         public override void SetStaticDefaults()
         {
-            Main.projFrames[Projectile.type] = 18; 
+            Main.projFrames[Projectile.type] = 18;
+            ClothTarget = new InstancedRequestableTarget();
+            Main.ContentThatNeedsRenderTargets.Add(ClothTarget);
+            ProjectileID.Sets.TrailingMode[Type] = 2;
+            ProjectileID.Sets.TrailCacheLength[Type] = 10;
         }
 
         public override void SetDefaults()
@@ -128,7 +130,11 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         }
 
 
-        private Rope rope;
+
+
+       
+
+
 
         public override void OnSpawn(IEntitySource source)
         {
@@ -161,6 +167,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         }
         public override void SafeAI()
         {
+            Cloth ??= new ClothSimulation(new Vector3(Projectile.Center, 10f*Projectile.direction), Projectile.width, 7, 0f, 60f, 0.02f);
 
 
             RibbonPhysics();
@@ -197,7 +204,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 StateTimer = 0;
             }
 
-            //UpdateCloth();
+            
             ExistenceTimer++;
 
 
@@ -209,52 +216,11 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             rope.gravity = new Vector2(0f, 0.5f);
             rope.Update();
             ApplyWindToRope();
+            UpdateCloth();
+            Time++;
         }
 
-        private void UpdateCloth()
-        {
-
-            //I'm assuming thsi is referring to the LEVEL OF DETAIL
-            int steps = 5;
-
-            float windSpeed = Math.Clamp(Main.WindForVisuals * Projectile.spriteDirection * 8f, -1.3f, 0f);
-
-            Vector2 ShroudPosition = Projectile.Center - Main.screenPosition;
-
-
-            //actually implement wind into the cloth
-            Vector3 wind = Vector3.UnitX * (AperiodicSin(ExistenceTimer * 0.029f) * 0.67f + windSpeed) * 1.74f;
-            for (int i = 0; i < steps; i++)
-            {
-                for (int x = 0; x < Shroud.Width; x += 2)
-                {
-                    for (int y = 0; y < 2; y++)
-                        ConstrainParticle(ShroudPosition, Shroud.particleGrid[x, y], 0f);
-                }
-                Main.NewText($"Simulating Shroud at {i}", Color.Cyan);
-                Shroud.Simulate(
-                    //deltaTime
-                    0.051f,
-                    //Has collision
-                    false,
-                    //Gravity!!
-                    Vector3.UnitY * 3.2f + wind);
-            }
-        }
-        private void ConstrainParticle(Vector2 anchor, ClothPoint point, float angleOffset)
-        {
-            if (point is null)
-                return;
-
-            float xInterpolant = point.X / (float)Shroud.Width;
-            float angle = MathHelper.Lerp(MathHelper.PiOver2, MathHelper.TwoPi - MathHelper.PiOver2, xInterpolant);
-
-            Vector3 ring = new Vector3(MathF.Cos(angle + angleOffset) * 50f, 0f, MathF.Sin(angle - MathHelper.PiOver2) * 10f);
-            ring.Y += point.Y * 6f;
-
-            point.Position = new Vector3(anchor, 0f) + ring;
-            point.IsFixed = true;
-        }
+        
 
         private void HandleFiring()
         {
@@ -269,12 +235,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 //firingSoundInstance.Play();
                 if (AmmoCount >= 5)
                 {
-                    SoundEngine.PlaySound(FireSoundNormal.WithVolumeScale(1).WithPitchOffset(1), Projectile.position);
+                    SoundEngine.PlaySound(FireSoundNormal.WithVolumeScale(1).WithPitchOffset(MaxAmmo - AmmoCount/10), Projectile.position);
 
                 }
                 else if (AmmoCount <5 && AmmoCount >1)
                 { 
-                    SoundEngine.PlaySound(FireSoundStrong.WithVolumeScale(1).WithPitchOffset(1), Projectile.position);
+                    SoundEngine.PlaySound(FireSoundStrong.WithVolumeScale(1).WithPitchOffset(MaxAmmo-AmmoCount/10), Projectile.position);
 
                 }
                 else if (AmmoCount == 1)
@@ -734,7 +700,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public void RibbonPhysics()
         {
             int length = 6; // Number of ribbon segments
-            Vector2 gravity = new Vector2(0, 0.65f); // Gravity to pull the ribbon downward
+            Vector2 gravity = new Vector2(0, 0.7f); // Gravity to pull the ribbon downward
             float maxDistance = 3f; // Spacing between segments
             float dampening = 0.5f; // Damping factor to stabilize motion
 
@@ -755,7 +721,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             }
 
 
-            ribbonPoints[0] = AnchorPosition();
+            //ribbonPoints[0] = AnchorPosition();
             float drawScale = Projectile.scale;
 
             
@@ -786,6 +752,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                     // Store or apply the rotation for the last segment
                     ribbonVels[i] = segmentRotation.ToRotationVector2() * ribbonVels[i].Length(); // Optional: align velocity
                 }
+                ribbonPoints[0] = AnchorPosition();
             }
         }
 
@@ -833,26 +800,144 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             //Main.EntitySpriteDraw(texture, drawPosition, frame, lightColor, Projectile.rotation, frame.Size() * 0.5f, 1f, 0, 0);
 
             //DrawShroud();
-            
 
 
 
+            ClothTarget.Request(350, 350, Projectile.whoAmI, DrawCloth);
+            if (ClothTarget.TryGetTarget(Projectile.whoAmI, out RenderTarget2D? clothTarget) && clothTarget is not null)
+            {
+                Main.spriteBatch.PrepareForShaders();
+
+                ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleClothPostProcessingShader");
+                postProcessingShader.TrySetParameter("textureSize", clothTarget.Size());
+                postProcessingShader.TrySetParameter("edgeColor", new Color(208, 37, 40).ToVector4());
+                postProcessingShader.Apply();
+
+                Main.spriteBatch.Draw(clothTarget, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(Color.White), 0f, clothTarget.Size() * 0.5f, 1f, 0, 0f);
+                Main.spriteBatch.ResetToDefault();
+
+            }
             return false;
         }
 
-
-        private void DrawShroud()
+        // Property to hold the cloth simulation object
+        public ClothSimulation Cloth
         {
+            get;
+            private set; // Only accessible within the class
+        }
+
+        /// <summary>
+        /// The render target responsible for rendering the cloth.
+        /// </summary>
+        public static InstancedRequestableTarget ClothTarget
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Constrains a cloth particle to a specific anchor point with an optional angle offset.
+        /// </summary>
+        private void ConstrainParticle(Vector2 anchor, ClothPoint? point, float angleOffset)
+        {
+            // Check if the particle (point) is null before proceeding
+            if (point is null)
+                return;
+
+            // Calculate the horizontal interpolation factor for the particle's X position within the cloth width
+            float xInterpolant = point.X*5 / (float)Cloth.Width;
+
+            // Determine the angle for the particle's position based on the interpolation factor
+            float angle = MathHelper.Lerp(MathHelper.PiOver2, MathHelper.TwoPi - MathHelper.PiOver2, xInterpolant);
+
+            // Calculate the offset for the particle's position based on its angle and projectile rotation
+            Vector2 offset = new Vector2(MathF.Cos(angle + angleOffset) * 60f, 0f).RotatedBy(Projectile.rotation);
+
+            // Compute a 3D ring position for the particle, adding depth based on the sine of the angle
+            Vector3 ring = new Vector3(offset.X, offset.Y, MathF.Sin(angle - MathHelper.PiOver2) * 6f);
+
+            // Adjust the Y-component of the ring based on the particle's Y position
+            ring.Y += point.Y * 24f;
+
+            // Set the particle's final position relative to the anchor and mark it as fixed
+            point.Position = new Vector3(anchor, 0f) + ring;
+            point.IsFixed = true;
+        }
+
+        /// <summary>
+        /// Updates the cloth simulation with wind and rotational forces.
+        /// </summary>
+        private void UpdateCloth()
+        {
+            // Number of simulation steps to perform in one update
+            int steps = 24;
+
+            // Calculate wind speed, clamping it between -1.3 and 1.3
+            float windSpeed = Math.Clamp(Main.WindForVisuals * Projectile.spriteDirection * 8f, -1.3f, 1.3f);
+
+            // Determine cloth position based on projectile properties (center, rotation, scale)
+            Vector2 clothPosition = Projectile.Center + new Vector2(90f, Projectile.velocity.X.NonZeroSign() * -3f).RotatedBy(Projectile.rotation) * Projectile.scale;
+
+            // Calculate previous and current barrel end positions for rotational force computation
+            Vector2 previousBarrelEnd = Projectile.Center + Projectile.oldRot[1].ToRotationVector2() * Projectile.scale * 30f;
+            Vector2 barrelEnd = Projectile.Center + Projectile.oldRot[0].ToRotationVector2() * Projectile.scale * 30f;
+
+            // Compute rotational force based on the difference in barrel end positions
+            Vector3 rotationalForce = new Vector3(barrelEnd - previousBarrelEnd, 0f) * 4f;
+
+            // Run the simulation for a predefined number of steps
+            for (int i = 0; i < steps; i++)
+            {
+                // Loop through the cloth grid's width with a step of 2 particles
+                for (int x = 0; x < Cloth.Width; x += 2)
+                {
+                    // Constrain particles in the first two rows of the cloth grid
+                    for (int y = 0; y < 2; y++)
+                        ConstrainParticle(clothPosition, Cloth.particleGrid[x, y], 0f);
+
+                    // Apply wind and rotational forces to all particles in the cloth grid
+                    for (int y = 0; y < Cloth.Height; y++)
+                    {
+                        // Calculate local wind force with turbulence and scaling
+                        Vector3 localWind = Vector3.UnitX * (LumUtils.AperiodicSin(Time * 0.01f + y * 0.05f) * windSpeed) * 1.2f;
+
+                        // Apply forces to the cloth particle at position (x, y)
+                        Cloth.particleGrid[x, y].AddForce(localWind + rotationalForce);
+                    }
+                }
+
+                // Simulate cloth behavior with gravity and a small time step
+                Cloth.Simulate(0.051f, false, Vector3.UnitY * 4f);
+            }
+        }
+
+        /// <summary>
+        /// Draws the cloth using a specific shader and transformation matrix.
+        /// </summary>
+        private void DrawCloth()
+        {
+            // Create a world matrix to center the viewport around the projectile
             Matrix world = Matrix.CreateTranslation(-Projectile.Center.X + WotGUtils.ViewportSize.X * 0.5f, -Projectile.Center.Y + WotGUtils.ViewportSize.Y * 0.5f, 0f);
+
+            // Create an orthographic projection matrix for rendering
             Matrix projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -1000f, 1000f);
+
+            // Combine the world and projection matrices for the final transformation
             Matrix matrix = world * projection;
 
-            ManagedShader clothShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssasinRobeShader");
-            clothShader.TrySetParameter("opacity", 150);
+            // Get the shader used for rendering the cloth
+            ManagedShader clothShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleClothShader");
+
+            // Set shader parameters for opacity and transformation
+            clothShader.TrySetParameter("opacity", Projectile.Opacity);
             clothShader.TrySetParameter("transform", matrix);
+
+            // Apply the shader
             clothShader.Apply();
-            Main.NewText($"DrawingShroud", Color.Cyan);
-            Shroud.Render();
+
+            // Render the cloth
+            Cloth.Render();
         }
 
         public override bool? CanDamage() => false;
