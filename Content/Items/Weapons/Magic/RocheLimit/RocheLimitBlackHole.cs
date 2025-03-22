@@ -7,8 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.DataStructures;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Terraria;
+using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
@@ -36,6 +39,11 @@ public class RocheLimitBlackHole : ModProjectile
     // 3. Add spaghettification/disintegration effects (Dear god I hope RTs work for this).
     // 4. Add burst ejections.
     // 5. Make a natural black hole dissipation effect instead of having the projectile get instantly deleted if casting conditions are not met.
+
+    /// <summary>
+    /// A remapped version of the temperature to fit a 0-1 interpolant range for color sampling.
+    /// </summary>
+    public float TemperatureInterpolant => MathF.Pow(1f - MathF.Exp(-SunTemperature / 4000f), 2.3f);
 
     /// <summary>
     /// The owner of this black hole.
@@ -145,6 +153,7 @@ public class RocheLimitBlackHole : ModProjectile
         Projectile.DamageType = DamageClass.Magic;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 1;
+        Projectile.hide = true;
         Projectile.netImportant = true;
     }
 
@@ -183,6 +192,9 @@ public class RocheLimitBlackHole : ModProjectile
         SetPlayerItemAnimations();
         StandardMouseHoverMotion();
 
+        if (ExistenceTimer >= 5f)
+            CastEnergy();
+
         int sunFormTime = 30;
         int collapseWaitDelay = 15;
         int collapseTime = 120;
@@ -215,7 +227,7 @@ public class RocheLimitBlackHole : ModProjectile
 
         float growthInterpolant = LumUtils.InverseLerp(0f, GrowthTime, Time);
         float easedGrowthInterpolant = EasingCurves.Cubic.Evaluate(EasingType.InOut, growthInterpolant);
-        BlackHoleDiameter = easedGrowthInterpolant * MaxBlackHoleDiameter;
+        BlackHoleDiameter = easedGrowthInterpolant * MaxBlackHoleDiameter + MathF.Cos(MathHelper.TwoPi * Time / 120f) * 10f;
         SunDiameter = LumUtils.InverseLerp(0.2f, 0f, easedGrowthInterpolant) * MaxSunDiameter * CollapsedSunDiameterFactor;
         DistortionDiameter = MathF.Max(DistortionDiameter, BlackHoleDiameter * 0.275f);
 
@@ -229,6 +241,7 @@ public class RocheLimitBlackHole : ModProjectile
         BlackHoleDiameter *= decayFactor;
         SunDiameter *= decayFactor;
         DistortionDiameter *= decayFactor;
+        Projectile.Opacity *= decayFactor;
         if (DistortionDiameter < 3f)
             DistortionDiameter = 0f;
     }
@@ -245,6 +258,8 @@ public class RocheLimitBlackHole : ModProjectile
         Vector2 hoverOffset = Owner.SafeDirectionTo(Main.MouseWorld) * hoverDistance;
         Vector2 stabilizedDestination = Owner.Center + hoverOffset;
 
+        Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Owner.AngleTo(Projectile.Center) - MathHelper.PiOver2);
+
         // Stay near the stabilized destination.
         // This only runs for the owner, since they're the client whose mouse should be listened.
         if (Main.myPlayer == Projectile.owner)
@@ -258,6 +273,22 @@ public class RocheLimitBlackHole : ModProjectile
                 Projectile.netUpdate = true;
                 Projectile.netSpam = 0;
             }
+        }
+    }
+
+    /// <summary>
+    /// Makes the owner player cast energy into this projectile.
+    /// </summary>
+    private void CastEnergy()
+    {
+        float speedFactor = MathF.Max(SunDiameter / MaxSunDiameter, BlackHoleDiameter / MaxBlackHoleDiameter);
+        for (int i = 0; i < 3; i++)
+        {
+            Vector2 handPosition = Owner.Center + Owner.SafeDirectionTo(Projectile.Center) * 20f;
+            Vector2 fireVelocity = handPosition.SafeDirectionTo(Projectile.Center).RotatedByRandom(0.09f) * Main.rand.NextFloat(10f, 120f) * speedFactor;
+            float fireSize = Main.rand.NextFloat(15f, 120f);
+            Color fireColor = Color.Lerp(new Color(209, 27, 10), new Color(255, 219, 32), Main.rand.NextFloat(0.4f));
+            RocheLimitBlackHoleRenderer.ParticleSystem.CreateNew(handPosition, fireVelocity, Vector2.One * fireSize, fireColor);
         }
     }
 
@@ -329,6 +360,39 @@ public class RocheLimitBlackHole : ModProjectile
         Main.spriteBatch.Draw(invisiblePixel, drawPosition, null, Color.Transparent, Projectile.rotation, invisiblePixel.Size() * 0.5f, BlackHoleDiameter, 0, 0f);
     }
 
+    private float RayWidthFunction(float completionRatio)
+    {
+        float generalScale = LumUtils.InverseLerp(0f, MaxSunDiameter * CollapsedSunDiameterFactor, SunDiameter);
+        float frontPinch = MathF.Sqrt(LumUtils.InverseLerp(1f, 0.75f, completionRatio));
+        return generalScale * frontPinch * 50f;
+    }
+
+    private Color RayColorFunction(float completionRatio) => new Color(170, 225, 255);
+
+    /// <summary>
+    /// Renders the beam that charges up this projectile's sun form into a black hole.
+    /// </summary>
+    private void RenderSunChargeUpBeam()
+    {
+        List<Vector2> rayPoints = Projectile.GetLaserControlPoints(10, Projectile.Distance(Owner.Center), Projectile.SafeDirectionTo(Owner.Center));
+
+        ManagedShader rayShader = ShaderManager.GetShader("HeavenlyArsenal.RocheLimitEnergyRayShader");
+        rayShader.SetTexture(TextureAssets.Extra[ExtrasID.FlameLashTrailShape], 1, SamplerState.LinearWrap);
+        PrimitiveRenderer.RenderTrail(rayPoints, new PrimitiveSettings(RayWidthFunction, RayColorFunction, Shader: rayShader), 40);
+
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+        Texture2D noise = GennedAssets.Textures.Noise.FireNoiseA;
+        ManagedShader shineShader = ShaderManager.GetShader("NoxusBoss.RadialShineShader");
+        shineShader.Apply();
+
+        Vector2 drawPosition = Owner.Center - Main.screenPosition + Owner.SafeDirectionTo(Projectile.Center) * 20f;
+        Vector2 shineScale = new Vector2(1.5f, 1f) * LumUtils.InverseLerp(0f, 0.5f, SunDiameter / MaxSunDiameter) * 112f / noise.Size();
+        Main.spriteBatch.Draw(noise, drawPosition, null, Color.White * Projectile.Opacity * 0.2f, Owner.AngleTo(Projectile.Center) + MathHelper.PiOver2, noise.Size() * 0.5f, shineScale, 0, 0f);
+        Main.spriteBatch.ResetToDefault();
+    }
+
     /// <summary>
     /// Renders the sun form for this projectile.
     /// </summary>
@@ -339,8 +403,7 @@ public class RocheLimitBlackHole : ModProjectile
 
         // Calculate sun colors.
         float coronaExponent = 1.23f;
-        float temperatureInterpolant = MathF.Pow(1f - MathF.Exp(-SunTemperature / 4000f), 2.3f);
-        Vector3 mainColor = TemperatureGradient.SampleColor(temperatureInterpolant).ToVector3();
+        Vector3 mainColor = TemperatureGradient.SampleColor(TemperatureInterpolant).ToVector3();
         Vector3 coronaColor = new Vector3(MathF.Pow(mainColor.X, coronaExponent), MathF.Pow(mainColor.Y, coronaExponent), MathF.Pow(mainColor.Z, coronaExponent));
 
         // The corona color calculations use rational functions, meaning that even the tiniest quantities can, on extremely small pixel scales, get inflated into high values.
@@ -352,7 +415,7 @@ public class RocheLimitBlackHole : ModProjectile
             coronaColor.Y = 0f;
         if (coronaColor.Z < minCoronaThreshold)
             coronaColor.Z = 0f;
-        coronaColor = Vector3.Lerp(coronaColor, Vector3.One * 2f, temperatureInterpolant);
+        coronaColor = Vector3.Lerp(coronaColor, Vector3.One * 2f, TemperatureInterpolant);
 
         RenderShineGlow(drawPosition, new Color(coronaColor));
 
@@ -404,6 +467,27 @@ public class RocheLimitBlackHole : ModProjectile
 
         if (BlackHoleDiameter >= 0.5f)
             RenderBlackHole();
+    }
+
+    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    {
+        overPlayers.Add(index);
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+        Texture2D noise = GennedAssets.Textures.Noise.FireNoiseA;
+        ManagedShader shineShader = ShaderManager.GetShader("NoxusBoss.RadialShineShader");
+        shineShader.Apply();
+
+        Vector2 drawPosition = Owner.Center - Main.screenPosition + Owner.SafeDirectionTo(Projectile.Center) * 20f;
+        Vector2 shineScale = new Vector2(1.5f, 1f) * LumUtils.InverseLerp(0f, 0.5f, SunDiameter / MaxSunDiameter) * 140f / noise.Size();
+        Main.spriteBatch.Draw(noise, drawPosition, null, Color.White * Projectile.Opacity * 0.2f, Owner.AngleTo(Projectile.Center) + MathHelper.PiOver2, noise.Size() * 0.5f, shineScale, 0, 0f);
+        Main.spriteBatch.ResetToDefault();
+        return false;
     }
 
     public override bool? CanDamage() => State == BlackHoleState.StabilizeNearMouse;
