@@ -70,7 +70,9 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     color += tex2D(noiseTexture, framedCoords * 3) * float4(0.3, -0.05, 0, 0) * lifetimeRatio;
     
     float4 fireColor = lerp(tex2D(baseTextureA, coords), tex2D(baseTextureB, coords), useAltTexture);
-    return fireColor * color * dissolveOpacity * fireColor.r;
+    float4 result = fireColor * color * dissolveOpacity;
+    
+    return result * fireColor.g * 1.75;
 }
 
 technique Technique1

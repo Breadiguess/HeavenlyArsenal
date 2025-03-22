@@ -1,5 +1,6 @@
 ﻿sampler baseTexture : register(s0);
 sampler blackHoleTargetTexture : register(s1);
+sampler disintegrationNoiseTexture : register(s2);
 
 float globalTime;
 float maxLensingAngle;
@@ -40,6 +41,8 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
         float2 sourcePosition = sourcePositions[i];
         lensingAngles[i] = CalculateGravitationalLensingAngle(sourceRadii[i], coords, sourcePosition);
         
+        float pull = smoothstep(0, 0.1, lensingAngles[i] / maxLensingAngle) * 0.99;
+        distortedCoords = lerp(distortedCoords, sourcePosition, pow(lensingAngles[i] / maxLensingAngle, 0.5) * -0.99);
         distortedCoords = RotatedBy(distortedCoords - 0.5, lensingAngles[i]) + 0.5;
     }
     

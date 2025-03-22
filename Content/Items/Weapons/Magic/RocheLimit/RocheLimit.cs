@@ -11,6 +11,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 
 public class RocheLimit : ModItem
 {
+    /// <summary>
+    /// The rate at which this weapon consumes mana.
+    /// </summary>
+    internal static int ManaConsumptionRate => LumUtils.SecondsToFrames(0.08f);
+
     public override void SetStaticDefaults()
     {
         GlobalNPCEventHandlers.ModifyNPCLootEvent += (npc, npcLoot) =>

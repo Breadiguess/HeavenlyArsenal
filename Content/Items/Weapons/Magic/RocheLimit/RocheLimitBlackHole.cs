@@ -5,6 +5,7 @@ using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.DataStructures;
 using System;
 using System.Collections.Generic;
@@ -163,9 +164,20 @@ public class RocheLimitBlackHole : ModProjectile
 
     public override void AI()
     {
+        // Update damage based on the curent magic damage stat, to ensure that mana sickness affects it.
+        Projectile.damage = Owner.HeldMouseItem() is null ? 0 : Owner.GetWeaponDamage(Owner.HeldMouseItem());
+
         // Begin dying if no longer holding the click button or otherwise unable to use the item.
         if ((!Owner.channel || Owner.dead || !Owner.active || Owner.noItems || Owner.CCed) && State != BlackHoleState.Vanish)
             SwitchState(BlackHoleState.Vanish);
+
+        // Check if mana should be consumed.
+        // If it should and the player has none, begin dying.
+        if (State != BlackHoleState.Vanish && ExistenceTimer % RocheLimit.ManaConsumptionRate == RocheLimit.ManaConsumptionRate - 1)
+        {
+            if (!Owner.CheckMana(Owner.HeldMouseItem(), -1, true))
+                SwitchState(BlackHoleState.Vanish);
+        }
 
         switch (State)
         {
@@ -224,6 +236,7 @@ public class RocheLimitBlackHole : ModProjectile
     {
         SetPlayerItemAnimations();
         StandardMouseHoverMotion();
+        CastMinorParticles();
 
         float growthInterpolant = LumUtils.InverseLerp(0f, GrowthTime, Time);
         float easedGrowthInterpolant = EasingCurves.Cubic.Evaluate(EasingType.InOut, growthInterpolant);
@@ -232,6 +245,7 @@ public class RocheLimitBlackHole : ModProjectile
         DistortionDiameter = MathF.Max(DistortionDiameter, BlackHoleDiameter * 0.275f);
 
         ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, LumUtils.Convert01To010(growthInterpolant) * 12.5f, shakeStrengthDissipationIncrement: 1.1f);
+        ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, LumUtils.InverseLerp(0.67f, 1f, growthInterpolant) * 1.5f, shakeStrengthDissipationIncrement: 0.56f);
     }
 
     private void DoBehavior_Vanish()
@@ -282,13 +296,32 @@ public class RocheLimitBlackHole : ModProjectile
     private void CastEnergy()
     {
         float speedFactor = MathF.Max(SunDiameter / MaxSunDiameter, BlackHoleDiameter / MaxBlackHoleDiameter);
+        Vector2 handPosition = Owner.Center + Owner.SafeDirectionTo(Projectile.Center) * 20f;
         for (int i = 0; i < 3; i++)
         {
-            Vector2 handPosition = Owner.Center + Owner.SafeDirectionTo(Projectile.Center) * 20f;
             Vector2 fireVelocity = handPosition.SafeDirectionTo(Projectile.Center).RotatedByRandom(0.09f) * Main.rand.NextFloat(10f, 120f) * speedFactor;
             float fireSize = Main.rand.NextFloat(15f, 120f);
-            Color fireColor = Color.Lerp(new Color(209, 27, 10), new Color(255, 219, 32), Main.rand.NextFloat(0.4f));
+            Color fireColor = Color.Lerp(new Color(209, 37, 5), new Color(255, 219, 32), Main.rand.NextFloat(0.4f));
+            fireColor.A /= 3;
+
             RocheLimitBlackHoleRenderer.ParticleSystem.CreateNew(handPosition, fireVelocity, Vector2.One * fireSize, fireColor);
+        }
+        CastMinorParticles();
+    }
+
+    /// <summary>
+    /// Makes the owner player cast minor particles into this projectile.
+    /// </summary>
+    private void CastMinorParticles()
+    {
+        Color stardustColor = TemperatureGradient.SampleColor(TemperatureInterpolant);
+        Vector2 handPosition = Owner.Center + Owner.SafeDirectionTo(Projectile.Center) * 18f;
+        for (int i = 0; i < 3; i++)
+        {
+            Vector2 energyVelocity = handPosition.SafeDirectionTo(Projectile.Center) * Main.rand.NextFloat(3f, 15f);
+
+            HighDefinitionSmokeParticle stardust = new HighDefinitionSmokeParticle(handPosition + Vector2.UnitY * 40f, energyVelocity, stardustColor, 27, Main.rand.NextFloat(0.3f, 0.85f), 0f);
+            stardust.Spawn();
         }
     }
 
@@ -483,14 +516,17 @@ public class RocheLimitBlackHole : ModProjectile
         ManagedShader shineShader = ShaderManager.GetShader("NoxusBoss.RadialShineShader");
         shineShader.Apply();
 
+        float shineScaleFactor = LumUtils.InverseLerp(0f, 15f, ExistenceTimer);
+        float shineSize = MathHelper.Lerp(135f, 155f, LumUtils.Cos01(Main.GlobalTimeWrappedHourly * 76f));
         Vector2 drawPosition = Owner.Center - Main.screenPosition + Owner.SafeDirectionTo(Projectile.Center) * 20f;
-        Vector2 shineScale = new Vector2(1.5f, 1f) * LumUtils.InverseLerp(0f, 0.5f, SunDiameter / MaxSunDiameter) * 140f / noise.Size();
+        Vector2 shineScale = new Vector2(1.5f, 1f) * shineScaleFactor * shineSize / noise.Size();
         Main.spriteBatch.Draw(noise, drawPosition, null, Color.White * Projectile.Opacity * 0.2f, Owner.AngleTo(Projectile.Center) + MathHelper.PiOver2, noise.Size() * 0.5f, shineScale, 0, 0f);
         Main.spriteBatch.ResetToDefault();
         return false;
     }
 
-    public override bool? CanDamage() => State == BlackHoleState.StabilizeNearMouse;
+    // See RocheLimitGlobalNPC.cs
+    public override bool? CanDamage() => false;
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => LumUtils.CircularHitboxCollision(Projectile.Center, BlackHoleDiameter * 0.27f, targetHitbox);
 }

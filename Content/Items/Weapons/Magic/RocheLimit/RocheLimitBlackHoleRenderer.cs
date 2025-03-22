@@ -16,7 +16,7 @@ public class RocheLimitBlackHoleRenderer : ModSystem
     /// <summary>
     /// The render target that holds all black holes.
     /// </summary>
-    private static InstancedRequestableTarget blackHoleTarget;
+    internal static InstancedRequestableTarget blackHoleTarget;
 
     /// <summary>
     /// The fire particle system used for charging up black holes.
@@ -97,32 +97,38 @@ public class RocheLimitBlackHoleRenderer : ModSystem
         blackHoleTarget.Request(Main.screenWidth, Main.screenHeight, 0, RenderIntoTarget);
         if (blackHoleTarget.TryGetTarget(0, out RenderTarget2D target) && target is not null)
         {
-            int index = 0;
-            float[] blackHoleRadii = new float[5];
             Vector2 aspectRatioCorrectionFactor = new Vector2(WotGUtils.ViewportSize.X / WotGUtils.ViewportSize.Y, 1f);
-            Vector2[] blackHolePositions = new Vector2[5];
-            foreach (Projectile blackHole in Main.ActiveProjectiles)
-            {
-                if (blackHole.type == blackHoleID)
-                {
-                    if (index < blackHoleRadii.Length - 1)
-                    {
-                        blackHoleRadii[index] = blackHole.As<RocheLimitBlackHole>().DistortionDiameter / WotGUtils.ViewportSize.X * Main.GameViewMatrix.Zoom.X;
-
-                        Vector2 positionCoords = (blackHole.Center - Main.screenLastPosition) / WotGUtils.ViewportSize;
-                        blackHolePositions[index] = (positionCoords - Vector2.One * 0.5f) * aspectRatioCorrectionFactor * Main.GameViewMatrix.Zoom + Vector2.One * 0.5f;
-                    }
-                    index++;
-                }
-            }
+            GetBlackHoleData(aspectRatioCorrectionFactor, out float[] blackHoleRadii, out Vector2[] blackHolePositions);
 
             ManagedScreenFilter distortionShader = ShaderManager.GetFilter("HeavenlyArsenal.BlackHoleDistortionShader");
-            distortionShader.TrySetParameter("maxLensingAngle", 193.1f);
+            distortionShader.TrySetParameter("maxLensingAngle", 72.1f);
             distortionShader.TrySetParameter("aspectRatioCorrectionFactor", aspectRatioCorrectionFactor);
             distortionShader.TrySetParameter("sourceRadii", blackHoleRadii);
             distortionShader.TrySetParameter("sourcePositions", blackHolePositions);
             distortionShader.SetTexture(target, 1);
             distortionShader.Activate();
+        }
+    }
+
+    internal static void GetBlackHoleData(Vector2 aspectRatioCorrectionFactor, out float[] blackHoleRadii, out Vector2[] blackHolePositions)
+    {
+        int index = 0;
+        int blackHoleID = ModContent.ProjectileType<RocheLimitBlackHole>();
+        blackHoleRadii = new float[5];
+        blackHolePositions = new Vector2[5];
+        foreach (Projectile blackHole in Main.ActiveProjectiles)
+        {
+            if (blackHole.type == blackHoleID)
+            {
+                if (index < blackHoleRadii.Length - 1)
+                {
+                    blackHoleRadii[index] = blackHole.As<RocheLimitBlackHole>().DistortionDiameter / WotGUtils.ViewportSize.X * Main.GameViewMatrix.Zoom.X;
+
+                    Vector2 positionCoords = (blackHole.Center - Main.screenLastPosition) / WotGUtils.ViewportSize;
+                    blackHolePositions[index] = (positionCoords - Vector2.One * 0.5f) * aspectRatioCorrectionFactor * Main.GameViewMatrix.Zoom + Vector2.One * 0.5f;
+                }
+                index++;
+            }
         }
     }
 }
