@@ -504,7 +504,7 @@ public class RocheLimitBlackHole : ModProjectile, IDrawsOverRocheLimitDistortion
     }
 
     /// <summary>
-    /// Renders the shine glow behind this projectile's sun form
+    /// Renders the shine glow behind this projectile's sun form.
     /// </summary>
     private void RenderShineGlow(Vector2 drawPosition, Color shineColor)
     {
