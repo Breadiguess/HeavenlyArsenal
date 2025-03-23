@@ -98,22 +98,37 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
            
         }
         private bool fusionOut = false;
+        
         public override void HoldItem(Player player)
         {
             if (!fusionOut)
             {
-                // Spawn the projectile
-                Projectile.NewProjectile(
-                    player.GetSource_ItemUse(Item), // Source of the projectile
-                    player.Center.X,               // X coordinate of the spawn location
-                    player.Center.Y,               // Y coordinate of the spawn location
-                    0f, 0f,                        // Velocity (set to 0 for stationary)
-                    ModContent.ProjectileType<FusionRifleHoldout>(), // Type of the projectile
-                    Item.damage,                   // Damage of the projectile
-                    Item.knockBack,                // Knockback of the projectile
-                    player.whoAmI                  // Owner of the projectile
-                );
-                fusionOut = true; // Set the flag to true to prevent further spawns
+                // Check if there is already a projectile of this type owned by the player
+                bool projectileExists = false;
+                for (int i = 0; i < Main.projectile.Length; i++)
+                {
+                    if (Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].type == ModContent.ProjectileType<FusionRifleHoldout>())
+                    {
+                        projectileExists = true;
+                        break;
+                    }
+                }
+
+                if (!projectileExists)
+                {
+                    // Spawn the projectile
+                    Projectile.NewProjectile(
+                        player.GetSource_ItemUse(Item), // Source of the projectile
+                        player.Center.X,               // X coordinate of the spawn location
+                        player.Center.Y,               // Y coordinate of the spawn location
+                        0f, 0f,                        // Velocity (set to 0 for stationary)
+                        ModContent.ProjectileType<FusionRifleHoldout>(), // Type of the projectile
+                        Item.damage,                   // Damage of the projectile
+                        Item.knockBack,                // Knockback of the projectile
+                        player.whoAmI                  // Owner of the projectile
+                    );
+                    fusionOut = true; // Set the flag to true to prevent further spawns
+                }
             }
         }
 
@@ -123,9 +138,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             // Reset the flag if the item is not being held
             if (player.HeldItem.type != Item.type)
             {
-               fusionOut = false;
+                fusionOut = false;
             }
         }
+   
 
        
 

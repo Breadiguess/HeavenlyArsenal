@@ -31,7 +31,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Assets\Textures\Backpacks\" />
-	  <Folder Include="Content\Items\Debug\" />
 	  <Folder Include="Content\Items\Weapons\Ranged\NewFolder\" />
 	  <Folder Include="Content\Projectiles\Weapons\Holdout\" />
 	</ItemGroup>

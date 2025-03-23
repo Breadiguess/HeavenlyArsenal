@@ -26,12 +26,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Melee.Nadir2
         /// <summary>
         /// The texture path for drawing the chain (string).
         /// </summary>
-        public string StringTexture = "HeavenlyArsenal/Content/Projectiles/Holdout/Nadir2/nadir2Lantern_String";
+        public string StringTexture = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/Nadir2/nadir2Lantern_String";
 
         /// <summary>
         /// The texture path for drawing the lantern.
         /// </summary>
-        public string LanternTexture = "HeavenlyArsenal/Content/Projectiles/Holdout/Nadir2/nadir2Lantern";
+        public string LanternTexture = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/Nadir2/nadir2Lantern";
 
     
         public Vector2 gravityVector = new Vector2(0f, 1.2f);

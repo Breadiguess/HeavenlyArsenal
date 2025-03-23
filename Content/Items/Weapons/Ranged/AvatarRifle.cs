@@ -93,18 +93,32 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
         {
             if (!AvatarRifle_Out)
             {
-                // Spawn the projectile
-                Projectile.NewProjectile(
-                    player.GetSource_ItemUse(Item), // Source of the projectile
-                    player.Center.X,               // X coordinate of the spawn location
-                    player.Center.Y,               // Y coordinate of the spawn location
-                    0f, 0f,                        // Velocity (set to 0 for stationary)
-                    ModContent.ProjectileType<AvatarRifle_Holdout>(), // Type of the projectile
-                    Item.damage,                   // Damage of the projectile
-                    Item.knockBack,                // Knockback of the projectile
-                    player.whoAmI                  // Owner of the projectile
-                );
-                AvatarRifle_Out = true; // Set the flag to true to prevent further spawns
+                // Check if there is already a projectile of this type owned by the player
+                bool projectileExists = false;
+                for (int i = 0; i < Main.projectile.Length; i++)
+                {
+                    if (Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].type == ModContent.ProjectileType<AvatarRifle_Holdout>())
+                    {
+                        projectileExists = true;
+                        break;
+                    }
+                }
+
+                if (!projectileExists)
+                {
+                    // Spawn the projectile
+                    Projectile.NewProjectile(
+                        player.GetSource_ItemUse(Item), // Source of the projectile
+                        player.Center.X,               // X coordinate of the spawn location
+                        player.Center.Y,               // Y coordinate of the spawn location
+                        0f, 0f,                        // Velocity (set to 0 for stationary)
+                        ModContent.ProjectileType<AvatarRifle_Holdout>(), // Type of the projectile
+                        Item.damage,                   // Damage of the projectile
+                        Item.knockBack,                // Knockback of the projectile
+                        player.whoAmI                  // Owner of the projectile
+                    );
+                    AvatarRifle_Out = true; // Set the flag to true to prevent further spawns
+                }
             }
         }
 

@@ -126,7 +126,7 @@ public class Succ : ModProjectile
         {
             if (Charge < 1000 && Charge != 0) // Prevent Charge from exceeding the max value
             {
-                Charge += 1 + Charge / 1000;
+                Charge += 1 * (1+ Charge / 1000);
             }
             else if (Charge == 0)
             {

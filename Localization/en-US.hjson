@@ -220,5 +220,7 @@ Mods: {
 			Mercy.DisplayName: mercy
 			SolynWhip_Projectile.DisplayName: Solyn Whip_ Projectile
 		}
+
+		NPCs.AnAffrontToGod.DisplayName: An Affront To God
 	}
 }

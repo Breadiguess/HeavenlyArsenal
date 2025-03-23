@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using rail;
 using System;
 using Terraria;
 using Terraria.DataStructures;
@@ -216,10 +217,22 @@ public class nadir2_Holdout : ModProjectile
         }
     }
 
+    public bool IsEmpowered = false;
 
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        IsEmpowered = true;
+        base.OnHitNPC(target, hit, damageDone);
+    }
     public override bool PreDraw(ref Color lightColor)
     {
+
+
         Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
+        Texture2D Empowered = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Melee/Nadir2/Nadir2Upgrade_Empowered").Value;  
+
+
 
         // Declare the origin variable outside the if-else scope
         Vector2 origin;
@@ -241,7 +254,24 @@ public class nadir2_Holdout : ModProjectile
         }
 
         Vector2 drawPosition = Projectile.Center - new Vector2(0,-10) - Main.screenPosition;
-       
+        if(IsEmpowered)
+        {
+            Main.spriteBatch.Draw(
+                Empowered,
+                drawPosition,
+                null,
+                Projectile.GetAlpha(lightColor),
+                rotation,
+                origin,
+                Projectile.scale,
+                direction,
+                0f
+            );
+        }
+        else
+        {
+
+        
         // Draw the projectile
         Main.spriteBatch.Draw(
             texture,
@@ -254,6 +284,7 @@ public class nadir2_Holdout : ModProjectile
             direction,
             0f
         );
+    }
 
         return false;
     }
