@@ -212,7 +212,7 @@ public class RocheLimitBlackHole : ModProjectile, IDrawsOverRocheLimitDistortion
 
         int sunFormTime = 30;
         int collapseWaitDelay = 15;
-        int collapseTime = 120;
+        int collapseTime = 60;
         int duration = sunFormTime + collapseWaitDelay + collapseTime + collapseTime;
         float sunGrowInterpolant = LumUtils.InverseLerp(0f, sunFormTime, Time);
         float sunExpandInterpolant = EasingCurves.Sine.Evaluate(EasingType.Out, sunGrowInterpolant);
