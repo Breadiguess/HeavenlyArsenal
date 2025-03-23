@@ -213,8 +213,7 @@ public class RocheLimitGlobalNPC : GlobalNPC
                     {
                         npc.HitSound = null;
                         npc.DeathSound = null;
-                        Main.player[closestBlackHole.owner].addDPS(damage);
-                        npc.SimpleStrikeNPC(damage, 0);
+                        Main.player[closestBlackHole.owner].addDPS(npc.SimpleStrikeNPC(damage, 0));
                     }
                     finally
                     {
