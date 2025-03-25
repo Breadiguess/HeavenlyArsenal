@@ -23,7 +23,7 @@ float CalculateGravitationalLensingAngle(float sourceRadius, float2 coords, floa
     
     // Calculate the lensing angle based on the aforementioned distance. This uses distance-based exponential decay to ensure that the effect
     // does not extend far past the source itself.
-    float gravitationalLensingAngle = maxLensingAngle * exp(-distanceToSource / sourceRadius * 2);
+    float gravitationalLensingAngle = maxLensingAngle * exp(-distanceToSource / sourceRadius * 2.3);
     return gravitationalLensingAngle;
 }
 
@@ -39,11 +39,10 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
         // Concepts such as the speed of light, the gravitational constant, mass etc. aren't really necessary in this context since those physics definitions do not
         // exist in Terraria, and given how extreme their values are it's possible that using them would result in floating-point imprecisions.
         float2 sourcePosition = sourcePositions[i];
-        lensingAngles[i] = CalculateGravitationalLensingAngle(sourceRadii[i], coords, sourcePosition);
-        
-        float pull = smoothstep(0, 0.1, lensingAngles[i] / maxLensingAngle) * 0.99;
+        float2 scaledSourcePosition = (coords - 0.5) * aspectRatioCorrectionFactor + 0.5;
+        lensingAngles[i] = CalculateGravitationalLensingAngle(sourceRadii[i], coords, sourcePosition);        
         distortedCoords = lerp(distortedCoords, sourcePosition, pow(lensingAngles[i] / maxLensingAngle, 0.5) * -0.99);
-        distortedCoords = RotatedBy(distortedCoords - 0.5, lensingAngles[i]) + 0.5;
+        distortedCoords = RotatedBy(distortedCoords - scaledSourcePosition, lensingAngles[i]) + scaledSourcePosition;
     }
     
     float4 distortedColor = tex2D(baseTexture, distortedCoords);

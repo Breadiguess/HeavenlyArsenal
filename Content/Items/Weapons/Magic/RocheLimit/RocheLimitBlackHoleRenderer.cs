@@ -115,7 +115,7 @@ public class RocheLimitBlackHoleRenderer : ModSystem
             GetBlackHoleData(aspectRatioCorrectionFactor, out float[] blackHoleRadii, out Vector2[] blackHolePositions);
 
             ManagedScreenFilter distortionShader = ShaderManager.GetFilter("HeavenlyArsenal.BlackHoleDistortionShader");
-            distortionShader.TrySetParameter("maxLensingAngle", 72.1f);
+            distortionShader.TrySetParameter("maxLensingAngle", 172.1f);
             distortionShader.TrySetParameter("aspectRatioCorrectionFactor", aspectRatioCorrectionFactor);
             distortionShader.TrySetParameter("sourceRadii", blackHoleRadii);
             distortionShader.TrySetParameter("sourcePositions", blackHolePositions);

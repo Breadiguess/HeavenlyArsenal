@@ -555,7 +555,7 @@ public class AntishadowAssassin : ModProjectile
         float xInterpolant = point.X / (float)Robe.Width;
         float angle = MathHelper.Lerp(MathHelper.PiOver2, MathHelper.TwoPi - MathHelper.PiOver2, xInterpolant);
 
-        Vector3 ring = new Vector3(MathF.Cos(angle + angleOffset) * 50f, 0f, MathF.Sin(angle - MathHelper.PiOver2) * 10f);
+        Vector3 ring = new Vector3(MathF.Cos(angle + angleOffset) * 50f, 0f, -MathF.Cos(angle) * 10f);
         ring.Y += point.Y * 6f;
 
         point.Position = new Vector3(anchor, 0f) + ring;

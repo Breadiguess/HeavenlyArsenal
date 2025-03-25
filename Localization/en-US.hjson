@@ -185,7 +185,12 @@ Mods: {
 
 			RocheLimit: {
 				DisplayName: The Roche Limit
-				Tooltip: ""
+				Tooltip:
+					'''
+					Conjures a localized star in front of you
+					Over time its energy is increased, until eventually it transforms into a blazing kugelblitz which consumes everything
+					'Rage, rage against the dying of the light'
+					'''
 			}
 
 			SolynWhip_Item: {

@@ -1,4 +1,10 @@
 ﻿using HeavenlyArsenal.Core.Globals;
+using Luminance.Assets;
+using Luminance.Common.Utilities;
+using Luminance.Core.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
 using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.GlobalInstances;
@@ -15,6 +21,8 @@ public class RocheLimit : ModItem
     /// The rate at which this weapon consumes mana.
     /// </summary>
     internal static int ManaConsumptionRate => LumUtils.SecondsToFrames(0.08f);
+
+    public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
 
     public override void SetStaticDefaults()
     {
@@ -57,6 +65,62 @@ public class RocheLimit : ModItem
         Item.shootSpeed = 10f;
         Item.rare = ModContent.RarityType<NamelessDeityRarity>();
         Item.value = Item.buyPrice(gold: 2);
+    }
+
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    {
+        Main.spriteBatch.PrepareForShaders(null, true);
+
+        Vector3 mainColor = RocheLimitBlackHole.TemperatureGradient.SampleColor(0.37f).ToVector3();
+        Vector3 coronaColor = Vector3.One;
+        Vector2 drawPosition = position;
+
+        // Supply information to the sun shader.
+        ManagedShader sunShader = ShaderManager.GetShader("HeavenlyArsenal.RocheLimitSunShader");
+        sunShader.TrySetParameter("coronaIntensityFactor", 0.23f);
+        sunShader.TrySetParameter("mainColor", mainColor);
+        sunShader.TrySetParameter("darkerColor", mainColor);
+        sunShader.TrySetParameter("coronaColor", coronaColor);
+        sunShader.TrySetParameter("subtractiveAccentFactor", Vector3.Zero);
+        sunShader.TrySetParameter("sphereSpinTime", Main.GlobalTimeWrappedHourly * 0.21f);
+        sunShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
+        sunShader.SetTexture(GennedAssets.Textures.Extra.PsychedelicWingTextureOffsetMap, 2, SamplerState.LinearWrap);
+        sunShader.Apply();
+
+        // Draw the sun.
+        Texture2D fireNoise = GennedAssets.Textures.Noise.FireNoiseA;
+        Main.spriteBatch.Draw(fireNoise, drawPosition, null, new Color(mainColor), 0f, fireNoise.Size() * 0.5f, scale * 0.15f, 0, 0f);
+
+        Main.spriteBatch.ResetToDefaultUI();
+        return false;
+    }
+
+    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
+    {
+        Main.spriteBatch.PrepareForShaders();
+
+        Vector3 mainColor = RocheLimitBlackHole.TemperatureGradient.SampleColor(0.37f).ToVector3();
+        Vector3 coronaColor = Vector3.One;
+        Vector2 drawPosition = Item.Center - Main.screenPosition;
+
+        // Supply information to the sun shader.
+        ManagedShader sunShader = ShaderManager.GetShader("HeavenlyArsenal.RocheLimitSunShader");
+        sunShader.TrySetParameter("coronaIntensityFactor", 0.23f);
+        sunShader.TrySetParameter("mainColor", mainColor);
+        sunShader.TrySetParameter("darkerColor", mainColor);
+        sunShader.TrySetParameter("coronaColor", coronaColor);
+        sunShader.TrySetParameter("subtractiveAccentFactor", Vector3.Zero);
+        sunShader.TrySetParameter("sphereSpinTime", Main.GlobalTimeWrappedHourly * 0.2f);
+        sunShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
+        sunShader.SetTexture(GennedAssets.Textures.Extra.PsychedelicWingTextureOffsetMap, 2, SamplerState.LinearWrap);
+        sunShader.Apply();
+
+        // Draw the sun.
+        Texture2D fireNoise = GennedAssets.Textures.Noise.FireNoiseA;
+        Main.spriteBatch.Draw(fireNoise, drawPosition, null, new Color(mainColor), rotation, fireNoise.Size() * 0.5f, 0.3f, 0, 0f);
+
+        Main.spriteBatch.ResetToDefault();
+        return false;
     }
 
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;

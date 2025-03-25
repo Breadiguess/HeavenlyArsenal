@@ -3,6 +3,7 @@ using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using Terraria;
 using Terraria.Audio;
@@ -93,7 +94,9 @@ public class RocheLimitGlobalNPC : GlobalNPC
                 spaghettificationShader.TrySetParameter("sourcePositions", blackHolePositions);
                 spaghettificationShader.TrySetParameter("aspectRatioCorrectionFactor", aspectRatioCorrectionFactor);
                 spaghettificationShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
+                spaghettificationShader.TrySetParameter("burnColor", new Vector3(2.4f, 1.13f, 0.04f));
                 spaghettificationShader.SetTexture(blackHoleTarget, 1);
+                spaghettificationShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 2, SamplerState.LinearWrap);
                 spaghettificationShader.Apply();
 
                 Main.spriteBatch.Draw(npcTarget, Main.screenLastPosition - Main.screenPosition, Color.White);
@@ -174,7 +177,8 @@ public class RocheLimitGlobalNPC : GlobalNPC
             }
 
             // It's time to die.
-            if (npc.WithinRange(suctionOrigin, 232f) && suctionInterpolant >= 0.85f)
+            float shredDistance = closestBlackHole.As<RocheLimitBlackHole>().BlackHoleDiameter * 0.33f;
+            if (npc.WithinRange(suctionOrigin, shredDistance) && suctionInterpolant >= 0.85f)
             {
                 BeingShredded = true;
 
@@ -213,7 +217,7 @@ public class RocheLimitGlobalNPC : GlobalNPC
                     {
                         npc.HitSound = null;
                         npc.DeathSound = null;
-                        npc.SimpleStrikeNPC(damage, 0);
+                        Main.player[closestBlackHole.owner].addDPS(npc.SimpleStrikeNPC(damage, 0));
                     }
                     finally
                     {

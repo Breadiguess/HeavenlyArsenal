@@ -105,7 +105,6 @@ public class Mercy : ModProjectile
             return;
         }
 
-        float pulse = MathF.Sin(MathHelper.TwoPi * Time / 150f) * 0.04f;
         Projectile.Top = target.Center;
         Projectile.Opacity = LumUtils.InverseLerp(0f, 12f, Time);
         Projectile.scale = Math.Clamp(target.width / 80f, 1f, 2.3f);
