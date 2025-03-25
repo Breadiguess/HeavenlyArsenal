@@ -14,12 +14,25 @@ using CalamityMod.Buffs.DamageOverTime;
 using Luminance.Core.Graphics;
 using static NoxusBoss.Assets.GennedAssets.Textures;
 using static NoxusBoss.Assets.GennedAssets;
+using static Luminance.Common.Utilities.Utilities;
+using NoxusBoss.Assets;
+using System.Linq;
+using Luminance.Assets;
+
 
 namespace HeavenlyArsenal.Content.Projectiles
 {
-    internal class ParasiteParadiseProjectile : ModProjectile, IPixelatedPrimitiveRenderer
+    internal class FusionRifle_Projectile : ModProjectile//, IPixelatedPrimitiveRenderer
     {
+        private Vector2[] oldPos;
+        public int Time
+        {
+            get;
+            set;
+        }
 
+
+        public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
         public static float SmoothStep(float edge0, float edge1, float value)
         {
             // Clamp the input value to the range [0, 1]
@@ -99,6 +112,20 @@ namespace HeavenlyArsenal.Content.Projectiles
 
         }
 
+        public override bool PreAI()
+        {
+            if (oldPos == null)
+                oldPos = Enumerable.Repeat(Projectile.Center, 20).ToArray();
+
+            for (int i = oldPos.Length - 2; i > 0; i--)
+            {
+                oldPos[i] = oldPos[i - 1];
+            }
+
+            oldPos[0] = Projectile.Center + Projectile.velocity * 2;
+            return false;
+        }
+
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
@@ -125,55 +152,54 @@ namespace HeavenlyArsenal.Content.Projectiles
 
         public override bool PreDraw(ref Color lightColor)
         {
-            Main.instance.LoadProjectile(Projectile.type);
-            Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
+           
+            float WidthFunction(float p) => 50f * MathF.Pow(p, 0.66f) * (1f - p * 0.5f);
+            //Color ColorFunction(float p) => new Color(8, 6, 20, 200);
+            Color ColorFunction(float p) => new Color(60, 0, 150, 200);
 
-            // Redraw the projectile with the color not influenced by light
-            Vector2 drawOrigin = new Vector2(texture.Width * 0.5f, Projectile.height * 0.5f);
-            for (int k = 0; k < Projectile.oldPos.Length; k++)
-            {
-                Vector2 drawPos = (Projectile.oldPos[k] - Main.screenPosition) + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-                Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-                Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0);
-            }
-            
+            ManagedShader trailShader = ShaderManager.GetShader("HeavenlyArsenal.FusionRifle_Bullet");
+            trailShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * Projectile.velocity.Length() / 8f + Projectile.identity); //72.113f);
+            trailShader.TrySetParameter("spin", 1f* Math.Sign(Projectile.velocity.X));
+            trailShader.TrySetParameter("brightness",  1.5f);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.TurbulentNoise, 0, SamplerState.LinearWrap);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.FireNoiseB, 1, SamplerState.LinearWrap);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);
+
+            PrimitiveRenderer.RenderTrail(oldPos, new PrimitiveSettings(WidthFunction, ColorFunction, _ => Vector2.Zero, Shader: trailShader, Smoothen: false), oldPos.Length);
+
+
             return true;
         }
 
 
 
+        /*
         public void RenderPixelatedPrimitives(SpriteBatch spriteBatch)
         {
-            //sets up space to do shader in 
+            Texture2D BubblyNoise = ModContent.Request<Texture2D>("NoxusBoss/Assets/Textures/Extra/Noise/BubblyNoise").Value;
+            Texture2D DendriticNoiseZoomedOut = ModContent.Request<Texture2D>("NoxusBoss/Assets/Textures/Extra/Noise/DendriticNoiseZoomedOut").Value;
+
             Rectangle viewBox = Projectile.Hitbox;
             Rectangle screenBox = new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
             viewBox.Inflate(540, 540);
             if (!viewBox.Intersects(screenBox))
-                return; 
+                return;
 
-            float lifetimeRatio = 1/ 240f;
-            float dissolveThreshold = MathHelper.Lerp(0.67f, 1f, lifetimeRatio) * 0.5f;
-            ManagedShader bloodShader = ShaderManager.GetShader("NoxusBoss.BloodBlobShader");
-            //initializes shader
+            float WidthFunction(float p) => 50f * MathF.Pow(p, 0.66f) * (1f - p * 0.5f);
+            Color ColorFunction(float p) => new Color(215, 30, 35, 200);
 
+            ManagedShader trailShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleBulletAuroraEffect");
+            trailShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * Projectile.velocity.Length() / 8f + Projectile.identity * 72.113f);
+            trailShader.TrySetParameter("spin", 2f * Math.Sign(Projectile.velocity.X));
+            trailShader.TrySetParameter("brightness", 1.5f);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 0, SamplerState.LinearWrap);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoiseDetailed, 1, SamplerState.LinearWrap);
+            trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);
 
-            bloodShader.TrySetParameter("localTime", Main.GlobalTimeWrappedHourly + Projectile.identity * 72.113f);
-            bloodShader.TrySetParameter("dissolveThreshold", dissolveThreshold);
-            bloodShader.TrySetParameter("accentColor", new Vector4(0.6f, 0.02f, -0.1f, 0f));
-            //setting shader values
-            
-            Texture2D Silly = ModContent.Request<Texture2D>("NoxusBoss/Assets/Textures/Extra/Noise/BubblyNoise").Value;
-            bloodShader.SetTexture(Silly, 1, SamplerState.LinearWrap);
-            Texture2D Silly2 = ModContent.Request<Texture2D>("NoxusBoss/Assets/Textures/Extra/Noise/DendriticNoiseZoomedOut").Value;
-            bloodShader.SetTexture(Silly2, 2, SamplerState.LinearWrap);
-            //get textures
-
-
-
-            //black magic
-            PrimitiveSettings settings = new PrimitiveSettings(BloodWidthFunction, BloodColorFunction, _ => Projectile.Size * 0.5f + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * 0.56f, Pixelate: true, Shader: bloodShader);
+            PrimitiveRenderer.RenderTrail(oldPos, new PrimitiveSettings(WidthFunction, ColorFunction, _ => Vector2.Zero, Shader: trailShader, Smoothen: false), oldPos.Length);
             PrimitiveRenderer.RenderTrail(Projectile.oldPos, settings, 9);
         }
+        */
 
 
 

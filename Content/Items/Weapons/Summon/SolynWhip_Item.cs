@@ -7,7 +7,7 @@ using static NoxusBoss.Assets.GennedAssets.Textures;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon
 {
-    public class TestWhip : ModItem
+    public class SolynWhip_Item : ModItem
     {
         public override void SetStaticDefaults()
         {

@@ -54,7 +54,7 @@ namespace HeavenlyArsenal.Content.Items.Misc
 
             //Item.UseSound = SoundID.Item1;
             Item.autoReuse = true;
-            //Item.shoot = ModContent.ProjectileType<ParasiteParadiseProjectile>();
+            //Item.shoot = ModContent.ProjectileType<FusionRifle_Projectile>();
             Item.shoot = ModContent.ProjectileType<incomplete_gunHoldout>();
             Item.ChangePlayerDirectionOnShoot = true;
             Item.noMelee = true;

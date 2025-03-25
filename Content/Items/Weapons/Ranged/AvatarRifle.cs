@@ -73,7 +73,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
            
             //Item.UseSound = SoundID.Item1;
             Item.autoReuse = true;
-            //Item.shoot = ModContent.ProjectileType<ParasiteParadiseProjectile>();
+            //Item.shoot = ModContent.ProjectileType<FusionRifle_Projectile>();
             //Item.shoot = ProjectileID<t>
             Item.shoot = AmmoID.Bullet;
             Item.ChangePlayerDirectionOnShoot = true;

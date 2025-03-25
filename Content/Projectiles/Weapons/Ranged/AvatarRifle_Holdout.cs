@@ -45,7 +45,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         public new string LocalizationCategory => "Projectiles.Ranged";
         public override int AssociatedItemID => ModContent.ItemType<AvatarRifle>();
-        public override int IntendedProjectileType => ModContent.ProjectileType<ParasiteParadiseProjectile>();
+        public override int IntendedProjectileType => ModContent.ProjectileType<FusionRifle_Projectile>();
 
 
          

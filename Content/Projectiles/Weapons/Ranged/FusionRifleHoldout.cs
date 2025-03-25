@@ -1,5 +1,6 @@
 ﻿using CalamityMod;
 using CalamityMod.Projectiles.BaseProjectiles;
+using CalamityMod.Tiles;
 using HeavenlyArsenal.Content.Items.Weapons.Ranged;
 using HeavenlyArsenal.Content.Projectiles.Misc;
 using HeavenlyArsenal.Core.Physics.ClothManagement;
@@ -8,6 +9,7 @@ using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
 using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using System;
@@ -53,7 +55,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public ref float ShootDelay => ref Projectile.localAI[0];
 
         public override int AssociatedItemID => ModContent.ItemType<FusionRifle>();
-        public override int IntendedProjectileType => ModContent.ProjectileType<ParasiteParadiseProjectile>();
+        public override int IntendedProjectileType => ModContent.ProjectileType<FusionRifle_Projectile>();
 
         public float Time { get; private set; }
 
@@ -468,7 +470,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
             // Spawn the projectile with the adjusted velocity
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), spawnPosition, adjustedVelocity * (40f + chargePower),
-                ModContent.ProjectileType<ParasiteParadiseProjectile>(),
+                ModContent.ProjectileType<FusionRifle_Projectile>(),
                 damage,
                 knockback,
                 Projectile.owner
@@ -500,7 +502,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         private static float recoilIntensity = 0f; // Tracks the current recoil intensity
         private const float maxRecoil = 10f; // Maximum recoil amount
-        private const float recoilRecoverySpeed = 0.1f; // Speed at which recoil eases out
+        private float recoilRecoverySpeed = 0.99f; // Speed at which recoil eases out
 
         public static Vector2 RecoilOffset = new Vector2(-recoilIntensity, 0);
 
@@ -509,8 +511,15 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         {
             if (Main.myPlayer == Projectile.owner)
             {
-                float aimInterpolant = Utils.GetLerpValue(10f, 40f, Projectile.Distance(Main.MouseWorld), true);
+                float aimInterpolant = Utils.GetLerpValue(0.1f, 1f, Projectile.Distance(Main.MouseWorld), true);
                 Vector2 oldVelocity = Projectile.velocity;
+
+                //Vector2 newDirection = Projectile.SafeDirectionTo(Main.MouseWorld);
+                //if (!newDirection.Equals(Vector2.Zero))
+                //{
+                //    Projectile.velocity = Vector2.Lerp(Projectile.velocity, newDirection, aimInterpolant);
+                //}
+
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Main.MouseWorld), aimInterpolant);
                 if (Projectile.velocity != oldVelocity)
                 {
@@ -521,7 +530,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             // Update recoil intensity (ease it out over time)
             if (recoilIntensity > 0f)
             {
-                recoilIntensity -= recoilRecoverySpeed;
+                recoilIntensity *= recoilRecoverySpeed;
                 if (recoilIntensity < 0f)
                     recoilIntensity = 0f; // Clamp to prevent negative values
             }
@@ -564,7 +573,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Matrix projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -1000f, 1000f);
             Matrix matrix = world * projection;
 
-            ManagedShader clothShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleClothShader");
+            ManagedShader clothShader = ShaderManager.GetShader("HeavenlyArsenal.FusionRifleClothShader");
             clothShader.TrySetParameter("opacity", Projectile.Opacity);
             clothShader.TrySetParameter("transform", matrix);
             clothShader.Apply();
@@ -578,10 +587,11 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             if (ClothTarget.TryGetTarget(Projectile.whoAmI, out RenderTarget2D? clothTarget) && clothTarget is not null)
             {
                 Main.spriteBatch.PrepareForShaders();
-
-                ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleClothPostProcessingShader");
+                //new Texture Placeholder = GennedAssets.Textures.Extra.Code;
+                ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.FusionRifleClothPostProcessingShader");
                 postProcessingShader.TrySetParameter("textureSize", clothTarget.Size());
                 postProcessingShader.TrySetParameter("edgeColor", new Color(208, 37, 40).ToVector4());
+                postProcessingShader.SetTexture(GennedAssets.Textures.SecondPhaseForm.Beads3, 0, SamplerState.LinearWrap);
                 postProcessingShader.Apply();
 
                 Main.spriteBatch.Draw(clothTarget, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(Color.White), 0f, clothTarget.Size() * 0.5f, 1f, 0, 0f);

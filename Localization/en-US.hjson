@@ -18,14 +18,15 @@ Mods: {
 			}
 
 			SolynWhip_Onhit_Buff: {
-				DisplayName: Solyn Whip_ Onhit_ Buff
-				Description: Mods.HeavenlyArsenal.Buffs.SolynWhip_Onhit_Buff.Description
+				DisplayName: Seyln
+				Description: Found on wish dot com
 			}
 		}
 
 		Items: {
 			avatar_FishingRod: {
 				DisplayName: FlyRift
+				FishingPower: ""
 				Tooltip:
 					'''
 					Incomprehensible% Fishing Power
@@ -186,6 +187,11 @@ Mods: {
 				DisplayName: The Roche Limit
 				Tooltip: ""
 			}
+
+			SolynWhip_Item: {
+				DisplayName: Solyn Whip_ Item
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -226,6 +232,8 @@ Mods: {
 			RocheLimitBlackHole.DisplayName: The Roche Limit
 			SolynWhip_Projectile.DisplayName: Solyn Whip_ Projectile
 			RelativisticJet.DisplayName: Relativistic Jet
+			SolynWhip_BattleSolyn.DisplayName: Solyn Whip_ Battle Solyn
+			FusionRifle_Projectile.DisplayName: Fusion Rifle_ Projectile
 		}
 
 		NPCs.AnAffrontToGod.DisplayName: An Affront To God
