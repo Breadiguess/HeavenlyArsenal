@@ -202,6 +202,16 @@ Mods: {
 				DisplayName: Flower Shuriken
 				Tooltip: ""
 			}
+
+			AvatarSpear: {
+				DisplayName: Avatar Spear
+				Tooltip: ""
+			}
+
+			AvatarLonginus: {
+				DisplayName: Avatar Longinus
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -245,6 +255,8 @@ Mods: {
 			SolynWhip_BattleSolyn.DisplayName: Solyn Whip_ Battle Solyn
 			FusionRifle_Projectile.DisplayName: Fusion Rifle_ Projectile
 			FlowerShuriken_Proj.DisplayName: Flower Shuriken_ Proj
+			AvatarSpear_Holdout.DisplayName: Avatar Spear_ Holdout
+			AvatarLonginusHeld.DisplayName: Avatar Longinus Held
 		}
 
 		NPCs.AnAffrontToGod.DisplayName: An Affront To God
