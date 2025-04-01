@@ -773,9 +773,10 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
             
             return BulletValue;
         }
-        private void DrawBullet(Texture2D Texture, Vector2 Drawpos, Color lightColor)
+        private void DrawBullet(Vector2 Drawpos, Color lightColor)
         {
-            Main.spriteBatch.Draw(Texture, Drawpos, lightColor);
+
+            Main.spriteBatch.Draw(getBulletToDraw(), Drawpos, lightColor);
         }
 
 
@@ -824,8 +825,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
 
             //DrawShroud();
 
-            Texture2D BulletTexture = getBulletToDraw();
-            DrawBullet(BulletTexture,drawPosition,lightColor);
+           
+            DrawBullet(drawPosition,lightColor);
 
             /*
             ClothTarget.Request(350, 350, Projectile.whoAmI, DrawCloth);

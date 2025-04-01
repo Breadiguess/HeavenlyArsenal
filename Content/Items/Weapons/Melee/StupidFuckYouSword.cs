@@ -28,11 +28,11 @@ public class StupidFuckYouSword : ModItem
         Item.damage = 5090; // Item damage
         Item.DamageType = DamageClass.Melee; // What type of damage item is deals, Melee, Ranged, Magic, Summon, Generic (takes bonuses from all damage multipliers), Default (doesn't take bonuses from any damage multipliers)
         // useTime and useAnimation often use the same value, but we'll see examples where they don't use the same values
-        Item.useTime = 200; // How long the swing lasts in ticks (60 ticks = 1 second)
-        Item.useAnimation = 200; // How long the swing animation lasts in ticks (60 ticks = 1 second)
+        Item.useTime = 120; // How long the swing lasts in ticks (60 ticks = 1 second)
+        Item.useAnimation = 120; // How long the swing animation lasts in ticks (60 ticks = 1 second)
         Item.knockBack = 6f; // How far the sword punches enemies, 20 is maximal value
         Item.autoReuse = true; // Can the item auto swing by holding the attack button
-
+        Item.noUseGraphic = false;
 
 
         Item.rare = ModContent.RarityType<NamelessDeityRarity>();
@@ -63,8 +63,8 @@ public class StupidFuckYouSword : ModItem
         {
             target.AddBuff(ModContent.BuffType<MiracleBlight>(), // Adding Poisoned to target
                  600); // for 5 seconds (60 ticks = 1 second)
-            target.AddBuff(ModContent.BuffType<AntimatterAnnihilation>(), // Adding Poisoned to target
-                 6000); // for 5 seconds (60 ticks = 1 second)
+            //target.AddBuff(ModContent.BuffType<AntimatterAnnihilation>(), // Adding Poisoned to target
+            //     6000); // for 5 seconds (60 ticks = 1 second)
             
         }
     }

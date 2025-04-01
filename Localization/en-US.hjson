@@ -27,13 +27,6 @@ Mods: {
 			avatar_FishingRod: {
 				DisplayName: FlyRift
 				FishingPowerTooltip: ∞
-				Tooltip:
-					'''
-					 Fishing Power
-
-					Upon Sufficient Ringing of the bell, A rift will open beneath you.
-					Cast the bell into the rift to Cause God to lash out, Shredding your foes.
-					'''
 				Tooltip: ""
 			}
 
@@ -194,24 +187,15 @@ Mods: {
 				Tooltip: ""
 			}
 
-			AvatarSpear: {
-<<<<<<< HEAD
-				DormantName: Slumbering Void
-				EmpoweredName: Crimson Needle
-				Tooltip: ""
-				DisplayName: Avatar Spear
-			}
-
 			AvatarBow: {
-				DisplayName: Avatar Bow
-=======
 				DisplayName: Avatar Spear
 				Tooltip: ""
 			}
 
 			AvatarLonginus: {
+				DormantName: Slumbering Void
+				EmpoweredName: Crimson Needle
 				DisplayName: Avatar Longinus
->>>>>>> b27ef742013257a6e59cb57c2694460214c12930
 				Tooltip: ""
 			}
 		}
@@ -257,11 +241,7 @@ Mods: {
 			SolynWhip_BattleSolyn.DisplayName: Solyn Whip_ Battle Solyn
 			FusionRifle_Projectile.DisplayName: Nothing
 			FlowerShuriken_Proj.DisplayName: Flower Shuriken_ Proj
-			AvatarSpear_Holdout.DisplayName: Avatar Spear_ Holdout
-<<<<<<< HEAD
-=======
 			AvatarLonginusHeld.DisplayName: Avatar Longinus Held
->>>>>>> b27ef742013257a6e59cb57c2694460214c12930
 		}
 
 		NPCs.AnAffrontToGod.DisplayName: An Affront To God

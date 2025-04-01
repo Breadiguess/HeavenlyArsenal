@@ -10,6 +10,10 @@ using Terraria.ModLoader;
 using CalamityMod.Items.Weapons.Summon;
 using HeavenlyArsenal.Content.Projectiles.Weapons.Magic;
 using System.Collections.Generic;
+using HeavenlyArsenal.Core.Globals;
+using NoxusBoss.Core.GlobalInstances;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
+using Terraria.GameContent.ItemDropRules;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic;
 
@@ -79,7 +83,25 @@ public class avatar_FishingRod : ModItem
         }
     }
 
-
+    public override void SetStaticDefaults()
+    {
+        GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>
+        {
+            if (npc.type == ModContent.NPCType<AvatarOfEmptiness>())
+            {
+                LeadingConditionRule normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+                {
+                    normalOnly.OnSuccess(ItemDropRule.Common(Type));
+                }   
+                npcLoot.Add(normalOnly);
+            }
+        };
+        ArsenalGlobalItem.ModifyItemLootEvent += (Item item, ItemLoot loot) =>
+        {
+            if (item.type == AvatarOfEmptiness.TreasureBagID)
+                loot.Add(ItemDropRule.Common(Type));
+        };
+    }
 
     // The following prevents the rod from using mana when first used
 
