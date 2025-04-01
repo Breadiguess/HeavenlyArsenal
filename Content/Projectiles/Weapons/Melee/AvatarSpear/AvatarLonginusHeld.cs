@@ -318,7 +318,7 @@ public class AvatarLonginusHeld : ModProjectile
                         Time = 0;
                     }
                 }
-                    
+
                 break;
 
             case (int)AttackStates.ThrowTeleport:
@@ -437,10 +437,8 @@ public class AvatarLonginusHeld : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         //Add to percentage. probably add a check for if the next hit should restore the spear to normal/empowered state
-        if (AttackState == (int)AttackStates.HeavyStab)
-        {
-            Player.SetImmuneTimeForAllTypes(40);
-        }
+
+
     }
 
     //public string StringTexture = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarSpear_Lantern_String";
