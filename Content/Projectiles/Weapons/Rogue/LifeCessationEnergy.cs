@@ -32,6 +32,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue
 
             Projectile.aiStyle = 0;
             Projectile.damage = 300;
+            Projectile.timeLeft = 2;
         }
 
         public override void AI()

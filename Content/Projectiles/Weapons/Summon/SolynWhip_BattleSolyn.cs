@@ -39,7 +39,7 @@ public class SolynWhip_BattleSolyn : ModProjectile
         Player player = Main.player[Projectile.owner];
         if (!player.active || player.dead)
          {
-             //Main.NewText($"I should be dead!", Color.AntiqueWhite);
+             Main.NewText($"I should be dead!", Color.AntiqueWhite);
              Projectile.Kill();
               return;
           }
@@ -104,7 +104,7 @@ public class SolynWhip_BattleSolyn : ModProjectile
         // Avoid flying directly into solid ground
         if (Collision.SolidCollision(Projectile.position, Projectile.width, Projectile.height))
         {
-            Main.NewText("Avoiding collision with the ground!", Color.Red);
+            
             force.Y -= 0.6f;
         }
 
@@ -153,7 +153,7 @@ public class SolynWhip_BattleSolyn : ModProjectile
         // Dash toward the target
         else if (wrappedTimer <= dashPrepareTime + dashTime)
         {
-            Main.NewText($"Dashing toward target! Target Location: {targetPosition}", Color.LightBlue);
+            
             Projectile.velocity *= 1.67f;
             Projectile.velocity = Projectile.velocity.ClampLength(0f, 50f); 
         }
@@ -172,21 +172,15 @@ public class SolynWhip_BattleSolyn : ModProjectile
                 // Main.NewText($"Fired homing star bolts!", Color.Magenta);
             }
         }
-        //somewhere in here it breaks but i have NO IDEA ASIUDHFASUHFIAS
+      
 
         else
         {
-          
 
-
+            if (Projectile.velocity.Length() > 0)
             {
-                
 
-                if (Projectile.velocity.Length() > 0)
-                {
-                    Main.NewText($"Slowing down after dash. {Projectile.velocity}", Color.Gray);
-                    Projectile.velocity *= 0.76f; // Gradually reduce velocity
-                }
+                Projectile.velocity *= 0.76f; // Gradually reduce velocity
             }
 
         }

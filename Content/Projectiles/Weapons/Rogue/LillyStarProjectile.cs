@@ -117,7 +117,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = 210;
+        Projectile.timeLeft = 1000;
         CooldownSlot = ImmunityCooldownID.Bosses;
         Projectile.friendly = true;
         Projectile.hostile = false;
@@ -188,8 +188,10 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         Projectile.rotation = (pulseInterpolant <= 0.5f) ? MathHelper.PiOver4 : 0f;
         Projectile.scale *= MathF.Pow(pulseInterpolant, 0.1f);
 
-        // Dangle phase: first 65 frames.
-        if (Time < 65f)
+
+
+        // Dangle phase: first 200 frames.
+        if (Time < 200f)
         {
             // Use the projectile's owner for anchoring the rope.
             Player owner = Main.player[Projectile.owner];
@@ -238,7 +240,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
                 Projectile.netUpdate = true;
             }
 
-            // Optionally, trigger an explosion if conditions are met.
+            
             if ((HasDetached || Time >= 240f)
                 && (target == null || (!Projectile.WithinRange(target.Center, 400f) && Time >= 180f))
                 && Main.rand.NextBool(10))
@@ -275,7 +277,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(BuffID.OnFire, 300); // 5 seconds of OnFire
+        //target.AddBuff(BuffID.OnFire, 300); 
     }
 
     Texture2D ChromaticSpires = GennedAssets.Textures.GreyscaleTextures.ChromaticSpires;
