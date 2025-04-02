@@ -1,5 +1,5 @@
 ﻿
-using HeavenlyArsenal.Common.Ui;
+using HeavenlyArsenal.Common.UI;
 using HeavenlyArsenal.Content.Items.Weapons.Melee;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -449,7 +449,7 @@ public class AvatarLonginusHeld : ModProjectile
         {
             float heat = Player.GetModPlayer<AvatarSpearHeatPlayer>().Heat;
             if (heat > 0f)
-                WeaponBar.DisplayBar(Color.Red, Color.Black, heat);
+                WeaponBar.DisplayBar(Color.Black * 0.2f, Color.Red, heat);
         }
     }
 
