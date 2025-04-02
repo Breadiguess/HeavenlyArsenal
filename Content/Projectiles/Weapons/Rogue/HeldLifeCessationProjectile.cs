@@ -68,7 +68,7 @@ class HeldLifeCessationProjectile : ModProjectile
         Projectile.tileCollide = false;
         Projectile.timeLeft = 2;
     }
-    public Vector2 SpiderLilyPosition => Owner.Center - Vector2.UnitY * 1f * LilyScale * 140f;
+    public Vector2 SpiderLilyPosition => Main.MouseWorld;//Player.Center - Vector2.UnitY * 1f * LilyScale * 140f;
 
 
     public static readonly SoundStyle HeatReleaseLoop = GennedAssets.Sounds.Avatar.SuctionLoop;
@@ -96,7 +96,11 @@ class HeldLifeCessationProjectile : ModProjectile
     public override void AI()
     {
 
-        WeaponBar.DisplayBar(Color.SlateBlue, Color.Lerp(Color.DeepSkyBlue, Color.Crimson, Utils.GetLerpValue(0.3f, 0.8f, Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat, true)), Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat);
+        if (Time % 3 == 0)
+        {
+            
+        }
+        WeaponBar.DisplayBar(Color.SlateBlue, Color.Lerp(Color.DeepSkyBlue, Color.Crimson, Utils.GetLerpValue(0.3f, 0.8f, Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat, true)), Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat, 120, 1);
 
         Owner.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat = Heat;
 
@@ -115,7 +119,6 @@ class HeldLifeCessationProjectile : ModProjectile
             UpdateLoopedSounds();
         }
 
-        bool canKill = false;
 
         Projectile.Center = Owner.MountedCenter + Projectile.velocity.SafeNormalize(Vector2.Zero) * 25 + new Vector2(0, Owner.gfxOffY) + Main.rand.NextVector2Circular(2, 2) * Projectile.ai[2];
 
@@ -233,7 +236,7 @@ class HeldLifeCessationProjectile : ModProjectile
 
     public void Scream()
     {
-        Vector2 energySource = SpiderLilyPosition + Vector2.UnitY * Projectile.scale * 76f;
+        Vector2 energySource = Owner.Center + Vector2.UnitY * Projectile.scale * 76f;
         if (!HasScreamed)
         {
             SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.ExplosionTeleport);
@@ -251,24 +254,17 @@ class HeldLifeCessationProjectile : ModProjectile
     private void ReleaseLilyStars(Player player)
     {
         
-        int starCount = 1;
+        int starCount = 3;
 
         for (int i = 0; i < starCount; i++)
         {
             SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.DisgustingStarSummon with { Volume = 1.3f, MaxInstances = 32 } ) ;
-            // Fire in random spread around the cursor
-            Vector2 shootDirection = Main.MouseWorld - player.Center;
-            shootDirection.Normalize();
-
-           
-            float spread = 0.1f; // Radians
-            //shootDirection = shootDirection.RotatedByRandom(spread);
-
+            
             // Fire the projectile
             Projectile.NewProjectile(
-                Projectile.GetSource_FromThis(), // The source for the projectile
-                player.Center,
-                shootDirection * 10f, // speed
+                Projectile.GetSource_FromThis(),
+                SpiderLilyPosition,
+                Vector2.Zero, // speed
                 ModContent.ProjectileType<LillyStarProjectile>(),
                 Player.HeldItem.damage,
                 Player.HeldItem.knockBack,

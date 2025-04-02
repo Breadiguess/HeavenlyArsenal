@@ -109,6 +109,12 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 15000;
     }
 
+    public Vector2 DangleTopOffset
+    {
+        get;
+        set;
+    }
+
     public override void SetDefaults()
     {
         Projectile.width = 104;
@@ -130,7 +136,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         Projectile.aiStyle = 0; 
     }
 
-    public Vector2 SpiderLilyPosition => Player.Center - Vector2.UnitY * 1f * LilyScale * 140f;
+    
 
 
     public override void OnSpawn(IEntitySource source)
@@ -139,7 +145,12 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         //Main.NewText($"StarSpawned", Color.CadetBlue);
         float lilyGlowIntensity = InverseLerp(0f, LilyStars_ChargeUpDuration * 0.53f, Projectile.ai[0]) * LilyStars_MaxLilyBrightnessIntensity;
         LilyGlowIntensityBoost = MathF.Max(LilyGlowIntensityBoost, lilyGlowIntensity);
+        Projectile.position = Main.MouseWorld;
 
+        DangleTopOffset = Main.rand.NextVector2CircularEdge(500, 200);
+        Projectile.localAI[0] = DangleTopOffset.X;
+        Projectile.localAI[1] = DangleTopOffset.Y;
+    
     }
 
     public override void SendExtraAI(BinaryWriter writer)
@@ -161,7 +172,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
     {
         // Find the nearest targetable enemy near the cursor.
         NPC target = null;
-        float maxTargetDistance = 400f; // Maximum search radius around the cursor
+        float maxTargetDistance = 1000f; // Maximum search radius around the cursor
         Vector2 cursorPosition = Main.MouseWorld;
         foreach (NPC npc in Main.npc)
         {
@@ -175,6 +186,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
                 }
             }
         }
+      
 
         // Apply fading and scaling effects (common to both phases)
         Projectile.frame = Projectile.identity % Main.projFrames[Type];
@@ -191,7 +203,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
 
 
         // Dangle phase: first 200 frames.
-        if (Time < 200f)
+        if (Time < 200f || target == null)
         {
             // Use the projectile's owner for anchoring the rope.
             Player owner = Main.player[Projectile.owner];
@@ -200,19 +212,15 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
             float hoverOffsetFactor = MathHelper.Lerp(0.69f, 1.3f, (Projectile.identity / 13f) % 1f);
             float ropeLength = MathHelper.Lerp(840f, 990f, (Projectile.identity / 14f) % 1f);
             
-            float verticalOffset = Utils.Remap(Time, 0f, 65f, -1750f, -ropeLength * 1.32f - DangleVerticalOffset);
-            Vector2 dangleTop = owner.Center
-                + new Vector2(0f, verticalOffset)
-                + RopeOffsetAngle.ToRotationVector2() * new Vector2(650f, 470f) * hoverOffsetFactor;
-
-            
+            float verticalOffset = Utils.Remap(Time, 0f, 30f, -1750f, -ropeLength * 1.32f - DangleVerticalOffset);
+            Vector2 dangleTop = (Main.MouseWorld + new Vector2(Projectile.localAI[0], Projectile.localAI[1]) 
+                + new Vector2(0, verticalOffset) );
+          
             DanglingRope ??= new VerletSimulatedRope(dangleTop, Vector2.Zero, 50, ropeLength);
             DanglingRope.Update(dangleTop, Utils.Remap(owner.velocity.Y, 0f, -12f, 0.5f, -0.1f));
-
+            Main.NewText($"RopeTop: {dangleTop}", Color.AntiqueWhite);
             
             Projectile.Center = DanglingRope.EndPosition;
-
-            
             Projectile.velocity *= 0.971f;
         }
         else 
@@ -225,8 +233,8 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
                 // Lerp the velocity toward the direction of the target enemy.
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * originalSpeed, 0.042f);
                 Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.Zero) * newSpeed;
-                DangleVerticalOffset += 6f;
-                DangleVerticalOffset *= 1.2f;
+                //DangleVerticalOffset += 6f;
+                //DangleVerticalOffset *= 1.2f;
             }
             else
             {

@@ -15,14 +15,16 @@ public class WeaponBar : ModSystem
     private static Color fillColor;
     private static float fillPercent;
     private static int style;
+    private static Vector2 Baroffset;
 
-    public static void DisplayBar(Color baseColor, Color fillColor, float percent, int showTime = 120, int style = 0)
+    public static void DisplayBar(Color baseColor, Color fillColor, float percent, int showTime = 120, int style = 0, Vector2 BarOffset = default)
     {
         WeaponBar.showTime = showTime;
         WeaponBar.baseColor = baseColor;
         WeaponBar.fillColor = fillColor;
         WeaponBar.fillPercent = percent;
         WeaponBar.style = style;
+        WeaponBar.Baroffset = BarOffset;
     }
 
     public override void UpdateUI(GameTime gameTime)
@@ -55,12 +57,12 @@ public class WeaponBar : ModSystem
                         {
                             float fade = Utils.GetLerpValue(0, 30, showTime, true);
 
-                            Texture2D bar = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Rogue/BarBase_0").Value;
-                            Texture2D barCharge = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Rogue/BarFill_0").Value;
+                            Texture2D bar = AssetDirectory.Textures.Bars.Bar[style].Value;
+                            Texture2D barCharge = AssetDirectory.Textures.Bars.BarFill[style].Value;
 
                             int fillAmount = (fillPercent > 0.99f) ? barCharge.Width : (int)(barCharge.Width * fillPercent);
                             Rectangle fillFrame = new Rectangle(0, 0, fillAmount, barCharge.Height);
-                            Vector2 position = (Main.LocalPlayer.Center - Main.screenPosition) / Main.UIScale - new Vector2(barCharge.Width / 2f, 48f / Main.UIScale);
+                            Vector2 position = ((Main.LocalPlayer.Center - Main.screenPosition) + Baroffset) / Main.UIScale - new Vector2(barCharge.Width / 2f, 48f / Main.UIScale);
 
                             float fadeOut = Utils.GetLerpValue(0, 30, showTime, true);
                             Main.spriteBatch.Draw(bar, position, bar.Frame(), baseColor * fadeOut, 0, Vector2.Zero, 1f, 0, 0);

@@ -36,6 +36,7 @@ using NoxusBoss.Assets;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj;
 using Terraria.GameContent;
+using HeavenlyArsenal.Common.Ui;
 
 
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
@@ -169,7 +170,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
         {
             //Cloth ??= new ClothSimulation(new Vector3(Projectile.Center, 10f*Projectile.direction), Projectile.width, 7, 0f, 60f, 0.02f);
 
-
+            WeaponBar.DisplayBar(Color.SlateBlue, Color.Lerp(Color.DeepSkyBlue, Color.Crimson, Utils.GetLerpValue(0.3f, 0.8f, (float)Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().AvatarRifleCounter/7, true)), (float)Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().AvatarRifleCounter/7, 120, 1,new Vector2(0,-40));
+           
             RibbonPhysics();
 
             //CreateDustAtOrigin();
