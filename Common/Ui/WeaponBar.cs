@@ -6,7 +6,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace HeavenlyArsenal.Common.Ui;
+namespace HeavenlyArsenal.Common.UI;
 
 public class WeaponBar : ModSystem
 {

@@ -13,7 +13,7 @@ using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Common.utils;
 using System;
 using Terraria.DataStructures;
-using HeavenlyArsenal.Common.Ui;
+using HeavenlyArsenal.Common.UI;
 using System.Threading;
 using Luminance.Core.Sounds;
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue;

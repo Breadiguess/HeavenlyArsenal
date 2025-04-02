@@ -39,8 +39,8 @@ public class AvatarLonginus : ModItem
         Item.knockBack = 3;
         Item.autoReuse = true;
         Item.ChangePlayerDirectionOnShoot = true;
-        Item.noMelee = false;
-        Item.noUseGraphic = false;
+        Item.noMelee = true;
+        Item.noUseGraphic = true;
         Item.shoot = ModContent.ProjectileType<AvatarLonginusHeld>();
     }
 
@@ -66,6 +66,8 @@ public class AvatarLonginus : ModItem
             }
         }
     }
+
+    public override bool AltFunctionUse(Player player) => true;
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
 
