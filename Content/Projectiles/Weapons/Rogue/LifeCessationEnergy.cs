@@ -15,8 +15,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue
     class LifeCessationEnergy : ModProjectile
     {
 
+        public ref float Time => ref Projectile.ai[0];
         public ref float Size => ref Projectile.ai[1];
-        public ref float Time => ref Projectile.ai[2];
 
         public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
         public override void SetStaticDefaults() 

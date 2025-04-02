@@ -54,9 +54,9 @@ class LifeAndCessation : ModItem
 
     public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
     {
-        Texture2D bar = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Rogue/BarBase_0").Value;
-        Texture2D barCharge = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Rogue/BarFill_0").Value;
-        
+        int style = 1;
+        Texture2D bar = AssetDirectory.Textures.Bars.Bar[style].Value;
+        Texture2D barCharge = AssetDirectory.Textures.Bars.BarFill[style].Value;
 
 
         Rectangle chargeFrame = new Rectangle(0, 0, (int)(barCharge.Width * Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat), barCharge.Height);
