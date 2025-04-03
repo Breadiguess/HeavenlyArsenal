@@ -1,11 +1,13 @@
 ﻿
 using HeavenlyArsenal.Common.UI;
 using HeavenlyArsenal.Content.Items.Weapons.Melee;
+using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -18,27 +20,6 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Melee.AvatarSpear;
 
 public class AvatarLonginusHeld : ModProjectile
 {
-    public ref Player Player => ref Main.player[Projectile.owner];
-
-    public bool IsEmpowered => Player.GetModPlayer<AvatarSpearHeatPlayer>().Active;
-
-    public enum AttackStates
-    {
-        Idle,
-        ThrowTeleport,
-
-        RapidStabs,
-        HeavyStab,
-        WhipSlash,
-
-        // Empowered attacks
-        // RapidStabs
-        SecondSlash,
-        SuperHeavyThrust,
-        RipOut,
-        Castigation
-    }
-
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.HeldProjDoesNotUsePlayerGfxOffY[Type] = true;
@@ -71,6 +52,30 @@ public class AvatarLonginusHeld : ModProjectile
 
     public bool InUse => Player.controlUseItem && Player.altFunctionUse == 0;
 
+    public ref Player Player => ref Main.player[Projectile.owner];
+
+    public bool IsEmpowered => Player.GetModPlayer<AvatarSpearHeatPlayer>().Active;
+
+    public Vector2 JavelinOffset { get; set; }
+
+    public int HitTimer { get; set; }
+
+    public enum AvatarSpearAttacks
+    {
+        Idle,
+        ThrowTeleport,
+
+        RapidStabs,
+        HeavyStab,
+        WhipSlash,
+
+        // Empowered attacks
+        // RapidStabs
+        SecondSlash,
+        RipOut,
+        Castigation
+    }
+
     public override void AI()
     {
         Projectile.extraUpdates = 3;
@@ -90,7 +95,7 @@ public class AvatarLonginusHeld : ModProjectile
         Vector2 handPosition = Player.MountedCenter;
         float attackSpeed = Player.GetAttackSpeed(DamageClass.Melee) * (1f + Projectile.extraUpdates * 0.15f);
 
-        if (AttackState != (int)AttackStates.Idle)
+        if (AttackState != (int)AvatarSpearAttacks.Idle)
         {
             if (Time < 2 && Main.myPlayer == Projectile.owner)
             {
@@ -105,7 +110,7 @@ public class AvatarLonginusHeld : ModProjectile
         switch (AttackState)
         {
             default:
-            case (int)AttackStates.Idle:
+            case (int)AvatarSpearAttacks.Idle:
 
                 Time = 0;
 
@@ -120,13 +125,13 @@ public class AvatarLonginusHeld : ModProjectile
                 handPosition = Player.GetFrontHandPosition(Player.CompositeArmStretchAmount.ThreeQuarters, -0.3f * Player.direction);
 
                 if (Player.altFunctionUse == 1 && Player.GetModPlayer<AvatarSpearHeatPlayer>().ConsumeHeat(0.2f))
-                    AttackState = (int)AttackStates.ThrowTeleport;
+                    AttackState = (int)AvatarSpearAttacks.ThrowTeleport;
                 else if (InUse)
-                    AttackState = (int)AttackStates.RapidStabs;
+                    AttackState = (int)AvatarSpearAttacks.RapidStabs;
 
                 break;
 
-            case (int)AttackStates.RapidStabs:
+            case (int)AvatarSpearAttacks.RapidStabs:
 
                 Player.SetDummyItemTime(5);
 
@@ -205,22 +210,22 @@ public class AvatarLonginusHeld : ModProjectile
                 {
                     if (InUse)
                     {
-                        AttackState = (int)AttackStates.WhipSlash;
+                        AttackState = (int)AvatarSpearAttacks.HeavyStab;
                         Time = 0;
                     }
                     else if (Time > RapidWindUp + RapidStabTime + RapidWindDown)
                     {
-                        AttackState = (int)AttackStates.Idle;
+                        AttackState = (int)AvatarSpearAttacks.Idle;
                         Time = 0;
                     }
                 }
 
                 break;
 
-            case (int)AttackStates.WhipSlash:
-            case (int)AttackStates.SecondSlash:
+            case (int)AvatarSpearAttacks.WhipSlash:
+            case (int)AvatarSpearAttacks.SecondSlash:
 
-                bool isSecondSlash = AttackState == (int)AttackStates.SecondSlash;
+                bool isSecondSlash = AttackState == (int)AvatarSpearAttacks.SecondSlash;
 
                 int SlashWindUp = isSecondSlash ? 20 : 30;
                 int SlashTime = (isSecondSlash ? 20 : 35) + (int)(30 / attackSpeed);
@@ -234,7 +239,7 @@ public class AvatarLonginusHeld : ModProjectile
                 {
                     float windProgress = Time / (SlashWindUp - 1f);
 
-                    float wiggle = -MathF.Sqrt(windProgress) * SlashRotation * Projectile.direction;
+                    float wiggle = -MathF.Sqrt(windProgress) * SlashRotation * -Projectile.direction;
 
                     Projectile.rotation = Utils.AngleLerp(Projectile.rotation, Projectile.velocity.ToRotation() + wiggle, 0.9f);
                     offset = new Vector2(MathHelper.SmoothStep(0, -30, windProgress), 0).RotatedBy(Projectile.rotation);
@@ -251,7 +256,10 @@ public class AvatarLonginusHeld : ModProjectile
                         SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.DaggerBurst with { MaxInstances = 0 }, Projectile.Center);
 
                     if (Time == SlashWindUp + SlashTime - 1)
+                    {
+                        DoShake();
                         SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.SliceTelegraph with { MaxInstances = 0 }, Projectile.Center);
+                    }
 
                     float slashProgress = Utils.GetLerpValue(0, SlashTime, Time - SlashWindUp, true);
                     float windDown = Utils.GetLerpValue(0, SlashWindDown, Time - SlashWindUp - SlashTime, true);
@@ -279,23 +287,23 @@ public class AvatarLonginusHeld : ModProjectile
                     if (InUse)
                     {
                         if (IsEmpowered && !isSecondSlash)
-                            AttackState = (int)AttackStates.SecondSlash;
+                            AttackState = (int)AvatarSpearAttacks.SecondSlash;
                         else
-                            AttackState = (int)AttackStates.HeavyStab;
+                            AttackState = (int)AvatarSpearAttacks.RapidStabs;
 
                         Time = 0;
 
                     }
                     else if (Time > SlashTime)
                     {
-                        AttackState = (int)AttackStates.Idle;
+                        AttackState = (int)AvatarSpearAttacks.Idle;
                         Time = 0;
                     }
                 }
 
                 break;
 
-            case (int)AttackStates.HeavyStab:
+            case (int)AvatarSpearAttacks.HeavyStab:
 
                 int HeavyWindUp = IsEmpowered ? 50 : 80;
                 int HeavyThrustTime = 10 + (int)(30 / Player.GetAttackSpeed(DamageClass.Melee));
@@ -319,14 +327,24 @@ public class AvatarLonginusHeld : ModProjectile
                 else
                 {
                     if (Time == HeavyWindUp + 1)
+                    {
+                        DoShake(0.5f);
                         SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.DaggerGrazeEcho with { Pitch = 0.5f, MaxInstances = 0 }, Projectile.Center);
-
+                    }
+                    
                     canHit = true;
                     float thrustProgress = Utils.GetLerpValue(0, HeavyThrustTime, Time - HeavyWindUp, true);
                     float windDown = Utils.GetLerpValue(0, HeavyWindDown, Time - HeavyWindUp - HeavyThrustTime, true);
 
                     float thrustCurve = Utils.GetLerpValue(0, 0.2f, thrustProgress, true);
                     float windDownCurve = MathF.Cbrt(windDown);
+
+                    if (Main.myPlayer == Projectile.owner)
+                    {
+                        Projectile.velocity = Vector2.Lerp(Projectile.velocity, Player.DirectionTo(Main.MouseWorld) * 15f, 0.01f);
+                        Projectile.direction = Projectile.velocity.X > 0 ? 1 : -1;
+                        Projectile.netUpdate = true;
+                    }
 
                     Projectile.rotation = Utils.AngleLerp(Projectile.rotation, Projectile.velocity.ToRotation() - (thrustCurve - 1f) * 0.3f * Projectile.direction, 0.5f - thrustCurve * 0.2f);
                     offset = new Vector2(MathHelper.SmoothStep(0, 150, thrustCurve) * (1f - windDownCurve), 0).RotatedBy(Projectile.rotation);
@@ -340,31 +358,89 @@ public class AvatarLonginusHeld : ModProjectile
 
                 Time++;
 
+
+                if (Time > HeavyWindDown + HeavyThrustTime + HeavyWindDown - 20 && InUse && IsEmpowered && HitTimer > 1)
+                {
+                    AttackState = (int)AvatarSpearAttacks.RipOut;
+                    Time = 0;
+                }
+
                 if (Time > HeavyWindUp + HeavyThrustTime + HeavyWindDown - 5)
                 {
                     if (InUse)
                     {
-                        if (IsEmpowered)
-                            AttackState = (int)AttackStates.RapidStabs;
-                        else
-                            AttackState = (int)AttackStates.RapidStabs;
-
+                        AttackState = (int)AvatarSpearAttacks.WhipSlash;
                         Time = 0;
                     }
                     else if (Time > HeavyWindUp + HeavyThrustTime - HeavyWindDown)
                     {
-                        AttackState = (int)AttackStates.Idle;
+                        AttackState = (int)AvatarSpearAttacks.Idle;
                         Time = 0;
                     }
                 }
 
                 break;
 
-            case (int)AttackStates.RipOut:
+            case (int)AvatarSpearAttacks.RipOut:
+
+                const int PullTime = 80;
+                const int RipTime = 90;
+
+                if (Time < PullTime)
+                {
+                    throwMode = true;
+
+                    float pullProgress = Time / PullTime;
+
+                    if (attackedNPC > -1 && attackedNPC < Main.npc.Length)
+                    {
+                        if (Main.npc[attackedNPC].CanBeChasedBy(Player))
+                            Projectile.Center = Main.npc[attackedNPC].Center + JavelinOffset;
+                        else
+                            Time = PullTime;
+                    }
+
+                    Projectile.rotation = Utils.AngleLerp(Projectile.rotation, Projectile.velocity.ToRotation(), 0.5f);
+                    offset = new Vector2(150 + MathF.Sin(pullProgress * MathHelper.Pi) * 50, 0).RotatedBy(Projectile.rotation);
+                    Projectile.scale = 1.75f;
+                }
+                else
+                {
+                    canHit = true;
+
+                    if (Time == PullTime + 1)
+                    {
+                        DoShake(1.5f);
+                        SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.ArmJutOut with { Pitch = 1f, MaxInstances = 0 }, Projectile.Center);
+                    }
+
+                    float ripProgress = Utils.GetLerpValue(0, RipTime, Time - PullTime, true);
+                    float twirl = MathF.Cbrt(ripProgress) * 2f * (1f - ripProgress * 0.3f) 
+                        + MathHelper.TwoPi * MathHelper.SmoothStep(0f, 1f, Utils.GetLerpValue(0.3f, 1f, ripProgress, true));
+                    Projectile.rotation = Utils.AngleLerp(Projectile.rotation, Projectile.velocity.ToRotation() + twirl * Projectile.direction, 0.5f - ripProgress * 0.3f);
+
+                    Projectile.scale = MathHelper.Lerp(Projectile.scale, 1f, 0.05f);
+                }
+
+                Time++;
+
+                if (Time > PullTime + RipTime - 10)
+                {
+                    if (InUse)
+                    {
+                        AttackState = (int)AvatarSpearAttacks.WhipSlash;
+                        Time = 0;
+                    }
+                    else if (Time > PullTime + RipTime)
+                    {
+                        AttackState = (int)AvatarSpearAttacks.Idle;
+                        Time = 0;
+                    }
+                }
 
                 break;
 
-            case (int)AttackStates.ThrowTeleport:
+            case (int)AvatarSpearAttacks.ThrowTeleport:
 
                 const int ThrowWindUp = 30;
                 const int ThrowTime = 50;
@@ -423,7 +499,7 @@ public class AvatarLonginusHeld : ModProjectile
 
                 if (Time > ThrowWindUp + ThrowTime + TPTime)
                 {
-                    AttackState = (int)AttackStates.Idle;
+                    AttackState = (int)AvatarSpearAttacks.Idle;
                     Time = 0;
                 }
 
@@ -449,7 +525,7 @@ public class AvatarLonginusHeld : ModProjectile
         {
             float heat = Player.GetModPlayer<AvatarSpearHeatPlayer>().Heat;
             if (heat > 0f)
-                WeaponBar.DisplayBar(Color.Black * 0.2f, Color.Red, heat);
+                WeaponBar.DisplayBar(Color.DarkRed, Color.Red, heat, style: 1, BarOffset: IsEmpowered ? Main.rand.NextVector2Circular(2, 2) : Vector2.Zero);
         }
     }
 
@@ -480,7 +556,15 @@ public class AvatarLonginusHeld : ModProjectile
         return false;
     }
 
-    public int HitTimer { get; set; }
+    private void DoShake(float strength = 1f)
+    {
+        if (Main.myPlayer == Projectile.owner)
+            ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 5f * strength, 
+                shakeDirection: Projectile.velocity.SafeNormalize(Vector2.Zero), 
+                shakeStrengthDissipationIncrement: 0.7f - strength * 0.2f);
+    }
+
+    public int attackedNPC;
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
@@ -488,21 +572,21 @@ public class AvatarLonginusHeld : ModProjectile
 
         switch (AttackState)
         {
-            case (int)AttackStates.WhipSlash:
-            case (int)AttackStates.SecondSlash:
+            case (int)AvatarSpearAttacks.WhipSlash:
+            case (int)AvatarSpearAttacks.SecondSlash:
 
                 addHeat = 0.1f;
 
                 break;
 
-            case (int)AttackStates.HeavyStab:
-            case (int)AttackStates.RipOut:
+            case (int)AvatarSpearAttacks.HeavyStab:
+            case (int)AvatarSpearAttacks.RipOut:
 
                 addHeat = 0.02f;
 
                 break;
 
-            case (int)AttackStates.ThrowTeleport:
+            case (int)AvatarSpearAttacks.ThrowTeleport:
 
                 // No heat, but sets the timer
                 addHeat = 0f;
@@ -511,12 +595,32 @@ public class AvatarLonginusHeld : ModProjectile
         }
 
         if (IsEmpowered)
-            addHeat *= 0.2f;
+            addHeat *= 0.4f;
+
+        DoShake(0.2f);
 
         if (HitTimer <= 0)
             Player.GetModPlayer<AvatarSpearHeatPlayer>().AddHeat(addHeat);
 
-        HitTimer = 5;
+        if (Main.myPlayer == Projectile.owner)
+        {
+            HitTimer = 5;
+            JavelinOffset = Projectile.Center - target.Center;
+            attackedNPC = target.whoAmI;
+            Projectile.netUpdate = true;
+        }
+    }
+
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(HitTimer);
+        writer.WriteVector2(JavelinOffset);
+    }
+
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        HitTimer = reader.Read();
+        JavelinOffset = reader.ReadVector2();
     }
 
     public override bool PreDraw(ref Color lightColor)
