@@ -1,4 +1,5 @@
 ﻿using CalamityMod;
+using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using Terraria;
@@ -22,7 +23,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
 			Item.height = 18; // Height of the item
 			Item.value = Item.sellPrice(gold: 1); // How many coins the item is worth
 			Item.rare = ItemRarityID.Green; // The rarity of the item
-			Item.defense = 5; // The amount of defense the item will give when equipped
+			Item.defense = 54; // The amount of defense the item will give when equipped
 		}
         public override void UpdateEquip(Player player)
         {
@@ -46,7 +47,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
                 .AddIngredient(ItemID.NinjaPants)
                 .AddIngredient(ItemID.CrystalNinjaLeggings)
                 .AddIngredient(CalamityHunt.Find<ModItem>("ShogunPants").Type)
-
+                .AddIngredient<StatisVoidSash>()
                 .AddTile<DraedonsForge>()
                 .Register();
             }

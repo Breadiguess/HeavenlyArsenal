@@ -3,12 +3,17 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
+using CalamityMod.Cooldowns;
+using CalamityMod.Items.Accessories;
+using CalamityMod;
+using CalamityMod.CalPlayer;
+using HeavenlyArsenal.Content.Items.Armor;
 
 namespace HeavenlyArsenal.ArsenalPlayer
 {
     class ShintoArmorPlayer : ModPlayer
     {
-        public bool active;
+        public bool SetActive;
         public int maxBarrier = 560;
         public int barrier = 0;
         public int timeSinceLastHit;
@@ -16,11 +21,15 @@ namespace HeavenlyArsenal.ArsenalPlayer
         public int rechargeRate = 100;
         public float barrierDamageReduction = 0.5f;
         public bool ShadowShieldVisible = false;
+        public bool ShadowVeil;
 
+        
 
+        
+        public int ShadowVeilImmunity = 0;
         public override void PostUpdateMiscEffects()
         {
-            if (active)
+            if (SetActive)
             {
                 //Main.NewText($"Barrier: {barrier}, TimeSinceLastHit: {timeSinceLastHit}",Color.AntiqueWhite);
                 Player.buffImmune[BuffID.Silenced] = true;
@@ -62,6 +71,62 @@ namespace HeavenlyArsenal.ArsenalPlayer
                     Player.buffImmune[calamity.Find<ModBuff>("BrimstoneFlames").Type] = true;
                     calamity.Call("SetWearingRogueArmor", Player, true);
                     calamity.Call("SetWearingPostMLSummonerArmor", Player, true);
+                }
+            }
+
+            if (ShadowVeil)
+            {
+                CalamityPlayer modPlayer = Player.Calamity();
+                bool wearingRogueArmor = modPlayer.wearingRogueArmor;
+                float rogueStealth = modPlayer.rogueStealth;
+                float rogueStealthMax = modPlayer.rogueStealthMax;
+                int chaosStateDuration = 900; 
+
+                if (CalamityKeybinds.SpectralVeilHotKey.JustPressed && ShadowVeil && Main.myPlayer == Player.whoAmI && rogueStealth >= rogueStealthMax * 0.25f &&
+                wearingRogueArmor && rogueStealthMax > 0)
+                {
+                    if (!Player.chaosState)
+                    {
+                        Vector2 teleportLocation;
+                        teleportLocation.X = Main.mouseX + Main.screenPosition.X;
+                        if (Player.gravDir == 1f)
+                            teleportLocation.Y = Main.mouseY + Main.screenPosition.Y - Player.height;
+                        else
+                            teleportLocation.Y = Main.screenPosition.Y + Main.screenHeight - Main.mouseY;
+
+                        teleportLocation.X -= Player.width * 0.5f;
+                        Vector2 teleportOffset = teleportLocation - Player.position;
+                        if (teleportOffset.Length() > SpectralVeil.TeleportRange)
+                        {
+                            teleportOffset = teleportOffset.SafeNormalize(Vector2.Zero) * SpectralVeil.TeleportRange;
+                            teleportLocation = Player.position + teleportOffset;
+                        }
+                        if (teleportLocation.X > 50f && teleportLocation.X < (float)(Main.maxTilesX * 16 - 50) && teleportLocation.Y > 50f && teleportLocation.Y < (float)(Main.maxTilesY * 16 - 50))
+                        {
+                            if (!Collision.SolidCollision(teleportLocation, Player.width, Player.height))
+                            {
+                                rogueStealth -= rogueStealthMax * 0.25f;
+
+                                Player.Teleport(teleportLocation, 1);
+                                NetMessage.SendData(MessageID.TeleportEntity, -1, -1, null, 0, (float)Player.whoAmI, teleportLocation.X, teleportLocation.Y, 1, 0, 0);
+
+                                int duration = chaosStateDuration;
+                                Player.AddBuff(BuffID.ChaosState, duration, true);
+                                Player.AddCooldown(ChaosState.ID, duration, true, "spectralveil");
+
+                                int numDust = 40;
+                                Vector2 step = teleportOffset / numDust;
+                                for (int i = 0; i < numDust; i++)
+                                {
+                                    int dustIndex = Dust.NewDust(Player.Center - (step * i), 1, 1, DustID.VilePowder, step.X, step.Y);
+                                    Main.dust[dustIndex].noGravity = true;
+                                    Main.dust[dustIndex].noLight = true;
+                                }
+
+                                ShadowVeilImmunity = ShintoArmorHelmet.ShadowVeilIFrames;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -123,7 +188,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         public override void ResetEffects()
         {
             //barrier = 0;
-            active = false;
+            SetActive = false;
         }
     }
 }

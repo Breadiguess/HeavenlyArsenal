@@ -204,26 +204,15 @@ Mods: {
 				Tooltip: ""
 			}
 
-			ExampleBreastplate: {
-				DisplayName: Example Breastplate
-				Tooltip: ""
-			}
-
-			ExampleHelmet: {
-				SetBonus: Mods.HeavenlyArsenal.Items.ExampleHelmet.SetBonus
-				DisplayName: Example Helmet
-				Tooltip: ""
-			}
-
-			ExampleLeggings: {
-				DisplayName: Example Leggings
-				Tooltip: ""
-			}
-
 			ShintoArmorHelmet: {
-				SetBonus: Mods.HeavenlyArsenal.Items.ShintoArmorHelmet.SetBonus
+				SetBonus: You get Shinto with it
 				DisplayName: Shinto Armor Helmet
-				Tooltip: ""
+				Tooltip:
+					'''
+					Effects of Spectral Veil
+
+
+					'''
 			}
 
 			ShintoArmorBreastplate: {
@@ -233,7 +222,11 @@ Mods: {
 
 			ShintoArmorLeggings: {
 				DisplayName: Shinto Armor Leggings
-				Tooltip: ""
+				Tooltip:
+					'''
+					Provides a dash if you do not have one already
+
+					'''
 			}
 		}
 

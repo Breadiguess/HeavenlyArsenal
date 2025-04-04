@@ -1,4 +1,5 @@
 ﻿using CalamityMod;
+using CalamityMod.Balancing;
 using CalamityMod.CalPlayer;
 using CalamityMod.DataStructures;
 using CalamityMod.Items.Accessories;
@@ -26,7 +27,9 @@ namespace HeavenlyArsenal.Content.Items.Armor
 		public static readonly int MaxManaIncrease = 200;
 		public static readonly int MaxMinionIncrease = 10;
 
-        Texture2D NoiseTex = GennedAssets.Textures.Noise.SwirlNoise2;
+       
+
+        static Texture2D NoiseTex = GennedAssets.Textures.Noise.SwirlNoise2;
         public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MaxManaIncrease, MaxMinionIncrease);
 
 		public override void SetDefaults() {
@@ -53,27 +56,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
         // Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.
         public float RenderDepth => IDyeableShaderRenderer.SpongeShieldDepth;
 
-        public bool ShouldDrawDyeableShader
-        {
-            get
-            {
-                bool result = false;
-                foreach (Player player in Main.ActivePlayers)
-                {
-                    if (player.outOfRange || player.dead)
-                        continue;
-
-                    ShintoArmorPlayer modPlayer = player.GetModPlayer<ShintoArmorPlayer>();
-
-                    // Do not render the shield if its visibility is off (or it does not exist)
-                    bool isVanityOnly = modPlayer.ShadowShieldVisible && !modPlayer.active;
-                    bool shieldExists = isVanityOnly || modPlayer.barrier > 0;
-                    bool shouldntDraw = !modPlayer.ShadowShieldVisible || !shieldExists;
-                    result |= !shouldntDraw;    
-                }
-                return result;
-            }
-        }
+      
         // Renders the bubble shield over the item in the world.
         public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
         {
@@ -81,9 +64,8 @@ namespace HeavenlyArsenal.Content.Items.Armor
             spriteBatch.Draw(tex, Item.Center - Main.screenPosition + new Vector2(0f, 0f), Main.itemAnimations[Item.type].GetFrame(tex), Color.Cyan * 0.5f, 0f, new Vector2(tex.Width / 2f, (tex.Height / 30f) * 0.8f), 1f, SpriteEffects.None, 0);
         }
 
-        // Complex drawcode which draws Sponge shields on ALL players who have it available. Supposedly.
-        // This is applied as IL (On hook) which draws right before Inferno Ring.
-        public void DrawDyeableShader(SpriteBatch spriteBatch)
+
+        public static void DrawDyeableShader(SpriteBatch spriteBatch)
         {
             // TODO -- Control flow analysis indicates that this hook is not stable (as it was copied from Rover Drive).
             // Sponge shields will be drawn for each player with the Sponge equipped, yes.
@@ -96,12 +78,13 @@ namespace HeavenlyArsenal.Content.Items.Armor
                 if (player.outOfRange || player.dead)
                     continue;
 
-                CalamityPlayer modPlayer = player.Calamity();
+                ShintoArmorPlayer modPlayer = player.GetModPlayer<ShintoArmorPlayer>(); ;
+
 
                 // Do not render the shield if its visibility is off (or it does not exist)
-                bool isVanityOnly = modPlayer.spongeShieldVisible && !modPlayer.sponge;
-                bool shieldExists = isVanityOnly || modPlayer.SpongeShieldDurability > 0;
-                if (!modPlayer.spongeShieldVisible || modPlayer.drawnAnyShieldThisFrame || !shieldExists)
+                bool isVanityOnly = modPlayer.ShadowShieldVisible && !modPlayer.SetActive;
+                bool shieldExists = isVanityOnly || modPlayer.barrier > 0;
+                if (!modPlayer.ShadowShieldVisible || !shieldExists)
                     continue;
 
                 // Scale the shield is drawn at. The Sponge shield gently grows and shrinks; it should be largely imperceptible.
@@ -114,7 +97,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
 
                 if (!alreadyDrawnShieldForPlayer)
                 {
-                    // If in vanity, the shield is always projected as if it's at full strength.
+
                     float visualShieldStrength = 1f;
                     if (!isVanityOnly)
                     {
@@ -162,7 +145,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
                 }
 
                 alreadyDrawnShieldForPlayer = true;
-                modPlayer.drawnAnyShieldThisFrame = true;
+                //modPlayer.drawnAnyShieldThisFrame = true;
 
                 // Fetch shield noise overlay texture (this is the polygons fed to the shader)
                
@@ -177,7 +160,37 @@ namespace HeavenlyArsenal.Content.Items.Armor
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
             }
         }
-    
+
+
+        public override void Load()
+        {
+            On_Main.DrawInfernoRings += On_Main_DrawInfernoRings;
+        }
+
+        private void On_Main_DrawInfernoRings(On_Main.orig_DrawInfernoRings orig, Main self)
+        {
+            orig(self);
+                bool result = false;
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    if (player.outOfRange || player.dead)
+                        continue;
+
+                    ShintoArmorPlayer modPlayer = player.GetModPlayer<ShintoArmorPlayer>();
+
+                    // Do not render the shield if its visibility is off (or it does not exist)
+                    bool isVanityOnly = modPlayer.ShadowShieldVisible && !modPlayer.SetActive;
+                    bool shieldExists = isVanityOnly || modPlayer.barrier > 0;
+                    bool shouldntDraw = !modPlayer.ShadowShieldVisible || !shieldExists;
+                    result |= !shouldntDraw;
+                }
+            if (result == true)
+            {
+                DrawDyeableShader(Main.spriteBatch);
+            }
+                
+            
+        }
 
         public override void AddRecipes()
 		{

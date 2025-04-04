@@ -1,6 +1,10 @@
-﻿using CalamityMod.Items.Armor.Demonshade;
+﻿using CalamityMod;
+using CalamityMod.Balancing;
+using CalamityMod.Items.Accessories;
+using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.ArsenalPlayer;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -14,8 +18,11 @@ namespace HeavenlyArsenal.Content.Items.Armor
 	public class ShintoArmorHelmet : ModItem
 	{
 		public static readonly int AdditiveGenericDamageBonus = 20;
+        public const float TeleportRange = 845f;
 
-		public static LocalizedText SetBonusText { get; private set; }
+        // Boosted by Cross Necklace.
+        internal static readonly int ShadowVeilIFrames = 80;
+        public static LocalizedText SetBonusText { get; private set; }
 
 		public override void SetStaticDefaults() {
 			// If your head equipment should draw hair while drawn, use one of the following:
@@ -45,7 +52,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
         {
             player.setBonus = Language.GetOrRegister(Mod.GetLocalizationKey("SetBonuses.Shogun")).Value;
             player.jumpSpeedBoost += 2f;
-            player.GetModPlayer<ShintoArmorPlayer>().active = true;
+            player.GetModPlayer<ShintoArmorPlayer>().SetActive = true;
             player.GetDamage(DamageClass.Generic) += 0.18f;
             player.maxMinions += 5;
         }
@@ -53,11 +60,16 @@ namespace HeavenlyArsenal.Content.Items.Armor
         
 		public override void UpdateEquip(Player player)
 		{
+            
+            player.Calamity().stealthGenMoving += 0.15f;
+            player.Calamity().stealthGenStandstill += 0.15f;
             player.GetDamage(DamageClass.Generic) += 0.20f;
             player.GetCritChance(DamageClass.Generic) += 15;
             player.GetAttackSpeed(DamageClass.Melee) += 0.15f;
+			player.GetModPlayer<ShintoArmorPlayer>().ShadowVeil = true;
 		}
-		
+        public override void ModifyTooltips(List<TooltipLine> list) => list.IntegrateHotkey(CalamityKeybinds.SpectralVeilHotKey);
+
 
         // Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.
         public override void AddRecipes() {
@@ -70,12 +82,19 @@ namespace HeavenlyArsenal.Content.Items.Armor
                 .AddIngredient(ItemID.NinjaHood)
 				.AddIngredient(ItemID.CrystalNinjaHelmet)
 				.AddIngredient(CalamityHunt.Find<ModItem>("ShogunHelm").Type)
-				//.AddIngredient<>
+				.AddIngredient<SpectralVeil>()
 				.AddTile<DraedonsForge>()
-
-                //				.AddIngredient<NinjaHood>()
-                //.AddTile<>()
                 .Register();
+            }
+			else
+			{
+                CreateRecipe()
+               .AddIngredient<DemonshadeHelm>()
+               .AddIngredient(ItemID.NinjaHood)
+               .AddIngredient(ItemID.CrystalNinjaHelmet)
+               .AddIngredient<SpectralVeil>()
+               .AddTile<DraedonsForge>()
+               .Register();
             }
             
 		}
