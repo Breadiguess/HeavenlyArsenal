@@ -60,6 +60,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         }
         public override void Load()
         {
+            chainTexture = // Load it here
             PlayerDashManager.TryAddDash(new ShintoArmorDash());
         }
 

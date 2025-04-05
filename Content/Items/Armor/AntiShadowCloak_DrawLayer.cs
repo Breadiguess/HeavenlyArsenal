@@ -18,7 +18,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
 
         public override Position GetDefaultPosition() => new AfterParent(PlayerDrawLayers.BackAcc);
 
-        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.head == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorBreastplate), EquipType.Body);
+        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.body == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorBreastplate), EquipType.Body);
 
         public override bool IsHeadLayer => false;
         
