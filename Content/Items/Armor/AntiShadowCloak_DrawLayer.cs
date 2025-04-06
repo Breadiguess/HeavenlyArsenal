@@ -33,7 +33,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
             
             
             DrawData data = capePlayer.GetRobeTarget();
-            data.position = drawInfo.HeadPosition() + new Vector2(2 * drawInfo.drawPlayer.direction, (drawInfo.drawPlayer.gravDir < 0 ? 11 : 0) + -8 * drawInfo.drawPlayer.gravDir);
+            data.position = drawInfo.BodyPosition() + new Vector2(2 * drawInfo.drawPlayer.direction, (drawInfo.drawPlayer.gravDir < 0 ? 11 : 0) + -8 * drawInfo.drawPlayer.gravDir);
             data.position.ApplyVerticalOffset(drawInfo);
             data.color = Color.White;
             data.effect = Main.GameViewMatrix.Effects;

@@ -63,8 +63,11 @@ namespace HeavenlyArsenal.Content.Items.Armor
                     return;
                 Main.spriteBatch.GraphicsDevice.Clear(Color.Transparent);
                 Main.spriteBatch.GraphicsDevice.SetRenderTarget(RobeTarget);
-                Matrix world = Matrix.CreateTranslation(-Player.Center.X + WotGUtils.ViewportSize.X * 0.5f, -Player.Center.Y + WotGUtils.ViewportSize.Y * 0.5f, 0f);
-                Matrix projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -1000f, 1000f);
+                Vector2 robePosition = Player.Center + new Vector2(14f, -50f).RotatedBy(Player.fullRotation);
+
+                Matrix world = Matrix.CreateTranslation(-robePosition.X + backSize / 2, -robePosition.Y + backSize / 2, 0f);
+                
+                Matrix projection = Matrix.CreateOrthographicOffCenter(0, 600, 600, 0, -1000, 1000);
                 Matrix matrix = world * projection;
 
                 ManagedShader clothShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssasinRobeShader");
@@ -90,6 +93,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
             int steps = 25;
             float windSpeed = Math.Clamp(Main.WindForVisuals  * 8f, -1.3f, 0f);
             Vector2 robePosition = Player.Center + new Vector2(14f, -50f).RotatedBy(Player.fullRotation);
+
             Vector3 wind = Vector3.UnitX * (LumUtils.AperiodicSin(ExistenceTimer * 0.029f) * 0.67f + windSpeed) * 1.74f;
             for (int i = 0; i < steps; i++)
             {
