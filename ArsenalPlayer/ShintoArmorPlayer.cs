@@ -39,7 +39,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
         public int ShadowVeilImmunity = 0;
 
-        public const int segmentCount = 10;
+        public const int segmentCount = 7;
         public const float segmentLength = 5f;
         public Vector2[] verletPoints;
         public Vector2[] verletOldPoints;
@@ -69,7 +69,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         }
         public override void Load()
         {
-            chainTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/ShintoArmorBreastplate");
+            chainTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/ShintoArmor_Cape");
             PlayerDashManager.TryAddDash(new ShintoArmorDash());
         }
 
@@ -268,7 +268,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
                 for (int iter = 0; iter < constraintIterations; iter++)
                 {
                     // Fix the first segment to the player's top.
-                    verletPoints[0] = new Vector2(Player.Center.X - 7 * Player.direction, Player.Center.Y - Player.height / 4);
+                    verletPoints[0] = new Vector2(Player.Center.X, Player.Center.Y - Player.height / 4);
 
                     for (int i = 0; i < segmentCount - 1; i++)
                     {
@@ -284,20 +284,17 @@ namespace HeavenlyArsenal.ArsenalPlayer
                         }
                         else
                         {
+                           
                             verletPoints[i] += offset;
                             verletPoints[i + 1] -= offset;
+                            
                         }
                     }
                 }
+               
+                
 
-                // Load the chain segment texture if not already loaded.
-                if (chainTexture == null)
-                {
-                    chainTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/ShintoArmorBreastplate");
-                }
-
-                // Draw the chain segments.
-                // (Assumes that Main.spriteBatch is active for immediate drawing. In a real mod, you might use a PostDraw hook.)
+               
             }
 
             if (IsDashing)

@@ -37,6 +37,7 @@ public class ShintoArmorDash : PlayerDashEffect
 
     public override void MidDashEffects(Player player, ref float dashSpeed, ref float dashSpeedDecelerationFactor, ref float runSpeedDecelerationFactor)
     {
+        player.GetModPlayer<ShintoArmorPlayer>().IsDashing = true;
         Time++;
         if (Time % 2 == 0)
         {

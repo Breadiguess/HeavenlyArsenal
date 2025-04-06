@@ -26,24 +26,21 @@ namespace HeavenlyArsenal.Content.Items.Armor
 
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
+            ShintoArmorCapePlayer capePlayer = drawInfo.drawPlayer.GetModPlayer<ShintoArmorCapePlayer>();
+            if (!capePlayer.IsReady())
+                return;
             drawInfo.drawPlayer.GetModPlayer<ShintoArmorPlayer>().ShadowVeil = true;
-
-            int segmentCount = ShintoArmorPlayer.segmentCount;
-            Texture2D chainTexture = ShintoArmorPlayer.chainTexture.Value;
-            Vector2[] verletPoints = drawInfo.drawPlayer.GetModPlayer<ShintoArmorPlayer>().verletPoints;
-          
-            for (int i = 0; i < segmentCount - 1; i++)
-            {
-                Vector2 posA = verletPoints[i]; 
-                Vector2 posB = verletPoints[i + 1] ;
-                Vector2 segmentVector = posB - posA;
-                float rotation = (float)Math.Atan2(segmentVector.Y, segmentVector.X);
-                float scale = segmentVector.Length() / chainTexture.Width; // stretch texture to fill segment length
-
-                //Main.spriteBatch.Draw(chainTexture, posA, null, Color.White, rotation, new Vector2(0, chainTexture.Height / 2f), new Vector2(scale, 1f), SpriteEffects.None, 0f);
-                drawInfo.DrawDataCache.Add(new DrawData(chainTexture, posA - Main.screenPosition, null, Color.White, 0f, new Vector2(0, chainTexture.Height / 2f), 10f, SpriteEffects.None, 0));
-                //Main.NewText($"I'm doing my part! drawn:{posA}, drawp", Color.AntiqueWhite);
-            }
+            
+            
+            DrawData data = capePlayer.GetRobeTarget();
+            data.position = drawInfo.HeadPosition() + new Vector2(2 * drawInfo.drawPlayer.direction, (drawInfo.drawPlayer.gravDir < 0 ? 11 : 0) + -8 * drawInfo.drawPlayer.gravDir);
+            data.position.ApplyVerticalOffset(drawInfo);
+            data.color = Color.White;
+            data.effect = Main.GameViewMatrix.Effects;
+            data.shader = drawInfo.cHead;
+            Main.NewText($"Position: {data.position}", Color.AntiqueWhite);
+            drawInfo.DrawDataCache.Add(data);
+            
            
         }
     }

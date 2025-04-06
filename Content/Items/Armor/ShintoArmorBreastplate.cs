@@ -70,6 +70,10 @@ namespace HeavenlyArsenal.Content.Items.Armor
             player.GetAttackSpeed<GenericDamageClass>() += 0.25f;
             player.GetModPlayer<ShintoArmorPlayer>().ChestplateEquipped = true;
         }
+        public override void UpdateVanity(Player player)
+        {
+            player.GetModPlayer<ShintoArmorPlayer>().ChestplateEquipped = true;
+        }
 
         // Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.
         public float RenderDepth => IDyeableShaderRenderer.SpongeShieldDepth;
@@ -176,7 +180,9 @@ namespace HeavenlyArsenal.Content.Items.Armor
             if (Main.netMode != NetmodeID.Server)
             {
                 //register the faulds texture. This appears either when the leggings  or the chestplate is equipped (both works)
-                EquipLoader.AddEquipTexture(Mod, "HeavenlyArsenal/Content/Items/Armor/ShintoArmorFaulds_Waist", EquipType.Waist, name: "ShintoArmorFaulds");
+
+                EquipLoader.AddEquipTexture(Mod, Texture + "_Waist", EquipType.Waist, this);
+                //EquipLoader.AddEquipTexture(Mod, "HeavenlyArsenal/Content/Items/Armor/ShintoArmorFaulds_Waist", EquipType.Waist, name: "ShintoArmorFaulds");
             }
              On_Main.DrawInfernoRings += On_Main_DrawInfernoRings;
         }
@@ -190,6 +196,17 @@ namespace HeavenlyArsenal.Content.Items.Armor
                 
             
         }
+
+        public override void EquipFrameEffects(Player player, EquipType type)
+        {
+          if (player.body == Item.bodySlot)
+            {
+                player.waist = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Waist);
+                player.cWaist = player.cBody;
+            }
+        }
+
+
 
         public override void AddRecipes()
 		{
