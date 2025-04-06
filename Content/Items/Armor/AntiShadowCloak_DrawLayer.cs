@@ -11,37 +11,36 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Items.Armor
+namespace HeavenlyArsenal.Content.Items.Armor;
+
+public class AntiShadowCloak_DrawLayer : PlayerDrawLayer
 {
-    class AntiShadowCloak_DrawLayer : PlayerDrawLayer
-    {
 
-        public override Position GetDefaultPosition() => new AfterParent(PlayerDrawLayers.BackAcc);
+    public override Position GetDefaultPosition() => new AfterParent(PlayerDrawLayers.BackAcc);
 
-        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.body == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorBreastplate), EquipType.Body);
+    public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.body == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorBreastplate), EquipType.Body);
 
-        public override bool IsHeadLayer => false;
-        
+    public override bool IsHeadLayer => false;
     
 
-        protected override void Draw(ref PlayerDrawSet drawInfo)
-        {
-            ShintoArmorCapePlayer capePlayer = drawInfo.drawPlayer.GetModPlayer<ShintoArmorCapePlayer>();
-            if (!capePlayer.IsReady())
-                return;
-            drawInfo.drawPlayer.GetModPlayer<ShintoArmorPlayer>().ShadowVeil = true;
-            
-            
-            DrawData data = capePlayer.GetRobeTarget();
-            data.position = drawInfo.BodyPosition() + new Vector2(2 * drawInfo.drawPlayer.direction, (drawInfo.drawPlayer.gravDir < 0 ? 11 : 0) + -8 * drawInfo.drawPlayer.gravDir);
-            data.position.ApplyVerticalOffset(drawInfo);
-            data.color = Color.White;
-            data.effect = Main.GameViewMatrix.Effects;
-            data.shader = drawInfo.cHead;
-            Main.NewText($"Position: {data.position}", Color.AntiqueWhite);
-            drawInfo.DrawDataCache.Add(data);
-            
-           
-        }
+
+    protected override void Draw(ref PlayerDrawSet drawInfo)
+    {
+        ShintoArmorCapePlayer capePlayer = drawInfo.drawPlayer.GetModPlayer<ShintoArmorCapePlayer>();
+        if (!capePlayer.IsReady())
+            return;
+
+        drawInfo.drawPlayer.GetModPlayer<ShintoArmorPlayer>().ShadowVeil = true;
+
+        DrawData data = capePlayer.GetRobeTarget();
+        data.position = drawInfo.BodyPosition() + new Vector2(2 * drawInfo.drawPlayer.direction, (drawInfo.drawPlayer.gravDir < 0 ? 11 : 0) + -8 * drawInfo.drawPlayer.gravDir);
+        data.position.ApplyVerticalOffset(drawInfo);
+        data.color = Color.White;
+        data.effect = Main.GameViewMatrix.Effects;
+        data.shader = drawInfo.cBody;
+        //Main.NewText($"Position: {data.position}", Color.AntiqueWhite);
+        drawInfo.DrawDataCache.Add(data);
+        
+       
     }
 }

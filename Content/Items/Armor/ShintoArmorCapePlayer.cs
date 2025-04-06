@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Armor
@@ -48,7 +49,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
         {
             Main.QueueMainThreadAction(() =>
             {
-              
+                drawToTarget += DrawRobeToTarget;
                 //frenziedParticles = new MonoParticleSystem<FrenziedFlameParticle>(200);
                 RobeTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, backSize, backSize);
                 //frenziedTargetFront = new RenderTarget2D(Main.graphics.GraphicsDevice, frontSize, frontSize);
@@ -59,10 +60,13 @@ namespace HeavenlyArsenal.Content.Items.Armor
         {
             if (Player != null)
             {
-                if (!IsReady())
+                if (!IsReady() || !ShaderManager.HasFinishedLoading) // God damn Luminance you slowpoke
                     return;
-                Main.spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+
                 Main.spriteBatch.GraphicsDevice.SetRenderTarget(RobeTarget);
+                Main.spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+
                 Vector2 robePosition = Player.Center + new Vector2(14f, -50f).RotatedBy(Player.fullRotation);
 
                 Matrix world = Matrix.CreateTranslation(-robePosition.X + backSize / 2, -robePosition.Y + backSize / 2, 0f);
@@ -76,8 +80,11 @@ namespace HeavenlyArsenal.Content.Items.Armor
                 clothShader.Apply();
                 Robe.Render();
 
+                //Main.spriteBatch.Draw(TextureAssets.BlackTile.Value, new Vector2(backSize / 2), new Rectangle(0, 0, 24, 24), Color.Red);
+                Main.spriteBatch.End();
             }
         }
+
         public bool IsReady() => RobeTarget != null;
         public DrawData GetRobeTarget() => new DrawData(RobeTarget, Vector2.Zero, null, Color.White, -Player.fullRotation, RobeTarget.Size() * 0.5f, 1f, 0);
         //public DrawData GetFrenzyTargetFront() => new DrawData(frenziedTargetFront, Vector2.Zero, frenziedTargetFront.Frame(), Color.White, -Player.fullRotation, frenziedTargetFront.Size() * 0.5f, 1f, 0);
