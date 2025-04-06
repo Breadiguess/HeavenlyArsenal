@@ -1,4 +1,5 @@
-﻿using HeavenlyArsenal.Core.Physics.ClothManagement;
+﻿using HeavenlyArsenal.Common.utils;
+using HeavenlyArsenal.Core.Physics.ClothManagement;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -97,40 +98,30 @@ namespace HeavenlyArsenal.Content.Items.Armor
         }
         private void UpdateCloth()
         {
-            int steps = 25;
+            int steps = 15;
             float windSpeed = Math.Clamp(Main.WindForVisuals  * 8f, -1.3f, 0f);
-            Vector2 robePosition = Player.Center + new Vector2(14f, -50f).RotatedBy(Player.fullRotation);
-
+            Vector2 robePosition = Player.Center + new Vector2(0, -50f * Player.gravDir).RotatedBy(Player.fullRotation);
+            robePosition += Main.OffsetsPlayerHeadgear[(int)(Player.bodyFrame.Y / Player.bodyFrame.Height)];
             Vector3 wind = Vector3.UnitX * (LumUtils.AperiodicSin(ExistenceTimer * 0.029f) * 0.67f + windSpeed) * 1.74f;
             for (int i = 0; i < steps; i++)
             {
                 for (int x = 0; x < Robe.Width; x += 2)
                 {
-                    for (int y = 0; y < 2; y++)
-                        ConstrainParticle(robePosition, Robe.particleGrid[x, y], 0f);
+                    for (int y = 0; y < 1; y++)
+                        ConstrainParticle(robePosition + new Vector2((6 - x) * Player.direction, 0), Robe.particleGrid[x, y], 0f);
                 }
 
-                Robe.Simulate(0.051f, false, Vector3.UnitY * 3.2f + wind);
+                Robe.Simulate(0.06f, false, Vector3.UnitY * 5 + wind * 2 * Player.direction);
             }
         }
-
-       
 
         private void ConstrainParticle(Vector2 anchor, ClothPoint? point, float angleOffset)
         {
             if (point is null)
                 return;
-
-            float xInterpolant = point.X / (float)Robe.Width;
-            float angle = MathHelper.Lerp(MathHelper.PiOver2, MathHelper.TwoPi - MathHelper.PiOver2, xInterpolant);
-
-            Vector3 ring = new Vector3(MathF.Cos(angle + angleOffset) * 50f, 0f, -MathF.Cos(angle) * 10f);
-            ring.Y += point.Y * 6f;
-
-            point.Position = new Vector3(anchor, 0f) + ring;
-            point.IsFixed = true;
-        }
-
-        
+            Robe.DampeningCoefficient = 0.05f;
+            point.Position = new Vector3(anchor, 0f);
+            point.IsFixed = false;
+        }       
     }
 }
