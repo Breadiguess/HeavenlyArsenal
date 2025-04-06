@@ -304,7 +304,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
                 Main.NewText($"Im doing things!", Color.Coral);
             }
 
-            if (!cooldowns.ContainsKey(AbyssDashCooldown.ID)) 
+            if (cooldowns.ContainsKey(AbyssDashCooldown.ID)) 
             {
                 empoweredDash = true;
             }
