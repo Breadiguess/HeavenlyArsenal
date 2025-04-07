@@ -22,7 +22,17 @@ namespace HeavenlyArsenal.Content.Items.Armor
 
 		public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MoveSpeedBonus);
 
-		public override void SetDefaults() {
+        public override void SetStaticDefaults()
+        {
+
+            if (Main.netMode != NetmodeID.Server)
+            {
+                var equipSlot = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Legs);
+                ArmorIDs.Legs.Sets.HidesBottomSkin[equipSlot] = true;
+            }
+        }
+
+        public override void SetDefaults() {
 			Item.width = 18; // Width of the item
 			Item.height = 18; // Height of the item
 			Item.value = Item.sellPrice(gold: 1); // How many coins the item is worth

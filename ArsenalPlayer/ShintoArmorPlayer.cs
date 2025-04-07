@@ -70,7 +70,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         }
         public override void Load()
         {
-            chainTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/ShintoArmor_Cape");
+           
             PlayerDashManager.TryAddDash(new ShintoArmorDash());
             PlayerDashManager.TryAddDash(new AbyssDash());
         }
@@ -215,7 +215,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
                                     Main.dust[dustIndex].noLight = true;
                                 }
 
-                                ShadowVeilImmunity = ShintoArmorHelmet.ShadowVeilIFrames;
+                                ShadowVeilImmunity = ShintoArmorHelmetAll.ShadowVeilIFrames;
                             }
                         }
                     }

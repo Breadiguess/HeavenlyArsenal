@@ -205,22 +205,6 @@ Mods: {
 			}
 
 			ShintoArmorHelmet: {
-				SetBonus:
-					'''
-					100% increased summon damage and +10 max minions
-
-					'''
-				DisplayName: Visage of Silent Stars
-				Tooltip:
-					'''
-					Press [KEY] to consume 25% of your maximum stealth to perform a mid-range teleport and render you momentarily invulnerable
-					If you dodge something while invulnerable, you instantly gain full stealth
-					Teleportation is disabled while Chaos State is active
-					Stealth generates 15% faster
-					50% increased damage
-					30% increased critical strike chance
-					15% increased attack speed
-					'''
 			}
 
 			ShintoArmorBreastplate: {
@@ -242,6 +226,46 @@ Mods: {
 					50% increased movement speed 
 					Shadow Speed
 					Greatly improved acceleration and maneuverability 
+					'''
+			}
+
+			ShintoArmorHelmetAll: {
+				SetBonus:
+					'''
+					100% increased summon damage and +10 max minions
+
+					'''
+				DisplayName: Visage of Silent Stars
+				Tooltip:
+					'''
+
+					Press [KEY] to consume 25% of your maximum stealth to perform a mid-range teleport and render you momentarily invulnerable
+					If you dodge something while invulnerable, you instantly gain full stealth
+					Teleportation is disabled while Chaos State is active
+					Stealth generates 15% faster
+					50% increased damage
+					30% increased critical strike chance
+					15% increased attack speed
+					'''
+			}
+
+			ShintoArmorHelmetRogue: {
+				SetBonus:
+					'''
+					100% increased summon damage and +10 max minions
+
+					'''
+				DisplayName: Visage of Silent Stars
+				Tooltip:
+					'''
+					Press [KEY] to consume 25% of your maximum stealth to perform a mid-range teleport and render you momentarily invulnerable
+					If you dodge something while invulnerable, you instantly gain full stealth
+					Teleportation is disabled while Chaos State is active
+					Stealth generates 15% faster
+					50% increased damage
+					30% increased critical strike chance
+					15% increased attack speed
+					The inside is full of teeth
 					'''
 			}
 		}

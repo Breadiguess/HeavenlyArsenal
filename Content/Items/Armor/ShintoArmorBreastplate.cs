@@ -16,6 +16,7 @@ using System;
 using System.Diagnostics.Metrics;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.Localization;
@@ -191,7 +192,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
             if (Main.netMode != NetmodeID.Server)
             {
                 //register the faulds texture. This appears either when the leggings  or the chestplate is equipped (both works)
-
+                EquipLoader.AddEquipTexture(Mod, Texture + "_Bulk", EquipType.Front, this);
                 EquipLoader.AddEquipTexture(Mod, Texture + "_Waist", EquipType.Waist, this);
                 //EquipLoader.AddEquipTexture(Mod, "HeavenlyArsenal/Content/Items/Armor/ShintoArmorFaulds_Waist", EquipType.Waist, name: "ShintoArmorFaulds");
             }
@@ -214,6 +215,9 @@ namespace HeavenlyArsenal.Content.Items.Armor
             {
                 player.waist = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Waist);
                 player.cWaist = player.cBody;
+
+                player.front = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Front);
+                player.front = player.cBody;
             }
         }
 
@@ -246,4 +250,23 @@ namespace HeavenlyArsenal.Content.Items.Armor
 
         }
     }
+    public class ShintoArmorBreastplate_DrawLayer : PlayerDrawLayer
+    {
+
+        public override Position GetDefaultPosition() => new BeforeParent(PlayerDrawLayers.FrontAccFront);
+
+        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.body == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorBreastplate), EquipType.Body);
+
+        public override bool IsHeadLayer => false;
+
+
+
+        protected override void Draw(ref PlayerDrawSet drawInfo)
+        {
+
+
+
+        }
+    }
+
 }

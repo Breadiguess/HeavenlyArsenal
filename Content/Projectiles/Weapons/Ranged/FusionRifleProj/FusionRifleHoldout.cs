@@ -326,7 +326,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
                 Owner.PickAmmo(Owner.HeldItem, out _, out _, out _, out _, out _);
                 CurrentState = FusionRifleState.Delay; // Transition to delay state after the burst
                 StateTimer = 60; // Cycle duration after firing
-                //ChargeTimer = 0; // Reset charge
+                ChargeTimer = 0; // Reset charge
             }
         }
 

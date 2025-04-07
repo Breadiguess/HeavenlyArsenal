@@ -137,7 +137,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
         public override void OnSpawn(IEntitySource source)
         {
-            FusionRifleHoldout.BurstCount++;
+           // FusionRifleHoldout.BurstCount++;
         }
         public override void OnKill(int timeLeft)
         {
