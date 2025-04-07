@@ -1,8 +1,11 @@
-﻿using System;
+﻿using HeavenlyArsenal.Common.Graphics;
+using HeavenlyArsenal.Content.Particles;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Melee.AvatarSpear;
@@ -16,11 +19,13 @@ public class AvatarSpearHeatPlayer : ModPlayer
 
     public bool Active { get; private set; }
 
-    public bool ConsumeHeat(float heat)
+    public bool ConsumeHeat(float heat, bool pay = true)
     {
         if (Heat - heat > 0f)
         {
-            Heat -= heat;
+            if (pay)
+                Heat -= heat;
+
             return true;
         }
 
@@ -50,5 +55,15 @@ public class AvatarSpearHeatPlayer : ModPlayer
             Heat = Math.Max(Heat - SevenSeconds, 0f);
         else
             Active = false;
+    }
+
+    public override void PostUpdateMiscEffects()
+    {
+        if (Active && Main.rand.NextBool(13))
+        {
+            HeatLightning particle = HeatLightning.pool.RequestParticle();
+            particle.Prepare(Player.MountedCenter, Player.velocity * 2f + Main.rand.NextVector2Circular(10, 10), Main.rand.NextFloat(-2f, 2f), 10, Main.rand.NextFloat(0.5f, 1f));
+            ParticleEngine.Particles.Add(particle);
+        }
     }
 }
