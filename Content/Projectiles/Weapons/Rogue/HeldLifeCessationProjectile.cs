@@ -145,7 +145,7 @@ class HeldLifeCessationProjectile : ModProjectile
 
         Owner.heldProj = Projectile.whoAmI;
         Projectile.velocity = Vector2.Lerp(Projectile.velocity.SafeNormalize(Vector2.Zero), Owner.DirectionTo(Main.MouseWorld).SafeNormalize(Vector2.Zero), 0.08f) * Owner.HeldItem.shootSpeed;
-        Projectile.Center = Owner.MountedCenter + Projectile.velocity.SafeNormalize(Vector2.Zero) * 25 + new Vector2(0, Owner.gfxOffY) + Main.rand.NextVector2Circular(2, 2) * Projectile.ai[2];
+        Projectile.Center = Owner.MountedCenter + Projectile.velocity.SafeNormalize(Vector2.Zero) * 25 + new Vector2(0, Owner.gfxOffY) + Main.rand.NextVector2Circular(2, 2); //* Projectile.ai[2];
         Projectile.rotation = Projectile.velocity.ToRotation();
 
         Main.NewText($"Velocity = {Projectile.velocity}", Color.AntiqueWhite);
@@ -293,7 +293,7 @@ class HeldLifeCessationProjectile : ModProjectile
             GeneralScreenEffectSystem.ChromaticAberration.Start(Player.Center, 3f, 90);
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
-                //NewProjectileBetter(Projectile.GetSource_FromThis(), energySource, Vector2.Zero, ModContent.ProjectileType<DarkWave>(), 0, 0f);
+               NewProjectileBetter(Projectile.GetSource_FromThis(), energySource, Vector2.Zero, ModContent.ProjectileType<DarkWave>(), 0, 0f);
             HasScreamed = true;
         }
     }

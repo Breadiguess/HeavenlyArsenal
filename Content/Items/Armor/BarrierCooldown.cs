@@ -5,6 +5,7 @@ using CalamityMod.Items.Accessories;
 using HeavenlyArsenal.ArsenalPlayer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -18,18 +19,18 @@ namespace HeavenlyArsenal.Content.Items.Armor;
 
 public class BarrierDurability : CooldownHandler
 {
-    private static Color ringColorLerpStart = new Color(82, 203, 222);
-    private static Color ringColorLerpEnd = new Color(113, 178, 222);
+    private static Color ringColorLerpStart = new Color(220, 20, 78);
+    private static Color ringColorLerpEnd = new Color(0, 0, 0);
 
     private float AdjustedCompletion => instance.timeLeft / (float)ShintoArmorBreastplate.ShieldDurabilityMax;
 
     public static new string ID => "BarrierDurability";
-    public override bool CanTickDown => !instance.player.Calamity().sponge || instance.timeLeft <= 0;
-    public override bool ShouldDisplay => true;//player.GetShintoArmorPlayer<ShintoArmorPlayer>().barrier;
-    public override LocalizedText DisplayName => GetText($"UI.Cooldowns.{ID}");
-    public override string Texture => "CalamityMod/Cooldowns/SpongeDurability";
-    public override string OutlineTexture => "CalamityMod/Cooldowns/SpongeOutline";
-    public override string OverlayTexture => "CalamityMod/Cooldowns/SpongeOverlay";
+    public override bool CanTickDown => !instance.player.GetModPlayer<ShintoArmorPlayer>().SetActive || instance.timeLeft <= 0;
+    public override bool ShouldDisplay => instance.player.GetModPlayer<ShintoArmorPlayer>().SetActive;
+    public override LocalizedText DisplayName => Language.GetOrRegister("AntiShield Decay");//"HeavenlyArsenal.Cooldowns.AntiShield.BarrierCooldown");
+    public override string Texture => "HeavenlyArsenal/Assets/Textures/UI/Cooldowns/BarrierCooldown_Icon";
+    public override string OutlineTexture => "HeavenlyArsenal/Assets/Textures/UI/Cooldowns/BarrierCooldownOutline_Icon";
+    public override string OverlayTexture => "HeavenlyArsenal/Assets/Textures/UI/Cooldowns/BarrierCooldownOverlay_Icon";
     public override Color OutlineColor => new Color(220, 20, 70);
     public override Color CooldownStartColor => Color.Lerp(ringColorLerpStart, ringColorLerpEnd, instance.Completion);
     public override Color CooldownEndColor => Color.Lerp(ringColorLerpStart, ringColorLerpEnd, instance.Completion);
@@ -78,13 +79,13 @@ public class BarrierDurability : CooldownHandler
 
 public class BarrierRecharge : CooldownHandler
 {
-    private static Color ringColorLerpStart = new Color(179, 212, 242);
-    private static Color ringColorLerpEnd = new Color(113, 178, 222);
+    private static Color ringColorLerpStart = new Color(0, 0, 0);
+    private static Color ringColorLerpEnd = new Color(220, 220, 220);
 
     public static new string ID => "BarrierRecharge";
     public override bool ShouldDisplay => true;
-    public override LocalizedText DisplayName => GetText($"UI.Cooldowns.{ID}");
-    public override string Texture => "CalamityMod/Cooldowns/SpongeRecharge";
+    public override LocalizedText DisplayName => Language.GetOrRegister("AntiShield Inversion");
+    public override string Texture => "HeavenlyArsenal/Assets/Textures/UI/Cooldowns/BarrierRecharge_Icon";
     public override string OutlineTexture => "CalamityMod/Cooldowns/SpongeOutline";
     public override string OverlayTexture => "CalamityMod/Cooldowns/SpongeOverlay";
     public override bool SavedWithPlayer => false;

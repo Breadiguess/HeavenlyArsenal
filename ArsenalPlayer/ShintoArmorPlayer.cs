@@ -14,6 +14,13 @@ using System.Collections.Generic;
 using CalamityMod.CalPlayer.Dashes;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using NoxusBoss.Core.Graphics.GeneralScreenEffects;
+using NoxusBoss.Assets;
+using CalamityMod.NPCs.TownNPCs;
+using Terraria.Graphics.Shaders;
+using HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
+using Steamworks;
+using NoxusBoss.Core.Graphics.TentInterior.Cutscenes;
 
 namespace HeavenlyArsenal.ArsenalPlayer
 {
@@ -38,15 +45,9 @@ namespace HeavenlyArsenal.ArsenalPlayer
         public Dictionary<string, CooldownInstance> cooldowns;
 
         public int ShadowVeilImmunity = 0;
-
-        public const int segmentCount = 7;
-        public const float segmentLength = 5f;
-        public Vector2[] verletPoints;
-        public Vector2[] verletOldPoints;
-        private bool verletInitialized = false;
-        public static Asset<Texture2D> chainTexture;
         public bool ChestplateEquipped = false;
 
+        public bool VoidBeltEquipped = false;
         public override void Initialize()
         {
 
@@ -62,8 +63,8 @@ namespace HeavenlyArsenal.ArsenalPlayer
             ChestplateEquipped = false;
             IsDashing = false;
             empoweredDash = false;
+            VoidBeltEquipped = false;
 
-          
         }
         public override void Load()
         {
@@ -129,7 +130,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
             if (SetActive)
             {
                 // Begin visual cooldown handling for shield recharge.
-
+                
                 // If the shield is completely discharged and not recharging, start the recharge cooldown.
                 if (timeSinceLastHit == 0 && !cooldowns.ContainsKey(BarrierRecharge.ID))
                     Player.AddCooldown(BarrierRecharge.ID, ShintoArmorBreastplate.ShieldRechargeDelay);
@@ -154,6 +155,13 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
                     if (cooldowns.TryGetValue(BarrierDurability.ID, out var cdDurability))
                         cdDurability.timeLeft = displayBarrier;
+                }
+            }
+            else
+            {
+                if (cooldowns.ContainsKey(BarrierDurability.ID))
+                {
+                    cooldowns.Remove(BarrierDurability.ID);
                 }
             }
 
@@ -233,26 +241,38 @@ namespace HeavenlyArsenal.ArsenalPlayer
             {
                 empoweredDash = false;
             }
+
+
+
+            
         }
 
 
 
         public override void ModifyHurt(ref Player.HurtModifiers modifiers)
         {
-            if (SetActive && barrier > 0 && Iframe <= 0)
+            if(SetActive)
             {
-                modifiers.DisableSound();
-                SoundEngine.PlaySound(ShintoArmorBreastplate.ShieldHurtSound, Player.Center);
-            }
-            else if (SetActive && barrier <= 0)
-            {
-                if(timeSinceLastHit !< 0)
+                if (barrier > 0 && Iframe <= 0)
                 {
-                    SoundEngine.PlaySound(ShintoArmorBreastplate.BreakSound, Player.Center);
-                    barrier = 0;
+                    modifiers.DisableSound();
+                    SoundEngine.PlaySound(ShintoArmorBreastplate.ShieldHurtSound, Player.Center);
                 }
+                else if (barrier <= 0)
+                {
+                    if (timeSinceLastHit! < 0)
+                    {
+                        SoundEngine.PlaySound(ShintoArmorBreastplate.BreakSound, Player.Center);
+                        barrier = 0;
+                    }
 
-                
+
+                }
+            }
+            if (VoidBeltEquipped&& barrier <= 0 && Main.rand.NextBool(10))
+            {
+               
+                VoidBelt();
             }
         }
 
@@ -265,6 +285,13 @@ namespace HeavenlyArsenal.ArsenalPlayer
                 if (Iframe <= 0)
                 {
                     int actualDamage = (int)Math.Round(incoming * barrierDamageReduction, 0);
+                    //retaliation
+                    if(actualDamage > ShintoArmorBreastplate.ShieldDurabilityMax && barrier == ShintoArmorBreastplate.ShieldDurabilityMax)
+                    {
+                        Main.NewText($"Retaliation!", Color.AntiqueWhite);
+                        GeneralScreenEffectSystem.ChromaticAberration.Start(Player.Center, 3f, 90);
+                        SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Angry, Player.Center);
+                    }
                     Iframe = Player.ComputeHitIFrames(info);
                     barrier -= actualDamage;
                     CombatText.NewText(Player.Hitbox, Color.Cyan, actualDamage);
@@ -325,6 +352,115 @@ namespace HeavenlyArsenal.ArsenalPlayer
             }
         }
 
+        public void VoidBelt()
+        {
+
+            GeneralScreenEffectSystem.RadialBlur.Start(Player.Center, 3f, 90);
+            Player.SetImmuneTimeForAllTypes(120);
+            Dust.NewDust(Player.Center, Player.width, Player.height, DustID.BunnySlime, 0, 0, 100, Color.Crimson, 1);
+            SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.AngryDistant with { MaxInstances = 0, PitchVariance = 0.5f });
+            for(int i = 0; i <20; i++)
+            {
+                int fireBrightness = Main.rand.Next(40);
+                Color fireColor = new Color(fireBrightness, fireBrightness, fireBrightness);
+                if (Main.rand.NextBool(3) && Player.velocity.X > 20)
+                    fireColor = new Color(220, 20, Main.rand.Next(16), 255);
+
+                Vector2 position = Player.Center + Main.rand.NextVector2Circular(30f, 30f);
+                AntishadowFireParticleSystemManager.CreateNew(Player.whoAmI, false, position, Main.rand.NextVector2Circular(30f, Player.velocity.X * .96f), Vector2.One * Main.rand.NextFloat(30f, 50f), fireColor);
+            }
+
+        }
+        /*
+        public void SetImmuneTimeForAllTypes(int time)
+        {
+            immune = true;
+            immuneTime = time;
+            for (int i = 0; i < hurtCooldowns.Length; i++)
+            {
+                hurtCooldowns[i] = time;
+            }
+        }
+
+        public void ShadowDodge()
+        {
+            SetImmuneTimeForAllTypes(longInvince ? 120 : 80);
+            if (whoAmI != Main.myPlayer)
+                return;
+
+            for (int i = 0; i < maxBuffs; i++)
+            {
+                if (buffTime[i] > 0 && buffType[i] == 59)
+                    DelBuff(i);
+            }
+
+            PutHallowedArmorSetBonusOnCooldown();
+            NetMessage.SendData(62, -1, -1, null, whoAmI, 2f);
+        }
+
+        private void PutHallowedArmorSetBonusOnCooldown()
+        {
+            shadowDodgeTimer = 1800;
+        }
+
+        public void BrainOfConfusionDodge()
+        {
+            SetImmuneTimeForAllTypes(longInvince ? 120 : 80);
+            brainOfConfusionDodgeAnimationCounter = 300;
+            if (whoAmI == Main.myPlayer)
+            {
+                AddBuff(321, 240, quiet: false);
+                NetMessage.SendData(62, -1, -1, null, whoAmI, 4f);
+            }
+        }
+
+        public void NinjaDodge()
+        {
+            SetImmuneTimeForAllTypes(longInvince ? 120 : 80);
+            for (int i = 0; i < 100; i++)
+            {
+                int num = Dust.NewDust(new Vector2(position.X, position.Y), width, height, 31, 0f, 0f, 100, default(Color), 2f);
+                Main.dust[num].position.X += Main.rand.Next(-20, 21);
+                Main.dust[num].position.Y += Main.rand.Next(-20, 21);
+                Main.dust[num].velocity *= 0.4f;
+                Main.dust[num].scale *= 1f + (float)Main.rand.Next(40) * 0.01f;
+                Main.dust[num].shader = GameShaders.Armor.GetSecondaryShader(cWaist, this);
+                if (Main.rand.Next(2) == 0)
+                {
+                    Main.dust[num].scale *= 1f + (float)Main.rand.Next(40) * 0.01f;
+                    Main.dust[num].noGravity = true;
+                }
+            }
+
+            int num2 = Gore.NewGore(new Vector2(position.X + (float)(width / 2) - 24f, position.Y + (float)(height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64));
+            Main.gore[num2].scale = 1.5f;
+            Main.gore[num2].velocity.X = (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity.Y = (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity *= 0.4f;
+            num2 = Gore.NewGore(new Vector2(position.X + (float)(width / 2) - 24f, position.Y + (float)(height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64));
+            Main.gore[num2].scale = 1.5f;
+            Main.gore[num2].velocity.X = 1.5f + (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity.Y = 1.5f + (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity *= 0.4f;
+            num2 = Gore.NewGore(new Vector2(position.X + (float)(width / 2) - 24f, position.Y + (float)(height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64));
+            Main.gore[num2].scale = 1.5f;
+            Main.gore[num2].velocity.X = -1.5f - (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity.Y = 1.5f + (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity *= 0.4f;
+            num2 = Gore.NewGore(new Vector2(position.X + (float)(width / 2) - 24f, position.Y + (float)(height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64));
+            Main.gore[num2].scale = 1.5f;
+            Main.gore[num2].velocity.X = 1.5f + (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity.Y = -1.5f - (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity *= 0.4f;
+            num2 = Gore.NewGore(new Vector2(position.X + (float)(width / 2) - 24f, position.Y + (float)(height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64));
+            Main.gore[num2].scale = 1.5f;
+            Main.gore[num2].velocity.X = -1.5f - (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity.Y = -1.5f - (float)Main.rand.Next(-50, 51) * 0.01f;
+            Main.gore[num2].velocity *= 0.4f;
+            if (whoAmI == Main.myPlayer)
+                NetMessage.SendData(62, -1, -1, null, whoAmI, 1f);
+        }
+        */
         public override void ResetEffects()
         {
             IsDashing = false;
