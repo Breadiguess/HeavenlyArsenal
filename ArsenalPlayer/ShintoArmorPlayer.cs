@@ -286,6 +286,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
                 {
                     if (timeSinceLastHit! < 0)
                     {
+                        BarrierCrack(Player);
                         SoundEngine.PlaySound(ShintoArmorBreastplate.BreakSound, Player.Center);
                         barrier = 0;
                     }
@@ -327,7 +328,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
                     //retaliation
                     if(actualDamage > ShintoArmorBreastplate.ShieldDurabilityMax && barrier == ShintoArmorBreastplate.ShieldDurabilityMax)
                     {
-                        Main.NewText($"Retaliation!", Color.AntiqueWhite);
+                      //  Main.NewText($"Retaliation!", Color.AntiqueWhite);
                         GeneralScreenEffectSystem.ChromaticAberration.Start(Player.Center, 3f, 90);
                         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Angry, Player.Center);
                     }
@@ -337,7 +338,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
                     BarrierTakeDamageVFX();
                     CombatText.NewText(Player.Hitbox, Color.Cyan, actualDamage);
-                    Main.NewText($"Barrier: {barrier}, TimeSinceLastHit: {timeSinceLastHit}, Damage taken: {actualDamage}, Incoming damage: {incoming}", Color.AntiqueWhite);
+                 //   Main.NewText($"Barrier: {barrier}, TimeSinceLastHit: {timeSinceLastHit}, Damage taken: {actualDamage}, Incoming damage: {incoming}", Color.AntiqueWhite);
                     timeSinceLastHit = 0;
                 }
 

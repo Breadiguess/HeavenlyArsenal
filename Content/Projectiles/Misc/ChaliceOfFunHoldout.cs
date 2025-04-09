@@ -23,6 +23,7 @@ using NoxusBoss.Assets;
 using Luminance.Core.Graphics;
 using Humanizer;
 using Terraria.ID;
+using HeavenlyArsenal.ArsenalPlayer;
 
 namespace HeavenlyArsenal.Content.Projectiles.Misc
 {
@@ -129,6 +130,9 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc
             }
             else
             {
+                player.GetModPlayer<StimPlayer>().Addicted = false;
+                player.GetModPlayer<StimPlayer>().Withdrawl = false;
+                player.GetModPlayer<StimPlayer>().stimsUsed = 0;
                 Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
                 SoundEngine.PlaySound(GennedAssets.Sounds.Common.TwinkleMuffled with { MaxInstances = 0, PitchVariance = 1f});
                 player.AddBuff(ModContent.BuffType<BloodflareBloodFrenzy>(),1200,true,false);
@@ -147,7 +151,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc
                     Dust.NewDust(dustLocation, 5, 5, 324, (1 + Main.rand.NextFloat(0, 5)) * -player.direction, -1 +Main.rand.NextFloat(0,5), 1, default, 1);
                     
                 }
-                Main.NewText($"Dust: {dustLocation}", Color.AntiqueWhite);
+                //Main.NewText($"Dust: {dustLocation}", Color.AntiqueWhite);
                 //drained();
             }
         }

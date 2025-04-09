@@ -283,7 +283,7 @@ class HeldLifeCessationProjectile : ModProjectile
 
     public void Scream()
     {
-        Vector2 energySource = Owner.Center + Vector2.UnitY * Projectile.scale * 76f;
+        Vector2 energySource =Projectile.Center;
         if (!HasScreamed)
         {
             SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.ExplosionTeleport);

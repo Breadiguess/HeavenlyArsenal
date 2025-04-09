@@ -21,6 +21,21 @@ Mods: {
 				DisplayName: Seyln
 				Description: Found on wish dot com
 			}
+
+			CombatStimBuff: {
+				DisplayName: Combat Stim Buff
+				Description: you feel like you could break something... in two
+			}
+
+			StimWithdrawl_Debuff: {
+				DisplayName: Stim Withdrawl
+				Description: i dont feel so god....
+			}
+
+			StimAddicted_Debuff: {
+				DisplayName: Stim Addicted
+				Description: you are addicted to stims
+			}
 		}
 
 		Items: {
@@ -114,17 +129,12 @@ Mods: {
 
 			CircularSaw: {
 				DisplayName: Circular Saw
-				Tooltip: ""
+				Tooltip: Blockaroz's dead child
 			}
 
 			StupidFuckYouSword: {
 				DisplayName: Stupid Fuck You Sword
 				Tooltip: I HATE !!!
-			}
-
-			TestWhip: {
-				DisplayName: Test Whip
-				Tooltip: ""
 			}
 
 			DevWing: {
@@ -188,7 +198,7 @@ Mods: {
 			}
 
 			AvatarBow: {
-				DisplayName: Avatar Spear
+				DisplayName: Bow of the Idol
 				Tooltip: ""
 			}
 
@@ -196,38 +206,47 @@ Mods: {
 				DormantName: Slumbering Void
 				EmpoweredName: Crimson Needle
 				DisplayName: Avatar Longinus
-				Tooltip: Goddamn the sun
+				Tooltip:
+					'''
+					Cycles through several attacks.
+
+					'''
 			}
 
 			LifeAndCessation: {
 				DisplayName: Life And Cessation
-				Tooltip: ""
-			}
-
-			ShintoArmorHelmet: {
+				Tooltip:
+					'''
+					Hold out the stone to suck the heat from the surrounding areas
+					After reaching half heat, release to summon lilly stars from above
+					Lilly stars home in on nearby enemies after a brief period.
+					'''
 			}
 
 			ShintoArmorBreastplate: {
 				DisplayName: Mantle of Dimming Radience
-				loreTip: ""
 				Tooltip:
 					'''
 					20% increased damage
 					Reduces damage taken by 9% and greatly increases life regeneration
 					Increases max life and mana by 350
-
 					'''
+				loretip: "\n"
 			}
 
 			ShintoArmorLeggings: {
 				DisplayName: Steps of the Darkened Passage
-				loreTip: ""
 				Tooltip:
 					'''
 					20% increased damage
 					50% increased movement speed 
 					Shadow Speed
 					Greatly improved acceleration and maneuverability 
+					'''
+				loreTip:
+					'''
+					"Do you want to know what I see when I feel you near?"
+					"Nothing."
 					'''
 			}
 
@@ -243,9 +262,12 @@ Mods: {
 					50% increased damage
 					30% increased critical strike chance
 					15% increased attack speed
-					Press [KEY] to consume 25% of your maximum stealth to perform a mid-range teleport and render you momentarily invulnerable
-					If you dodge something while invulnerable, you instantly gain full stealth
-					Teleportation is disabled while Chaos State is active
+					Effects of Occult Skull Crown
+					'''
+				loretip:
+					'''
+					"Do you want to know what I see when I look at you?"
+					"Nothing."
 					'''
 			}
 
@@ -267,6 +289,11 @@ Mods: {
 					15% increased attack speed
 					The inside is full of teeth
 					'''
+				loretip:
+					'''
+					"Do you want to know what I see when I look at you?"
+					"Nothing."
+					'''
 			}
 
 			AncientCoin: {
@@ -276,7 +303,32 @@ Mods: {
 
 			ChaliceOfFun: {
 				DisplayName: Chalice Of Fun
+				Tooltip:
+					'''
+					the blood god is not pleased
+					yummers
+					yummers
+					yummers
+					DRINK DRINK DRINK DRINK DRINK DEEP FROM THE CHALICE
+
+					'''
+			}
+
+			DebugWeapon: {
+				DisplayName: Debug Weapon
 				Tooltip: ""
+			}
+
+			CombatStim: {
+				DisplayName: Expirmental Combat Stim
+				Tooltip:
+					'''
+					Don't worry — stims have zero addictive properties*!
+
+					*study paid for by draedon.inc
+					Please stim responsibly.
+
+					'''
 			}
 		}
 
@@ -327,6 +379,9 @@ Mods: {
 			LifeCessationEnergy.DisplayName: Life Cessation Energy
 			LillyStarProjectile.DisplayName: Lilly Star Projectile
 			ShintoArmorDash_Hand.DisplayName: Shinto Armor Dash_ Hand
+			EyeOfTranscendenceProjectile.DisplayName: Eye Of Transcendence Projectile
+			EyeOfTranscendence_Held.DisplayName: Eye Of Transcendence_ Held
+			AvatarBow_Held.DisplayName: Avatar Bow_ Held
 		}
 
 		NPCs.AnAffrontToGod.DisplayName: An Affront To God
