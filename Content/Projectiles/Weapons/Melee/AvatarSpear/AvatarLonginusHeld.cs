@@ -69,7 +69,7 @@ public class AvatarLonginusHeld : ModProjectile
     public enum AvatarSpearAttacks
     {
         Idle,
-        ThrowTeleport,
+        ThrowRupture,
 
         RapidStabs,
         HeavyStab,
@@ -133,9 +133,9 @@ public class AvatarLonginusHeld : ModProjectile
                 if (Player.altFunctionUse == 1)
                 {
                     if (IsEmpowered && Player.GetModPlayer<AvatarSpearHeatPlayer>().ConsumeHeat(0.5f, false))
-                        AttackState = (int)AvatarSpearAttacks.ThrowTeleport;
+                        AttackState = (int)AvatarSpearAttacks.Castigation;
                     else
-                        AttackState = (int)AvatarSpearAttacks.ThrowTeleport;
+                        AttackState = (int)AvatarSpearAttacks.ThrowRupture;
                 }
                 else if (InUse)
                     AttackState = (int)AvatarSpearAttacks.RapidStabs;
@@ -381,7 +381,6 @@ public class AvatarLonginusHeld : ModProjectile
 
                 Time++;
 
-
                 if (Time > HeavyWindDown + HeavyThrustTime + HeavyWindDown - 20 && InUse && IsEmpowered && HitTimer > 1)
                 {
                     AttackState = (int)AvatarSpearAttacks.RipOut;
@@ -477,19 +476,21 @@ public class AvatarLonginusHeld : ModProjectile
 
                 break;
 
-            case (int)AvatarSpearAttacks.ThrowTeleport:
+            case (int)AvatarSpearAttacks.Castigation:
+            case (int)AvatarSpearAttacks.ThrowRupture:
 
                 const int ThrowWindUp = 30;
                 const int ThrowTime = 50;
                 const int TPTime = 50;
 
-                Player.velocity *= 0.9f;
-                Player.SetImmuneTimeForAllTypes(30);
-
                 if (Time < ThrowWindUp)
                 {
+                    if (Time == 1)
+                        SoundEngine.PlaySound(GennedAssets.Sounds.Common.Twinkle with { Pitch = 0f, PitchVariance = 0.2f, Volume = 0.5f, MaxInstances = 0 }, Projectile.Center);
+
                     HitTimer = 0;
 
+                    Player.velocity -= Projectile.velocity.SafeNormalize(Vector2.Zero);
                     Player.ChangeDir(Projectile.velocity.X > 0 ? 1 : -1);
 
                     float windProgress = Time / (ThrowWindUp - 1f);
@@ -503,11 +504,11 @@ public class AvatarLonginusHeld : ModProjectile
                 {
                     if (Time == ThrowWindUp)
                     {
-                        SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.PortalHandReach with { Pitch = 1f, PitchVariance = 0.2f, MaxInstances = 0 }, Projectile.Center);
                         Projectile.Center = Player.MountedCenter;
+                        SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.RiftOpen with { Pitch = 0.5f, PitchVariance = 0.2f, Volume = 0.5f, MaxInstances = 0 }, Projectile.Center);
                     }
 
-                    Projectile.extraUpdates = 5;
+                    Projectile.extraUpdates = 10;
 
                     canHit = true;
                     throwMode = true;
@@ -515,35 +516,36 @@ public class AvatarLonginusHeld : ModProjectile
                     Projectile.rotation = Projectile.velocity.ToRotation();
 
                     bool hitSomething = Collision.SolidCollision(Projectile.Center - new Vector2(20) + Projectile.velocity.SafeNormalize(Vector2.Zero) * 20, 40, 40);
-                    if (hitSomething && Time < ThrowWindUp + ThrowTime)
-                    {
-                        SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact, Projectile.Center);
-                        Time = ThrowWindUp + ThrowTime;
-                        Projectile.velocity *= 0.01f;
-                    }
-
                     if (HitTimer > 0)
                     {
-                        Projectile.velocity *= -0.5f;
-                        HitTimer = 120;
+                        SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact, Projectile.Center);
+
                         Time = ThrowWindUp + ThrowTime;
+                        HitTimer = TPTime + 10;
+                        Projectile.velocity *= -0.5f;
                     }
                 }
                 else
                 {
-                    Projectile.velocity *= 0.85f;
+                    Projectile.extraUpdates = 2;
+                    Projectile.velocity *= 0.9f;
 
                     if (Main.myPlayer == Projectile.owner)
                         Main.SetCameraLerp(0.1f, 20);
 
                     canHit = true;
                     throwMode = true;
-                    float lerpToAmt = 0.6f;
-                    if (HitTimer > 0)
-                        lerpToAmt = 0.005f;
 
-                    Player.Center = Vector2.Lerp(Player.Center, Projectile.Center, lerpToAmt);
+                    bool inWall = Collision.SolidCollision(Projectile.Center - new Vector2(60) + Projectile.velocity.SafeNormalize(Vector2.Zero) * 20, 120, 120);
+                    
+                    if (!inWall)
+                        Player.Center = Vector2.Lerp(Player.Center, Projectile.Center, 0.3f);
+                    else
+                        Projectile.Center = Vector2.Lerp(Projectile.Center, Player.MountedCenter, MathF.Pow(Utils.GetLerpValue(0, TPTime, Time - ThrowWindUp - ThrowTime, true), 5f) * 0.1f);
                 }
+
+                Player.velocity *= 0.95f;
+                Player.SetImmuneTimeForAllTypes(30);
 
                 Time++;
 
@@ -563,10 +565,14 @@ public class AvatarLonginusHeld : ModProjectile
         {
             for (int i = 0; i < 3; i++)
             {
-                int size = (int)(110 * MathF.Exp(-i));
+                int size = (int)(70 * MathF.Exp(-i));
                 Projectile.EmitEnchantmentVisualsAt(Projectile.Center + new Vector2((120 + 40 * i) * Projectile.scale, 0).RotatedBy(Projectile.rotation) - new Vector2(size / 2), size, size);
             }
         }
+
+        Projectile.localAI[0]++;
+        if (Projectile.localAI[0] > 240)
+            Projectile.localAI[0] = 0;
 
         Lighting.AddLight(Player.Center, Color.DarkRed.ToVector3());
 
@@ -599,7 +605,7 @@ public class AvatarLonginusHeld : ModProjectile
     {
         if (canHit)
         {
-            Vector2 offset = new Vector2(150 * Projectile.scale, 0).RotatedBy(Projectile.rotation);
+            Vector2 offset = new Vector2(250 * Projectile.scale * (IsEmpowered ? 1.2f : 1f), 0).RotatedBy(Projectile.rotation);
             float _ = 0;
             return Collision.CheckAABBvLineCollision(targetHitbox.Location.ToVector2(), targetHitbox.Size(), Projectile.Center - offset / 2, Projectile.Center + offset, 100f, ref _);
         }    
@@ -610,22 +616,31 @@ public class AvatarLonginusHeld : ModProjectile
     private void DoShake(float strength = 1f)
     {
         if (Main.myPlayer == Projectile.owner)
-            ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 5f * strength, 
-                shakeDirection: Projectile.velocity.SafeNormalize(Vector2.Zero), 
-                shakeStrengthDissipationIncrement: 0.7f - strength * 0.2f);
+            ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 7f * strength, 
+                shakeDirection: Projectile.velocity.SafeNormalize(Vector2.Zero) * 2, 
+                shakeStrengthDissipationIncrement: 0.7f - strength * 0.1f);
     }
 
     public int attackedNPC;
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        if (AttackState == (int)AvatarSpearAttacks.ThrowTeleport)
+        if (AttackState == (int)AvatarSpearAttacks.ThrowRupture)
             modifiers.FinalDamage /= 3;
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         OnHitEffects(target.Center, target.velocity, target.CanBeChasedBy(this));
+
+        if (AttackState == (int)AvatarSpearAttacks.ThrowRupture)
+        {
+            if (Player.GetModPlayer<AvatarSpearHeatPlayer>().ConsumeHeat(0.2f))
+            {
+                Vector2 bombVelocity = Player.DirectionTo(target.Center).SafeNormalize(Vector2.Zero) * 20;
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Player.MountedCenter, bombVelocity, ProjectileID.BloodArrow, Projectile.damage * 2, 0.5f, Player.whoAmI, ai1: target.whoAmI + 1);
+            }
+        }
 
         if (Main.myPlayer == Projectile.owner)
         {
@@ -652,34 +667,21 @@ public class AvatarLonginusHeld : ModProjectile
     public void OnHitEffects(Vector2 targetPosition, Vector2 targetVelocity, bool canAddHeat)
     {
         float addHeat = 0.01f;
+        bool forceAddHeat = false;
 
         switch (AttackState)
         {
             case (int)AvatarSpearAttacks.WhipSlash:
             case (int)AvatarSpearAttacks.SecondSlash: addHeat = 0.1f; break;
-
             case (int)AvatarSpearAttacks.HeavyStab: addHeat = IsEmpowered ? 0.33f : 0.02f; break;
-
             case (int)AvatarSpearAttacks.RipOut: addHeat = IsEmpowered ? 0.33f : 0f; break;
-
-            case (int)AvatarSpearAttacks.ThrowTeleport:
-
-                addHeat = 0.002f; // Barely enough heat, but sets the timer
-
-                if (Player.GetModPlayer<AvatarSpearHeatPlayer>().ConsumeHeat(0.2f))
-                {
-                    Vector2 bombVelocity = Player.DirectionTo(targetPosition).SafeNormalize(Vector2.Zero) * 20;
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Player.MountedCenter, bombVelocity, ProjectileID.BloodArrow, Projectile.damage * 2, 0.5f);
-                }
-
-                break;
-
+            case (int)AvatarSpearAttacks.ThrowRupture: addHeat = 0.002f; break;
         }
 
         if (IsEmpowered)
             addHeat *= 0.15f;
 
-        if (HitTimer <= 0 && canAddHeat)
+        if ((HitTimer <= 0 || forceAddHeat) && canAddHeat)
             Player.GetModPlayer<AvatarSpearHeatPlayer>().AddHeat(addHeat);
 
         DoShake(0.2f);
@@ -719,19 +721,25 @@ public class AvatarLonginusHeld : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = TextureAssets.Projectile[Type].Value;
+        Rectangle frame = texture.Frame(1, 2, 0, IsEmpowered ? 1 : 0);
         Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
 
+        float scale = (IsEmpowered ? 0.9f : 1f) * Projectile.scale;
         int direction = Projectile.spriteDirection;
         SpriteEffects flipEffect = direction > 0 ? 0 : SpriteEffects.FlipVertically;
         int gripDistance = 30;
-        Vector2 origin = new Vector2(texture.Width / 2 - gripDistance, texture.Height / 2 + (gripDistance + 2) * Player.gravDir * direction);
+        Vector2 origin = new Vector2(frame.Width / 2 - gripDistance, frame.Height / 2 + (gripDistance + 2) * Player.gravDir * direction);
         Vector2 spearHeadPosition = Projectile.Center + new Vector2(90 * Projectile.scale, 0).RotatedBy(Projectile.rotation);
 
         float glowAmt = (IsEmpowered ? 0.5f : 0.3f) + MathF.Cbrt(Math.Clamp(HitTimer / 5f, 0f, 1f)) * 0.5f;
 
-        Main.EntitySpriteDraw(glow, spearHeadPosition - Main.screenPosition, glow.Frame(), Color.Red with { A = 120 } * glowAmt, Projectile.rotation, glow.Size() * 0.5f, Projectile.scale * 0.15f, flipEffect, 0);
-        Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, texture.Frame(), Color.White, Projectile.rotation + MathHelper.PiOver4 * direction, origin, Projectile.scale, flipEffect, 0);
-        Main.EntitySpriteDraw(glow, spearHeadPosition - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 0 } * glowAmt, Projectile.rotation, glow.Size() * 0.5f, Projectile.scale * 0.4f, flipEffect, 0);
+        Vector2 highlightOffset = new Vector2(3, 0).RotatedBy(Main.GlobalTimeWrappedHourly * 2 * MathHelper.TwoPi);
+        Main.EntitySpriteDraw(texture, Projectile.Center + highlightOffset - Main.screenPosition, frame, Color.Red with { A = 100 } * 0.5f, Projectile.rotation + MathHelper.PiOver4 * direction, origin, scale, flipEffect, 0);
+        Main.EntitySpriteDraw(texture, Projectile.Center - highlightOffset - Main.screenPosition, frame, Color.RoyalBlue with { A = 100 } * 0.5f, Projectile.rotation + MathHelper.PiOver4 * direction, origin, scale, flipEffect, 0);
+
+        Main.EntitySpriteDraw(glow, spearHeadPosition - Main.screenPosition, glow.Frame(), Color.Red with { A = 120 } * (glowAmt + 0.2f), Projectile.rotation, glow.Size() * 0.5f, scale * 0.15f, flipEffect, 0);
+        Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation + MathHelper.PiOver4 * direction, origin, scale, flipEffect, 0);
+        Main.EntitySpriteDraw(glow, spearHeadPosition - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 0 } * glowAmt, Projectile.rotation, glow.Size() * 0.5f, scale * 0.4f, flipEffect, 0);
 
         return false;
     }
