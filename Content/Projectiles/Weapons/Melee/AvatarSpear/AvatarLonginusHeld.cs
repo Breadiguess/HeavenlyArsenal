@@ -498,10 +498,10 @@ public class AvatarLonginusHeld : ModProjectile
 
                     HitTimer = 0;
 
-                    Player.velocity -= Projectile.velocity.SafeNormalize(Vector2.Zero);
+                    Player.velocity -= Projectile.velocity.SafeNormalize(Vector2.Zero) * 0.5f;
                     Player.ChangeDir(Projectile.velocity.X > 0 ? 1 : -1);
 
-                    float windProgress = Time / (ThrowWindUp - 1f);
+                    float windProgress = Time / ThrowWindUp;
 
                     float wiggle = (windProgress * -0.5f - 0.5f) * Projectile.direction;
                     Projectile.rotation = Utils.AngleLerp(Projectile.rotation, Projectile.velocity.ToRotation() + wiggle, windProgress);
@@ -510,7 +510,7 @@ public class AvatarLonginusHeld : ModProjectile
                 }
                 else if (Time < ThrowWindUp + ThrowTime)
                 {
-                    if (Time == ThrowWindUp + 1)
+                    if (Time == ThrowWindUp)
                     {
                         Projectile.Center = Player.MountedCenter;
                         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.StakeGraze with { Pitch = -0.1f, PitchVariance = 0.2f, MaxInstances = 0 }, Projectile.Center);
@@ -520,49 +520,48 @@ public class AvatarLonginusHeld : ModProjectile
                     if (Time == ThrowWindUp + 2)
                         BreakSoundBarrierParticle(-0.5f);
 
-                    Projectile.extraUpdates = 10;
+                    Projectile.extraUpdates = 8;
 
                     canHit = true;
                     throwMode = true;
-                    Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.Zero) * 16;
+                    Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.Zero) * 20f;
                     Projectile.rotation = Projectile.velocity.ToRotation();
-
-                    bool hitSomething = Collision.SolidCollision(Projectile.Center - new Vector2(20) + Projectile.velocity.SafeNormalize(Vector2.Zero) * 20, 40, 40);
-                    if (HitTimer > 0)
-                    {
-                        SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact, Projectile.Center);
-
-                        Time = ThrowWindUp + ThrowTime;
-                        HitTimer = TPTime + 10;
-                        Projectile.velocity *= -0.5f;
-
-                        Player.SetImmuneTimeForAllTypes(30);
-
-                        if (Player.GetModPlayer<AvatarSpearHeatPlayer>().ConsumeHeat(0.2f, false))
-                        {
-                            AttackState = (int)AvatarSpearAttacks.Rupture;
-                            Time = 0;
-                        }
-                    }
                 }
                 else
                 {
                     Projectile.extraUpdates = 2;
-                    Projectile.velocity *= 0.9f;
+                    Projectile.velocity *= 0.6f;
 
                     if (Main.myPlayer == Projectile.owner)
                         Main.SetCameraLerp(0.1f, 10);
 
                     canHit = true;
                     throwMode = true;
-                    
-                    if (!Collision.SolidCollision(Projectile.Center - new Vector2(20) + Projectile.velocity.SafeNormalize(Vector2.Zero) * 20, 40, 40))
+
+                    if (HitTimer <= 0 && !Collision.SolidCollision(Projectile.Center - new Vector2(20) + Projectile.velocity.SafeNormalize(Vector2.Zero) * 20, 40, 40))
                         Player.Center = Vector2.Lerp(Player.Center, Projectile.Center, 0.3f);
                     else
-                        Projectile.Center = Vector2.Lerp(Projectile.Center, Player.MountedCenter, MathF.Pow(Utils.GetLerpValue(0, TPTime, Time - ThrowWindUp - ThrowTime, true), 5f) * 0.1f);
+                        Projectile.Center = Vector2.Lerp(Projectile.Center, Player.MountedCenter, MathF.Pow(Utils.GetLerpValue(0, TPTime, Time - ThrowWindUp - ThrowTime, true), 5f) * 0.2f);
                 }
 
-                Player.velocity *= 0.95f;
+                Player.velocity *= 0.98f;
+
+                if (HitTimer > 0)
+                {
+                    if (Time < ThrowTime + ThrowWindUp)
+                    {
+                        Time = ThrowWindUp + ThrowTime;
+                        HitTimer = TPTime + 10;
+                        Projectile.velocity *= -0.5f;
+                        Player.SetImmuneTimeForAllTypes(30);
+                    }
+
+                    if (Player.GetModPlayer<AvatarSpearHeatPlayer>().ConsumeHeat(0.2f, false))
+                    {
+                        AttackState = (int)AvatarSpearAttacks.Rupture;
+                        Time = 0;
+                    }
+                }
 
                 Time++;
 
@@ -646,9 +645,13 @@ public class AvatarLonginusHeld : ModProjectile
     {
         if (canHit)
         {
-            Vector2 offset = new Vector2(200 * Projectile.scale * (IsEmpowered ? 1.5f : 1f), 0).RotatedBy(Projectile.rotation);
+            float dist = 200f;
+            if (AttackState == (int)AvatarSpearAttacks.ThrowRupture)
+                dist = 100f;
+
+            Vector2 offset = new Vector2(dist * Projectile.scale * (IsEmpowered ? 1.5f : 1f), 0).RotatedBy(Projectile.rotation);
             float _ = 0;
-            return Collision.CheckAABBvLineCollision(targetHitbox.Location.ToVector2(), targetHitbox.Size(), Projectile.Center - offset / 2, Projectile.Center + offset, 100f, ref _);
+            return Collision.CheckAABBvLineCollision(targetHitbox.Location.ToVector2(), targetHitbox.Size(), Projectile.Center - offset / 2, Projectile.Center + offset, 120f, ref _);
         }    
 
         return false;
