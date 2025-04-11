@@ -169,7 +169,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
                 string specialTooltip = this.GetLocalizedValue("ShiftTooltip");
                 TooltipLine[] tooltipLines = specialTooltip.Split('\n').Select((t, index) =>
                 {
-                    Item.rare = ModContent.RarityType<AvatarRarity>();
+                    
                     return new TooltipLine(Mod, $"ShiftTooltip{index + 1}", t);
                 }).ToArray();
 

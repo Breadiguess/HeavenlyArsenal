@@ -1,6 +1,7 @@
 ﻿using CalamityMod;
 using CalamityMod.Buffs.Potions;
 using CalamityMod.Items.Materials;
+using CalamityMod.Items.Potions;
 using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Content.Buffs;
 using Microsoft.Xna.Framework;
@@ -41,6 +42,7 @@ namespace HeavenlyArsenal.Content.Items.Consumables
             Item.buffType = ModContent.BuffType<CombatStimBuff>();
             Item.UseSound = SoundID.DoubleJump;
         }
+        //public override void 
         public override void OnConsumeItem(Player player)
         {
             player.AddBuff(ModContent.BuffType<CombatStimBuff>(), (int)(Math.Abs(player.GetModPlayer<StimPlayer>().stimsUsed-160) * 10), true, false);
@@ -57,7 +59,7 @@ namespace HeavenlyArsenal.Content.Items.Consumables
                     player.HealEffect(-50, true);
                 GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, 3f, 10);
                 GeneralScreenEffectSystem.RadialBlur.Start(player.Center, 1, 60);
-                player.GetModPlayer<StimPlayer>().UseStim();
+                //player.GetModPlayer<StimPlayer>().UseStim();
             }
             if (player.statLife <= 0)
             {
@@ -79,9 +81,13 @@ namespace HeavenlyArsenal.Content.Items.Consumables
 
         public override void AddRecipes()
         {
-            CreateRecipe()
+            CreateRecipe(20)
                 .AddIngredient<YharonSoulFragment>(3)
-                .AddIngredient(ItemID.BottledWater)
+                .AddIngredient<AstralInjection>(6)
+               // .AddIngredient(ItemID.BottledWater)
+                .AddIngredient<BloodOrb>(20)
+                .AddIngredient<BloodSample>(10)
+                .AddIngredient<Bloodstone>(5)
                 .AddTile(TileID.Bottles)
                 .Register();
         }

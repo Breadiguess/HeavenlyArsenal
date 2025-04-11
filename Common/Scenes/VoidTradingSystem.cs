@@ -10,6 +10,16 @@ using HeavenlyArsenal.Content.Items.Armor;
 using HeavenlyArsenal.Content.Items.Misc;
 using NoxusBoss.Assets;
 using CalamityMod.Items.Accessories;
+using CalamityMod.Items.Weapons.Melee;
+using HeavenlyArsenal.Content.Items.Weapons.Melee;
+using Luminance.Core.Graphics;
+using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
+using CalamityMod.Items.Accessories.Wings;
+using HeavenlyArsenal.Content.Items.Accessories;
+using CalamityMod.Items;
+using HeavenlyArsenal.Content.Items.Weapons.Rogue;
+using Terraria.ID;
+using HeavenlyArsenal.Content.Items.Weapons.Summon;
 
 namespace HeavenlyArsenal.Common.Scenes
 {
@@ -57,7 +67,7 @@ namespace HeavenlyArsenal.Common.Scenes
 
         public override void PostSetupContent()
         {
-            // Initialize trade definitions.
+            //fun to Blood
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
                ModContent.ItemType<ChaliceOfFun>(),
@@ -65,25 +75,57 @@ namespace HeavenlyArsenal.Common.Scenes
                ItemReturnType.None,
                //Items to get back
 
-               ModContent.ItemType<ChaliceOfTheBloodGod>(), 1,
-               ModContent.ItemType<AncientCoin>(), 1
+               ModContent.ItemType<ChaliceOfTheBloodGod>(), 1
                 ));
 
-            
-               tradeDefinitions.Add(new TradeDefinition(
+            //Blood to fun
+            tradeDefinitions.Add(new TradeDefinition(
                //item to trade
                ModContent.ItemType<ChaliceOfTheBloodGod>(),
                1000f,
                ItemReturnType.None,
                //Items to get back
-               
-               ModContent.ItemType<ChaliceOfFun>(), 1,
-               ModContent.ItemType<ShintoArmorLeggings>(), 1,
-               ModContent.ItemType<ShintoArmorBreastplate>(), 1,
-               ModContent.ItemType<ShintoArmorHelmetAll>(), 1
+
+               ModContent.ItemType<ChaliceOfFun>(), 1
                 ));
 
+            //drew wings to dev wings
+            tradeDefinitions.Add(new TradeDefinition(
+               //item to trade
+            ModContent.ItemType<DrewsWings>(),
+            1000f,
+            ItemReturnType.None,
+               //Items to get back
+               
+            ModContent.ItemType<DevWing>(), 1
+              
+            ));
+            
 
+            //rock to cessation
+            tradeDefinitions.Add(new TradeDefinition(
+               //item to trade
+               ModContent.ItemType<Rock>(),
+               1000f,
+               ItemReturnType.None,
+               //Items to get back
+
+               ModContent.ItemType<LifeAndCessation>(), 1
+
+                ));
+            //solynel
+            tradeDefinitions.Add(new TradeDefinition(
+               //item to trade
+               ItemID.BlandWhip,
+               1000f,
+               ItemReturnType.None,
+               //Items to get back
+
+               ModContent.ItemType<SolynWhip_Item>(), 1
+
+                ));
+
+            //coin for coin
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
                ModContent.ItemType<CoinofDeceit>(),
@@ -93,16 +135,69 @@ namespace HeavenlyArsenal.Common.Scenes
 
                ModContent.ItemType<AncientCoin>(), 1
                 ));
-        }
 
+            //armor bargain
+            tradeDefinitions.Add(new TradeDefinition(
+              //item to trade
+              ModContent.ItemType<AncientCoin>(),
+              1000f,
+              ItemReturnType.None,
+               //Items to get back
+               ModContent.ItemType<ShintoArmorLeggings>(), 1,
+               ModContent.ItemType<ShintoArmorBreastplate>(), 1,
+               ModContent.ItemType<ShintoArmorHelmetAll>(), 1
+              
+               ));
+           
+            //nadir to nadir2
+            tradeDefinitions.Add(new TradeDefinition(
+              //item to trade
+              ModContent.ItemType<Nadir>(),
+              1000f,
+              ItemReturnType.None,
+              //Items to get back
+
+              ModContent.ItemType<AvatarLonginus>(), 1
+               ));
+
+
+            TradeInputRegistry.RegisterTrades(tradeDefinitions);
+        }
+        public static class TradeInputRegistry
+        {
+            // The list of all input item types used in trades.
+            public static List<int> InputItemTypes { get; } = new List<int>();
+
+            /// <summary>
+            /// Registers the input item types from the provided list of trade definitions.
+            /// </summary>
+            /// <param name="trades">A list of trade definitions to register.</param>
+            public static void RegisterTrades(List<TradeDefinition> trades)
+            {
+                InputItemTypes.Clear();
+                foreach (TradeDefinition trade in trades)
+                {
+                    // Only add each unique input type once.
+                    if (!InputItemTypes.Contains(trade.InputItemType))
+                    {
+                        InputItemTypes.Add(trade.InputItemType);
+                    }
+                }
+            }
+        }
         public override void PostUpdateEverything()
         {
-           
+           // TODO: only run this code when the player has something in their inventory that can be traded
             // Only process trades when in the Avatar Universe.
+
+            
             if (AvatarUniverseExplorationSystem.InAvatarUniverse)
             {
-                Player player = Main.LocalPlayer;
 
+
+                Player player = Main.LocalPlayer;
+               //Main.NewText(AvatarUniverseExplorationSky.PushPlayersOutInterpolant, Color.AntiqueWhite);
+               
                 // Check each trade definition.
                 foreach (TradeDefinition trade in tradeDefinitions)
                 {
@@ -113,6 +208,8 @@ namespace HeavenlyArsenal.Common.Scenes
 
                         if (worldItem.active && worldItem.type == trade.InputItemType)
                         {
+
+                          
                             // Check that the found item meets the minimum distance requirement.
                             if (Vector2.Distance(worldItem.Center, player.Center) > trade.MinDistance)
                             {
@@ -124,6 +221,8 @@ namespace HeavenlyArsenal.Common.Scenes
 
                                 // Play a sound to indicate successful trade execution.
                                 SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Clap with { PitchVariance = 0.2f });
+                                ScreenShakeSystem.SetUniversalRumble(4* 20f, MathHelper.TwoPi, null, 0.45f);
+                                //AvatarUniverseExplorationSystem.
                                 // Process each output item defined in this trade.
                                 foreach ((int outputItemType, int quantity) in trade.OutputItems)
                                 {
@@ -169,7 +268,7 @@ namespace HeavenlyArsenal.Common.Scenes
                 case ItemReturnType.SpatOut:
                     // Calculate a position below the bottom of the visible screen.
                     float bottomY = Main.screenPosition.Y + Main.screenHeight;
-                    return new Vector2(player.Center.X, bottomY + 20f);
+                    return new Vector2(player.Center.X, bottomY + 200f);
                 default:
                     return player.Center;
             }

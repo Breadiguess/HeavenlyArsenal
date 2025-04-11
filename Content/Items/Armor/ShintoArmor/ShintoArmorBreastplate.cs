@@ -23,7 +23,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Items.Armor
+namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 {
 	// The AutoloadEquip attribute automatically attaches an equip texture to this item.
 	// Providing the EquipType.Body value here will result in TML expecting a X_Body.png file to be placed next to the item's main texture.

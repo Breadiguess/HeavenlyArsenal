@@ -91,7 +91,7 @@ public class avatar_FishingRodProjectile : ModProjectile
 
             Player.LimitPointToPlayerReachableArea(ref targetPosition);
             Vector2 spoolOffset = new Vector2(MathF.Sin(Projectile.localAI[0] * 0.05f) * 5f, MathF.Cos(Projectile.localAI[0] * 0.025f) * 5f);
-            targetPosition += spoolOffset + Player.velocity * 2;
+            targetPosition += spoolOffset + Player.velocity;
             Vector2 targetVelocity = (targetPosition - Projectile.Center).SafeNormalize(Vector2.Zero) * Projectile.Distance(targetPosition) * 0.8f;
             Projectile.velocity = Vector2.Lerp(Projectile.velocity, targetVelocity, Utils.GetLerpValue(SwingTime / 3, SwingTime + 40, Time, true) * 0.3f);
             Projectile.velocity *= 0.8f;

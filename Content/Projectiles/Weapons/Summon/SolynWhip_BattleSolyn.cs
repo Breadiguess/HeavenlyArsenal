@@ -18,7 +18,7 @@ using static Luminance.Common.Utilities.Utilities;
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Summon;
 public class SolynWhip_BattleSolyn : ModProjectile
 {
-    public static int SolynHomingStarBoltDamage = 500; // Set the appropriate damage value
+    public static int SolynHomingStarBoltDamage = 5000; // Set the appropriate damage value
 
     public override void SetDefaults()
     {
@@ -30,8 +30,8 @@ public class SolynWhip_BattleSolyn : ModProjectile
     }
     public override void SetStaticDefaults()
     {
-        //ProjectileID.Sets.TrailingMode[Type] = Solyn.
-        //ProjectileID.Sets.TrailCacheLength[Type];
+        //ProjectileID.Sets.TrailingMode[Type] = Solyn;
+        _ = ProjectileID.Sets.TrailCacheLength[Type];
 
     }
     public override void AI()
@@ -39,7 +39,7 @@ public class SolynWhip_BattleSolyn : ModProjectile
         Player player = Main.player[Projectile.owner];
         if (!player.active || player.dead ||!player.HasBuff<SolynWhip_Onhit_Buff>())
          {
-             Main.NewText($"I should be dead!", Color.AntiqueWhite);
+             //Main.NewText($"I should be dead!", Color.AntiqueWhite);
              Projectile.Kill();
               return;
           }
@@ -184,10 +184,10 @@ public class SolynWhip_BattleSolyn : ModProjectile
             }
 
         }
-        if (wrappedTimer <= dashPrepareTime || wrappedTimer >= dashPrepareTime + dashTime + waitTime)
-            Projectile.rotation = Projectile.rotation.AngleLerp(Projectile.velocity.X * 0.0097f, 0.21f);
-        else
-            Projectile.rotation += Projectile.spriteDirection * MathHelper.TwoPi * 0.18f;
+        //if (wrappedTimer <= dashPrepareTime || wrappedTimer >= dashPrepareTime + dashTime + waitTime)
+           // Projectile.rotation = Projectile.rotation.AngleLerp(Projectile.velocity.X * 0.0097f, 0.21f);
+       // else
+            //Projectile.rotation += Projectile.spriteDirection * MathHelper.TwoPi * 0.18f;
         //Projectile.spriteDirection = (int)Projectile.velocity.X.NonZeroSign(); // Flip sprite based on movement direction
     }
     private bool CheckActive(Player owner)
@@ -299,7 +299,7 @@ public class SolynWhip_BattleSolyn : ModProjectile
         float starScale = MathHelper.Lerp(0.2f, 0.4f, starScaleInterpolant) * Projectile.scale;
         Color starColor = Color.Lerp(new Color(1f, 0.41f, 0.51f), new Color(1f, 0.85f, 0.37f), Main.rand.NextFloat());
         
-        Vector2 starSpawnPosition = Projectile.Center + new Vector2(Projectile.spriteDirection * 20f, 8f) + Main.rand.NextVector2Circular(16f, 16f);
+        Vector2 starSpawnPosition = Projectile.Center + new Vector2(Projectile.spriteDirection * 20f, 26f) + Main.rand.NextVector2Circular(16f, 16f);
 
 
         Vector2 starVelocity = Main.rand.NextVector2Circular(3f, 3f) + Projectile.velocity;
@@ -316,7 +316,7 @@ public class SolynWhip_BattleSolyn : ModProjectile
     }
     public override void OnKill(int timeLeft)
     {
-        Main.NewText($"Solyn was killed! position: {Projectile.position}, velocty: {Projectile.velocity}", Color.AntiqueWhite);
+       // Main.NewText($"Solyn was killed! position: {Projectile.position}, velocty: {Projectile.velocity}", Color.AntiqueWhite);
         
     }
 
@@ -332,14 +332,17 @@ public class SolynWhip_BattleSolyn : ModProjectile
 
         Vector2 drawPosition = Projectile.Center- Main.screenPosition+ Vector2.UnitY;
         Texture2D texture = TextureAssets.Projectile[Type].Value;
+        Texture2D overlay = GennedAssets.Textures.Friendly.SolynGlow.Value;
+        Rectangle solynframe = overlay.Frame(2, 26, 1, 26);
         {
-
+            
             Rectangle frame = texture.Frame(1, 1, 0, Projectile.frame);
+
             Main.spriteBatch.PrepareForShaders();
 
             glowmaskColor = new(255, 178, 97);
             //drawColor = glowmaskColor;
-
+            
             ManagedShader soulShader = ShaderManager.GetShader("NoxusBoss.SoulynShader");
             soulShader.TrySetParameter("outlineOnly",false);
             soulShader.TrySetParameter("imageSize", texture.Size());
@@ -347,8 +350,9 @@ public class SolynWhip_BattleSolyn : ModProjectile
             soulShader.TrySetParameter("sourceRectangle", new Vector4(0, 0, texture.Width, texture.Height));
             //Main.NewText($"Rendering ghost solyn!! as: {new Vector4(Projectile.frame, Projectile.frame, texture.Width, texture.Height)}", Color.AntiqueWhite);
             soulShader.Apply();
-            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition,frame, lightColor, Projectile.rotation, drawPosition, Projectile.scale, spriteEffects, 0);
-            Main.EntitySpriteDraw(GennedAssets.Textures.Friendly.SolynGlow.Value, Projectile.Center, frame, Projectile.GetAlpha(glowmaskColor) * 0.26f, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, direction);
+            
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition,frame, Color.AntiqueWhite, Projectile.rotation, drawPosition, Projectile.scale, spriteEffects, 0);
+            Main.EntitySpriteDraw(overlay, Projectile.Center-Main.screenPosition, solynframe, Projectile.GetAlpha(glowmaskColor) * 0.26f, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, direction);
 
             Main.spriteBatch.ExitShaderRegion();
         } 

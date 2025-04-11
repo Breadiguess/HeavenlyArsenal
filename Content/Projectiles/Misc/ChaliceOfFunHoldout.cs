@@ -24,6 +24,7 @@ using Luminance.Core.Graphics;
 using Humanizer;
 using Terraria.ID;
 using HeavenlyArsenal.ArsenalPlayer;
+using HeavenlyArsenal.Content.Buffs;
 
 namespace HeavenlyArsenal.Content.Projectiles.Misc
 {
@@ -133,6 +134,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc
                 player.GetModPlayer<StimPlayer>().Addicted = false;
                 player.GetModPlayer<StimPlayer>().Withdrawl = false;
                 player.GetModPlayer<StimPlayer>().stimsUsed = 0;
+                player.ClearBuff(ModContent.BuffType<StimAddicted_Debuff>());
                 Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
                 SoundEngine.PlaySound(GennedAssets.Sounds.Common.TwinkleMuffled with { MaxInstances = 0, PitchVariance = 1f});
                 player.AddBuff(ModContent.BuffType<BloodflareBloodFrenzy>(),1200,true,false);

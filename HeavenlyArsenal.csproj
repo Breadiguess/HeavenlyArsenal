@@ -14,9 +14,7 @@
 	  <None Remove="Sounds\**" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Compile Remove="Content\Items\Weapons\Ranged\AvatarBow.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\CosmicWatergun_proj.cs" />
-	  <Compile Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.cs" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Content\Items\auric_catalyst.png" />

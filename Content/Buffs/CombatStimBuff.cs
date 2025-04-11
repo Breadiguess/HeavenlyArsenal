@@ -8,11 +8,17 @@ using Terraria;
 using Terraria.ModLoader;
 using NoxusBoss.Core.Graphics.GeneralScreenEffects;
 using HeavenlyArsenal.ArsenalPlayer;
+using NoxusBoss.Assets.Fonts;
+using ReLogic.Graphics;
+using Terraria.GameContent;
+using Terraria.UI.Chat;
+using Microsoft.Xna.Framework;
 
 namespace HeavenlyArsenal.Content.Buffs
 {
     class CombatStimBuff : ModBuff
     {
+        public bool notApplied = true;
         public override void SetStaticDefaults()
         {
             Main.debuff[Type] = true;
@@ -21,8 +27,24 @@ namespace HeavenlyArsenal.Content.Buffs
             BuffID.Sets.LongerExpertDebuff[Type] = false;
         }
 
-
         
+
+
+        private void RenderNameWithSpecialFont(On_Main.orig_MouseText_DrawBuffTooltip orig, Main self, string buffString, ref int X, ref int Y, int buffNameHeight)
+        {
+            orig(self, buffString, ref X, ref Y, buffNameHeight);
+            if (buffString == this.GetLocalizedValue("Description"))
+            {
+                DynamicSpriteFont vanillaFont = FontAssets.MouseText.Value;
+                Vector2 vanillaTextSize = vanillaFont.MeasureString(buffString);
+
+                DynamicSpriteFont font = FontRegistry.Instance.AvatarPoemText;
+                string text = this.GetLocalizedValue("NameText");
+                Vector2 drawPosition = new Vector2(X + (int)vanillaTextSize.X + 6f, Y + 42f);
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, drawPosition, new Color(252, 37, 74), 0f, font.MeasureString(text) * Vector2.UnitY * 0.5f, Vector2.One * 0.5f, -1f, 1f);
+            }
+        }
+
         public override void Update(Player player, ref int buffIndex)
         {
             /* Exquisitely stuffed stats, for reference.
@@ -39,8 +61,16 @@ namespace HeavenlyArsenal.Content.Buffs
             player.pickSpeed -= 0.15f;
             */
             //
-            
-
+           
+            if (notApplied)
+            {
+                player.GetModPlayer<StimPlayer>().UseStim();
+                notApplied = false;
+                float addiction = player.GetModPlayer<StimPlayer>().addictionChance;
+                float stimsUsed = player.GetModPlayer<StimPlayer>().stimsUsed;
+                Main.NewText($"Addiction chance: {addiction}, stims used: {stimsUsed}", Color.AntiqueWhite);
+            }
+        
 
             if (!GeneralScreenEffectSystem.ChromaticAberration.Active)
                 GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, 0.75f, 0);
@@ -49,7 +79,7 @@ namespace HeavenlyArsenal.Content.Buffs
 
             if (player.GetModPlayer<StimPlayer>().Addicted)
             {
-                player.statDefense += 5;
+                player.statDefense += 2;
                 player.GetAttackSpeed<MeleeDamageClass>() += 0.5f;
                 player.GetDamage<GenericDamageClass>() += 0.325f;
                 player.GetCritChance<GenericDamageClass>() += 2f;
