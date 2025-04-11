@@ -96,7 +96,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
     }
 
     public ref Player Owner => ref Main.player[Projectile.owner];
-    public ref float Time => ref Projectile.localAI[0];
+    public ref float Time => ref Projectile.ai[0];
 
     public ref float DangleVerticalOffset => ref Projectile.localAI[1];
 
@@ -123,21 +123,16 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
        
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
-        Projectile.penetrate = -1;
         Projectile.timeLeft = 1000;
         CooldownSlot = ImmunityCooldownID.Bosses;
         Projectile.friendly = true;
         Projectile.hostile = false;
-        Projectile.penetrate = -1; 
-       
-        
+        Projectile.penetrate = -1;
         Projectile.DamageType = ModContent.GetInstance<RogueDamageClass>();
-
         Projectile.timeLeft = 400;
         Projectile.aiStyle = 0;
 
-        Projectile.damage = Projectile.damage;
-            //Owner.GetWeaponDamage(Owner.heldProj);
+        
     }
 
     
@@ -214,12 +209,12 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
             float ropeLength = MathHelper.Lerp(840f, 990f, (Projectile.identity / 14f) % 1f);
             
             float verticalOffset = Utils.Remap(Time, 0f, 30f, -1750f, -ropeLength * 1.32f - DangleVerticalOffset);
-            Vector2 dangleTop = (Main.MouseWorld + new Vector2(Projectile.localAI[0], Projectile.localAI[1]) 
+            Vector2 dangleTop = (Main.MouseWorld + new Vector2(Projectile.localAI[0], Projectile.localAI[1]+40f) 
                 + new Vector2(0, verticalOffset) );
           
             DanglingRope ??= new VerletSimulatedRope(dangleTop, Vector2.Zero, 50, ropeLength);
             DanglingRope.Update(dangleTop, Utils.Remap(Owner.velocity.Y, 0f, -12f, 0.5f, -0.1f));
-            Main.NewText($"RopeTop: {dangleTop}. Projectile ID: {Projectile.identity}", Color.AntiqueWhite);
+            //Main.NewText($"RopeTop: {dangleTop}. Projectile ID: {Projectile.identity}", Color.AntiqueWhite);
             
             Projectile.Center = DanglingRope.EndPosition;
             Projectile.velocity *= 0.971f;
@@ -228,6 +223,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         {// After dangle phase, detach and begin homing
             if (target != null)
             {
+                DanglingFromTop = false;
                 float originalSpeed = Projectile.velocity.Length();
                 float newSpeed = MathHelper.Clamp(originalSpeed + 0.6f, 2f, 18.6f);
 
@@ -237,6 +233,8 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
                 //Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.Zero) * newSpeed;
                 //DangleVerticalOffset += 6f;
                 //DangleVerticalOffset *= 1.2f;
+                Main.NewText($"Projectile damage: {Projectile.damage}. Projectile ID: {Projectile.identity}", Color.AntiqueWhite);
+
             }
             else
             {
@@ -287,7 +285,8 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        //target.AddBuff(BuffID.OnFire, 300); 
+        target.AddBuff(BuffID.OnFire, 300);
+        Projectile.Kill();
     }
 
     Texture2D ChromaticSpires = GennedAssets.Textures.GreyscaleTextures.ChromaticSpires;
@@ -334,6 +333,20 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
 
     public override bool? CanDamage() => !DanglingFromTop;
 
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        if (Time > 150f)
+        {
+            Vector2 targetCenter = targetHitbox.Center();
+            Vector2 circle = Projectile.Center + Projectile.DirectionTo(targetCenter).SafeNormalize(Vector2.Zero) * Math.Min(Projectile.Distance(targetCenter), Projectile.width);
+            Dust.QuickDust(circle, Color.Cyan);
+            return targetHitbox.Contains(circle.ToPoint());
+        }
+
+        return false;
+    }
+
     public override void OnKill(int timeLeft)
     {
         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.DisgustingStarExplode with { Volume = 1.2f, MaxInstances = 10 }, Projectile.Center);
@@ -370,6 +383,10 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
             TwinkleParticle star = new TwinkleParticle(Projectile.Center, starVelocity, starColor, starLifetime, starPoints, new Vector2(Main.rand.NextFloat(0.4f, 1.6f), 1f) * starScale, starColor * 0.5f);
             star.Spawn();
         }
+
+
+
+        
     }
 
 

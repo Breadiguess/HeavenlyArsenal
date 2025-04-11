@@ -342,7 +342,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
                     BarrierTakeDamageVFX();
                     CombatText.NewText(Player.Hitbox, Color.Cyan, TakenDamage);
-                    Main.NewText($"Barrier: {barrier}, TimeSinceLastHit: {timeSinceLastHit}, Damage taken: {TakenDamage}, Incoming damage: {incoming}", Color.AntiqueWhite);
+                    //Main.NewText($"Barrier: {barrier}, TimeSinceLastHit: {timeSinceLastHit}, Damage taken: {TakenDamage}, Incoming damage: {incoming}", Color.AntiqueWhite);
                     timeSinceLastHit = 0;
                 }
 
@@ -410,7 +410,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         public void VoidBelt()
         {
             Player.AddBuff(ModContent.BuffType<BloodfinBoost>(),5,true,false);
-            Main.NewText($"Void belt activated", Color.AntiqueWhite);
+            //Main.NewText($"Void belt activated", Color.AntiqueWhite);
             GeneralScreenEffectSystem.RadialBlur.Start(Player.Center, 3f, 90);
             Player.SetImmuneTimeForAllTypes(120);
             Dust.NewDust(Player.Center, Player.width, Player.height, DustID.BunnySlime, 0, 0, 100, Color.Crimson, 1);

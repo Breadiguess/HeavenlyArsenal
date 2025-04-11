@@ -21,6 +21,11 @@ using HeavenlyArsenal.Content.Items.Weapons.Rogue;
 using Terraria.ID;
 using HeavenlyArsenal.Content.Items.Weapons.Summon;
 
+using HeavenlyArsenal.Core.Globals;
+using NoxusBoss.Core.Utilities;
+using CalamityMod.Items.Armor.OmegaBlue;
+using HeavenlyArsenal.Content.Items.Armor.NewFolder;
+
 namespace HeavenlyArsenal.Common.Scenes
 {
     // Define an enum to specify where the output items should appear.
@@ -160,6 +165,17 @@ namespace HeavenlyArsenal.Common.Scenes
               ModContent.ItemType<AvatarLonginus>(), 1
                ));
 
+            //omega blue to temp
+            tradeDefinitions.Add(new TradeDefinition(
+              //item to trade
+              ModContent.ItemType<OmegaBlueChestplate>(),
+              1000f,
+              ItemReturnType.None,
+              //Items to get back
+
+              ModContent.ItemType<TempBreastplate>(), 1
+               ));
+
 
             TradeInputRegistry.RegisterTrades(tradeDefinitions);
         }
@@ -196,8 +212,13 @@ namespace HeavenlyArsenal.Common.Scenes
 
 
                 Player player = Main.LocalPlayer;
-               //Main.NewText(AvatarUniverseExplorationSky.PushPlayersOutInterpolant, Color.AntiqueWhite);
-               
+                
+
+                //Main.NewText($"Pushout :{AvatarUniverseExplorationSky.PushPlayersOutInterpolant}");
+
+                //Main.NewText($"Time: {player.GetValueRef<int>(AvatarUniverseExplorationSky.TimeInUniverseVariableName).Value}");
+                //Main.NewText(AvatarUniverseExplorationSky.PushPlayersOutInterpolant, Color.AntiqueWhite);
+
                 // Check each trade definition.
                 foreach (TradeDefinition trade in tradeDefinitions)
                 {
@@ -274,4 +295,6 @@ namespace HeavenlyArsenal.Common.Scenes
             }
         }
     }
+
+
 }

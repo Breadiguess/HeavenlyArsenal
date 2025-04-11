@@ -8,22 +8,23 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using HeavenlyArsenal.Common.Scenes;
 using CalamityMod.Particles;
+using NoxusBoss.Core.Utilities;
 
 namespace HeavenlyArsenal.Core.Globals
 {
     public class TradeVFXGlobalItem : GlobalItem
     {
-        internal static ChargingEnergyParticleSet EnchantmentEnergyParticles = new ChargingEnergyParticleSet(-1, 2, Color.DarkViolet, Color.White, 0.04f, 24f);
-
-        internal static void UpdateAllParticleSets()
-        {
-            EnchantmentEnergyParticles.Update();
-        }
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             // Check if the item type is one that has a trade registered and if the Avatar Universe condition is met.
             if (!VoidTradingSystem.TradeInputRegistry.InputItemTypes.Contains(item.type) || !AvatarUniverseExplorationSystem.InAvatarUniverse)
                 return true;
+
+            Player player = Main.LocalPlayer;
+
+            
+            player.GetValueRef<int>(AvatarUniverseExplorationSky.TimeInUniverseVariableName).Value = 0;
+          
 
             // Retrieve the item texture and its frame.
             Texture2D itemTexture = TextureAssets.Item[item.type].Value;
@@ -31,22 +32,29 @@ namespace HeavenlyArsenal.Core.Globals
                                     ? itemTexture.Frame()
                                     : Main.itemAnimations[item.type].GetFrame(itemTexture);
 
-
             float currentPower = 0f;
             // Calculate the center point where to draw the particle effect.
-            Vector2 particleDrawCenter = position + new Vector2(1f, 6f);// * Main.inventoryScale - itemFrame.Size() * 0.25f;
+            Vector2 particleDrawCenter = position + new Vector2(1f, 6f);
 
             // Set the particle interpolation speed using a lerp between two values.
-            EnchantmentEnergyParticles.InterpolationSpeed = MathHelper.Lerp(0.035f, 0.1f, currentPower);
-            EnchantmentEnergyParticles.DrawSet(particleDrawCenter + Main.screenPosition);
+            //EnchantmentEnergyParticles.InterpolationSpeed = MathHelper.Lerp(0.035f, 0.1f, currentPower);
+            //EnchantmentEnergyParticles.DrawSet(particleDrawCenter + Main.screenPosition);
 
             Texture2D a = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/UI/Cooldowns/BarrierCooldown_Icon").Value;
-            // Draw the actual item.0
+            // Draw the actual item.
             spriteBatch.Draw(itemTexture, position, itemFrame, drawColor, 0f, origin, scale, SpriteEffects.None, 0f);
             spriteBatch.Draw(a, particleDrawCenter, itemFrame, drawColor, 0f, origin, scale, SpriteEffects.None, 0f);
             // Return false to skip the default drawing (since we handled it).
             return false;
         }
+    }
+
+    public class TradeGlobalItemReturn : GlobalItem
+    {
+        public override bool InstancePerEntity => true;
+
+
+        
     }
 
 }

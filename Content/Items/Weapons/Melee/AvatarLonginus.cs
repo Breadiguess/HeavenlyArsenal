@@ -1,4 +1,5 @@
-﻿using CalamityMod.Rarities;
+﻿using CalamityMod;
+using CalamityMod.Rarities;
 using HeavenlyArsenal.Content.Projectiles.Weapons.Melee.AvatarSpear;
 using Microsoft.Xna.Framework;
 using System;
@@ -25,9 +26,9 @@ public class AvatarLonginus : ModItem
     {
         Item.rare = ModContent.RarityType<HotPink>();
 
-        Item.damage = 10000;
+        Item.damage = 7537;
         Item.shootSpeed = 40f;
-        Item.crit = 84;
+        Item.crit = 43;
         Item.width = 40;
         Item.height = 32;
         Item.useTime = 40;
@@ -42,17 +43,12 @@ public class AvatarLonginus : ModItem
         Item.ChangePlayerDirectionOnShoot = true;
         Item.noMelee = true;
         Item.noUseGraphic = true;
+        Item.ArmorPenetration = 4;
         Item.shoot = ModContent.ProjectileType<AvatarLonginusHeld>();
     }
 
 
-    //TODO: replace the current sound styles with different ones more actualized of the spear
-
-    public static readonly SoundStyle ThrustSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_charge3");
-
-    public static readonly SoundStyle HitSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_fire");
-
-    public static readonly SoundStyle FullyChargedSound = new("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_FullyCharged");
+    //public override void ModifyTooltips(List<TooltipLine> list) => list.IntegrateHotkey();
 
     private bool SpearOut(Player player) => player.ownedProjectileCounts[Item.shoot] > 0;
 

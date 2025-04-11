@@ -7,7 +7,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Items.Vanity
+namespace HeavenlyArsenal.Content.Items.Armor.Vanity
 {
 
 

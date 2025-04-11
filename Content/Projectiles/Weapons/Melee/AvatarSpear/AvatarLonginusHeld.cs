@@ -134,7 +134,7 @@ public class AvatarLonginusHeld : ModProjectile
                 if (Player.altFunctionUse == 1 && Player.ItemTimeIsZero)
                 {
                     if (IsEmpowered && Player.GetModPlayer<AvatarSpearHeatPlayer>().ConsumeHeat(0.5f, false))
-                        AttackState = (int)AvatarSpearAttacks.Castigation;
+                        AttackState = (int)AvatarSpearAttacks.ThrowRupture; //replace with castigate when it actually does something
                     else
                         AttackState = (int)AvatarSpearAttacks.ThrowRupture;
                 }

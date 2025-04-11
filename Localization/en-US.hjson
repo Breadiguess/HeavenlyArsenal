@@ -213,7 +213,14 @@ Mods: {
 				DisplayName: Avatar Longinus
 				Tooltip:
 					'''
-					Cycles through several attacks.
+					<left> Cycles through several extremely fast attacks.
+					As you attack, you build up (insert resource that isnt heat here)
+					At max (Resource), The Spear awakens and gains a new set of attacks
+
+					<right> at any point will throw the spear 
+					The spear can pass through blocks, and will attempt to drag you to its location
+					If thrown with over (insert percentage ) (resource), you will create a small glowing orb that rapidly tracks into the hit target
+					Once the orb collides, You teleport inside of the enemy, dealing massive damage
 
 					'''
 			}
@@ -390,7 +397,7 @@ Mods: {
 			SolynWhip_BattleSolyn.DisplayName: Solyn Whip_ Battle Solyn
 			FusionRifle_Projectile.DisplayName: Nothing
 			FlowerShuriken_Proj.DisplayName: Flower Shuriken_ Proj
-			AvatarLonginusHeld.DisplayName: Avatar Longinus Held
+			AvatarLonginusHeld.DisplayName: The Spear
 			HeldLifeCessationProjectile.DisplayName: Held Life Cessation Projectile
 			LilyStarProjectile.DisplayName: Lily Star Projectile
 			LifeCessationEnergy.DisplayName: Life Cessation Energy

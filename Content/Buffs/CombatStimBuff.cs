@@ -18,7 +18,7 @@ namespace HeavenlyArsenal.Content.Buffs
 {
     class CombatStimBuff : ModBuff
     {
-        public bool notApplied = true;
+        internal bool notApplied = true;
         public override void SetStaticDefaults()
         {
             Main.debuff[Type] = true;
@@ -27,8 +27,20 @@ namespace HeavenlyArsenal.Content.Buffs
             BuffID.Sets.LongerExpertDebuff[Type] = false;
         }
 
-        
 
+        public override bool ReApply(Player player, int time, int buffIndex)
+        {
+           
+                player.GetModPlayer<StimPlayer>().UseStim();
+                notApplied = false;
+                float addiction = player.GetModPlayer<StimPlayer>().addictionChance;
+                float stimsUsed = player.GetModPlayer<StimPlayer>().stimsUsed;
+               // Main.NewText($"Reapply: Addiction chance: {addiction}, stims used: {stimsUsed}", Color.AntiqueWhite);
+           
+            
+            
+            return base.ReApply(player, time, buffIndex);
+        }
 
         private void RenderNameWithSpecialFont(On_Main.orig_MouseText_DrawBuffTooltip orig, Main self, string buffString, ref int X, ref int Y, int buffNameHeight)
         {
@@ -44,6 +56,7 @@ namespace HeavenlyArsenal.Content.Buffs
                 ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, drawPosition, new Color(252, 37, 74), 0f, font.MeasureString(text) * Vector2.UnitY * 0.5f, Vector2.One * 0.5f, -1f, 1f);
             }
         }
+
 
         public override void Update(Player player, ref int buffIndex)
         {
@@ -61,7 +74,7 @@ namespace HeavenlyArsenal.Content.Buffs
             player.pickSpeed -= 0.15f;
             */
             //
-           
+            /*
             if (notApplied)
             {
                 player.GetModPlayer<StimPlayer>().UseStim();
@@ -70,10 +83,11 @@ namespace HeavenlyArsenal.Content.Buffs
                 float stimsUsed = player.GetModPlayer<StimPlayer>().stimsUsed;
                 Main.NewText($"Addiction chance: {addiction}, stims used: {stimsUsed}", Color.AntiqueWhite);
             }
-        
-
+            */
+            /*
             if (!GeneralScreenEffectSystem.ChromaticAberration.Active)
                 GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, 0.75f, 0);
+            */
             player.wellFed = true;
 
 

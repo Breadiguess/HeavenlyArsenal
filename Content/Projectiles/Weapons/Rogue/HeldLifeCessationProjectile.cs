@@ -64,6 +64,9 @@ class HeldLifeCessationProjectile : ModProjectile
         set;
     }
 
+    private Dust[] heatDusts;
+    private const int HeatDustCount = 20; // How many dust particles do we want?
+
     public override void SetStaticDefaults()
     {
        
@@ -80,7 +83,7 @@ class HeldLifeCessationProjectile : ModProjectile
         Projectile.tileCollide = false;
         Projectile.timeLeft = 2;
     }
-    public Vector2 SpiderLilyPosition => Main.MouseWorld;//Player.Center - Vector2.UnitY * 1f * LilyScale * 140f;
+    public Vector2 SpiderLilyPosition => (Main.MouseWorld + new Vector2(0,40f))+ Main.rand.NextVector2CircularEdge(50, 50);//Player.Center - Vector2.UnitY * 1f * LilyScale * 140f;
 
     public static readonly SoundStyle HeatReleaseLoopStart = GennedAssets.Sounds.Avatar.UniversalAnnihilationCharge;
     public static readonly SoundStyle HeatReleaseLoop = GennedAssets.Sounds.Avatar.UniversalAnnihilationLoop;
@@ -125,8 +128,8 @@ class HeldLifeCessationProjectile : ModProjectile
         Owner.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat = Heat;
 
         Player player = Main.player[Projectile.owner];
-        //Main.NewText($"Heat:{Heat}",Color.AliceBlue);
-        //Main.NewText($"Actual Heat: {Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat}",Color.Pink);
+        Vector2 toMouse = Main.MouseWorld - player.Center;
+
         if (!Owner.active || Owner.dead || Owner.noItems || Owner.CCed)
         {
             Projectile.Kill();
@@ -144,21 +147,23 @@ class HeldLifeCessationProjectile : ModProjectile
         Owner.SetDummyItemTime(4);
 
         Owner.heldProj = Projectile.whoAmI;
-        Projectile.velocity = Vector2.Lerp(Projectile.velocity.SafeNormalize(Vector2.Zero), Owner.DirectionTo(Main.MouseWorld).SafeNormalize(Vector2.Zero), 0.08f) * Owner.HeldItem.shootSpeed;
-        Projectile.Center = Owner.MountedCenter + Projectile.velocity.SafeNormalize(Vector2.Zero) * 25 + new Vector2(0, Owner.gfxOffY) + Main.rand.NextVector2Circular(2, 2); //* Projectile.ai[2];
-        Projectile.rotation = Projectile.velocity.ToRotation();
+        //Projectile.velocity = Vector2.Lerp(Projectile.velocity.SafeNormalize(Vector2.Zero), Owner.DirectionTo(Main.MouseWorld).SafeNormalize(Vector2.Zero), 0.08f) * Owner.HeldItem.shootSpeed;
+        Projectile.velocity = Vector2.Lerp(Projectile.velocity.SafeNormalize(Vector2.Zero), Owner.DirectionTo(Main.MouseWorld), 0.4f);
+        Projectile.Center = Owner.MountedCenter + Projectile.velocity.SafeNormalize(Vector2.Zero); // * 25 + new Vector2(0, Owner.gfxOffY) + Main.rand.NextVector2Circular(2, 2); //* Projectile.ai[2];
+        Projectile.rotation = toMouse.ToRotation();
 
         Main.NewText($"Velocity = {Projectile.velocity}", Color.AntiqueWhite);
         
-        Projectile.rotation = Projectile.velocity.ToRotation();
+       
 
 
-        Projectile.spriteDirection = Projectile.direction;
+       
         Owner.ChangeDir(Projectile.velocity.X > 0 ? 1 : -1);
+        Projectile.spriteDirection = Projectile.direction;
         Owner.SetDummyItemTime(4);
 
-        Vector2 toMouse = Main.MouseWorld - player.Center;
-        Projectile.rotation = toMouse.ToRotation();
+       
+        
 
 
        
@@ -206,10 +211,98 @@ class HeldLifeCessationProjectile : ModProjectile
 
     public void AbsorbHeat()
     {
+        // Increase and clamp heat.
         Heat = MathHelper.Clamp(Heat + heatIncrement, minHeat, maxHeat);
-       
-        //SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.AbsoluteZeroChargeUp with { Volume = 1.3f, MaxInstances = 32 }, Projectile.Center);
+
+        // Ensure our dust array is initialized.
+        if (heatDusts == null || heatDusts.Length == 0)
+        {
+            heatDusts = new Dust[HeatDustCount];
+            CreateHeatDusts();
+        }
+
+        // Define a threshold distance: when dust is closer than this to the projectile center,
+        // we consider it “absorbed” and create a new dust particle.
+        const float absorptionThreshold = 10f;
+
+        // Loop through each dust particle.
+        for (int i = 0; i < HeatDustCount; i++)
+        {
+            // If the dust is missing or inactive, create one in the cone.
+            if (heatDusts[i] == null || !heatDusts[i].active)
+            {
+                heatDusts[i] = CreateConeHeatDust();
+            }
+            else
+            {
+                Dust dust = heatDusts[i];
+                // Calculate the distance to the projectile center.
+                float distance = Vector2.Distance(dust.position, Projectile.Center);
+
+                // If the dust is close enough, mark it inactive and create a new one.
+                if (distance < absorptionThreshold)
+                {
+                    dust.active = false;
+                    heatDusts[i] = CreateConeHeatDust();
+                    continue; // Skip further processing for this dust.
+                }
+
+                // Otherwise, pull the dust toward the projectile.
+                Vector2 pullDirection = Projectile.Center - dust.position;
+                float pullSpeed = 2f;
+                dust.velocity = pullDirection.SafeNormalize(Vector2.Zero) * pullSpeed;
+            }
+
+            // Optional: tweak visual properties for a smooth effect.
+            heatDusts[i].scale = 1.2f;
+            heatDusts[i].noGravity = true;
+        }
     }
+
+    /// <summary>
+    /// Spawns all heat dust particles within the defined cone in front of the projectile.
+    /// </summary>
+    private void CreateHeatDusts()
+    {
+        for (int i = 0; i < HeatDustCount; i++)
+        {
+            heatDusts[i] = CreateConeHeatDust();
+        }
+    }
+
+    /// <summary>
+    /// Creates a single dust particle spawned within a cone in front of the projectile,
+    /// respecting its current rotation.
+    /// </summary>
+    private Dust CreateConeHeatDust()
+    {
+        // Define the half-angle of the cone. Adjust this to widen or narrow the spread.
+        float halfConeAngle = MathHelper.Pi / 8f;
+
+        // Choose a random angle within the cone, centered around the projectile rotation.
+        float randomAngle = Projectile.rotation + Main.rand.NextFloat(-halfConeAngle, halfConeAngle);
+
+        // Set minimum and maximum distance for the dust's spawn offset relative to the projectile.
+        float minDistance = 60f;
+        float maxDistance = 80f;
+        float spawnDistance = Main.rand.NextFloat(minDistance, maxDistance);
+
+        // Calculate the offset using the chosen angle.
+        Vector2 offset = new Vector2(spawnDistance, 0).RotatedBy(randomAngle);
+
+        // Spawn the dust at the calculated offset.
+        Dust dust = Dust.NewDustPerfect(
+            Projectile.Center + offset,
+            DustID.Torch,     // Change to your desired dust type.
+            Vector2.Zero,     // Initial velocity will be set in the update loop.
+            100,              // Alpha value (transparency).
+            Color.White,      // Color override.
+            1.5f              // Scale.
+        );
+        dust.noGravity = true;
+        return dust;
+    }
+
 
     private float previousHeat = 0;
     private float newRot;
@@ -280,7 +373,8 @@ class HeldLifeCessationProjectile : ModProjectile
         Main.EntitySpriteDraw(sparkle, sparklePos - Main.screenPosition, sparkle.Frame(), Color.Black * 0.3f, MathHelper.PiOver2, sparkle.Size() * 0.5f, sparkleScaleY, 0, 0);
         
     }
-
+    
+    
     public void Scream()
     {
         Vector2 energySource =Projectile.Center;
@@ -302,7 +396,7 @@ class HeldLifeCessationProjectile : ModProjectile
     {
         
         int starCount = 3;
-
+        //TODO: make it better, dipshit
         for (int i = 0; i < starCount; i++)
         {
             SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.DisgustingStarSummon with { Volume = 1.3f, MaxInstances = 32 } ) ;
@@ -313,7 +407,7 @@ class HeldLifeCessationProjectile : ModProjectile
                 SpiderLilyPosition,
                 Vector2.Zero, // speed
                 ModContent.ProjectileType<LillyStarProjectile>(),
-                Player.HeldItem.damage,
+                Projectile.damage * 3,
                 Player.HeldItem.knockBack,
                 player.whoAmI
             );

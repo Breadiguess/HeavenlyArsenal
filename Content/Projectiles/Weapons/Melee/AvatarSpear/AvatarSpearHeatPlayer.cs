@@ -46,7 +46,7 @@ public class AvatarSpearHeatPlayer : ModPlayer
 
     public override void PostUpdateBuffs()
     {
-        const float SevenSeconds = 1f / (7f * 60f);
+        const float SevenSeconds = 1f / (10f * 60f);
 
         if (!Active && HeatAcculumationTimer > 0)
             HeatAcculumationTimer--;

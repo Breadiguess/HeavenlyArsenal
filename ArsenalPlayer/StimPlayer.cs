@@ -85,6 +85,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         
         public void UseStim()
         {
+
             stimsUsed++;
             timeSinceLastStim = 0;
 

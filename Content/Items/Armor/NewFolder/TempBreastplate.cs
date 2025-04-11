@@ -30,7 +30,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.NewFolder
             Item.width = 18;
             Item.height = 18;
             Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
-            Item.defense = 28;
+            Item.defense = 48;
             Item.rare = ModContent.RarityType<PureGreen>();
         }
 
@@ -40,18 +40,22 @@ namespace HeavenlyArsenal.Content.Items.Armor.NewFolder
             player.GetDamage<GenericDamageClass>() += 0.12f;
             player.GetCritChance<GenericDamageClass>() += 8;
             modPlayer.omegaBlueChestplate = true;
-            modPlayer.noLifeRegen = true;
+            modPlayer.noLifeRegen = false;
             modPlayer.omegaBlueSet = true;
+            player.statLifeMax2 += 245;
+
         }
 
         public override void AddRecipes()
         {
+            /*
             CreateRecipe().
                 AddIngredient<ReaperTooth>(5).
                 AddIngredient<DepthCells>(18).
                 AddIngredient<RuinousSoul>(3).
                 AddTile(TileID.LunarCraftingStation).
                 Register();
+            */
         }
     }
 }

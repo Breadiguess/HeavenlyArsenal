@@ -23,7 +23,7 @@
 	  <None Remove="Content\Items\incomplete_gun.png" />
 	  <None Remove="Content\Items\nadir2.png" />
 	  <None Remove="Content\Items\paradiseparasiteprojectile.png" />
-	  <None Remove="Content\Items\Vanity\devMask.png" />
+	  <None Remove="Content\Items\Armor\Vanity\devMask.png" />
 	  <None Remove="Content\Projectiles\fusionrifleHoldout.png" />
 	  <None Remove="Content\Projectiles\incomplete_gunHoldout.png" />
 	  <None Remove="Content\Projectiles\nadir2_Holdout.png" />
