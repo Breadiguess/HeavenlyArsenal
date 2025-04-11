@@ -14,9 +14,9 @@ using NoxusBoss.Assets;
 
 namespace HeavenlyArsenal.Content.Particles;
 
-public class SoundBarrierParticle : BaseParticle
+public class BleedingBurstParticle : BaseParticle
 {
-    public static ParticlePool<SoundBarrierParticle> pool = new ParticlePool<SoundBarrierParticle>(500, GetNewParticle<SoundBarrierParticle>);
+    public static ParticlePool<BleedingBurstParticle> pool = new ParticlePool<BleedingBurstParticle>(500, GetNewParticle<BleedingBurstParticle>);
 
     public Vector2 Position;
     public Vector2 Velocity;
@@ -31,10 +31,10 @@ public class SoundBarrierParticle : BaseParticle
     public void Prepare(Vector2 position, Vector2 velocity, float rotation, Color color, float scale)
     {
         Position = position;
-        Velocity = velocity * 3f;
-        Rotation = rotation;
+        Velocity = velocity;
+        Rotation = velocity.ToRotation() + rotation;
         ColorTint = color;
-        MaxTime = 7 + (int)(5 * scale);
+        MaxTime = 5 + (int)(20 / Math.Clamp(scale, 0.1f, 10f));
         Scale = scale;
         Offset = Main.rand.NextVector2Circular(10f, 10f);
     }
@@ -47,9 +47,7 @@ public class SoundBarrierParticle : BaseParticle
 
     public override void Update(ref ParticleRendererSettings settings)
     {
-        Position += Velocity;
-        Velocity *= 0.55f;
-
+        Position += Velocity * (1f - MathF.Cbrt((float)TimeLeft / MaxTime)) * 0.5f;
         if (++TimeLeft > MaxTime)
             ShouldBeRemovedFromRenderer = true;
     }
@@ -60,16 +58,16 @@ public class SoundBarrierParticle : BaseParticle
         float progress = (float)TimeLeft / MaxTime;
         ManagedShader shader = ShaderManager.GetShader("HeavenlyArsenal.RadialBlastEffect");
         shader.TrySetParameter("uProgress", progress);
-        shader.TrySetParameter("uProgressInside", progress);
+        shader.TrySetParameter("uProgressInside", Utils.GetLerpValue(0.4f, 1f, progress, true));
         shader.TrySetParameter("uNoiseOffset", Offset / 24f);
-        shader.TrySetParameter("uOffset", new Vector2(-0.1f, 0f));
-        shader.TrySetParameter("uNoiseStrength", 1.5f - progress);
-        shader.TrySetParameter("useDissolve", false);
+        shader.TrySetParameter("uOffset", Velocity);
+        shader.TrySetParameter("uNoiseStrength", 2f - progress * 1.5f);
+        shader.TrySetParameter("useDissolve", true);
         shader.SetTexture(texture, 0, SamplerState.PointWrap);
-        shader.SetTexture(GennedAssets.Textures.Noise.WatercolorNoiseA, 1, SamplerState.PointWrap);
+        shader.SetTexture(GennedAssets.Textures.Noise.FireNoiseA, 1, SamplerState.PointWrap);
         shader.Apply();
 
-        Vector2 stretch = Scale * MathF.Cbrt(progress) * new Vector2(70f, 360f) / texture.Size();
+        Vector2 stretch = Scale * MathF.Cbrt(progress) * new Vector2(300f) / texture.Size();
         Main.spriteBatch.Draw(texture, Position + settings.AnchorPosition, texture.Frame(), ColorTint, Rotation, texture.Size() * 0.5f, stretch, 0, 0);
     }
 }

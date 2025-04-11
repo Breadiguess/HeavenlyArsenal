@@ -276,12 +276,6 @@ public class AvatarLonginusHeld : ModProjectile
                     if (Time == SlashWindUp + SlashTime - 1)
                     {
                         DoShake();
-
-                        Vector2 soundBarrierVelocity = -Projectile.velocity.SafeNormalize(Vector2.Zero);
-                        SoundBarrierParticle largerParticle = SoundBarrierParticle.pool.RequestParticle();
-                        largerParticle.Prepare(Projectile.Center, soundBarrierVelocity + Player.velocity, Projectile.rotation, Color.Red, 1f);
-                        ParticleEngine.ShaderParticles.Add(largerParticle);
-
                         SoundEngine.PlaySound(GennedAssets.Sounds.Common.MediumBloodSpill with { Pitch = 1f, PitchVariance = 0.1f, MaxInstances = 0 }, Projectile.Center);
                     }
 
@@ -353,16 +347,14 @@ public class AvatarLonginusHeld : ModProjectile
                     handPosition = Player.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, Projectile.rotation + MathHelper.PiOver2);
 
                     if (Time == (IsEmpowered ? 0 : HeavyWindUp / 4))
-                    {
-                        DoShake(0.5f);
                         SoundEngine.PlaySound(GennedAssets.Sounds.Enemies.DismalLanternSway with { Pitch = 0.4f, MaxInstances = 0 }, Projectile.Center);
-                    }
                 }
                 else
                 {
-                    if (Time == HeavyWindUp + 1)
+                    if (Time == HeavyWindUp + 10)
                     {
-                        DoShake(0.5f);
+                        BreakSoundBarrierParticle(1f);
+                        DoShake(0.7f);
                         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.StakeGraze with { Pitch = 0.6f, PitchVariance = 0.2f, Volume = 0.3f, MaxInstances = 0 }, Projectile.Center);
                         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.StakeImpale with { Pitch = 0.2f, PitchVariance = 0.2f, Volume = 0.6f, MaxInstances = 0 }, Projectile.Center);
                     }
@@ -371,7 +363,7 @@ public class AvatarLonginusHeld : ModProjectile
                     float thrustProgress = Utils.GetLerpValue(0, HeavyThrustTime, Time - HeavyWindUp, true);
                     float windDown = Utils.GetLerpValue(0, HeavyWindDown, Time - HeavyWindUp - HeavyThrustTime, true);
 
-                    float thrustCurve = Utils.GetLerpValue(0, 0.2f, thrustProgress, true);
+                    float thrustCurve = Utils.GetLerpValue(0, 0.15f, thrustProgress, true);
                     float windDownCurve = MathF.Cbrt(windDown);
 
                     if (Main.myPlayer == Projectile.owner)
@@ -518,12 +510,15 @@ public class AvatarLonginusHeld : ModProjectile
                 }
                 else if (Time < ThrowWindUp + ThrowTime)
                 {
-                    if (Time == ThrowWindUp)
+                    if (Time == ThrowWindUp + 1)
                     {
                         Projectile.Center = Player.MountedCenter;
                         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.StakeGraze with { Pitch = -0.1f, PitchVariance = 0.2f, MaxInstances = 0 }, Projectile.Center);
                         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.RiftOpen with { Pitch = 1f, PitchVariance = 0.2f, Volume = 0.3f, MaxInstances = 0 }, Projectile.Center);
                     }
+
+                    if (Time == ThrowWindUp + 2)
+                        BreakSoundBarrierParticle(-0.5f);
 
                     Projectile.extraUpdates = 10;
 
@@ -622,7 +617,7 @@ public class AvatarLonginusHeld : ModProjectile
     {
         if (canHit)
         {
-            Vector2 offset = new Vector2(250 * Projectile.scale * (IsEmpowered ? 1.2f : 1f), 0).RotatedBy(Projectile.rotation);
+            Vector2 offset = new Vector2(200 * Projectile.scale * (IsEmpowered ? 1.5f : 1f), 0).RotatedBy(Projectile.rotation);
             float _ = 0;
             return Collision.CheckAABBvLineCollision(targetHitbox.Location.ToVector2(), targetHitbox.Size(), Projectile.Center - offset / 2, Projectile.Center + offset, 100f, ref _);
         }    
@@ -636,6 +631,21 @@ public class AvatarLonginusHeld : ModProjectile
             ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 7f * strength, 
                 shakeDirection: Projectile.velocity.SafeNormalize(Vector2.Zero) * 2, 
                 shakeStrengthDissipationIncrement: 0.7f - strength * 0.1f);
+    }
+
+    private void BreakSoundBarrierParticle(float speed)
+    {
+        Vector2 soundBarrierVelocity = Projectile.velocity.SafeNormalize(Vector2.Zero) * speed;
+        Vector2 soundBarrierPosition = Projectile.Center + new Vector2(100, 0).RotatedBy(Projectile.rotation);
+
+        SoundBarrierParticle particle = SoundBarrierParticle.pool.RequestParticle();
+        particle.Prepare(soundBarrierPosition, -soundBarrierVelocity * 30f + Player.velocity, Projectile.rotation, Color.DarkRed with { A = 200 }, 0.5f);
+        SoundBarrierParticle largerParticle = SoundBarrierParticle.pool.RequestParticle();
+        largerParticle.Prepare(soundBarrierPosition, -soundBarrierVelocity * 50f + Player.velocity, Projectile.rotation, Color.DarkRed with { A = 200 }, 1f);
+
+        ParticleEngine.ShaderParticles.Add(particle);
+        ParticleEngine.ShaderParticles.Add(largerParticle);
+
     }
 
     public int attackedNPC;

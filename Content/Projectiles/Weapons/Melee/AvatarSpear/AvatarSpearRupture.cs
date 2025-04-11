@@ -112,6 +112,14 @@ public class AvatarSpearRupture : ModProjectile
                 ParticleEngine.Particles.Add(particle);
             }
 
+            if (Time % 3 == 0 && Time < FlickerTime + ExplosionTime / 4)
+            {
+                BleedingBurstParticle bombParticle = BleedingBurstParticle.pool.RequestParticle();
+                Color randomColor = Color.Lerp(Color.Black, Color.DarkRed, Main.rand.NextFloat());
+                bombParticle.Prepare(Projectile.Center + Main.rand.NextVector2Circular(35, 35), Main.rand.NextVector2Circular(35, 35), Main.rand.NextFloat(-1f, 1f), randomColor, Main.rand.NextFloat(0.5f, 1.5f));
+                ParticleEngine.ShaderParticles.Add(bombParticle);
+            }
+
             ScreenShakeSystem.StartShake(10f * (1f - explodeProgress), shakeStrengthDissipationIncrement: 0.7f);
 
             if (Time > FlickerTime + ExplosionTime)
