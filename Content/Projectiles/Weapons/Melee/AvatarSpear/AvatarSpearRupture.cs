@@ -63,6 +63,11 @@ public class AvatarSpearRupture : ModProjectile
             {
                 float targetProgress = Utils.GetLerpValue(0, FlickerTime, Time, true);
                 NPC target = Main.npc[Target];
+                if (!target.active && target.life < 3)
+                {
+                    Time = FlickerTime;
+                    return;
+                }
 
                 Projectile.Center = Vector2.Lerp(Player.Center, target.Center, targetProgress * 0.9f);
 

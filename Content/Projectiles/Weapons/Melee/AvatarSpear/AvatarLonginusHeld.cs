@@ -582,7 +582,7 @@ public class AvatarLonginusHeld : ModProjectile
                     if (Main.npc[attackedNPC].active && Main.npc[attackedNPC].life > 2)
                         Projectile.Center = Main.npc[attackedNPC].Center + JavelinOffset;
                     else
-                        Time = PullTime;
+                        Time = AvatarSpearRupture.FlickerTime + AvatarSpearRupture.ExplosionTime;
                 }
 
                 if (Time > AvatarSpearRupture.FlickerTime + AvatarSpearRupture.ExplosionTime)
