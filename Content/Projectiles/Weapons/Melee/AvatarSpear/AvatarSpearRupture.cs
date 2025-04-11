@@ -70,7 +70,7 @@ public class AvatarSpearRupture : ModProjectile
                     return;
                 }
 
-                Projectile.Center = Vector2.Lerp(Player.Center, target.Center, targetProgress * 0.9f);
+                Projectile.Center = Vector2.Lerp(Player.Center, target.Center, targetProgress);
 
                 if (Time % 18 == 0)
                     SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.StakeImpale with { Pitch = targetProgress, Volume = 0.5f, MaxInstances = 0 }, Projectile.Center);
@@ -90,13 +90,16 @@ public class AvatarSpearRupture : ModProjectile
 
                 Player.GetModPlayer<HidePlayer>().ShouldHide = true;
                 Player.SetImmuneTimeForAllTypes(60);
+
+                if (Time < FlickerTime + ExplosionTime / 4)
+                {
+                    if (!Collision.SolidCollision(Projectile.Center - new Vector2(20) + Projectile.velocity.SafeNormalize(Vector2.Zero) * 20, 40, 40))
+                        Player.Center = Main.npc[Target].Center;
+                }
             }
 
             if (Time == FlickerTime + 1)
             {
-                if (!Collision.SolidCollision(Projectile.Center - new Vector2(20) + Projectile.velocity.SafeNormalize(Vector2.Zero) * 20, 40, 40))
-                    Player.Center = Main.npc[Target].Center;
-
                 for (int i = 0; i < 100; i++)
                 {
                     BloodMetaball metaball = ModContent.GetInstance<BloodMetaball>();
@@ -160,7 +163,7 @@ public class AvatarSpearRupture : ModProjectile
 
         if (Time < FlickerTime)
         {
-            float flickerScale = Projectile.scale * (0.2f + MathF.Sin(Time / 4f) * 0.1f) * MathF.Sin(Time / FlickerTime * MathHelper.Pi);
+            float flickerScale = Projectile.scale * (0.2f + MathF.Sin(Time / 4f) * 0.1f) * (Time / FlickerTime);
             Main.EntitySpriteDraw(glow, Projectile.Center - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 0 }, Projectile.rotation, glow.Size() * 0.5f, flickerScale * 3f, 0, 0);
             Main.EntitySpriteDraw(glow, Projectile.Center - Main.screenPosition, glow.Frame(), Color.Red with { A = 50 } * 0.5f, Projectile.rotation, glow.Size() * 0.5f, flickerScale * 2f, 0, 0);
             Main.EntitySpriteDraw(glow, Projectile.Center - Main.screenPosition, glow.Frame(), Color.Coral with { A = 10 }, Projectile.rotation, glow.Size() * 0.5f, flickerScale, 0, 0);
