@@ -24,6 +24,9 @@ using NoxusBoss.Core.Graphics.TentInterior.Cutscenes;
 using HeavenlyArsenal.Content.Particles;
 using HeavenlyArsenal.Common.Graphics;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.Projectiles;
+using HeavenlyArsenal.Content.Buffs;
+using CalamityMod.Buffs.Potions;
+using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 
 namespace HeavenlyArsenal.ArsenalPlayer
 {
@@ -36,7 +39,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         public int Iframe;
         public int rechargeDelay;
         public int rechargeRate;
-        public float barrierDamageReduction = 0.65f;
+        public float barrierDamageReduction = 0.75f;
         public bool ShadowShieldVisible = true;
         public bool ShadowVeil;
         internal float barrierShieldPartialRechargeProgress = 0f;
@@ -324,21 +327,22 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
                 if (Iframe <= 0)
                 {
-                    int actualDamage = (int)Math.Round(incoming * barrierDamageReduction, 0);
+                    int TakenDamage = (int)Math.Round(incoming * barrierDamageReduction, 0);
                     //retaliation
-                    if(actualDamage > ShintoArmorBreastplate.ShieldDurabilityMax && barrier == ShintoArmorBreastplate.ShieldDurabilityMax)
+                    if(TakenDamage > ShintoArmorBreastplate.ShieldDurabilityMax && barrier == ShintoArmorBreastplate.ShieldDurabilityMax)
                     {
                       //  Main.NewText($"Retaliation!", Color.AntiqueWhite);
                         GeneralScreenEffectSystem.ChromaticAberration.Start(Player.Center, 3f, 90);
                         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Angry, Player.Center);
+                        retaliate();
                     }
                     Iframe = Player.ComputeHitIFrames(info);
-                    barrier -= actualDamage;
+                    barrier -= TakenDamage;
 
 
                     BarrierTakeDamageVFX();
-                    CombatText.NewText(Player.Hitbox, Color.Cyan, actualDamage);
-                 //   Main.NewText($"Barrier: {barrier}, TimeSinceLastHit: {timeSinceLastHit}, Damage taken: {actualDamage}, Incoming damage: {incoming}", Color.AntiqueWhite);
+                    CombatText.NewText(Player.Hitbox, Color.Cyan, TakenDamage);
+                    Main.NewText($"Barrier: {barrier}, TimeSinceLastHit: {timeSinceLastHit}, Damage taken: {TakenDamage}, Incoming damage: {incoming}", Color.AntiqueWhite);
                     timeSinceLastHit = 0;
                 }
 
@@ -405,7 +409,8 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
         public void VoidBelt()
         {
-
+            Player.AddBuff(ModContent.BuffType<BloodfinBoost>(),5,true,false);
+            Main.NewText($"Void belt activated", Color.AntiqueWhite);
             GeneralScreenEffectSystem.RadialBlur.Start(Player.Center, 3f, 90);
             Player.SetImmuneTimeForAllTypes(120);
             Dust.NewDust(Player.Center, Player.width, Player.height, DustID.BunnySlime, 0, 0, 100, Color.Crimson, 1);
@@ -421,6 +426,15 @@ namespace HeavenlyArsenal.ArsenalPlayer
                 AntishadowFireParticleSystemManager.CreateNew(Player.whoAmI, false, position, Main.rand.NextVector2Circular(30f, Player.velocity.X * .96f), Vector2.One * Main.rand.NextFloat(30f, 50f), fireColor);
             }
 
+        }
+
+
+        public void retaliate()
+        {
+            for(int i = 0; i < 10; i++)
+            {
+
+            }
         }
         /*
         public void SetImmuneTimeForAllTypes(int time)
@@ -517,6 +531,8 @@ namespace HeavenlyArsenal.ArsenalPlayer
             IsDashing = false;
             SetActive = false;
             ChestplateEquipped = false;
+            VoidBeltEquipped = false;
+         
 
         }
     }

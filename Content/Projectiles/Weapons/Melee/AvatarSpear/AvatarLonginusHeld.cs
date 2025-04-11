@@ -727,7 +727,7 @@ public class AvatarLonginusHeld : ModProjectile
         float scale = (IsEmpowered ? 0.9f : 1f) * Projectile.scale;
         int direction = Projectile.spriteDirection;
         SpriteEffects flipEffect = direction > 0 ? 0 : SpriteEffects.FlipVertically;
-        int gripDistance = 30;
+        int gripDistance = 70;
         Vector2 origin = new Vector2(frame.Width / 2 - gripDistance, frame.Height / 2 + (gripDistance + 2) * Player.gravDir * direction);
         Vector2 spearHeadPosition = Projectile.Center + new Vector2(90 * Projectile.scale, 0).RotatedBy(Projectile.rotation);
 

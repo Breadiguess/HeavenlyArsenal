@@ -7,6 +7,7 @@ using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.GodSlayer;
 using CalamityMod.NPCs.DevourerofGods;
 using CalamityMod.Particles;
+using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using Microsoft.Xna.Framework;
 using ReLogic.Utilities;
 using Terraria;

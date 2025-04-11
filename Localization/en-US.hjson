@@ -42,7 +42,12 @@ Mods: {
 			avatar_FishingRod: {
 				DisplayName: FlyRift
 				FishingPowerTooltip: ∞
-				Tooltip: ""
+				Tooltip:
+					'''
+					Left click to cast a fishing line into the void
+					ringing the bell via excessive movement will cause a rift to open beneath you
+					dunk the fishing line into the rift to catch a rather large fish
+					'''
 			}
 
 			AvatarRifle: {
@@ -105,7 +110,6 @@ Mods: {
 					"This is my destiny too!"
 
 					'''
-				Tooltip1: silly!
 			}
 
 			UncannyDye: {
@@ -123,6 +127,7 @@ Mods: {
 				Tooltip:
 					'''
 					Bound by blood and seal, it shall always be by your side.
+
 					There may be only one.
 					'''
 			}
@@ -139,7 +144,7 @@ Mods: {
 
 			DevWing: {
 				DisplayName: Wings of a Forgetful God
-				Tooltip: ""
+				Tooltip: they're dev wings lmao
 			}
 
 			Accessories: {
@@ -329,6 +334,18 @@ Mods: {
 					Please stim responsibly.
 
 					'''
+			}
+
+			AuraCosmetic: {
+				DisplayName: Aura Cosmetic
+				Tooltip: light over mind
+			}
+
+			Armor: {
+				TempBreastplate: {
+					DisplayName: Temp Breastplate
+					Tooltip: effects of omega blue armor while worn
+				}
 			}
 		}
 

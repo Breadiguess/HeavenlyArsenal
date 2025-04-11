@@ -1,5 +1,6 @@
 ﻿using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Common.Utilities;
+using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

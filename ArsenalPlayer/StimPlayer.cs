@@ -34,7 +34,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
         public override void PostUpdate()
         {
-            addictionChance = MathHelper.Clamp(5*stimsUsed/3+stimsUsed,0,100);
+            addictionChance = MathHelper.Clamp(10*stimsUsed/3+stimsUsed,0,100);
             //Main.NewText($"Stims Used: {stimsUsed}, Addiction chance: {addictionChance}, Widthdrawl: {Withdrawl}, Addicted {Addicted}, Time since last Stim: {timeSinceLastStim}, addictionCheckInterval = {AddictionCheckInterval}, withdrawltime: {WithdrawlTime}, LoseStimTimer: {LoseStimTimer }", Color.AntiqueWhite);
             if (Withdrawl)
             {
@@ -73,7 +73,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
                 }
             }
 
-            if (LoseStimTimer == 1200 && stimsUsed > 0)
+            if (LoseStimTimer == 2200 && stimsUsed > 0)
             {
                 stimsUsed -= 1;
                 LoseStimTimer = -1;
@@ -82,6 +82,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
             LoseStimTimer++;
         }
 
+        
         public void UseStim()
         {
             stimsUsed++;

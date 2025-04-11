@@ -121,6 +121,7 @@ namespace HeavenlyArsenal.Content.Items.Armor
 
         public override void PostUpdateMiscEffects()
         {
+
             UpdateCloth();
             ExistenceTimer++;
 

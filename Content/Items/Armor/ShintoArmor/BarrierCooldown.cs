@@ -3,6 +3,7 @@ using CalamityMod.CalPlayer;
 using CalamityMod.Cooldowns;
 using CalamityMod.Items.Accessories;
 using HeavenlyArsenal.ArsenalPlayer;
+using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
