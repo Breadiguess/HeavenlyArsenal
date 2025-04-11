@@ -58,7 +58,7 @@ public class BleedingBurstParticle : BaseParticle
         float progress = (float)TimeLeft / MaxTime;
         ManagedShader shader = ShaderManager.GetShader("HeavenlyArsenal.RadialBlastEffect");
         shader.TrySetParameter("uProgress", progress);
-        shader.TrySetParameter("uProgressInside", Utils.GetLerpValue(0.4f, 1f, progress, true));
+        shader.TrySetParameter("uProgressInside", Utils.GetLerpValue(0.2f, 1f, progress, true));
         shader.TrySetParameter("uNoiseOffset", Offset / 24f);
         shader.TrySetParameter("uOffset", Velocity);
         shader.TrySetParameter("uNoiseStrength", 2f - progress * 1.5f);
@@ -69,5 +69,9 @@ public class BleedingBurstParticle : BaseParticle
 
         Vector2 stretch = Scale * MathF.Cbrt(progress) * new Vector2(300f) / texture.Size();
         Main.spriteBatch.Draw(texture, Position + settings.AnchorPosition, texture.Frame(), ColorTint, Rotation, texture.Size() * 0.5f, stretch, 0, 0);
+        Main.pixelShader.CurrentTechnique.Passes[0].Apply();
+
+        Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
+        Main.spriteBatch.Draw(glow, Position + settings.AnchorPosition, glow.Frame(), ColorTint with { A = 0 } * 0.33f, Rotation, glow.Size() * 0.5f, Scale * MathF.Cbrt(progress) * 0.5f, 0, 0);
     }
 }

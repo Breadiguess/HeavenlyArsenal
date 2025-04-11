@@ -80,6 +80,7 @@ public class AvatarLonginusHeld : ModProjectile
         // RapidStabs
         SecondSlash,
         RipOut,
+        Rupture,
         Castigation
     }
 
@@ -482,7 +483,6 @@ public class AvatarLonginusHeld : ModProjectile
 
                 break;
 
-            case (int)AvatarSpearAttacks.Castigation:
             case (int)AvatarSpearAttacks.ThrowRupture:
 
                 Player.SetDummyItemTime(10);
@@ -535,6 +535,14 @@ public class AvatarLonginusHeld : ModProjectile
                         Time = ThrowWindUp + ThrowTime;
                         HitTimer = TPTime + 10;
                         Projectile.velocity *= -0.5f;
+
+                        Player.SetImmuneTimeForAllTypes(30);
+
+                        if (Player.GetModPlayer<AvatarSpearHeatPlayer>().ConsumeHeat(0.2f, false))
+                        {
+                            AttackState = (int)AvatarSpearAttacks.Rupture;
+                            Time = 0;
+                        }
                     }
                 }
                 else
@@ -556,9 +564,6 @@ public class AvatarLonginusHeld : ModProjectile
 
                 Player.velocity *= 0.95f;
 
-                if (HitTimer > 0)
-                    Player.SetImmuneTimeForAllTypes(30);
-
                 Time++;
 
                 if (Time > ThrowWindUp + ThrowTime + TPTime)
@@ -568,6 +573,30 @@ public class AvatarLonginusHeld : ModProjectile
                 }
 
                 break;
+
+            case (int)AvatarSpearAttacks.Rupture:
+
+                Projectile.velocity *= 0.9f;
+                throwMode = true;
+
+                if (attackedNPC > -1 && attackedNPC < Main.npc.Length)
+                {
+                    if (Main.npc[attackedNPC].active && Main.npc[attackedNPC].life > 2)
+                        Projectile.Center = Main.npc[attackedNPC].Center + JavelinOffset;
+                    else
+                        Time = PullTime;
+                }
+
+                if (Time > AvatarSpearRupture.FlickerTime + AvatarSpearRupture.ExplosionTime)
+                {
+                    AttackState = (int)AvatarSpearAttacks.Idle;
+                    Time = 0;
+                }
+
+                Time++;
+
+                break;
+
         }
 
         if (!throwMode)

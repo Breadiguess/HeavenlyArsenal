@@ -50,6 +50,7 @@ public class AvatarSpearRupture : ModProjectile
     public int Target => (int)(Projectile.ai[1] - 1);
 
     public const int FlickerTime = 100;
+    public const int ExplosionTime = 100;
 
     public override void AI()
     {
@@ -72,7 +73,6 @@ public class AvatarSpearRupture : ModProjectile
         }
         else
         {
-            const int ExplosionTime = 100;
             float explodeProgress = Utils.GetLerpValue(0, ExplosionTime, Time - FlickerTime, true);
             Projectile.Resize(500, 500);
 
@@ -104,11 +104,11 @@ public class AvatarSpearRupture : ModProjectile
             BloodMetaball smallBlood = ModContent.GetInstance<BloodMetaball>();
             smallBlood.CreateParticle(Projectile.Center, Main.rand.NextVector2Circular(30, 30), Main.rand.NextFloat(10f, 40f), Main.rand.NextFloat(1f, 12f));
 
-            if (Time % 7 == 0)
+            if (Time % 5 == 0)
             {
-                Vector2 lightningPos = Projectile.Center + Main.rand.NextVector2Circular(12, 12);
+                Vector2 lightningPos = Projectile.Center + Main.rand.NextVector2Circular(20, 20);
                 HeatLightning particle = HeatLightning.pool.RequestParticle();
-                particle.Prepare(lightningPos, Main.rand.NextVector2Circular(20, 20), Main.rand.NextFloat(-1f, 1f), Main.rand.Next(5, 10), Main.rand.NextFloat(1f, 2f) + explodeProgress * 0.5f);
+                particle.Prepare(lightningPos, Main.rand.NextVector2Circular(40, 40), Main.rand.NextFloat(-1f, 1f), Main.rand.Next(5, 10), Main.rand.NextFloat(1f, 2f) + explodeProgress * 0.5f);
                 ParticleEngine.Particles.Add(particle);
             }
 
@@ -153,8 +153,9 @@ public class AvatarSpearRupture : ModProjectile
 
         if (Time < FlickerTime)
         {
-            float flickerScale = Projectile.scale * 0.3f * MathF.Sin(Time / FlickerTime * MathHelper.Pi);
-            Main.EntitySpriteDraw(glow, Projectile.Center - Main.screenPosition, glow.Frame(), Color.Red with { A = 50 }, Projectile.rotation, glow.Size() * 0.5f, flickerScale * 2f, 0, 0);
+            float flickerScale = Projectile.scale * (0.2f + MathF.Sin(Time / 4f) * 0.1f) * MathF.Sin(Time / FlickerTime * MathHelper.Pi);
+            Main.EntitySpriteDraw(glow, Projectile.Center - Main.screenPosition, glow.Frame(), Color.DarkRed with { A = 0 }, Projectile.rotation, glow.Size() * 0.5f, flickerScale * 3f, 0, 0);
+            Main.EntitySpriteDraw(glow, Projectile.Center - Main.screenPosition, glow.Frame(), Color.Red with { A = 50 } * 0.5f, Projectile.rotation, glow.Size() * 0.5f, flickerScale * 2f, 0, 0);
             Main.EntitySpriteDraw(glow, Projectile.Center - Main.screenPosition, glow.Frame(), Color.Coral with { A = 10 }, Projectile.rotation, glow.Size() * 0.5f, flickerScale, 0, 0);
         }
 
