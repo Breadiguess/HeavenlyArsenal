@@ -8,7 +8,7 @@ using Terraria;
 using Terraria.ModLoader;
 using HeavenlyArsenal.ArsenalPlayer;
 
-namespace HeavenlyArsenal.Content.Buffs
+namespace HeavenlyArsenal.Content.Buffs.Stims
 {
     class StimWithdrawl_Debuff :ModBuff
     {

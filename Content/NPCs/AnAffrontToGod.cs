@@ -55,7 +55,7 @@ namespace HeavenlyArsenal.Content.NPCs
 
         public override void SetDefaults()
         {
-            //NPC.CloneDefaults(NPCID.KingSlime);
+            NPC.CloneDefaults(NPCID.KingSlime);
             NPC.damage = 104384;
             NPC.lifeMax = 104934;
             NPC.defense = 103;
@@ -180,7 +180,7 @@ namespace HeavenlyArsenal.Content.NPCs
         {
             SpriteEffects direction = NPC.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             Vector2 currentDrawPosition = start;
-            Main.NewText($"Drawing segment at: {currentDrawPosition}", Color.Green);
+            //Main.NewText($"Drawing segment at: {currentDrawPosition}", Color.Green);
             for (int i = 0; i < textures.Length; i++)
             {
                 float rotation = offsets[i].ToRotation() - rotationOffsets[i] - MathHelper.PiOver2;
@@ -228,7 +228,7 @@ namespace HeavenlyArsenal.Content.NPCs
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, TransformPerspective);
 
-            // Draw the rift.
+            
             AvatarRiftTargetContent.DrawRiftWithShader(NPC, screenPos, TransformPerspective, BackgroundProp, 0f, 10f, TargetIdentifierOverride);
 
            

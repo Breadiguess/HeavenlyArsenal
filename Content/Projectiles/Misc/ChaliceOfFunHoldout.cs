@@ -24,7 +24,7 @@ using Luminance.Core.Graphics;
 using Humanizer;
 using Terraria.ID;
 using HeavenlyArsenal.ArsenalPlayer;
-using HeavenlyArsenal.Content.Buffs;
+using HeavenlyArsenal.Content.Buffs.Stims;
 
 namespace HeavenlyArsenal.Content.Projectiles.Misc
 {

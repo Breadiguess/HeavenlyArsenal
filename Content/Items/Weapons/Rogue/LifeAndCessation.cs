@@ -28,7 +28,7 @@ class LifeAndCessation : ModItem
 
         
         Item.DamageType = ModContent.GetInstance<RogueDamageClass>();
-        Item.damage = 190;
+        Item.damage = 300;
         Item.crit = -3;
         Item.knockBack = 2f;
         Item.useTime = 5;

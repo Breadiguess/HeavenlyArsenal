@@ -632,7 +632,7 @@ public class AvatarLonginusHeld : ModProjectile
     {
     }
 
-    public override bool? CanCutTiles() => true;
+    public override bool? CanCutTiles() => canHit;
 
     public override void ModifyDamageHitbox(ref Rectangle hitbox)
     {

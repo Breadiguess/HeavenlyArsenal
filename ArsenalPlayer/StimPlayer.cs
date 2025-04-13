@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Content.Buffs;
+﻿using HeavenlyArsenal.Content.Buffs.Stims;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;

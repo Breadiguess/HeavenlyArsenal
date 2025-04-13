@@ -9,6 +9,7 @@ using Terraria.ModLoader;
 using HeavenlyArsenal.Common.Scenes;
 using CalamityMod.Particles;
 using NoxusBoss.Core.Utilities;
+using System.Collections.Generic;
 
 namespace HeavenlyArsenal.Core.Globals
 {
@@ -17,9 +18,10 @@ namespace HeavenlyArsenal.Core.Globals
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             // Check if the item type is one that has a trade registered and if the Avatar Universe condition is met.
-            if (!VoidTradingSystem.TradeInputRegistry.InputItemTypes.Contains(item.type) || !AvatarUniverseExplorationSystem.InAvatarUniverse)
+            if (!VoidTradingSystem.TradeInputRegistry.InputItemTypes.Contains(item.type)|| !AvatarUniverseExplorationSystem.InAvatarUniverse)
                 return true;
 
+           
             Player player = Main.LocalPlayer;
 
             
@@ -46,6 +48,11 @@ namespace HeavenlyArsenal.Core.Globals
             spriteBatch.Draw(a, particleDrawCenter, itemFrame, drawColor, 0f, origin, scale, SpriteEffects.None, 0f);
             // Return false to skip the default drawing (since we handled it).
             return false;
+        }
+
+        public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
+        {
+            base.ModifyTooltips(item, tooltips);
         }
     }
 

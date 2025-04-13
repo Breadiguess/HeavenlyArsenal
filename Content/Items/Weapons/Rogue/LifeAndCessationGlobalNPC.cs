@@ -1,4 +1,4 @@
-using Luminance.Common.Easings;
+﻿using Luminance.Common.Easings;
 using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
@@ -12,7 +12,7 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 
-public class RocheLimitGlobalNPC : GlobalNPC
+public class LifeAndCessationGlobalNPC : GlobalNPC
 {
     private static int timeSinceLastRTAccess;
 
@@ -49,90 +49,13 @@ public class RocheLimitGlobalNPC : GlobalNPC
 
     public override void SetStaticDefaults()
     {
-        Main.ContentThatNeedsRenderTargets.Add(DisintegrationTarget = new InstancedRequestableTarget());
-        On_Main.DrawNPC += DecreaseTargetScale;
-        On_Main.DrawNPCs += ApplyDisintegrationEffect;
-        On_Item.NewItem_Inner += UseSpecialVelocity;
+     //leftovers becuase im using the stupid black hole as a base
+     //   On_Main.DrawNPC += DecreaseTargetScale;
+     //   On_Main.DrawNPCs += ApplyDisintegrationEffect;
+     
     }
 
-    private static int UseSpecialVelocity(On_Item.orig_NewItem_Inner orig, IEntitySource source, int X, int Y, int Width, int Height, Item itemToClone, int Type, int Stack, bool noBroadcast, int pfix, bool noGrabDelay, bool reverseLookup)
-    {
-        int index = orig(source, X, Y, Width, Height, itemToClone, Type, Stack, noBroadcast, pfix, noBroadcast, reverseLookup);
-        if (index >= 0 && index < Main.maxItems && itemVelocityOverride is not null)
-            Main.item[index].velocity = itemVelocityOverride.Value.RotatedByRandom(0.1f);
-
-        return index;
-    }
-
-    private static void ApplyDisintegrationEffect(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles)
-    {
-        int blackHoleID = ModContent.ProjectileType<RocheLimitBlackHole>();
-        int targetIdentifier = behindTiles.ToInt();
-        if (LumUtils.AnyProjectiles(blackHoleID))
-        {
-            // Not doing this causes one-frame visual bugs in which the old contents of the RT flicker on the screen.
-            timeSinceLastRTAccess++;
-
-            DisintegrationTarget.Request(Main.screenWidth, Main.screenHeight, targetIdentifier, () =>
-            {
-                Main.spriteBatch.ResetToDefault(false);
-                orig(self, behindTiles);
-                Main.spriteBatch.End();
-            });
-
-            if (RocheLimitBlackHoleRenderer.blackHoleTarget.TryGetTarget(0, out RenderTarget2D blackHoleTarget) && blackHoleTarget is not null &&
-                DisintegrationTarget.TryGetTarget(targetIdentifier, out RenderTarget2D npcTarget) && npcTarget is not null && timeSinceLastRTAccess >= 3)
-            {
-                Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
-
-                Vector2 aspectRatioCorrectionFactor = new Vector2(WotGUtils.ViewportSize.X / WotGUtils.ViewportSize.Y, 1f);
-                RocheLimitBlackHoleRenderer.GetBlackHoleData(aspectRatioCorrectionFactor, out float[] blackHoleRadii, out Vector2[] blackHolePositions);
-
-                ManagedShader spaghettificationShader = ShaderManager.GetShader("HeavenlyArsenal.RocheLimitSpaghettificationShader");
-                spaghettificationShader.TrySetParameter("sourceRadii", blackHoleRadii);
-                spaghettificationShader.TrySetParameter("sourcePositions", blackHolePositions);
-                spaghettificationShader.TrySetParameter("aspectRatioCorrectionFactor", aspectRatioCorrectionFactor);
-                spaghettificationShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
-                spaghettificationShader.TrySetParameter("burnColor", new Vector3(2.4f, 1.13f, 0.04f));
-                spaghettificationShader.SetTexture(blackHoleTarget, 1);
-                spaghettificationShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 2, SamplerState.LinearWrap);
-                spaghettificationShader.Apply();
-
-                Main.spriteBatch.Draw(npcTarget, Main.screenLastPosition - Main.screenPosition, Color.White);
-
-                Main.spriteBatch.ResetToDefault();
-            }
-            else
-                orig(self, behindTiles);
-
-            return;
-        }
-        else
-            timeSinceLastRTAccess = 0;
-
-        orig(self, behindTiles);
-    }
-
-    private static void DecreaseTargetScale(On_Main.orig_DrawNPC orig, Main self, int index, bool behindTiles)
-    {
-        NPC npc = Main.npc[index];
-        if (!npc.active || !npc.TryGetGlobalNPC(out RocheLimitGlobalNPC globalNPC))
-            return;
-
-        float originalScale = npc.scale;
-
-        try
-        {
-            npc.scale *= globalNPC.DownscaleFactor;
-            orig(self, index, behindTiles);
-        }
-        finally
-        {
-            if (npc is not null)
-                npc.scale = originalScale;
-        }
-    }
+   
 
     // Lobotomize targets that are preoccupied with being fucking shredded to pieces by a black hole.
     public override bool PreAI(NPC npc) => !BeingShredded;

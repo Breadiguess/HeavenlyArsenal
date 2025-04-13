@@ -1,0 +1,29 @@
+{
+  "TaxidermyBook": [
+    {
+      "ItemName": "HeartreachPotion",
+      "MinStack": 2,
+      "MaxStack": 4,
+      "GiftedDirectlyFromSolyn": false
+    },
+    {
+      "ItemName": "LifeforcePotion",
+      "MinStack": 2,
+      "MaxStack": 4,
+      "GiftedDirectlyFromSolyn": false
+    },
+    {
+      "ItemName": "GardenFountain",
+      "MinStack": 1,
+      "MaxStack": 1,
+      "GiftedDirectlyFromSolyn": false
+    },
+    {
+      "ItemName": "StarblessedPlatform",
+      "MinStack": 8,
+      "MaxStack": 8,
+      "GiftedDirectlyFromSolyn": false
+    }
+  ]
+ 
+}

@@ -3,7 +3,7 @@ using CalamityMod.Buffs.Potions;
 using CalamityMod.Items.Materials;
 using CalamityMod.Items.Potions;
 using HeavenlyArsenal.ArsenalPlayer;
-using HeavenlyArsenal.Content.Buffs;
+using HeavenlyArsenal.Content.Buffs.Stims;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Core.Graphics.GeneralScreenEffects;

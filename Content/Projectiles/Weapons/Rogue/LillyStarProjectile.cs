@@ -21,6 +21,7 @@ using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.Graphics.Automators;
 using NoxusBoss.Core.Physics.VerletIntergration;
 using System.IO;
+using Terraria.WorldBuilding;
 
 
 
@@ -278,7 +279,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         if (Projectile.soundDelay <= 0)
         {
             if (Time >= 60)
-                SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.DisgustingStarBeat with { MaxInstances = 12, PitchVariance = 0.5f }, Projectile.Center);
+                //SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.DisgustingStarBeat with { MaxInstances = 1}, Projectile.Center);
             BeatDelay = Utils.Clamp(BeatDelay - 19, 26, 120);
             Projectile.soundDelay = BeatDelay;
         }
@@ -298,9 +299,19 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(BuffID.OnFire, 300);
-        target.takenDamageMultiplier = 40;
-        Projectile.Kill();
+        // target.AddBuff(BuffID.OnFire, 300);
+        if (target.life > damageDone)
+            Projectile.Kill();
+        else
+        {
+            SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.DisgustingStarSever with { Volume = 1.2f, MaxInstances = 10, PitchVariance = 0.5f }, Projectile.Center);
+
+        }
+    }
+
+    public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+    {
+        modifiers.FinalDamage *= 40;
     }
 
     Texture2D ChromaticSpires = GennedAssets.Textures.GreyscaleTextures.ChromaticSpires;

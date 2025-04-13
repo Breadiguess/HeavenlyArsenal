@@ -5,6 +5,7 @@ using CalamityMod.Cooldowns;
 using CalamityMod.DataStructures;
 using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
+using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.ArsenalPlayer;
 using Luminance.Core.Graphics;
@@ -266,6 +267,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                 .AddIngredient<DemonshadeBreastplate>()
                 .AddIngredient(ItemID.NinjaShirt)
                 .AddIngredient(ItemID.CrystalNinjaChestplate)
+                .AddIngredient<StatigelArmor>()
                 .AddIngredient<TheSponge>()
                 .AddTile<DraedonsForge>()
                 .Register();

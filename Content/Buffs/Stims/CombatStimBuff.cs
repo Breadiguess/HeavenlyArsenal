@@ -14,7 +14,7 @@ using Terraria.GameContent;
 using Terraria.UI.Chat;
 using Microsoft.Xna.Framework;
 
-namespace HeavenlyArsenal.Content.Buffs
+namespace HeavenlyArsenal.Content.Buffs.Stims
 {
     class CombatStimBuff : ModBuff
     {

@@ -16,7 +16,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Items.Accessories
+namespace HeavenlyArsenal.Content.Items.Accessories.Cosmetic
 {
     [AutoloadEquip(EquipType.Back)]
     public class AuraCosmetic :ModItem
@@ -64,12 +64,12 @@ namespace HeavenlyArsenal.Content.Items.Accessories
 
             float spireScale = 0.1f;
             float spireOpacity = drawInfo.drawPlayer.opacityForAnimation;
-            Vector2 drawPosition = (drawInfo.drawPlayer.Center+new Vector2(0,-20f)) - Main.screenPosition ;
+            Vector2 drawPosition = drawInfo.drawPlayer.Center+new Vector2(0,-20f) - Main.screenPosition ;
             //Main.NewText($"drawpos: {drawPosition}, head pos: {drawInfo.drawPlayer.headPosition}");
             float rotation = drawInfo.drawPlayer.headRotation + MathHelper.ToRadians(-45);
 
             Main.spriteBatch.Draw(ChromaticSpires, drawPosition, null, (Color.Violet with { A = 0 }) * spireOpacity, rotation+ MathHelper.PiOver4, ChromaticSpires.Size() * 0.5f, spireScale, 0, 0f);
-            Main.spriteBatch.Draw(ChromaticSpires, drawPosition, null, (Color.Violet with { A = 0 }) * spireOpacity, (rotation+MathHelper.ToRadians(180)) + MathHelper.PiOver4, ChromaticSpires.Size() * 0.5f, spireScale, 0, 0f);
+            Main.spriteBatch.Draw(ChromaticSpires, drawPosition, null, (Color.Violet with { A = 0 }) * spireOpacity, rotation+MathHelper.ToRadians(180) + MathHelper.PiOver4, ChromaticSpires.Size() * 0.5f, spireScale, 0, 0f);
             /*
             Main.spriteBatch.PrepareForShaders();
             //new Texture Placeholder = GennedAssets.Textures.Extra.Code;

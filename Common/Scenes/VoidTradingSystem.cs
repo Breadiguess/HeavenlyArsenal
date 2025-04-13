@@ -15,7 +15,6 @@ using HeavenlyArsenal.Content.Items.Weapons.Melee;
 using Luminance.Core.Graphics;
 using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using CalamityMod.Items.Accessories.Wings;
-using HeavenlyArsenal.Content.Items.Accessories;
 using CalamityMod.Items;
 using HeavenlyArsenal.Content.Items.Weapons.Rogue;
 using Terraria.ID;
@@ -25,6 +24,11 @@ using HeavenlyArsenal.Core.Globals;
 using NoxusBoss.Core.Utilities;
 using CalamityMod.Items.Armor.OmegaBlue;
 using HeavenlyArsenal.Content.Items.Armor.NewFolder;
+using NoxusBoss.Content.Items.Fishing;
+using HeavenlyArsenal.Content.Items.Weapons.Magic;
+
+using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
+using HeavenlyArsenal.Content.Items.Accessories.Cosmetic;
 
 namespace HeavenlyArsenal.Common.Scenes
 {
@@ -173,6 +177,37 @@ namespace HeavenlyArsenal.Common.Scenes
 
               ModContent.ItemType<TempBreastplate>(), 1
                ));
+            //Rod to Flyrift
+            tradeDefinitions.Add(new TradeDefinition(
+               //item to trade
+               ModContent.ItemType<Dreamcatcher>(),
+               1000f,
+               ItemReturnType.None,
+               //Items to get back
+
+               ModContent.ItemType<avatar_FishingRod>(), 1
+                ));
+            //FlyRift to Dreamcatcher
+            tradeDefinitions.Add(new TradeDefinition(
+               //item to trade
+               ModContent.ItemType<avatar_FishingRod>(),
+               1000f,
+               ItemReturnType.None,
+               //Items to get back
+
+               ModContent.ItemType<Dreamcatcher>(), 1
+                ));
+            //Warbanner to VoidCrest
+            tradeDefinitions.Add(new TradeDefinition(
+               //item to trade
+               ModContent.ItemType<WarbanneroftheSun>(),
+               1000f,
+               ItemReturnType.None,
+               //Items to get back
+
+               ModContent.ItemType<VoidCrestOath>(), 1
+                ));
+
 
 
             TradeInputRegistry.RegisterTrades(tradeDefinitions);

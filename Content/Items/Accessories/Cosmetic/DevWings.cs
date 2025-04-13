@@ -11,7 +11,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Items.Accessories;
+namespace HeavenlyArsenal.Content.Items.Accessories.Cosmetic;
 
 [AutoloadEquip(EquipType.Wings)]
 public class DevWing : ModItem
@@ -22,8 +22,8 @@ public class DevWing : ModItem
         private set;
     }
 
-    public override string Texture => "HeavenlyArsenal/Content/Items/Accessories/ExampleWings";
-
+    public override string Texture => "HeavenlyArsenal/Content/Items/Accessories/Cosmetic/ExampleWings";
+    public new string LocalizationCategory => "Items.Accessories";
 
     public override void SetStaticDefaults()
     {

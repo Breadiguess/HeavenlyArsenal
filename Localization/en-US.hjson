@@ -36,6 +36,21 @@ Mods: {
 				DisplayName: Stim Addicted
 				Description: you are addicted to stims
 			}
+
+			ColdBurn: {
+				DisplayName: Cold Burn
+				Description: Mods.HeavenlyArsenal.Buffs.ColdBurn.Description
+			}
+
+			HeatBurn: {
+				DisplayName: Heat Burn
+				Description: Mods.HeavenlyArsenal.Buffs.HeatBurn.Description
+			}
+
+			ThermalShock: {
+				DisplayName: Thermal Shock
+				Description: Mods.HeavenlyArsenal.Buffs.ThermalShock.Description
+			}
 		}
 
 		Items: {
@@ -159,6 +174,11 @@ Mods: {
 						Your dashes are empowered by the storm, Electrifying and chaining to nearby enemies
 
 						'''
+				}
+
+				VoidCrestOath: {
+					DisplayName: Void Crest Oath
+					Tooltip: ""
 				}
 			}
 
@@ -309,8 +329,9 @@ Mods: {
 			}
 
 			AncientCoin: {
-				DisplayName: Ancient Coin
-				Tooltip: Its old
+				DisplayName: Corroded Coin
+				Tooltip: it might be more rust than metal at this point
+				postCeaseless: ... maybe there's something you can do with this later?
 			}
 
 			ChaliceOfFun: {
@@ -353,6 +374,11 @@ Mods: {
 					DisplayName: Temp Breastplate
 					Tooltip: effects of omega blue armor while worn
 				}
+			}
+
+			DebugAffrontToGodSummon: {
+				DisplayName: Debug Affront To God Summon
+				Tooltip: ""
 			}
 		}
 
@@ -407,6 +433,8 @@ Mods: {
 			EyeOfTranscendence_Held.DisplayName: Eye Of Transcendence_ Held
 			AvatarBow_Held.DisplayName: Avatar Bow_ Held
 			AvatarSpearRupture.DisplayName: Avatar Spear Rupture
+			HeldLifeCessation_StealthStrike.DisplayName: Held Life Cessation_ Stealth Strike
+			VoidCrestInterceptorProjectile.DisplayName: Void Crest Interceptor Projectile
 		}
 
 		NPCs.AnAffrontToGod.DisplayName: An Affront To God
