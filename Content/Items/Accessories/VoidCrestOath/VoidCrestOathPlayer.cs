@@ -69,13 +69,21 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
         /// <summary>
         /// Distance at which an intercept is triggered (in pixels).
         /// </summary>
-        private float InterceptDistance = 800f;
+        private float InterceptDistance = 300f;
 
         /// <summary>
         /// Interceptor projectile type. Make sure to define this in your mod.
         /// </summary>
         private int interceptorType => ModContent.ProjectileType<VoidCrestInterceptorProjectile>();
 
+        /// <summary>
+        /// The current Projectile to be intercepted
+        /// </summary>
+        public int TobeDestroyed
+        {
+            get;
+            set;
+        }
         public override void ResetEffects()
         {
             
@@ -89,7 +97,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
             // If the conflicting accessory is equipped, skip all interception logic.
             if (warBannerOftheSunEquipped|| !voidCrestOathEquipped || NotVanity)
                 return;
-
+            
 
             // Rebuild the tracking list each tick.
             //trackedProjectileIndices.Clear();
@@ -100,11 +108,11 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                 //  • Are not friendly (not shot by player)
                 //  • Were not spawned by the player (owner check)
                 Projectile proj = Main.projectile[i];
-                if (!proj.active&& proj.hostile && proj.owner != Player.whoAmI)
+                if (proj.active&& proj.hostile && proj.owner != Player.whoAmI)
                     continue;
 
                
-                if (proj.hostile && proj.owner != Player.whoAmI)
+                if (proj.hostile && proj.type != interceptorType && !proj.friendly && proj.owner != Player.whoAmI)//&& proj.owner != Player.whoAmI)
                 {
 
                     float distance = Vector2.Distance(proj.Center, Player.Center);
@@ -124,10 +132,8 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
 
             
             bool interceptedSomethingThisTick = false;
-            foreach (int index in trackedProjectileIndices.ToList()) 
-            {
-               //if (index < 0 || index >= Main.maxProjectiles)
-               //     continue;
+            foreach (int index in trackedProjectileIndices.ToList())
+            { 
 
                 Projectile proj = Main.projectile[index];
                 if (proj != null && proj.owner != Player.whoAmI && proj.type != interceptorType)
@@ -142,7 +148,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                     {
 
                         //CombatText.NewText(Player.Hitbox, Color.Cyan, $"Tracking: {proj.Name} ({proj.type}) [{distance:F0}px]");
-                       // Main.NewText($"Hostile projectiles in range: {trackedProjectileIndices.Count}", Color.Yellow);
+                       Main.NewText($"Hostile projectiles in range: {trackedProjectileIndices.Count}", Color.Yellow);
                         Main.NewText($"tracking:{proj.whoAmI}");
                     }
                     catch
@@ -151,13 +157,13 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                     }
                 }
 
-                if (distance <= InterceptDistance && proj.type != interceptorType)
+                if (distance <= InterceptDistance && proj.type != interceptorType && !proj.friendly)
                 {
                     if (InterceptCount >= InterceptCost)
                     {
                         if (Main.myPlayer == Player.whoAmI)
                         {
-                            Main.NewText($"[VoidCrest] Intercepted {proj.Name}!", Color.Red);
+                            Main.NewText($"{interceptorType} Intercepted {proj.Name}!", Color.Red);
                         }
 
                         Projectile.NewProjectile(
@@ -165,7 +171,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                             proj.Center,
                             Vector2.Zero,
                             interceptorType,
-                            50,
+                            -1,
                             1f,
                             Player.whoAmI
                         );
@@ -173,9 +179,9 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                         CreateInterceptVisualEffect(proj.Center);
                         InterceptCount -= InterceptCost;
                         Main.NewText($"Projectile {proj} killed");
-                        proj.active = false;
+                        //proj.active = false;
                         proj.Kill();
-                        //interceptedSomethingThisTick = true;
+                        interceptedSomethingThisTick = true;
                     }
                     else
                     {

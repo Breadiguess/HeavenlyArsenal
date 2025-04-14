@@ -29,6 +29,8 @@ using CalamityMod;
 using HeavenlyArsenal.Content.Items.Weapons.Rogue;
 using HeavenlyArsenal.Content.Items.Weapons.Melee;
 using HeavenlyArsenal.Content.Buffs.LifeAndCessation;
+using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 
 
 
@@ -672,11 +674,32 @@ class HeldLifeCessationProjectile : ModProjectile
 
 
         //Main.spriteBatch.Draw(LillyTexture, LillyPos- Main.screenPosition, null, lightColor, wind,LillyTexture.Size() * new Vector2(0.5f, 1f), LillyScale, 0, 0f);
-        
+         
         Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, lightColor, wind, Lorigin, LillyScale, spriteEffects, 0f);
-        
+        /*
+        ManagedShader psychedelicShader = ShaderManager.GetShader("HeavenlyArsenal.ColdShader");
 
+        // Time and intensity settings
+        psychedelicShader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly); 
+        psychedelicShader.TrySetParameter("opacity", 100f);
+        psychedelicShader.TrySetParameter("intensityFactor", 1f); 
+        psychedelicShader.TrySetParameter("psychedelicExponent", 3f); 
+
+        // Color tweaking
+        psychedelicShader.TrySetParameter("colorAccentuationFactor", 1.5f);
+        psychedelicShader.TrySetParameter("colorToAccentuate", new Vector3(1f, 0.5f, 0f)); // Example: Orange-ish
+        psychedelicShader.TrySetParameter("goldColor", new Color(1f, 0.85f, 0.3f, 1f).ToVector4());
+        psychedelicShader.TrySetParameter("psychedelicColorTint", new Color(0.2f, 0.3f, 1f, 0.3f).ToVector4());
+
+        // Set texture slots
+        psychedelicShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoiseDetailed, 0, SamplerState.AnisotropicWrap); // baseTexture
+        psychedelicShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 1, SamplerState.AnisotropicWrap); // psychedelicTexture
+        psychedelicShader.SetTexture(GennedAssets.Textures.Noise.BurnNoise, 2, SamplerState.AnisotropicWrap); // noiseTexture
+
+        psychedelicShader.Apply();
+        */
         return false;
+        
     }
 
 

@@ -178,7 +178,11 @@ Mods: {
 
 				VoidCrestOath: {
 					DisplayName: Void Crest Oath
-					Tooltip: ""
+					Tooltip:
+						'''
+						summons a [thing] to intercept and destroy enemy projectiles
+
+						'''
 				}
 			}
 
@@ -378,19 +382,22 @@ Mods: {
 
 			DebugAffrontToGodSummon: {
 				DisplayName: Debug Affront To God Summon
-				Tooltip: ""
+				Tooltip: crabvatar
 			}
 
 			TaxidermyBook: {
-				DisplayName: Taxidermy Book
-				Tooltip: ""
+				DisplayName: Taxidermy for dummies
+				ObtainmentHint: "[c/F79BC6:Creates with new players]"
+				Tooltip:
+					'''
+					Its a dusty guide to taxidermy.
+					'''
 			}
 		}
 
 		Projectiles: {
 			Incomplete_gunHoldout.DisplayName: You shouldn't be seeing this!
-			nadir2_Holdout.DisplayName: nadir2_ Holdout
-			nadir2Lantern.DisplayName: nadir2 Lantern
+			
 			ParasiteParadiseProjectile.DisplayName: Parasite Paradise Projectile
 			TheBlackBell_Projectile.DisplayName: The Black Bell Projectile
 			FusionRifleHoldout.DisplayName: Cold Fusion

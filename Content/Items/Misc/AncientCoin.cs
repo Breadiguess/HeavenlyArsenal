@@ -1,6 +1,7 @@
 ﻿using CalamityMod.NPCs.CeaselessVoid;
 using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Content.Rarities;
+using NoxusBoss.Core.GlobalInstances;
 using NoxusBoss.Core.Graphics;
 using NoxusBoss.Core.World.GameScenes.AvatarUniverseExploration;
 using NoxusBoss.Core.World.WorldSaving;
@@ -20,6 +21,8 @@ namespace HeavenlyArsenal.Content.Items.Misc
         public override void SetDefaults()
         {
             Item.rare = ItemRarityID.Quest;
+            Item.value = 0;
+            
 
         }
         public override void SetStaticDefaults()

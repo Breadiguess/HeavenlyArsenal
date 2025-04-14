@@ -207,7 +207,18 @@ namespace HeavenlyArsenal.Common.Scenes
 
                ModContent.ItemType<VoidCrestOath>(), 1
                 ));
+            /*
+            //Book to Taxidermy
+            tradeDefinitions.Add(new TradeDefinition(
+               //item to trade
+               ModContent.ItemType>(),
+               1000f,
+               ItemReturnType.None,
+               //Items to get back
 
+               ModContent.ItemType<Taxidermy>(), 1
+                ));
+            */
 
 
             TradeInputRegistry.RegisterTrades(tradeDefinitions);
