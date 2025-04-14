@@ -24,7 +24,6 @@ public class AntiShadowCloak_DrawLayer : PlayerDrawLayer
     public override bool IsHeadLayer => false;
     
 
-
     protected override void Draw(ref PlayerDrawSet drawInfo)
     {
         ShintoArmorCapePlayer capePlayer = drawInfo.drawPlayer.GetModPlayer<ShintoArmorCapePlayer>();

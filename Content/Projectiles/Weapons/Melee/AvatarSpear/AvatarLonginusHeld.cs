@@ -27,7 +27,7 @@ public class AvatarLonginusHeld : ModProjectile
 {
     public override void SetStaticDefaults()
     {
-        ProjectileID.Sets.TrailingMode[Type] = 4;
+        ProjectileID.Sets.TrailingMode[Type] = -1;
         ProjectileID.Sets.TrailCacheLength[Type] = 10;
         ProjectileID.Sets.HeldProjDoesNotUsePlayerGfxOffY[Type] = true;
     }
@@ -56,6 +56,7 @@ public class AvatarLonginusHeld : ModProjectile
 
     public bool canHit;
     public bool throwMode;
+    private Vector2 handPosition;
 
     public bool InUse => Player.controlUseItem && Player.altFunctionUse == 0;
 
@@ -103,8 +104,12 @@ public class AvatarLonginusHeld : ModProjectile
 
         throwMode = false;
         canHit = false;
+
+        useTrail = false;
+        holdTrailUpdate = false;
+
         Vector2 offset = Vector2.Zero;
-        Vector2 handPosition = Player.MountedCenter;
+        handPosition = Player.MountedCenter;
         float attackSpeed = Player.GetAttackSpeed(DamageClass.Melee) * (1f + Projectile.extraUpdates * 0.15f);
 
         if (AttackState != (int)AvatarSpearAttacks.Idle)
@@ -226,9 +231,9 @@ public class AvatarLonginusHeld : ModProjectile
 
                 if (Time > RapidWindUp + RapidStabTime + RapidWindDown / 2)
                 {
-                    HandleEmpowerment();
                     if (InUse)
                     {
+                        HandleEmpowerment();
                         AttackState = (int)AvatarSpearAttacks.HeavyStab;
                         Time = 0;
                     }
@@ -245,12 +250,13 @@ public class AvatarLonginusHeld : ModProjectile
             case (int)AvatarSpearAttacks.SecondSlash:
 
                 Player.SetDummyItemTime(10);
+                Projectile.extraUpdates = 0;
 
                 bool isSecondSlash = AttackState == (int)AvatarSpearAttacks.SecondSlash;
 
                 int SlashWindUp = isSecondSlash ? 20 : 30;
                 int SlashTime = (isSecondSlash ? 20 : 35) + (int)(30 / attackSpeed);
-                int SlashWindDown = (isSecondSlash ? 35 : 15) + (int)(30 / attackSpeed);
+                int SlashWindDown = (isSecondSlash ? 30 : 20) + (int)(25 / attackSpeed);
                 float SlashRotation = MathHelper.ToRadians(190);
 
                 if (isSecondSlash && Time < 3) // Flip the second slash
@@ -270,8 +276,8 @@ public class AvatarLonginusHeld : ModProjectile
                 }
                 else
                 {
-                    if (Time < SlashWindUp + SlashTime)
-                        canHit = true;
+                    if (Time > SlashWindDown + 4 && Time < SlashWindDown + SlashTime + SlashWindDown / 2)
+                        useTrail = true;
 
                     if (Time == SlashWindUp + 1)
                         SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.StakeGraze with { Pitch = 0.2f, PitchVariance = 0.1f, Volume = 0.66f, MaxInstances = 0 }, Projectile.Center);
@@ -305,7 +311,7 @@ public class AvatarLonginusHeld : ModProjectile
 
                 if (Time > SlashWindUp + SlashTime + SlashWindDown)
                 {
-                    IsEmpowered = Player.GetModPlayer<AvatarSpearHeatPlayer>().Active;
+                    HandleEmpowerment();
 
                     if (InUse)
                     {
@@ -354,7 +360,7 @@ public class AvatarLonginusHeld : ModProjectile
                 }
                 else
                 {
-                    if (Time == HeavyWindUp + 10)
+                    if (Time == HeavyWindUp + 7)
                     {
                         BreakSoundBarrierParticle(1f);
                         DoShake(0.7f);
@@ -597,8 +603,12 @@ public class AvatarLonginusHeld : ModProjectile
 
         }
 
+        handPosition = Player.RotatedRelativePoint(handPosition);
+
         if (!throwMode)
-            Projectile.Center = Player.RotatedRelativePoint(handPosition) + offset - Projectile.velocity;
+            Projectile.Center = handPosition + offset - Projectile.velocity;
+
+        UpdateTrail();
 
         if (canHit)
         {
@@ -616,7 +626,7 @@ public class AvatarLonginusHeld : ModProjectile
         Lighting.AddLight(Player.Center, Color.DarkRed.ToVector3());
 
         if (HitTimer > 0)
-            HitTimer--;
+            HitTimer--; 
 
         if (Main.myPlayer == Projectile.owner)
         {
@@ -626,35 +636,41 @@ public class AvatarLonginusHeld : ModProjectile
         }
     }
 
-    public void HandleEmpowerment() => IsEmpowered = Player.GetModPlayer<AvatarSpearHeatPlayer>().Active;
-
-    public override void OnKill(int timeLeft)
+    public void SetTrailToCurrent()
     {
-    }
-
-    public override bool? CanCutTiles() => canHit;
-
-    public override void ModifyDamageHitbox(ref Rectangle hitbox)
-    {
-        hitbox.Inflate(200, 200);
-        hitbox.Location += (new Vector2(180 * Projectile.scale, 0).RotatedBy(Projectile.rotation)).ToPoint();
-    }
-
-    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
-    {
-        if (canHit)
+        for (int i = 0; i < Projectile.oldPos.Length; i++)
         {
-            float dist = 200f;
-            if (AttackState == (int)AvatarSpearAttacks.ThrowRupture)
-                dist = 100f;
-
-            Vector2 offset = new Vector2(dist * Projectile.scale * (IsEmpowered ? 1.5f : 1f), 0).RotatedBy(Projectile.rotation);
-            float _ = 0;
-            return Collision.CheckAABBvLineCollision(targetHitbox.Location.ToVector2(), targetHitbox.Size(), Projectile.Center - offset / 2, Projectile.Center + offset, 120f, ref _);
-        }    
-
-        return false;
+            Projectile.oldPos[i] = Projectile.Center;
+            Projectile.oldRot[i] = Projectile.rotation;
+        }
     }
+
+    public void UpdateTrail()
+    {
+        if (Projectile.numUpdates <= 0)
+        {
+            Vector2 playerPosOffset = Player.position - Player.oldPosition;
+            for (int i = Projectile.oldPos.Length - 1; i > 0; i--)
+            {
+                Projectile.oldPos[i] = Projectile.oldPos[i - 1];
+                Projectile.oldRot[i] = Projectile.oldRot[i - 1];
+
+                if (!throwMode)
+                    Projectile.oldPos[i] += playerPosOffset;
+            }
+
+            if (!holdTrailUpdate)
+            {
+                Projectile.oldPos[0] = Projectile.Center;
+                Projectile.oldRot[0] = Projectile.rotation;
+            }
+
+            if (!throwMode)
+                Projectile.oldPos[0] += playerPosOffset - Player.velocity;
+        }
+    }
+
+    public void HandleEmpowerment() => IsEmpowered = Player.GetModPlayer<AvatarSpearHeatPlayer>().Active;
 
     private void DoShake(float strength = 1f)
     {
@@ -769,6 +785,30 @@ public class AvatarLonginusHeld : ModProjectile
         }
     }
 
+    public override bool? CanCutTiles() => canHit;
+
+    public override void ModifyDamageHitbox(ref Rectangle hitbox)
+    {
+        hitbox.Inflate(200, 200);
+        hitbox.Location += (new Vector2(180 * Projectile.scale, 0).RotatedBy(Projectile.rotation)).ToPoint();
+    }
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        if (canHit)
+        {
+            float dist = 200f;
+            if (AttackState == (int)AvatarSpearAttacks.ThrowRupture)
+                dist = 100f;
+
+            Vector2 offset = new Vector2(dist * Projectile.scale * (IsEmpowered ? 1.5f : 1f), 0).RotatedBy(Projectile.rotation);
+            float _ = 0;
+            return Collision.CheckAABBvLineCollision(targetHitbox.Location.ToVector2(), targetHitbox.Size(), Projectile.Center - offset / 2, Projectile.Center + offset, 120f, ref _);
+        }
+
+        return false;
+    }
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.Write(IsEmpowered);
@@ -783,6 +823,9 @@ public class AvatarLonginusHeld : ModProjectile
         JavelinOffset = reader.ReadVector2();
     }
 
+    private bool useTrail;
+    private bool holdTrailUpdate;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = TextureAssets.Projectile[Type].Value;
@@ -796,7 +839,16 @@ public class AvatarLonginusHeld : ModProjectile
         Vector2 origin = new Vector2(frame.Width / 2 - gripDistance, frame.Height / 2 + (gripDistance - 4) * Player.gravDir * direction);
         Vector2 spearHeadPosition = Projectile.Center + new Vector2(90 * Projectile.scale, 0).RotatedBy(Projectile.rotation);
 
-        float glowAmt = (IsEmpowered ? 0.5f : 0.3f) + MathF.Cbrt(Math.Clamp(HitTimer / 5f, 0f, 1f)) * 0.5f;
+        float glowAmt = (IsEmpowered ? 0.6f : 0.4f) + MathF.Cbrt(Math.Clamp(HitTimer / 5f, 0f, 1f)) * 0.4f;
+
+        if (useTrail)
+            DrawTrail();
+
+        for (int i = 0; i < Projectile.oldPos.Length; i++)
+        {
+            Color color = Color.Lerp(Color.Red with { A = 100 } * 0.5f, Color.Blue * 0.15f, i / 9f);
+            Main.EntitySpriteDraw(texture, Projectile.oldPos[i] - Main.screenPosition, frame, color * 0.5f, Projectile.oldRot[i] + MathHelper.PiOver4 * direction, origin, scale, flipEffect, 0);
+        }
 
         Vector2 highlightOffset = new Vector2(3, 0).RotatedBy(Main.GlobalTimeWrappedHourly * 2 * MathHelper.TwoPi);
         Main.EntitySpriteDraw(texture, Projectile.Center + highlightOffset - Main.screenPosition, frame, Color.Red with { A = 100 } * 0.5f, Projectile.rotation + MathHelper.PiOver4 * direction, origin, scale, flipEffect, 0);
@@ -808,4 +860,27 @@ public class AvatarLonginusHeld : ModProjectile
 
         return false;
     }
+
+    private void DrawTrail()
+    {
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+
+        ManagedShader trailShader = ShaderManager.GetShader("HeavenlyArsenal.LonginusSlash");
+        trailShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 0, SamplerState.LinearWrap);
+
+        Vector2[] positions = new Vector2[Projectile.oldPos.Length];
+        for (int i = 0; i < Projectile.oldPos.Length; i++)
+        {
+            positions[i] = Projectile.oldPos[i] + new Vector2(120 * Projectile.scale, 0).RotatedBy(Projectile.oldRot[i]);
+        }
+
+        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(TrailWidthFunction, TrailColorFunction, Shader: trailShader), Projectile.oldPos.Length * 2);
+        
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+    }
+
+    private float TrailWidthFunction(float p) => 100 * Projectile.direction;
+    private Color TrailColorFunction(float p) => Color.Lerp(Color.Red, Color.MidnightBlue * 0.5f, p);
 }
