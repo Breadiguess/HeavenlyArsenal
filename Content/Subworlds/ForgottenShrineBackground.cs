@@ -4,12 +4,17 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Graphics.BackgroundManagement;
+using ReLogic.Content;
 using Terraria;
+using Terraria.Graphics.Effects;
+using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Subworlds;
 
 public class ForgottenShrineBackground : Background
 {
+    private static readonly Asset<Texture2D> skyColorShader = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Subworlds/ShrineSkyColor");
+
     public override float Priority => 1f;
 
     protected override Background CreateTemplateEntity() => new ForgottenShrineBackground();
@@ -18,11 +23,12 @@ public class ForgottenShrineBackground : Background
     {
         SetSpriteSortMode(SpriteSortMode.Immediate, Matrix.Identity);
 
-        ManagedShader fogShader = ShaderManager.GetShader("NoxusBoss.AvatarUniverseFogBackgroundShader");
-        fogShader.TrySetParameter("arcCurvature", 2.2f);
-        fogShader.TrySetParameter("fogColor", new Vector4(0.04f, 0.04f, 0.054f, 1f) * Opacity);
-        fogShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
-        fogShader.Apply();
+        ManagedShader gradientShader = ShaderManager.GetShader("HeavenlyArsenal.ShrineSkyGradientShader");
+        gradientShader.TrySetParameter("gradientSteepness", 1.5f);
+        gradientShader.TrySetParameter("gradientYOffset", Main.screenPosition.Y / Main.maxTilesY / 16f - 0.4f);
+        gradientShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
+        gradientShader.SetTexture(skyColorShader.Value, 2, SamplerState.LinearClamp);
+        gradientShader.Apply();
 
         Texture2D pixel = MiscTexturesRegistry.Pixel.Value;
         Vector2 screenArea = WotGUtils.ViewportSize;
@@ -32,13 +38,9 @@ public class ForgottenShrineBackground : Background
 
     public override void Update()
     {
-        base.Update();
+        SkyManager.Instance["Ambience"].Deactivate();
+        SkyManager.Instance["Party"].Deactivate();
 
-        ManagedScreenFilter fogShader = ShaderManager.GetFilter("NoxusBoss.AvatarUniverseRedFogShader");
-        fogShader.TrySetParameter("intensity", Opacity * 0.7f);
-        fogShader.TrySetParameter("fogDensityExponent", 5.6f);
-        fogShader.TrySetParameter("fogColor", new Vector4(1f, 0f, 0.15f, 0f));
-        fogShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
-        fogShader.Activate();
+        base.Update();
     }
 }

@@ -2,7 +2,7 @@
 using Terraria.IO;
 using Terraria.WorldBuilding;
 
-namespace HeavenlyArsenal.Content.Subworlds;
+namespace HeavenlyArsenal.Content.Subworlds.Generation;
 
 public class DefineWorldLinePass : GenPass
 {

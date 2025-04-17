@@ -1,4 +1,5 @@
-﻿using Luminance.Assets;
+﻿using HeavenlyArsenal.Content.Subworlds.Generation;
+using Luminance.Assets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
@@ -27,7 +28,8 @@ public class ForgottenShrineSubworld : Subworld
 
     public override List<GenPass> Tasks => new List<GenPass>()
     {
-        new DefineWorldLinePass()
+        new DefineWorldLinePass(),
+        new CreateGroundPass()
     };
 
     public override bool ChangeAudio()
