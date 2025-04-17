@@ -6,7 +6,6 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.Utilities;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
 
@@ -81,13 +80,11 @@ public class AntishadowUnidirectionalAssassinSlash : ModProjectile
         trailShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
         trailShader.SetTexture(TextureAssets.Projectile[Type], 2, SamplerState.LinearWrap);
 
-        UnifiedRandom rng = new UnifiedRandom(Projectile.identity);
-
         PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(default, default, _ => Projectile.Size * 0.5f, Shader: trailShader, UseUnscaledMatrix: true)
         {
             WidthFunction = TrailWidthFunction,
             ColorFunction = TrailColorFunction
-        }, 42);
+        }, 12);
         return false;
     }
 }

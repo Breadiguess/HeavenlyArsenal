@@ -417,6 +417,15 @@ Mods: {
 			}
 		}
 
+			}
+		}
+
+			}
+		}
+
+			}
+		}
+
 		Projectiles: {
 			Incomplete_gunHoldout.DisplayName: You shouldn't be seeing this!
 			ParasiteParadiseProjectile.DisplayName: Parasite Paradise Projectile

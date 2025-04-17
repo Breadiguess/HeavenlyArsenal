@@ -123,7 +123,7 @@ public class AntishadowAssassinSlash : ModProjectile
         {
             WidthFunction = TrailWidthFunction,
             ColorFunction = TrailColorFunction
-        }, 32);
+        }, 15);
         return false;
     }
 }
