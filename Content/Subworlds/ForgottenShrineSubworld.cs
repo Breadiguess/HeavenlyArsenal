@@ -8,6 +8,7 @@ using NoxusBoss.Core.World.WorldSaving;
 using SubworldLibrary;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.IO;
 using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
 
@@ -15,6 +16,21 @@ namespace HeavenlyArsenal.Content.Subworlds;
 
 public class ForgottenShrineSubworld : Subworld
 {
+    public class ShrinePass : GenPass
+    {
+        public ShrinePass() : base("Terrain", 1f) { }
+
+        protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
+        {
+            // Set the progress text.
+            progress.Message = "Forming a forgotten shrine.";
+
+            // Define the position of the world lines.
+            Main.worldSurface = Main.maxTilesY - 8;
+            Main.rockLayer = Main.maxTilesY - 9;
+        }
+    }
+
     public static TagCompound ClientWorldDataTag
     {
         get;
@@ -27,7 +43,7 @@ public class ForgottenShrineSubworld : Subworld
 
     public override List<GenPass> Tasks => new List<GenPass>()
     {
-
+        new ShrinePass()
     };
 
     public override bool ChangeAudio()

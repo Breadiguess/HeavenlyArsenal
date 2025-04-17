@@ -9,5 +9,7 @@ public class ForgottenShrineSystem : ModSystem
     {
         if (!SubworldSystem.IsActive<ForgottenShrineSubworld>())
             return;
+
+        ModContent.GetInstance<ForgottenShrineBackground>().ShouldBeActive = true;
     }
 }
