@@ -10,9 +10,14 @@ using Vector2SIMD = System.Numerics.Vector2;
 namespace HeavenlyArsenal.Content.Subworlds;
 
 [Autoload(Side = ModSide.Client)]
-public class ForgottenShrineSkyLanternParticleSystem(int maxParticles, Action renderPreparations, FastParticleSystem.ParticleUpdateAction extraUpdates = null) :
+public class FramedFastParticleSystem(int totalFrames, int maxParticles, Action renderPreparations, FastParticleSystem.ParticleUpdateAction extraUpdates = null) :
     FastParticleSystem(maxParticles, renderPreparations, extraUpdates)
 {
+    /// <summary>
+    /// The amount of frames this particle has.
+    /// </summary>
+    public readonly int TotalFrames = totalFrames;
+
     protected override void PopulateVertexBufferIndex(VertexPosition2DColorTexture[] vertices, int particleIndex)
     {
         ref FastParticle particle = ref particles[particleIndex];
@@ -33,10 +38,9 @@ public class ForgottenShrineSkyLanternParticleSystem(int maxParticles, Action re
         Vector2SIMD bottomLeftPosition = center + Vector2SIMD.Transform(bottomLeftOffset * size, particleRotationMatrix);
         Vector2SIMD bottomRightPosition = center + Vector2SIMD.Transform(bottomRightOffset * size, particleRotationMatrix);
 
-        int totalFrames = 5;
-        int frameY = particleIndex % totalFrames;
-        float topY = frameY / (float)totalFrames;
-        float bottomY = (frameY + 1f) / totalFrames;
+        int frameY = particleIndex % TotalFrames;
+        float topY = frameY / (float)TotalFrames;
+        float bottomY = (frameY + 1f) / TotalFrames;
 
         int vertexIndex = particleIndex * 4;
         vertices[vertexIndex] = new VertexPosition2DColorTexture(Unsafe.As<Vector2SIMD, Vector2>(ref topLeftPosition), color, Vector2.UnitY * topY, frameY);

@@ -20,7 +20,7 @@ public class ForgottenShrineBackground : Background
 
     private static DeCasteljauCurve lanternVelocityPath;
 
-    private static ForgottenShrineSkyLanternParticleSystem lanternSystem;
+    private static FramedFastParticleSystem lanternSystem;
 
     private static readonly Vector2[] lanternPathOffsets = new Vector2[95];
 
@@ -57,9 +57,11 @@ public class ForgottenShrineBackground : Background
 
         Main.QueueMainThreadAction(() =>
         {
-            lanternSystem = new ForgottenShrineSkyLanternParticleSystem(8192, PrepareLanternParticleRendering, UpdateLanternParticles);
+            lanternSystem = new FramedFastParticleSystem(5, 8192, PrepareLanternParticleRendering, UpdateLanternParticles);
         });
     }
+
+    public override void Unload() => Main.QueueMainThreadAction(lanternSystem.Dispose);
 
     private static void PrepareLanternParticleRendering()
     {
