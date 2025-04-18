@@ -1,4 +1,5 @@
-﻿using Luminance.Core.Graphics;
+﻿using HeavenlyArsenal.Content.Waters;
+using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
@@ -11,6 +12,17 @@ namespace HeavenlyArsenal.Content.Subworlds;
 
 public class ForgottenShrineSystem : ModSystem
 {
+    public override void OnModLoad() => On_Main.CalculateWaterStyle += ForceShrineWater;
+
+    // Not doing this results in beach water somehow having priority over shrine water in the outer parts of the subworld.
+    private static int ForceShrineWater(On_Main.orig_CalculateWaterStyle orig, bool ignoreFountains)
+    {
+        if (SubworldSystem.IsActive<ForgottenShrineSubworld>())
+            return ModContent.GetInstance<ForgottenShrineWater>().Slot;
+
+        return orig(ignoreFountains);
+    }
+
     public override void PreUpdateEntities()
     {
         if (!SubworldSystem.IsActive<ForgottenShrineSubworld>())
