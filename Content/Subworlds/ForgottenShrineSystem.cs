@@ -71,7 +71,7 @@ public class ForgottenShrineSystem : ModSystem
         mistShader.TrySetParameter("mistColor", new Color(84, 74, 154).ToVector4());
         mistShader.TrySetParameter("noiseAppearanceThreshold", 0.3f);
         mistShader.TrySetParameter("mistCoordinatesZoom", new Vector2(1f, 0.4f));
-        mistShader.TrySetParameter("mistHeight", 240f);
+        mistShader.TrySetParameter("mistHeight", 200f);
         mistShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
         mistShader.SetTexture(TileTargetManagers.LiquidTarget, 2, SamplerState.LinearClamp);
         mistShader.Activate();

@@ -42,7 +42,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     // Determine how much mist should be present. Only pixels above liquid may receive mist.
     float distanceToLiquid = DistanceToLiquidPixel(liquidTextureCoords);
     float modulatedDistanceToLiquid = distanceToLiquid + cos(globalTime * 1.1 + worldStableCoords.x * 20) * 10;
-    float mistInterpolant = smoothstep(0, 30, modulatedDistanceToLiquid) * smoothstep(mistHeight, 0, modulatedDistanceToLiquid);
+    float mistInterpolant = smoothstep(0, 30, modulatedDistanceToLiquid) * smoothstep(mistHeight, mistHeight * 0.45, modulatedDistanceToLiquid);
     
     // Do some standard noise calculations to determine the shape of the mist.
     float time = globalTime * 0.3;
