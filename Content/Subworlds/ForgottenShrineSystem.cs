@@ -20,6 +20,9 @@ public class ForgottenShrineSystem : ModSystem
         mistShader.TrySetParameter("targetSize", Main.ScreenSize.ToVector2());
         mistShader.TrySetParameter("oldScreenPosition", Main.screenPosition);
         mistShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
+        mistShader.TrySetParameter("mistColor", new Color(84, 74, 154).ToVector4());
+        mistShader.TrySetParameter("noiseAppearanceThreshold", 0.3f);
+        mistShader.TrySetParameter("mistCoordinatesZoom", new Vector2(1f, 0.4f));
         mistShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
         mistShader.SetTexture(TileTargetManagers.LiquidTarget, 2, SamplerState.LinearClamp);
         mistShader.Activate();
