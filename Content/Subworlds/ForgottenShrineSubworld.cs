@@ -7,7 +7,6 @@ using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Core.CrossCompatibility.Inbound;
 using NoxusBoss.Core.World.WorldSaving;
 using SubworldLibrary;
-using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader.IO;
@@ -26,8 +25,6 @@ public class ForgottenShrineSubworld : Subworld
     public override int Width => 2485;
 
     public override int Height => 524;
-
-    public static event Action OnEnterEvent;
 
     public override List<GenPass> Tasks => new List<GenPass>()
     {
@@ -48,8 +45,6 @@ public class ForgottenShrineSubworld : Subworld
 
         return false;
     }
-
-    public override void OnEnter() => OnEnterEvent?.Invoke();
 
     public override void DrawMenu(GameTime gameTime)
     {

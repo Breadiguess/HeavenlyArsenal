@@ -85,7 +85,7 @@ public class ForgottenShrineBackground : Background
         float spinSpeed = 0.000072f;
         float moveSpeedInterpolant = LumUtils.Saturate(8f / particle.Size.X);
         particle.ExtraData -= moveSpeedInterpolant * spinSpeed;
-        particle.Velocity = particle.Velocity.RotatedBy(spinSpeed * -15f);
+        particle.Velocity = particle.Velocity.RotatedBy(spinSpeed * -25f);
         particle.Rotation = particle.Velocity.ToRotation() - MathHelper.PiOver2;
     }
 
