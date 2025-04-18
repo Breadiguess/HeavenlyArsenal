@@ -29,7 +29,8 @@ public class ForgottenShrineSubworld : Subworld
     public override List<GenPass> Tasks => new List<GenPass>()
     {
         new DefineWorldLinePass(),
-        new CreateGroundPass()
+        new CreateGroundPass(),
+        new BridgePass()
     };
 
     public override bool ChangeAudio()

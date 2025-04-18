@@ -12,5 +12,25 @@ public static class ForgottenShrineGenerationConstants
     /// <summary>
     /// The depth of water beneath the shrine.
     /// </summary>
-    public static int WaterDepth => 3;
+    public static int WaterDepth => 24;
+
+    /// <summary>
+    /// The height of beams for the bridge before the shrine.
+    /// </summary>
+    public static int BridgeBeamHeight => 14;
+
+    /// <summary>
+    /// The width of arches on the bridge.
+    /// </summary>
+    public static int BridgeArchWidth => 105;
+
+    /// <summary>
+    /// The maximum height of arches on the bridge.
+    /// </summary>
+    public static int BridgeArchHeight => 10;
+
+    /// <summary>
+    /// The vertical thickness of the bridge.
+    /// </summary>
+    public static int BridgeThickness => 5;
 }
