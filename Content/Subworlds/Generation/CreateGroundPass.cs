@@ -14,16 +14,16 @@ public class CreateGroundPass : GenPass
         progress.Message = "Placing ground.";
 
         int groundDepth = ForgottenShrineGenerationConstants.GroundDepth;
-        for (int x = 0; x < Main.maxTilesX; x++)
+        for (int y = Main.maxTilesY - groundDepth; y < Main.maxTilesY; y++)
         {
-            for (int y = Main.maxTilesY - groundDepth; y < Main.maxTilesY; y++)
+            for (int x = 0; x < Main.maxTilesX; x++)
                 WorldGen.PlaceTile(x, y, TileID.Stone);
         }
 
         int waterDepth = ForgottenShrineGenerationConstants.WaterDepth;
-        for (int x = 0; x < Main.maxTilesX; x++)
+        for (int y = Main.maxTilesY - groundDepth - waterDepth; y < Main.maxTilesY - groundDepth; y++)
         {
-            for (int y = Main.maxTilesY - groundDepth - waterDepth; y < Main.maxTilesY - groundDepth; y++)
+            for (int x = 0; x < Main.maxTilesX; x++)
                 Main.tile[x, y].LiquidAmount = byte.MaxValue;
         }
     }
