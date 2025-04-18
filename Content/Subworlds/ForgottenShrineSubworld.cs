@@ -30,7 +30,8 @@ public class ForgottenShrineSubworld : Subworld
     {
         new DefineWorldLinePass(),
         new CreateGroundPass(),
-        new BridgePass()
+        new BridgePass(),
+        new SmoothenPass()
     };
 
     public override bool ChangeAudio()
