@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HeavenlyArsenal.Content.Tiles.ForgottenShrine;
+using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.ID;
@@ -47,10 +48,28 @@ public class BridgePass : GenPass
             }
         }
 
+        // Adorn the bridge with ropes and create beams.
+        int innerRopeSpacing = (int)(bridgeWidth * 0.33f);
+        int ropeY = bridgeLowYPoint - 4;
         for (int x = 0; x < Main.maxTilesX; x++)
         {
             if (x >= 5 && x < Main.maxTilesX - 5 && x % bridgeWidth == 0)
                 PlaceBeam(groundLevelY, x, bridgeLowYPoint);
+
+            if (x >= 5 && x < Main.maxTilesX - 5 && x % bridgeWidth == innerRopeSpacing)
+            {
+                Point start = new Point(x, ropeY).ToWorldCoordinates().ToPoint();
+                Point end = new Point(x + bridgeWidth - innerRopeSpacing * 2, ropeY).ToWorldCoordinates().ToPoint();
+                while (Framing.GetTileSafely(start.ToVector2()).HasTile)
+                    start.Y += 16;
+                while (Framing.GetTileSafely(end.ToVector2()).HasTile)
+                    end.Y += 16;
+
+                start.Y -= 16;
+                end.Y -= 16;
+
+                ShrineRopeSystem.Register(new ShrineRopeData(start, end));
+            }
         }
     }
 
