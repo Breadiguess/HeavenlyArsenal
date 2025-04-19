@@ -59,6 +59,10 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     float edgeOfScreenTaper = smoothstep(0, 0.1, reflectionCoords.y) * smoothstep(1, 0.9, reflectionCoords.y);
     float4 reflectedColor = tex2D(baseTexture, reflectionCoords);
     
+    // Make reflections brighter in spots where it's already bright.
+    float reflectionBrightness = dot(reflectedColor.rgb, float3(0.3, 0.6, 0.1));
+    reflectedColor *= 1 + smoothstep(0.5, 1, reflectionBrightness) * 0.75;
+    
     // Combine things together.
     return baseColor + reflectionInterpolant * reflectedColor * reflectionStrength * edgeOfScreenTaper;
 }
