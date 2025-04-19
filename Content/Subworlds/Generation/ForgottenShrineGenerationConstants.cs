@@ -38,4 +38,14 @@ public static class ForgottenShrineGenerationConstants
     /// The amount of tree structures to generate underwater.
     /// </summary>
     public static int UnderwaterTreeCount => Main.maxTilesX / 67;
+
+    /// <summary>
+    /// The amount of cattails to generate underwater.
+    /// </summary>
+    public static int CattailCount => Main.maxTilesX / 26;
+
+    /// <summary>
+    /// The maximum height of cattails above the water line.
+    /// </summary>
+    public static int MaxCattailHeight => 6;
 }
