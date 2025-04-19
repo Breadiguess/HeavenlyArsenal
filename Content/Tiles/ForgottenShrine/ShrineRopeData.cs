@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -154,8 +156,12 @@ public class ShrineRopeData
         DeCasteljauCurve positionCurve = new DeCasteljauCurve(curveControlPoints);
         DeCasteljauCurve velocityCurve = new DeCasteljauCurve(curveVelocities);
 
-        int ornamentCount = 7;
-        Texture2D pinTexture = GennedAssets.Textures.SolynCampsite.SolynTentOrnamentPin.Value;
+        Main.instance.LoadProjectile(ProjectileID.ReleaseLantern);
+
+        int ornamentCount = 6;
+        Texture2D lanternTexture = TextureAssets.Projectile[ProjectileID.ReleaseLantern].Value;
+        Texture2D glowTexture = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
+        Color glowColor = new Color(1f, 1f, 0.4f, 0f);
         for (int i = 0; i < ornamentCount; i++)
         {
             float sampleInterpolant = MathHelper.Lerp(0.1f, 0.8f, i / (float)(ornamentCount - 1f));
@@ -172,21 +178,24 @@ public class ShrineRopeData
             float windGridInterpolant = windTimeLeft / (float)windGridTime;
             float windGridRotation = Utils.GetLerpValue(0f, 0.5f, windGridInterpolant, true) * Utils.GetLerpValue(1f, 0.5f, windGridInterpolant, true) * direction * -0.93f;
 
-            float windForceWave = LumUtils.AperiodicSin(WindTime + ornamentWorldPosition.X * 0.025f);
+            // Draw ornamental spirals.
+            float windForceWave = LumUtils.AperiodicSin(WindTime * 0.4f + ornamentWorldPosition.X * 0.095f);
             float windForce = windForceWave * LumUtils.InverseLerp(0f, 0.75f, MathF.Abs(Main.windSpeedCurrent)) * 0.4f;
             float spiralRotation = WindTime + ornamentWorldPosition.X * 0.02f;
             Vector2 spiralDrawPosition = ornamentWorldPosition - Main.screenPosition + Vector2.UnitY * 3f;
             Main.spriteBatch.Draw(spiralTexture.Value, spiralDrawPosition, null, colorModifier, spiralRotation, spiralTexture.Size() * 0.5f, 0.5f, 0, 0f);
 
-            // Draw golden pins.
+            // Draw lanterns.
             sampleInterpolant = MathHelper.Lerp(0.1f, 0.8f, (i + 0.5f) / (float)(ornamentCount - 1f));
-            Vector2 pinWorldPosition = positionCurve.Evaluate(sampleInterpolant);
-            Vector2 pinDrawPosition = pinWorldPosition - Main.screenPosition;
-            float pinRotation = (positionCurve.Evaluate(sampleInterpolant + 0.001f) - pinWorldPosition).ToRotation();
-            if (MathF.Cos(pinRotation) < 0f)
-                pinRotation += MathHelper.Pi;
+            float lanternRotation = windForce;
+            Vector2 lanternWorldPosition = positionCurve.Evaluate(sampleInterpolant);
+            Vector2 lanternDrawPosition = lanternWorldPosition - Main.screenPosition;
+            Vector2 lanternGlowDrawPosition = lanternDrawPosition + Vector2.UnitY.RotatedBy(lanternRotation) * 8f;
+            Rectangle lanternFrame = lanternTexture.Frame(1, 4, 0, i % 4);
 
-            Main.spriteBatch.Draw(pinTexture, pinDrawPosition, null, colorModifier, pinRotation, pinTexture.Size() * new Vector2(0.5f, 0f), 0.8f, 0, 0f);
+            Main.spriteBatch.Draw(lanternTexture, lanternDrawPosition, lanternFrame, colorModifier, lanternRotation, lanternFrame.Size() * new Vector2(0.5f, 0f), 0.8f, 0, 0f);
+            Main.spriteBatch.Draw(glowTexture, lanternGlowDrawPosition, null, glowColor * 0.36f, 0f, glowTexture.Size() * 0.5f, 0.5f, 0, 0f);
+            Main.spriteBatch.Draw(glowTexture, lanternGlowDrawPosition, null, glowColor * 0.21f, 0f, glowTexture.Size() * 0.5f, 1.1f, 0, 0f);
         }
     }
 
