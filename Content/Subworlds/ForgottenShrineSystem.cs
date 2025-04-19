@@ -144,7 +144,7 @@ public class ForgottenShrineSystem : ModSystem
         if (!WasInSubworldLastFrame)
             return;
 
-        Main.time = Main.nightLength * 0.5;
+        Main.time = Main.nightLength * 0.71;
         Main.dayTime = false;
         Main.windSpeedCurrent = 0.23f;
     }
