@@ -90,6 +90,9 @@ public class ForgottenShrineSystem : ModSystem
 
     private static void CreateCandles()
     {
+        // TODO -- Dunno about these to be honest.
+        return;
+
         float spacingPerBridge = ForgottenShrineGenerationConstants.BridgeArchWidth * 16f;
         int candleCount = Main.maxTilesX / ForgottenShrineGenerationConstants.BridgeArchWidth;
         int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationConstants.GroundDepth;
