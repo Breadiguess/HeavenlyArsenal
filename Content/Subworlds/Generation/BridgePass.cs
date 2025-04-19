@@ -49,8 +49,8 @@ public class BridgePass : GenPass
         }
 
         // Adorn the bridge with ropes and create beams.
-        int innerRopeSpacing = (int)(bridgeWidth * 0.33f);
-        int ropeY = bridgeLowYPoint - 4;
+        int innerRopeSpacing = (int)(bridgeWidth * 0.24f);
+        int ropeY = bridgeLowYPoint - 2;
         for (int x = 0; x < Main.maxTilesX; x++)
         {
             if (x >= 5 && x < Main.maxTilesX - 5 && x % bridgeWidth == 0)
