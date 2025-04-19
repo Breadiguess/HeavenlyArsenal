@@ -13,7 +13,7 @@ public class UnderwaterTreeRenderer : ModSystem
 {
     public override void PostDrawTiles()
     {
-        List<TEUnderwaterTree> trees = TileEntity.ByID.Values.Where(te => te is TEUnderwaterTree).Select(te => te as TEUnderwaterTree).ToList();
+        List<TEUnderwaterTree> trees = [.. TileEntity.ByID.Values.Where(te => te is TEUnderwaterTree).Select(te => te as TEUnderwaterTree)];
         if (trees.Count <= 0)
             return;
 

@@ -2,8 +2,10 @@
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.IO;
+using Terraria.ModLoader;
 using Terraria.WorldBuilding;
 
 namespace HeavenlyArsenal.Content.Subworlds.Generation;
@@ -73,17 +75,8 @@ public class BridgePass : GenPass
         }
 
         // Create lanterns beneath the bridge.
-        for (int x = bridgeWidth / 2; x < Main.maxTilesX - bridgeWidth / 2; x += bridgeWidth)
-        {
-            for (int dx = -1; dx <= 1; dx++)
-            {
-                Point lanternPoint = new Point(x + dx * 5, ropeY);
-                while (Framing.GetTileSafely(lanternPoint.ToVector2()).HasTile)
-                    lanternPoint.Y++;
-
-                WorldGen.PlaceObject(lanternPoint.X, lanternPoint.Y, TileID.ChineseLanterns);
-            }
-        }
+        PlaceLanterns(ropeY, 4);
+        PlaceOfuda(ropeY, 6);
     }
 
     private static void PlaceBeam(int groundLevelY, int startingX, int startingY)
@@ -114,6 +107,44 @@ public class BridgePass : GenPass
                 else
                     Main.tile[x, y].WallType = WallID.GrayBrick;
                 WorldGen.paintWall(x, y, PaintID.None);
+            }
+        }
+    }
+
+    private static void PlaceLanterns(int startY, int spacing)
+    {
+        int bridgeWidth = ForgottenShrineGenerationConstants.BridgeArchWidth;
+        for (int x = bridgeWidth / 2; x < Main.maxTilesX - bridgeWidth / 2; x += bridgeWidth)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                Point lanternPoint = new Point(x + dx * spacing, startY);
+                while (Framing.GetTileSafely(lanternPoint.ToVector2()).HasTile)
+                    lanternPoint.Y++;
+
+                WorldGen.PlaceObject(lanternPoint.X, lanternPoint.Y, TileID.ChineseLanterns);
+            }
+        }
+    }
+
+    private static void PlaceOfuda(int startY, int spacing)
+    {
+        int bridgeWidth = ForgottenShrineGenerationConstants.BridgeArchWidth;
+        int ofudaID = ModContent.TileType<PlacedOfuda>();
+        for (int x = bridgeWidth / 2; x < Main.maxTilesX - bridgeWidth / 2; x += bridgeWidth)
+        {
+            for (int dx = -2; dx <= 2; dx++)
+            {
+                if (dx == 0)
+                    continue;
+
+                Point ofudaPoint = new Point(x + dx * spacing, startY);
+                while (Framing.GetTileSafely(ofudaPoint.ToVector2()).HasTile)
+                    ofudaPoint.Y++;
+
+                Main.tile[ofudaPoint.X, ofudaPoint.Y].TileType = (ushort)ofudaID;
+                Main.tile[ofudaPoint.X, ofudaPoint.Y].Get<TileWallWireStateData>().HasTile = true;
+                TileEntity.PlaceEntityNet(ofudaPoint.X, ofudaPoint.Y, ModContent.TileEntityType<TEPlacedOfuda>());
             }
         }
     }

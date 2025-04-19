@@ -82,7 +82,7 @@ public class SpiritCandleParticle : BaseParticle
         float horizontalSquish = MathF.Pow(squishWave * 0.5f + 0.5f, 2.3f) * 0.75f;
         float baseHorizontalSquish = horizontalSquish;
         horizontalSquish -= LumUtils.InverseLerp(0.4f, 0f, horizontalSquish) * 0.55f;
-        horizontalSquish *= 0.33f;
+        horizontalSquish *= 0.1f;
 
         Scale = new Vector2(1f + horizontalSquish, 1f - horizontalSquish) * BaseScale;
         Rotation = MathF.Sin(MathHelper.Pi * Time / squishRate) * 0.5f;

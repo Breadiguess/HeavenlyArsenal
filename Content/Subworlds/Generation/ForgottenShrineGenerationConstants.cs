@@ -22,7 +22,7 @@ public static class ForgottenShrineGenerationConstants
     /// <summary>
     /// The width of arches on the bridge.
     /// </summary>
-    public static int BridgeArchWidth => 75;
+    public static int BridgeArchWidth => 76;
 
     /// <summary>
     /// The maximum height of arches on the bridge.
