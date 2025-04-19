@@ -88,12 +88,18 @@ public class BridgePass : GenPass
         PlaceOfuda(decorationStartY, 6);
     }
 
+    /// <summary>
+    /// Determines the vertical offset of the bridge's arch at a given X position in tile coordinates.
+    /// </summary>
     private static int CalculateArchHeight(int x, out float archHeightInterpolant)
     {
         archHeightInterpolant = MathF.Abs(MathF.Sin(MathHelper.Pi * x / ForgottenShrineGenerationConstants.BridgeArchWidth));
         return (int)MathF.Round(archHeightInterpolant * ForgottenShrineGenerationConstants.BridgeArchHeight);
     }
 
+    /// <summary>
+    /// Places the base tiles for the bridge that the player can walk on.
+    /// </summary>
     private static void PlaceBaseTiles(int x, int archStartingY, int extraThickness)
     {
         int bridgeThickness = ForgottenShrineGenerationConstants.BridgeThickness;
@@ -110,6 +116,9 @@ public class BridgePass : GenPass
         }
     }
 
+    /// <summary>
+    /// Places guardrail fences above the bridge.
+    /// </summary>
     private static void PlaceFence(int x, int archStartingY, int[] placeFenceSpokeMap, bool[] useDescendingFramesMap)
     {
         int bridgeWidth = ForgottenShrineGenerationConstants.BridgeArchWidth;
@@ -148,6 +157,9 @@ public class BridgePass : GenPass
         }
     }
 
+    /// <summary>
+    /// Places walls below the bridge.
+    /// </summary>
     private static void PlaceWalls(int x, float archHeightInterpolant, int archStartingY, int extraThickness)
     {
         int bridgeThickness = ForgottenShrineGenerationConstants.BridgeThickness;
@@ -160,6 +172,9 @@ public class BridgePass : GenPass
         }
     }
 
+    /// <summary>
+    /// Places a bridge beam that descends into the water below.
+    /// </summary>
     private static void PlaceBeam(int groundLevelY, int startingX, int startingY)
     {
         // round(height * abs(sin(pi * x / width))) < 1
@@ -192,6 +207,9 @@ public class BridgePass : GenPass
         }
     }
 
+    /// <summary>
+    /// Places paper lanterns underneath the bridge.
+    /// </summary>
     private static void PlaceLanterns(int startY, int spacing)
     {
         int bridgeWidth = ForgottenShrineGenerationConstants.BridgeArchWidth;
@@ -208,6 +226,9 @@ public class BridgePass : GenPass
         }
     }
 
+    /// <summary>
+    /// Places ofuda underneath the bridge.
+    /// </summary>
     private static void PlaceOfuda(int startY, int spacing)
     {
         int bridgeWidth = ForgottenShrineGenerationConstants.BridgeArchWidth;
