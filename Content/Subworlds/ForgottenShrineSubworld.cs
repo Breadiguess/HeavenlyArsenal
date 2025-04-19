@@ -1,4 +1,5 @@
-﻿using HeavenlyArsenal.Content.Subworlds.Generation;
+﻿using HeavenlyArsenal.Common.Graphics;
+using HeavenlyArsenal.Content.Subworlds.Generation;
 using Luminance.Assets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,6 +34,10 @@ public class ForgottenShrineSubworld : Subworld
         new BridgePass(),
         new SmoothenPass()
     };
+
+    public override void OnEnter() => ParticleEngine.Clear();
+
+    public override void OnExit() => ParticleEngine.Clear();
 
     public override bool ChangeAudio()
     {

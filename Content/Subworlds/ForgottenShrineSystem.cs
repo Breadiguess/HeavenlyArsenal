@@ -1,4 +1,7 @@
-﻿using HeavenlyArsenal.Content.Waters;
+﻿using HeavenlyArsenal.Common.Graphics;
+using HeavenlyArsenal.Content.Particles;
+using HeavenlyArsenal.Content.Subworlds.Generation;
+using HeavenlyArsenal.Content.Waters;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,6 +9,7 @@ using NoxusBoss.Assets;
 using NoxusBoss.Core.Graphics.LightingMask;
 using NoxusBoss.Core.Graphics.SpecificEffectManagers;
 using SubworldLibrary;
+using System;
 using System.Reflection;
 using Terraria;
 using Terraria.GameContent.Shaders;
@@ -15,10 +19,25 @@ namespace HeavenlyArsenal.Content.Subworlds;
 
 public class ForgottenShrineSystem : ModSystem
 {
+    /// <summary>
+    /// Whether the current client was in the shrine subworld last frame.
+    /// </summary>
+    public static bool WasInSubworldLastFrame
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
+    /// An event that's invoked when the shrine subworld is entered.
+    /// </summary>
+    public static event Action OnEnter;
+
     public override void OnModLoad()
     {
         On_Main.CalculateWaterStyle += ForceShrineWater;
         On_WaterShaderData.Apply += DisableIdleLiquidDistortion;
+        OnEnter += CreateCandles;
     }
 
     // Not doing this results in beach water somehow having priority over shrine water in the outer parts of the subworld.
@@ -28,6 +47,27 @@ public class ForgottenShrineSystem : ModSystem
             return ModContent.GetInstance<ForgottenShrineWater>().Slot;
 
         return orig(ignoreFountains);
+    }
+
+    private static void CreateCandles()
+    {
+        float spacingPerBridge = ForgottenShrineGenerationConstants.BridgeArchWidth * 16f;
+        int candleCount = Main.maxTilesX / ForgottenShrineGenerationConstants.BridgeArchWidth;
+        int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationConstants.GroundDepth;
+        int waterLevelY = groundLevelY - ForgottenShrineGenerationConstants.WaterDepth;
+        int bridgeLowYPoint = waterLevelY - ForgottenShrineGenerationConstants.BridgeBeamHeight;
+        float x = spacingPerBridge * 0.5f;
+        for (int i = 0; i < candleCount; i++)
+        {
+            Vector2 candleSpawnPosition = new Vector2(x, bridgeLowYPoint * 16f - 425f);
+
+            SpiritCandleParticle candle = SpiritCandleParticle.Pool.RequestParticle();
+            candle.Prepare(candleSpawnPosition, Vector2.Zero, 0f, Color.White, Vector2.One * 0.5f);
+
+            ParticleEngine.Particles.Add(candle);
+
+            x += spacingPerBridge;
+        }
     }
 
     private void DisableIdleLiquidDistortion(On_WaterShaderData.orig_Apply orig, WaterShaderData self)
@@ -52,9 +92,17 @@ public class ForgottenShrineSystem : ModSystem
 
     public override void PreUpdateEntities()
     {
+        bool inSubworld = SubworldSystem.IsActive<ForgottenShrineSubworld>();
+        if (WasInSubworldLastFrame != inSubworld)
+        {
+            WasInSubworldLastFrame = inSubworld;
+            if (inSubworld)
+                OnEnter?.Invoke();
+        }
+
         ManagedScreenFilter mistShader = ShaderManager.GetFilter("HeavenlyArsenal.ForgottenShrineMistShader");
         ManagedScreenFilter reflectionShader = ShaderManager.GetFilter("HeavenlyArsenal.ForgottenShrineWaterReflectionShader");
-        if (!SubworldSystem.IsActive<ForgottenShrineSubworld>())
+        if (!WasInSubworldLastFrame)
         {
             for (int i = 0; i < 30; i++)
             {

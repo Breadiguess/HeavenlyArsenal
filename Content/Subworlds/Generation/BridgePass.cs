@@ -71,6 +71,19 @@ public class BridgePass : GenPass
                 ShrineRopeSystem.Register(new ShrineRopeData(start, end));
             }
         }
+
+        // Create lanterns beneath the bridge.
+        for (int x = bridgeWidth / 2; x < Main.maxTilesX - bridgeWidth / 2; x += bridgeWidth)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                Point lanternPoint = new Point(x + dx * 5, ropeY);
+                while (Framing.GetTileSafely(lanternPoint.ToVector2()).HasTile)
+                    lanternPoint.Y++;
+
+                WorldGen.PlaceObject(lanternPoint.X, lanternPoint.Y, TileID.ChineseLanterns);
+            }
+        }
     }
 
     private static void PlaceBeam(int groundLevelY, int startingX, int startingY)

@@ -417,7 +417,7 @@ Mods: {
 			}
 
 			ForgottenShrineTeleporter: {
-				DisplayName: Forgotten Shrine Teleporter [DEBUG]
+				DisplayName: Forgotten Shrine Teleporter (DEBUG)
 				Tooltip: ""
 			}
 		}

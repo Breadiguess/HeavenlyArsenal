@@ -33,13 +33,14 @@ public class ForgottenShrineLotusSystem : ModSystem
         }
 
         On_Main.DrawProjectiles += RenderLotuses;
+        ForgottenShrineSystem.OnEnter += ScatterLotusesIfNecessary;
     }
 
     public override void OnModUnload() => Main.QueueMainThreadAction(lotusParticleSystem.Dispose);
 
     private static void ScatterLotusesIfNecessary()
     {
-        if (SubworldSystem.IsActive<ForgottenShrineSubworld>() && !lotusParticleSystem.particles.Any(p => p.Active))
+        if (!lotusParticleSystem.particles.Any(p => p.Active))
         {
             int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationConstants.GroundDepth;
             int waterLevelY = groundLevelY - ForgottenShrineGenerationConstants.WaterDepth;
@@ -101,9 +102,5 @@ public class ForgottenShrineLotusSystem : ModSystem
         particle.Rotation = particle.Velocity.X * 0.3f + MathF.Sin(particle.Position.X * 0.14f) * 0.2f;
     }
 
-    public override void PreUpdateEntities()
-    {
-        ScatterLotusesIfNecessary();
-        lotusParticleSystem.UpdateAll();
-    }
+    public override void PreUpdateEntities() => lotusParticleSystem.UpdateAll();
 }

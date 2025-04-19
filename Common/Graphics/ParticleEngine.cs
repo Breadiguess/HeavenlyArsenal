@@ -13,6 +13,12 @@ public class ParticleEngine : ILoadable
     public static ParticleRenderer Particles = new ParticleRenderer();
     public static ParticleRenderer ShaderParticles = new ParticleRenderer();
 
+    public static void Clear()
+    {
+        Particles.Clear();
+        ShaderParticles.Clear();
+    }
+
     public void Load(Mod mod)
     {
         On_Main.UpdateParticleSystems += UpdateParticles;
