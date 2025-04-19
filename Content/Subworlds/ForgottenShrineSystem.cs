@@ -99,7 +99,10 @@ public class ForgottenShrineSystem : ModSystem
             if (inSubworld)
                 OnEnter?.Invoke();
         }
+    }
 
+    public override void PostDrawTiles()
+    {
         ManagedScreenFilter mistShader = ShaderManager.GetFilter("HeavenlyArsenal.ForgottenShrineMistShader");
         ManagedScreenFilter reflectionShader = ShaderManager.GetFilter("HeavenlyArsenal.ForgottenShrineWaterReflectionShader");
         if (!WasInSubworldLastFrame)
@@ -115,7 +118,7 @@ public class ForgottenShrineSystem : ModSystem
         }
 
         mistShader.TrySetParameter("targetSize", Main.ScreenSize.ToVector2());
-        mistShader.TrySetParameter("oldScreenPosition", Main.screenPosition);
+        mistShader.TrySetParameter("oldScreenPosition", Main.screenLastPosition);
         mistShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
         mistShader.TrySetParameter("mistColor", new Color(84, 74, 154).ToVector4());
         mistShader.TrySetParameter("noiseAppearanceThreshold", 0.3f);
@@ -127,7 +130,7 @@ public class ForgottenShrineSystem : ModSystem
         mistShader.Activate();
 
         reflectionShader.TrySetParameter("targetSize", Main.ScreenSize.ToVector2());
-        reflectionShader.TrySetParameter("oldScreenPosition", Main.screenPosition);
+        reflectionShader.TrySetParameter("oldScreenPosition", Main.screenLastPosition);
         reflectionShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
         reflectionShader.TrySetParameter("reflectionStrength", 0.47f);
         reflectionShader.TrySetParameter("reflectionMaxDepth", 146f);

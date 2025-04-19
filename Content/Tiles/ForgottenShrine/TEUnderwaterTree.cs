@@ -50,7 +50,7 @@ public class TEUnderwaterTree : ModTileEntity
 
         UnifiedRandom rng = new UnifiedRandom(Position.X + 74 + Position.Y * 113);
         float baseLength = ForgottenShrineGenerationConstants.WaterDepth * 16f;
-        float treeLength = baseLength + rng.NextFloat(175f);
+        float treeLength = baseLength + rng.NextFloat(100f, 193f);
         float rotation = rng.NextFloatDirection() * 0.4f + MathHelper.PiOver2;
 
         // This ensures that rotations do not interfere with the rule that the tree should reach treeLength pixels upwards.

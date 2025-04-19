@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Luminance.Core.Graphics;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Core.Graphics.SpecificEffectManagers;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -15,7 +17,15 @@ public class UnderwaterTreeRenderer : ModSystem
         if (trees.Count <= 0)
             return;
 
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+
+        ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.ShrineUnderwaterVegetationShader");
+        postProcessingShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
+        postProcessingShader.TrySetParameter("screenOffset", (Main.screenPosition - Main.screenLastPosition) / WotGUtils.ViewportSize);
+        postProcessingShader.TrySetParameter("targetSize", WotGUtils.ViewportSize);
+        postProcessingShader.SetTexture(TileTargetManagers.LiquidTarget, 1);
+        postProcessingShader.Apply();
+
         foreach (TEUnderwaterTree tree in trees)
             tree.Render();
 
