@@ -79,15 +79,15 @@ public class SpiritCandleParticle : BaseParticle
 
         float squishRate = 54f;
         float squishWave = MathF.Sin(MathHelper.TwoPi * Time / squishRate);
-        float squish = MathF.Pow(squishWave * 0.5f + 0.5f, 2.3f) * 0.75f;
-        float baseSquish = squish;
-        squish -= LumUtils.InverseLerp(0.4f, 0f, squish) * 0.55f;
+        float horizontalSquish = MathF.Pow(squishWave * 0.5f + 0.5f, 2.3f) * 0.75f;
+        float baseHorizontalSquish = horizontalSquish;
+        horizontalSquish -= LumUtils.InverseLerp(0.4f, 0f, horizontalSquish) * 0.55f;
 
-        Scale = new Vector2(1f + squish, 1f - squish) * BaseScale;
+        Scale = new Vector2(1f + horizontalSquish, 1f - horizontalSquish) * BaseScale;
         Rotation = MathF.Sin(MathHelper.Pi * Time / squishRate) * 0.2f;
         Velocity = new Vector2(Rotation * -12f, squishWave * -2f);
 
-        if (baseSquish <= 0.16f && Main.rand.NextBool())
+        if (baseHorizontalSquish <= 0.16f && Main.rand.NextBool())
         {
             Vector2 fireSpawnPosition = Position - Vector2.UnitY.RotatedBy(Rotation) * Scale.Y * 84f;
             Vector2 fireVelocity = Vector2.UnitY.RotatedBy(Rotation).RotatedByRandom(0.3f) * Main.rand.NextFloat(-4f, -2.4f);
