@@ -111,8 +111,10 @@ public class ForgottenShrineSystem : ModSystem
 
     private void DisableIdleLiquidDistortion(On_WaterShaderData.orig_Apply orig, WaterShaderData self)
     {
+        // Ensure that orig is still called, so as to not mess up any detours to this method made by other mods.
         orig(self);
 
+        // However, at the same time, if the subworld is active, apply a separate water distortion shader, so that the water can be rendered completely still by default.
         if (SubworldSystem.IsActive<ForgottenShrineSubworld>())
         {
             Vector2 screenSize = Main.ScreenSize.ToVector2();
