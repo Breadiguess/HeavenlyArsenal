@@ -143,7 +143,7 @@ public class ForgottenShrineSystem : ModSystem
 
         Main.time = Main.rand.Next((int)Main.dayLength);
         Main.dayTime = true;
-        Main.windSpeedCurrent = 0f;
+        Main.windSpeedCurrent = 0.23f;
     }
 
     public override void PostDrawTiles()
