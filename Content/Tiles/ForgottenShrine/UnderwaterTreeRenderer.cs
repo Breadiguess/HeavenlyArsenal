@@ -20,6 +20,7 @@ public class UnderwaterTreeRenderer : ModSystem
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 
         ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.ShrineUnderwaterVegetationShader");
+        postProcessingShader.TrySetParameter("underwaterOpacity", 0.09f);
         postProcessingShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
         postProcessingShader.TrySetParameter("screenOffset", (Main.screenPosition - Main.screenLastPosition) / WotGUtils.ViewportSize);
         postProcessingShader.TrySetParameter("targetSize", WotGUtils.ViewportSize);
