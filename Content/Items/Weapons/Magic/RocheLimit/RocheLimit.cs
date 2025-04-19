@@ -15,6 +15,7 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 
+// TODO -- Investigate bugs pertaining to rendering the black hole.
 public class RocheLimit : ModItem
 {
     /// <summary>
