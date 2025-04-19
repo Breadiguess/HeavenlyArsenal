@@ -99,6 +99,9 @@ public class BridgePass : GenPass
         // For a bit of artistic preference, 0.5 will be used instead of 1 like in the original equation, making the beams a bit thinner.
         float intermediateArcsine = MathF.Asin(0.5f / ForgottenShrineGenerationConstants.BridgeArchHeight);
         int beamWidth = (int)MathF.Round(intermediateArcsine * ForgottenShrineGenerationConstants.BridgeArchWidth / MathHelper.Pi);
+        if (ForgottenShrineGenerationConstants.BridgeArchHeight == 0)
+            beamWidth = ForgottenShrineGenerationConstants.BridgeArchWidth / 33;
+
         for (int dx = -beamWidth; dx <= beamWidth; dx++)
         {
             int x = startingX + dx;
