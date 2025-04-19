@@ -141,6 +141,9 @@ public class ForgottenShrineSystem : ModSystem
                 OnEnter?.Invoke();
         }
 
+        if (!WasInSubworldLastFrame)
+            return;
+
         Main.time = Main.rand.Next((int)Main.dayLength);
         Main.dayTime = true;
         Main.windSpeedCurrent = 0.23f;
