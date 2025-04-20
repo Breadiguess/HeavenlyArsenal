@@ -277,19 +277,29 @@ public class BridgeDetailsPass : GenPass
 
     private static void GenerateRooftop(int x, int y, int roofWidth, int roofHeight)
     {
+        int dynastyWoodLayerHeight = ForgottenShrineGenerationHelpers.BridgeRooftopDynastyWoodLayerHeight;
         for (int dy = 0; dy < roofHeight; dy++)
         {
             float heightInterpolant = dy / (float)(roofHeight - 1f);
             int width = (int)Math.Ceiling(MathF.Pow(1f - heightInterpolant, 2.3f) * roofWidth * 0.5f + 0.001f);
             for (int dx = -width; dx <= width; dx++)
             {
-                // Shave off a bit of the bottom of the rooftop based on X position since otherwise it looks like a werid christmas tree.
+                // Shave off a bit of the bottom of the rooftop based on X position since otherwise it looks like a weird christmas tree.
                 int verticalCull = (int)MathF.Round((1f - LumUtils.Convert01To010(LumUtils.InverseLerp(-width, width, dx))) * 4f);
                 if (dy < verticalCull)
                     continue;
 
-                WorldGen.PlaceTile(x + dx, y - dy, TileID.BlueDynastyShingles);
-                WorldGen.paintTile(x + dx, y - dy, PaintID.BluePaint);
+                Point p = new Point(x + dx, y - dy);
+                if (dy < verticalCull + dynastyWoodLayerHeight && !Framing.GetTileSafely(p).HasTile)
+                {
+                    WorldGen.PlaceTile(p.X, p.Y, TileID.DynastyWood);
+                    WorldGen.paintTile(p.X, p.Y, PaintID.RedPaint);
+                }
+                else
+                {
+                    WorldGen.PlaceTile(p.X, p.Y, TileID.BlueDynastyShingles);
+                    WorldGen.paintTile(p.X, p.Y, PaintID.BluePaint);
+                }
             }
         }
     }
