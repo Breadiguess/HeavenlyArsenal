@@ -210,7 +210,10 @@ public class BridgeDetailsPass : GenPass
         // Adorn the bottom of the roof with cool things.
         // This has be done separately from the rooptop generation loop because otherwise the rooftops may be incomplete, making it impossible to place decorations at certain spots.
         for (int x = 5; x < Main.maxTilesX - 5; x++)
+        {
             PlaceDecorationsUnderneathRooftop(x, roofBottomY);
+            PlaceDecorationsAboveTopOfArch(x, roofBottomY);
+        }
     }
 
     /// <summary>
@@ -250,6 +253,26 @@ public class BridgeDetailsPass : GenPass
             Main.tile[x, roofBottomY + 2].TileType = (ushort)ofudaID;
             Main.tile[x, roofBottomY + 2].Get<TileWallWireStateData>().HasTile = true;
             TileEntity.PlaceEntityNet(x, roofBottomY + 2, ModContent.TileEntityType<TEPlacedOfuda>());
+        }
+    }
+
+    /// <summary>
+    /// Places decorations atop the roof walls where there isn't a rooftop.
+    /// </summary>
+    private static void PlaceDecorationsAboveTopOfArch(int x, int roofBottomY)
+    {
+        int bridgeWidth = ForgottenShrineGenerationHelpers.BridgeArchWidth;
+        int tiledBridgeX = x % bridgeWidth;
+        bool atArchWithoutRooftop = x / bridgeWidth % ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge != 0;
+        if (!atArchWithoutRooftop)
+            return;
+
+        if (tiledBridgeX == bridgeWidth / 2)
+        {
+            int tapestryID = ModContent.TileType<EnigmaticTapestry>();
+            Main.tile[x, roofBottomY + 2].TileType = (ushort)tapestryID;
+            Main.tile[x, roofBottomY + 2].Get<TileWallWireStateData>().HasTile = true;
+            TileEntity.PlaceEntityNet(x, roofBottomY + 2, ModContent.TileEntityType<TEEnigmaticTapestry>());
         }
     }
 
