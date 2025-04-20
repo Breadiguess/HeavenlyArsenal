@@ -831,7 +831,9 @@ public class AvatarLonginusHeld : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D texture = TextureAssets.Projectile[Type].Value;
+        
+        Texture2D texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld_Alt").Value;
+            //default: TextureAssets.Projectile[Type].Value;
         Rectangle frame = texture.Frame(1, 2, 0, IsEmpowered ? 1 : 0);
         Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
 

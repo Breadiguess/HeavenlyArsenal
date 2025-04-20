@@ -307,7 +307,7 @@ namespace HeavenlyArsenal.Content.NPCs
             float LillyScale = 0.1f;
             Vector2 LillyPos = NPC.Center;
             Color glowmaskColor = new Color(2, 0, 156);
-            Main.NewText($"{LillyPos - Main.screenPosition}");
+            //Main.NewText($"{LillyPos - Main.screenPosition}");
             Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, drawColor, wind, Lorigin, LillyScale, spriteEffects, 0f);
             RenderLegs(spriteBatch);    
             return false;

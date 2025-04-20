@@ -305,6 +305,18 @@ Mods: {
 
 			Armor: {
 				AwakenedBloodHelm: {
+					SetBonus:
+						'''
+						temporary for now, please go into your settings and bind the haemsong mode keybind.
+						Press <key> to toggle between offense form and defense form
+						while in offense form, your damage is drastically increased in exchange for heavily reducing your defense
+						additionally, two blood needles follow you around and attack with you
+
+						while in defense form, you gain increased defense and the ability to spawn a blood harpoon by activating setbonus.
+
+						while wearing the armor, you accumulate blood on hit. Blood eventually decays into clot. clot only can be reduced by using the defense form to heal (temporary)
+						while in offense form, if you reach max blood, you enter a blood frenzy where you deal increased damage.
+						'''
 					DisplayName: Awakened Blood Helm
 					Tooltip:
 						'''
@@ -326,7 +338,12 @@ Mods: {
 
 				AwakenedBloodStrides: {
 					DisplayName: Awakened Blood Strides
-					Tooltip: ""
+					Tooltip:
+						'''
+						increases movement speed by 17%
+						increases damage by 10%
+						increases crit chance by 7
+						'''
 				}
 			}
 
@@ -484,6 +501,12 @@ Mods: {
 			VambraceDash.DisplayName: Vambrace Dash
 			VambraceDischarge.DisplayName: Vambrace Discharge
 			BloodHarpoon.DisplayName: Blood Harpoon
+			Lotus_Laser_Proj.DisplayName: Lotus_ Laser_ Proj
+			Rose_Petal_Proj.DisplayName: Rose_ Petal_ Proj
+			Rose_Proj.DisplayName: Rose_ Proj
+			Scythe_Stealth.DisplayName: Scythe_ Stealth
+			Shuuriken_Proj.DisplayName: Shuuriken_ Proj
+			Thistle_Proj.DisplayName: Thistle_ Proj
 		}
 
 		NPCs.AnAffrontToGod.DisplayName: Cravatar

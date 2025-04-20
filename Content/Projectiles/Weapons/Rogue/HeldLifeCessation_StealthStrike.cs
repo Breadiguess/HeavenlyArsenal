@@ -14,7 +14,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue
 {
     class HeldLifeCessation_StealthStrike : ModProjectile
     {
-        public override string Texture => "HeavenlyArsenal/Content/Projectiles/Weapons/Rogue/FlowerShuriken_Proj";//"CalamityMod/Projectiles/InvisibleProj";
+        public override string Texture => "CalamityMod/Projectiles/InvisibleProj";
         public override void SetStaticDefaults()
         {
             //Projectile.

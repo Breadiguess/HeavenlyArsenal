@@ -47,7 +47,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.NewFolder
         private float MaxResource = 1f;
         private float AgingThreshold = 7f;      // how long until one unit turns to clot
         private float ClotDrainInterval = 0.4f;   // defense form healing
-        private float ClotHealingRate = 0.055f; // 5.5% max health per clot unit
+        private float ClotHealingRate = 0.015f; // 5.5% max health per clot unit
 
         private float clotDrainTimer = 0f;
 
@@ -63,7 +63,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.NewFolder
             frenzyTimer = 0f;
             CurrentForm = BloodArmorForm.Offense;
         }
-
+        
         public override void UpdateEquips()
         {
             if (BloodArmorEquipped)
@@ -231,7 +231,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.NewFolder
             {
                 if (CurrentForm == BloodArmorForm.Offense)
                 {
-
+                    // big stupid, i am
                     Player.head = EquipLoader.GetEquipSlot(Mod, "AwakenedBloodHelm", EquipType.Head);
                     Player.body = EquipLoader.GetEquipSlot(Mod, "AwakenedBloodplateDefense", EquipType.Body);
                 }
@@ -283,14 +283,14 @@ namespace HeavenlyArsenal.Content.Items.Armor.NewFolder
         {
             if (!BloodArmorEquipped)
             {
-                /*
+                
                 for (int i = bloodUnits.Count - 1; i >= 0; i--)
                 {
                     bloodUnits[i].Amount = Math.Max(bloodUnits[i].Amount - 0.05f, 0f);
                     if (bloodUnits[i].Amount <= 0f)
                         bloodUnits.RemoveAt(i);
                 }
-                */
+                
             }
             BloodArmorEquipped = false;
         }
