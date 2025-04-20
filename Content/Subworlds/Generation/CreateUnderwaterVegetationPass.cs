@@ -17,6 +17,7 @@ public class CreateUnderwaterVegetationPass : GenPass
     {
         progress.Message = "Creating underwater vegetation.";
 
+        // Create underwater trees.
         ushort treeID = (ushort)ModContent.TileType<UnderwaterTree>();
         for (int i = 0; i < ForgottenShrineGenerationHelpers.UnderwaterTreeCount; i++)
         {
@@ -28,6 +29,7 @@ public class CreateUnderwaterVegetationPass : GenPass
             TileEntity.PlaceEntityNet(x, y, ModContent.TileEntityType<TEUnderwaterTree>());
         }
 
+        // Create cattails.
         int cattailCount = ForgottenShrineGenerationHelpers.CattailCount;
         for (int i = 0; i < cattailCount; i++)
         {
@@ -38,6 +40,7 @@ public class CreateUnderwaterVegetationPass : GenPass
             GenerateCattail(x, y, height);
         }
 
+        // Create lilypads.
         for (int i = 0; i < ForgottenShrineGenerationHelpers.LilypadCount; i++)
         {
             int x = WorldGen.genRand.Next(10, Main.maxTilesX - 10);
