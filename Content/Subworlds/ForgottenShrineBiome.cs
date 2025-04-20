@@ -13,7 +13,7 @@ public class ForgottenShrineBiome : ModBiome
 
     public override Color? BackgroundColor => Color.White;
 
-    public override int Music => 0;
+    public override int Music => MusicLoader.GetMusicSlot("HeavenlyArsenal/Assets/Sounds/Music/PerfectShrineWithoutAnIdol");
 
     public override bool IsBiomeActive(Player player) => SubworldSystem.IsActive<ForgottenShrineSubworld>();
 
