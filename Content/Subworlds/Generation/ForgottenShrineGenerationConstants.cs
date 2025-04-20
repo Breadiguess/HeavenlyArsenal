@@ -109,7 +109,7 @@ public static class ForgottenShrineGenerationConstants
 
         // Flat.
         new ShrineRooftopSet().
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 0.95f), (int)(BridgeArchWidth / 2.9f), 0)).
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 1.5f), (int)(BridgeArchWidth / 1.5f), (int)(BridgeArchWidth / 6.2f))),
+            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 0.65f), (int)(BridgeArchWidth / 2.9f), 0)).
+            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 1.4f), (int)(BridgeArchWidth / 1.5f), (int)(BridgeArchWidth / 7.2f))),
     ];
 }
