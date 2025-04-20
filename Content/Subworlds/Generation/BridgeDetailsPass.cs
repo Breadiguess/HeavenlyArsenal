@@ -231,7 +231,7 @@ public class BridgeDetailsPass : GenPass
         if (tiledBridgeX == bridgeWidth / 2 - smallLanternSpacing ||
             tiledBridgeX == bridgeWidth / 2 + smallLanternSpacing)
         {
-            Point lanternPoint = ForgottenShrineGenerationHelpers.DescendToAir(new Point(x, roofBottomY - 4));
+            Point lanternPoint = ForgottenShrineGenerationHelpers.DescendToAir(new Point(x, roofBottomY));
             int lanternVariant = possibleLanternVariants[bridgeIndex * 2 % possibleLanternVariants.Length];
             WorldGen.PlaceObject(lanternPoint.X, lanternPoint.Y, TileID.HangingLanterns, false, lanternVariant);
         }
@@ -239,7 +239,7 @@ public class BridgeDetailsPass : GenPass
         // Place a large dynasty lantern.
         if (tiledBridgeX == bridgeWidth / 2)
         {
-            Point lanternPoint = ForgottenShrineGenerationHelpers.DescendToAir(new Point(x, roofBottomY - 4));
+            Point lanternPoint = ForgottenShrineGenerationHelpers.DescendToAir(new Point(x, roofBottomY));
             WorldGen.PlaceObject(lanternPoint.X, lanternPoint.Y, TileID.Chandeliers, false, 22);
         }
 
