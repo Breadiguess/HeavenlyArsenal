@@ -138,7 +138,7 @@ public class BridgeDetailsPass : GenPass
     private static void GenerateRoof(int archTopY)
     {
         int bridgeWidth = ForgottenShrineGenerationHelpers.BridgeArchWidth;
-        int wallHeight = ForgottenShrineGenerationHelpers.BridgeArchHeight + 21;
+        int wallHeight = ForgottenShrineGenerationHelpers.BridgeArchHeight + ForgottenShrineGenerationHelpers.BridgeBackWallHeight;
         int ceilingWallHeight = 4;
         int roofBottomY = archTopY - wallHeight;
         int ofudaID = ModContent.TileType<PlacedOfuda>();

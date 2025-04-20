@@ -99,6 +99,11 @@ public static class ForgottenShrineGenerationHelpers
     public static int BridgeRooftopsPerBridge => 3;
 
     /// <summary>
+    /// The baseline height of walls behind the bridge. Determines things such as how high rooftops are as a baseline.
+    /// </summary>
+    public static int BridgeBackWallHeight => 19;
+
+    /// <summary>
     /// The set of possible rooftops that can be selected for a given roof on the bridge.
     /// </summary>
     public static List<ShrineRooftopSet> BridgeRooftopConfigurations =>
