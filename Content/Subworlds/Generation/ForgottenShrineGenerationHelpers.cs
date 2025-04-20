@@ -87,7 +87,7 @@ public static class ForgottenShrineGenerationHelpers
     /// <summary>
     /// The amount of cattails to generate underwater.
     /// </summary>
-    public static int CattailCount => Main.maxTilesX / 26;
+    public static int CattailCount => Main.maxTilesX / 9;
 
     /// <summary>
     /// The maximum height of cattails above the water line.

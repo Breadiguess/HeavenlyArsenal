@@ -28,10 +28,11 @@ public class CreateUnderwaterVegetationPass : GenPass
             TileEntity.PlaceEntityNet(x, y, ModContent.TileEntityType<TEUnderwaterTree>());
         }
 
-        for (int i = 0; i < ForgottenShrineGenerationHelpers.CattailCount; i++)
+        int cattailCount = ForgottenShrineGenerationHelpers.CattailCount;
+        for (int i = 0; i < cattailCount; i++)
         {
-            float xInterpolant = i / (float)(ForgottenShrineGenerationHelpers.CattailCount - 1f);
-            int x = (int)MathHelper.Lerp(20f, Main.maxTilesX - 20f, xInterpolant) + WorldGen.genRand.Next(-15, 15);
+            float xInterpolant = i / (float)(cattailCount - 1f);
+            int x = (int)MathHelper.Lerp(20f, Main.maxTilesX - 20f, xInterpolant) + WorldGen.genRand.Next(-20, 20);
             int y = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth - 1;
             int height = ForgottenShrineGenerationHelpers.WaterDepth + WorldGen.genRand.Next(1, ForgottenShrineGenerationHelpers.MaxCattailHeight);
             GenerateCattail(x, y, height);
