@@ -35,6 +35,7 @@ public class ForgottenShrineSubworld : Subworld
         new BridgeDetailsPass(),
         new CreateUnderwaterVegetationPass(),
         new SmoothenPass(),
+        new SetPlayerSpawnPointPass()
     ];
 
     public override void OnEnter() => ParticleEngine.Clear();
