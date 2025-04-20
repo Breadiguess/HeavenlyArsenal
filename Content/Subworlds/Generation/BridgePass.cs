@@ -60,12 +60,12 @@ public class BridgePass : GenPass
 
         // Adorn the bridge with ropes and create beams.
         int innerRopeSpacing = (bridgeWidth - ForgottenShrineGenerationConstants.BridgeUndersideRopeWidth) / 2;
-        int ropeY = bridgeLowYPoint - 2;
         for (int x = 0; x < Main.maxTilesX; x++)
         {
             if (x >= 5 && x < Main.maxTilesX - 5 && x % bridgeWidth == 0)
                 PlaceBeam(groundLevelY, x, bridgeLowYPoint);
 
+            int ropeY = bridgeLowYPoint - bridgeThickness - CalculateArchHeight(x, out _);
             if (x >= 5 && x < Main.maxTilesX - 5 && x % bridgeWidth == innerRopeSpacing)
             {
                 Point start = new Point(x, ropeY).ToWorldCoordinates().ToPoint();
@@ -74,7 +74,6 @@ public class BridgePass : GenPass
                     start.Y += 16;
                 while (Framing.GetTileSafely(end.ToVector2()).HasTile)
                     end.Y += 16;
-
                 start.Y -= 11;
                 end.Y -= 11;
 
