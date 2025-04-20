@@ -24,6 +24,8 @@ public class ShrineRopeData
 
     private static readonly Asset<Texture2D> spiralTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Tiles/ForgottenShrine/RopeSpiral");
 
+    private static readonly Asset<Texture2D> paperLanternTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Tiles/ForgottenShrine/PaperLantern");
+
     /// <summary>
     /// A general-purpose timer used for wind movement on the baubles attached to this rope.
     /// </summary>
@@ -231,13 +233,11 @@ public class ShrineRopeData
 
         Main.instance.LoadProjectile(ProjectileID.ReleaseLantern);
 
-        int ornamentCount = 6;
-        Texture2D lanternTexture = TextureAssets.Projectile[ProjectileID.ReleaseLantern].Value;
+        int ornamentCount = 7;
         Texture2D glowTexture = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
-        Color glowColor = new Color(1f, 1f, 0.4f, 0f);
         for (int i = 0; i < ornamentCount; i++)
         {
-            float sampleInterpolant = MathHelper.Lerp(0.1f, 0.8f, i / (float)(ornamentCount - 1f));
+            float sampleInterpolant = MathHelper.Lerp(0.06f, 0.8f, i / (float)(ornamentCount - 1f));
             Vector2 ornamentWorldPosition = positionCurve.Evaluate(sampleInterpolant);
             Vector2 velocity = velocityCurve.Evaluate(sampleInterpolant) * 0.3f;
 
@@ -259,16 +259,32 @@ public class ShrineRopeData
             Main.spriteBatch.Draw(spiralTexture.Value, spiralDrawPosition, null, colorModifier, spiralRotation, spiralTexture.Size() * 0.5f, 0.5f, 0, 0f);
 
             // Draw lanterns.
-            sampleInterpolant = MathHelper.Lerp(0.1f, 0.8f, (i + 0.5f) / (float)(ornamentCount - 1f));
+            Texture2D lanternTexture = TextureAssets.Projectile[ProjectileID.ReleaseLantern].Value;
+            sampleInterpolant = MathHelper.Lerp(0.06f, 0.8f, (i + 0.5f) / (float)(ornamentCount - 1f));
             float lanternRotation = LumUtils.AperiodicSin(WindTime * 0.23f + ornamentWorldPosition.X * 0.01f) * 0.45f + windGridRotation;
             Vector2 lanternWorldPosition = positionCurve.Evaluate(sampleInterpolant);
             Vector2 lanternDrawPosition = lanternWorldPosition - Main.screenPosition;
             Vector2 lanternGlowDrawPosition = lanternDrawPosition + Vector2.UnitY.RotatedBy(lanternRotation) * 8f;
             Rectangle lanternFrame = lanternTexture.Frame(1, 4, 0, i % 4);
+            Color lanternGlowColor = new Color(1f, 1f, 0.4f, 0f);
+            float lanternGlowOpacity = 0.36f;
+            float lanternGlowScaleFactor = 1f;
+            float lanternScale = 0.8f;
+            if (i == ornamentCount / 2)
+            {
+                lanternTexture = paperLanternTexture.Value;
+                lanternFrame = lanternTexture.Frame();
+                lanternGlowColor = new Color(1f, 0.44f, 0.15f, 0f);
+                lanternGlowOpacity = 0.5f;
+                lanternRotation *= 0.33f;
+                lanternGlowDrawPosition = lanternDrawPosition + Vector2.UnitY.RotatedBy(lanternRotation) * 26f;
+                lanternGlowScaleFactor = 1.6f;
+                lanternScale = 0.6f;
+            }
 
-            Main.spriteBatch.Draw(lanternTexture, lanternDrawPosition, lanternFrame, colorModifier, lanternRotation, lanternFrame.Size() * new Vector2(0.5f, 0f), 0.8f, 0, 0f);
-            Main.spriteBatch.Draw(glowTexture, lanternGlowDrawPosition, null, glowColor * 0.36f, 0f, glowTexture.Size() * 0.5f, 0.5f, 0, 0f);
-            Main.spriteBatch.Draw(glowTexture, lanternGlowDrawPosition, null, glowColor * 0.21f, 0f, glowTexture.Size() * 0.5f, 1.1f, 0, 0f);
+            Main.spriteBatch.Draw(lanternTexture, lanternDrawPosition, lanternFrame, colorModifier, lanternRotation, lanternFrame.Size() * new Vector2(0.5f, 0f), lanternScale, 0, 0f);
+            Main.spriteBatch.Draw(glowTexture, lanternGlowDrawPosition, null, lanternGlowColor * lanternGlowOpacity, 0f, glowTexture.Size() * 0.5f, lanternGlowScaleFactor * 0.5f, 0, 0f);
+            Main.spriteBatch.Draw(glowTexture, lanternGlowDrawPosition, null, lanternGlowColor * lanternGlowOpacity * 0.6f, 0f, glowTexture.Size() * 0.5f, lanternGlowScaleFactor * 1.1f, 0, 0f);
         }
     }
 
