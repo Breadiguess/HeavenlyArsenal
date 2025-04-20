@@ -105,7 +105,7 @@ public static class ForgottenShrineGenerationConstants
         // Pointy.
         new ShrineRooftopSet().
             Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 1.3f), (int)(BridgeArchWidth / 2.2f), 0)).
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 2.8f), (int)(BridgeArchWidth / 1.4f), (int)(BridgeArchWidth / 5.6f))),
+            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 3.1f), (int)(BridgeArchWidth / 0.9f), (int)(BridgeArchWidth / 5.6f))),
 
         // Flat.
         new ShrineRooftopSet().
