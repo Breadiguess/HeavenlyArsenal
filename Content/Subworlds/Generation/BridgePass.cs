@@ -262,6 +262,7 @@ public class BridgePass : GenPass
         int ofudaID = ModContent.TileType<PlacedOfuda>();
         int pillarSpacing = bridgeWidth / 3;
         int rooftopY = roofBottomY + 1;
+        int smallLanternSpacing = bridgeWidth / 19;
         int ofudaSpacing = bridgeWidth / 9;
 
         // Create pillars.
@@ -315,6 +316,23 @@ public class BridgePass : GenPass
                 ForgottenShrineGenerationConstants.ShrineRooftopSet rooftopSet = WorldGen.genRand.Next(ForgottenShrineGenerationConstants.BridgeRooftopConfigurations);
                 foreach (var rooftop in rooftopSet.Rooftops)
                     GenerateRooftop(x, rooftopY - rooftop.VerticalOffset, rooftop.Width, rooftop.Height);
+            }
+        }
+
+        for (int x = 5; x < Main.maxTilesX - 5; x++)
+        {
+            int tiledBridgeX = x % (bridgeWidth * 2);
+
+            // Place small lanterns.
+            if (tiledBridgeX == bridgeWidth / 2 - smallLanternSpacing ||
+                tiledBridgeX == bridgeWidth / 2 + smallLanternSpacing)
+            {
+                int y = roofBottomY - 4;
+                while (Framing.GetTileSafely(x, y).HasTile)
+                    y++;
+
+                int lanternVariant = WorldGen.genRand.NextFromList(3, 5, 26);
+                WorldGen.PlaceObject(x, y, TileID.HangingLanterns, false, lanternVariant);
             }
 
             // Place a large dynasty lantern.
