@@ -96,18 +96,25 @@ public class ForgottenShrineSystem : ModSystem
         int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth;
         int waterLevelY = groundLevelY - ForgottenShrineGenerationHelpers.WaterDepth;
         int bridgeLowYPoint = waterLevelY - ForgottenShrineGenerationHelpers.BridgeBeamHeight - ForgottenShrineGenerationHelpers.BridgeThickness;
-        float x = spacingPerBridge * 1.5f;
+        int bridgeIndex = 0;
+        float x = spacingPerBridge * (ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge - 0.5f);
         for (int i = 0; i < candleCount; i++)
         {
-            float verticalOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight((int)(x / 16), out _) * -16f - 30f;
-            Vector2 candleSpawnPosition = new Vector2(x + 8f, bridgeLowYPoint * 16f + verticalOffset);
+            // Ensure that candles only appear on bridges without a roof.
+            if (bridgeIndex % ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge != 1)
+            {
+                float verticalOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight((int)(x / 16), out _) * -16f - 30f;
+                Vector2 candleSpawnPosition = new Vector2(x + 8f, bridgeLowYPoint * 16f + verticalOffset);
 
-            SpiritCandleParticle candle = SpiritCandleParticle.Pool.RequestParticle();
-            candle.Prepare(candleSpawnPosition, Vector2.Zero, 0f, Color.White, Vector2.One * 0.35f);
+                SpiritCandleParticle candle = SpiritCandleParticle.Pool.RequestParticle();
+                candle.Prepare(candleSpawnPosition, Vector2.Zero, 0f, Color.White, Vector2.One * 0.35f);
 
-            ParticleEngine.Particles.Add(candle);
+                ParticleEngine.Particles.Add(candle);
+            }
 
-            x += spacingPerBridge * 2f;
+            // Increment the bridge index and X position.
+            bridgeIndex++;
+            x += spacingPerBridge;
         }
     }
 

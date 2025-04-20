@@ -94,6 +94,11 @@ public static class ForgottenShrineGenerationHelpers
     public static int LilypadCount => 0;
 
     /// <summary>
+    /// The amount of bridges it takes on a cyclical basis in order for a bridge to be created with a roof.
+    /// </summary>
+    public static int BridgeRooftopsPerBridge => 3;
+
+    /// <summary>
     /// The set of possible rooftops that can be selected for a given roof on the bridge.
     /// </summary>
     public static List<ShrineRooftopSet> BridgeRooftopConfigurations =>

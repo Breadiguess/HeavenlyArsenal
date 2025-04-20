@@ -146,6 +146,7 @@ public class BridgeDetailsPass : GenPass
         int rooftopY = roofBottomY + 1;
         int smallLanternSpacing = bridgeWidth / 19;
         int ofudaSpacing = bridgeWidth / 9;
+        int rooftopsPerBridge = ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge;
 
         // Create pillars.
         for (int y = archTopY; y >= roofBottomY; y--)
@@ -192,7 +193,7 @@ public class BridgeDetailsPass : GenPass
         // Place a roof over center points on the bridge.
         for (int x = 5; x < Main.maxTilesX - 5; x++)
         {
-            int tiledBridgeX = x % (bridgeWidth * 2);
+            int tiledBridgeX = x % (bridgeWidth * rooftopsPerBridge);
             if (tiledBridgeX == bridgeWidth / 2)
             {
                 ForgottenShrineGenerationHelpers.ShrineRooftopSet rooftopSet = WorldGen.genRand.Next(ForgottenShrineGenerationHelpers.BridgeRooftopConfigurations);
@@ -201,9 +202,10 @@ public class BridgeDetailsPass : GenPass
             }
         }
 
+        // Adorn the bottom of the roof with cool things.
         for (int x = 5; x < Main.maxTilesX - 5; x++)
         {
-            int tiledBridgeX = x % (bridgeWidth * 2);
+            int tiledBridgeX = x % (bridgeWidth * rooftopsPerBridge);
 
             // Place small lanterns.
             if (tiledBridgeX == bridgeWidth / 2 - smallLanternSpacing ||
