@@ -26,9 +26,9 @@ public class BaseBridgePass : GenPass
         bool[] useDescendingFramesMap = new bool[Main.maxTilesX];
         for (int x = 1; x < Main.maxTilesX - 1; x++)
         {
-            int previousHeight = ForgottenShrineGenerationHelpers.CalculateArchHeight(x - 1, out _);
-            int archHeight = ForgottenShrineGenerationHelpers.CalculateArchHeight(x, out _);
-            int nextArchHeight = ForgottenShrineGenerationHelpers.CalculateArchHeight(x + 1, out _);
+            int previousHeight = ForgottenShrineGenerationHelpers.CalculateArchHeight(x - 1);
+            int archHeight = ForgottenShrineGenerationHelpers.CalculateArchHeight(x);
+            int nextArchHeight = ForgottenShrineGenerationHelpers.CalculateArchHeight(x + 1);
             bool ascending = archHeight > previousHeight;
             bool descending = archHeight > nextArchHeight;
             if (ascending)

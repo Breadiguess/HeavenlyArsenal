@@ -79,7 +79,7 @@ public class BridgeDetailsPass : GenPass
             if (!ForgottenShrineGenerationHelpers.InRooftopBridgeRange(x))
                 continue;
 
-            int ropeY = startY - ForgottenShrineGenerationHelpers.CalculateArchHeight(x, out _);
+            int ropeY = startY - ForgottenShrineGenerationHelpers.CalculateArchHeight(x);
             if (x >= 5 && x < Main.maxTilesX - 5 && x % bridgeWidth == innerRopeSpacing)
             {
                 Vector2 start = new Point(x, ropeY).ToWorldCoordinates();
@@ -88,6 +88,7 @@ public class BridgeDetailsPass : GenPass
                     start.Y += 16f;
                 while (Framing.GetTileSafely(end).HasTile)
                     end.Y += 16f;
+
                 start.Y -= 11f;
                 end.Y -= 11f;
 
@@ -104,7 +105,7 @@ public class BridgeDetailsPass : GenPass
         int bridgeWidth = ForgottenShrineGenerationHelpers.BridgeArchWidth;
         for (int x = bridgeWidth / 2; x < Main.maxTilesX - bridgeWidth / 2; x += bridgeWidth)
         {
-            int archOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight(x, out _);
+            int archOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight(x);
             bool onlyPlaceInCenter = !ForgottenShrineGenerationHelpers.InRooftopBridgeRange(x);
             for (int dx = -1; dx <= 1; dx++)
             {
@@ -134,7 +135,7 @@ public class BridgeDetailsPass : GenPass
         int ofudaID = ModContent.TileType<PlacedOfuda>();
         for (int x = bridgeWidth / 2; x < Main.maxTilesX - bridgeWidth / 2; x += bridgeWidth)
         {
-            int archOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight(x, out _);
+            int archOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight(x);
             int ofudaOnEachSide = ForgottenShrineGenerationHelpers.InRooftopBridgeRange(x) ? 3 : 1;
             for (int dx = -ofudaOnEachSide; dx <= ofudaOnEachSide; dx++)
             {
@@ -171,7 +172,7 @@ public class BridgeDetailsPass : GenPass
             int height = archTopY - y;
             for (int x = 5; x < Main.maxTilesX - 5; x++)
             {
-                if (y >= archTopY - ForgottenShrineGenerationHelpers.CalculateArchHeight(x, out _))
+                if (y >= archTopY - ForgottenShrineGenerationHelpers.CalculateArchHeight(x))
                     continue;
 
                 int distanceFromPillar = TriangleWaveDistance(x, pillarSpacing);
@@ -192,7 +193,7 @@ public class BridgeDetailsPass : GenPass
             int height = archTopY - y;
             for (int x = 5; x < Main.maxTilesX - 5; x++)
             {
-                if (y >= archTopY - ForgottenShrineGenerationHelpers.CalculateArchHeight(x, out _))
+                if (y >= archTopY - ForgottenShrineGenerationHelpers.CalculateArchHeight(x))
                     continue;
 
                 if (height >= wallHeight - ceilingWallHeight)

@@ -103,7 +103,7 @@ public class ForgottenShrineSystem : ModSystem
             // Ensure that candles only appear on bridges without a roof.
             if (bridgeIndex % ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge != 1)
             {
-                float verticalOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight((int)(x / 16), out _) * -16f - 30f;
+                float verticalOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight((int)(x / 16)) * -16f - 30f;
                 Vector2 candleSpawnPosition = new Vector2(x + 8f, bridgeLowYPoint * 16f + verticalOffset);
 
                 SpiritCandleParticle candle = SpiritCandleParticle.Pool.RequestParticle();

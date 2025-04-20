@@ -162,7 +162,7 @@ public static class ForgottenShrineGenerationHelpers
     ];
 
     /// <summary>
-    /// Determines the vertical offset of the bridge's arch at a given X position in tile coordinates.
+    /// Determines the vertical offset of the bridge's arch at a given X position in tile coordinates, providing the arch height interpolant in the process.
     /// </summary>
     internal static int CalculateArchHeight(int x, out float archHeightInterpolant)
     {
@@ -173,6 +173,11 @@ public static class ForgottenShrineGenerationHelpers
 
         return (int)MathF.Round(archHeightInterpolant * maxHeight);
     }
+
+    /// <summary>
+    /// Determines the vertical offset of the bridge's arch at a given X position in tile coordinates.
+    /// </summary>
+    internal static int CalculateArchHeight(int x) => CalculateArchHeight(x, out _);
 
     /// <summary>
     /// Determines whether a given X position in tile coordinates is in the range of a bridge with a rooftop.
