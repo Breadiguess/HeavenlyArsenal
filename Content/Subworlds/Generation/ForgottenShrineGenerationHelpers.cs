@@ -45,6 +45,31 @@ public static class ForgottenShrineGenerationHelpers
     public static int WaterDepth => 33;
 
     /// <summary>
+    /// The width of beams for the bridge before the shrine.
+    /// </summary>
+    public static int BridgeBeamWidth
+    {
+        get
+        {
+            // round(height * abs(sin(pi * x / width))) < 1
+            // height * abs(sin(pi * x / width)) < 1
+            // abs(sin(pi * x / width)) < 1 / height
+            // sin(pi * x / width) < 1 / height
+            // sin(pi * x / width) = 1 / height
+            // pi * x / width = arcsin(1 / height)
+            // x = arcsin(1 / height) * width / pi
+
+            // For a bit of artistic preference, 0.5 will be used instead of 1 like in the original equation, making the beams a bit thinner.
+            float intermediateArcsine = MathF.Asin(0.5f / BridgeArchHeight);
+            int beamWidth = (int)MathF.Round(intermediateArcsine * BridgeArchWidth / MathHelper.Pi);
+            if (BridgeArchHeight == 0)
+                beamWidth = BridgeArchWidth / 33;
+
+            return beamWidth;
+        }
+    }
+
+    /// <summary>
     /// The height of beams for the bridge before the shrine.
     /// </summary>
     public static int BridgeBeamHeight => 11;
