@@ -1,12 +1,8 @@
-﻿using CalamityMod.NPCs.CalamityAIs.CalamityBossAIs;
-using Luminance.Common.Utilities;
+﻿using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
-using NoxusBoss.Content.NPCs.Bosses.Avatar.FirstPhaseForm;
-using NoxusBoss.Core.Graphics.SwagRain;
-using NoxusBoss.Core.Physics.InverseKinematics;
 using NoxusBoss.Core.World.GameScenes.AvatarAppearances;
 using System;
 using Terraria;
@@ -14,7 +10,6 @@ using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
 using Terraria.ModLoader;
-using XPT.Core.Audio.MP3Sharp.Decoding.Decoders.LayerIII;
 using static Luminance.Common.Utilities.Utilities;
 
 namespace HeavenlyArsenal.Content.NPCs
@@ -155,7 +150,7 @@ namespace HeavenlyArsenal.Content.NPCs
         }
         public override void AI()
         {
-            
+
             //AstrumAureusAI.VanillaAstrumAureusAI(NPC, Mod);
         }
 
@@ -221,7 +216,7 @@ namespace HeavenlyArsenal.Content.NPCs
                     origin.X = texture.Width - origin.X;
 
                 spriteBatch.Draw(texture, currentDrawPosition, null, color, rotation, origin, scale, direction, 0f);
-                
+
                 currentDrawPosition += offsets[i];
             }
         }
@@ -232,15 +227,15 @@ namespace HeavenlyArsenal.Content.NPCs
         }
 
 
-        
+
 
         public void DrawSelf(Vector2 screenPos)
         {
             // Draw the backglow.
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, TransformPerspective);
-            
-               // NPC.position -= NPC.Size * 0.5f;
+
+            // NPC.position -= NPC.Size * 0.5f;
 
             float backglowScale = NPC.scale * (DrawnFromTelescope ? 0.3f : 0.74f);
             float backglowOpacity = BackgroundProp ? RiftEclipseSky.RiftScaleFactor : 1f;
@@ -253,7 +248,7 @@ namespace HeavenlyArsenal.Content.NPCs
                 backglowScale += growPulse.Cubed() * Cos01(Main.GlobalTimeWrappedHourly * 56f) * 0.6f + growPulse * 1.3f;
             }
 
-           
+
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, TransformPerspective);
@@ -270,7 +265,7 @@ namespace HeavenlyArsenal.Content.NPCs
             riftShader.SetTexture(GennedAssets.Textures.Noise.BurnNoise, 2, SamplerState.AnisotropicWrap);
             riftShader.Apply();
 
-           
+
 
         }
 
@@ -286,11 +281,11 @@ namespace HeavenlyArsenal.Content.NPCs
             Texture2D Glow = GennedAssets.Textures.FirstPhaseForm.AvatarRift;
             Vector2 bodyOrigin = new Vector2(bodyTexture.Width / 2f, bodyTexture.Height / 2f);
             float scale = 0.4f;
-            
-     
+
+
             Main.spriteBatch.Draw(Glow, NPC.Center - screenPos, null, drawColor, NPC.rotation, bodyOrigin, scale, SpriteEffects.None, 0f);
-            
-           // Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, TransformPerspective);
+
+            // Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, TransformPerspective);
 
             Main.spriteBatch.Draw(bodyTexture, NPC.Center - screenPos, null, drawColor, NPC.rotation, bodyOrigin, scale, SpriteEffects.None, 0f);
 
@@ -303,18 +298,18 @@ namespace HeavenlyArsenal.Content.NPCs
             Texture2D LillyTexture = GennedAssets.Textures.SecondPhaseForm.SpiderLily;
             Rectangle Lillyframe = LillyTexture.Frame(1, 3, 0, (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 3);
             Vector2 Lorigin = new Vector2(Lillyframe.Width / 2, Lillyframe.Height + 54 * Math.Sign(NPC.gravity));
-            float LillySquish = MathF.Cos(Main.GlobalTimeWrappedHourly * 10.5f + NPC.Center.X +NPC.Center.Y) * 1f;
+            float LillySquish = MathF.Cos(Main.GlobalTimeWrappedHourly * 10.5f + NPC.Center.X + NPC.Center.Y) * 1f;
             float LillyScale = 0.1f;
             Vector2 LillyPos = NPC.Center;
             Color glowmaskColor = new Color(2, 0, 156);
             //Main.NewText($"{LillyPos - Main.screenPosition}");
             Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, drawColor, wind, Lorigin, LillyScale, spriteEffects, 0f);
-            RenderLegs(spriteBatch);    
+            RenderLegs(spriteBatch);
             return false;
         }
     }
 
-
+    // TODO -- Uhhhhh why is there an extensions method static class just hiding in this NPC file? It should be moved somewhere else and made into a separate .cs file.
     public static class ExtensionMethods
     {
         public static Vector2 ToWorldCoordinates(this Vector2 tilePosition, float offsetX = 0f, float offsetY = 0f)
