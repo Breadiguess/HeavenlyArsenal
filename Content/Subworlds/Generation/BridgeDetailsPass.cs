@@ -92,16 +92,16 @@ public class BridgeDetailsPass : GenPass
             int ropeY = startY - ForgottenShrineGenerationHelpers.CalculateArchHeight(x, out _);
             if (x >= 5 && x < Main.maxTilesX - 5 && x % bridgeWidth == innerRopeSpacing)
             {
-                Point start = new Point(x, ropeY).ToWorldCoordinates().ToPoint();
-                Point end = new Point(x + bridgeWidth - innerRopeSpacing * 2, ropeY).ToWorldCoordinates().ToPoint();
-                while (Framing.GetTileSafely(start.ToVector2()).HasTile)
-                    start.Y += 16;
-                while (Framing.GetTileSafely(end.ToVector2()).HasTile)
-                    end.Y += 16;
-                start.Y -= 11;
-                end.Y -= 11;
+                Vector2 start = new Point(x, ropeY).ToWorldCoordinates();
+                Vector2 end = new Point(x + bridgeWidth - innerRopeSpacing * 2, ropeY).ToWorldCoordinates();
+                while (Framing.GetTileSafely(start).HasTile)
+                    start.Y += 16f;
+                while (Framing.GetTileSafely(end).HasTile)
+                    end.Y += 16f;
+                start.Y -= 11f;
+                end.Y -= 11f;
 
-                ShrineRopeSystem.Register(new ShrineRopeData(start, end, ForgottenShrineGenerationHelpers.BridgeUndersideRopeSag * 16f));
+                ShrineRopeSystem.Register(new ShrineRopeData(start.ToPoint(), end.ToPoint(), ForgottenShrineGenerationHelpers.BridgeUndersideRopeSag * 16f));
             }
         }
     }
