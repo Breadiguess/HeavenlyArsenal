@@ -136,7 +136,7 @@ public class ForgottenShrineBackground : Background
         for (int i = -3; i <= 3; i++)
         {
             // Draw the base background.
-            Vector2 layerPosition = new Vector2(backgroundSize.X * 0.5f + backgroundTexture.Width * i * scale, backgroundSize.Y - (int)((screenYPositionInterpolant + 0.4f) * scale * 230f));
+            Vector2 layerPosition = new Vector2(backgroundSize.X * 0.5f + backgroundTexture.Width * i * scale, backgroundSize.Y - (int)((screenYPositionInterpolant + 0.45f) * scale * 230f));
             layerPosition.Y += 10f / parallax;
             layerPosition.X -= parallax * Main.screenPosition.X % (backgroundTexture.Width * scale);
 
