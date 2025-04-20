@@ -24,6 +24,14 @@ public class AvatarRifleSuperBullet : GlobalProjectile
 
     private Vector2[] oldPos;
 
+    public override void SetStaticDefaults()
+    {
+        base.SetStaticDefaults();
+    }
+    public override void SetDefaults(Projectile entity)
+    {
+        entity.penetrate = -1;
+    }
     public override bool PreAI(Projectile projectile)
     {
         if (hasEmpowerment)

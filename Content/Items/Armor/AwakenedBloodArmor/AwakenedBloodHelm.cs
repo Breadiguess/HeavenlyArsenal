@@ -53,7 +53,9 @@ public class AwakenedBloodHelm : ModItem, ILocalizedModType
 
     public override void UpdateArmorSet(Player player)
     {
-        player.setBonus = Language.GetOrRegister(Mod.GetLocalizationKey("AwakenedBloodHelm.SetBonus")).Value;
+        //player.setBonus = this.GetLocalizedValue("SetBonus") + "\n";
+        player.setBonus = Language.GetOrRegister(Mod.GetLocalizationKey("Items.Armor.AwakenedBloodHelm.SetBonus")).Value;
+        
         var modPlayer = player.Calamity();
         player.GetAttackSpeed<MeleeDamageClass>() += 0.18f;
         modPlayer.bloodflareSet = true;
@@ -62,7 +64,7 @@ public class AwakenedBloodHelm : ModItem, ILocalizedModType
         modPlayer.abyssalAmulet = true;
         modPlayer.reaverRegen = true;
         player.GetModPlayer<BloodArmorPlayer>().BloodArmorEquipped = true;
-        //player.setBonus = this.GetLocalizedValue("SetBonus") + "\n" + CalamityUtils.GetTextValueFromModItem<BloodflareBodyArmor>("CommonSetBonus");
+        
         player.crimsonRegen = true;
         player.aggro += 900;
     }

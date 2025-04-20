@@ -1,14 +1,9 @@
 ﻿using CalamityMod;
-
-using HeavenlyArsenal.Content.Projectiles.Weapons.Rogue;
-using NoxusBoss.Assets;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Rogue
@@ -18,9 +13,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue
         public override string Texture => "HeavenlyArsenal/Content/Items/Weapons/Magic/avatar_FishingRod";
         public override void SetDefaults()
         {
-
-        
-           
             DamageClass d;
             Mod calamity = ModLoader.GetMod("CalamityMod");
             calamity.TryFind("RogueDamageClass", out d);
@@ -44,6 +36,21 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue
 
         }
 
+        public override void SetStaticDefaults()
+        {
+            ItemID.Sets.ItemNoGravity[Item.type] = true;
+            ItemID.Sets.AnimatesAsSoul[Item.type] = true;
+            ItemID.Sets.BonusAttackSpeedMultiplier[Item.type] = 0.76f;
+            Item.ResearchUnlockCount = 1;
+            //ItemID.Sets.SortingPriorityBossSpawns[Type] = 12;
+            //ItemID.Sets.AnimatesAsSoul[Type] = true;
+            Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(0, 1));
+        }
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+        {
+            //FlowerShuriken_Proj.CurrentFlower++;
+            return base.Shoot(player, source, position, velocity, type, damage, knockback);
+        }
 
 
     }

@@ -1,36 +1,22 @@
-﻿using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
+﻿using CalamityMod;
+using HeavenlyArsenal.ArsenalPlayer;
+using HeavenlyArsenal.Common.UI;
+using HeavenlyArsenal.Content.Buffs.LifeAndCessation;
+using HeavenlyArsenal.Content.Items.Weapons.Rogue;
+using Luminance.Core.Graphics;
+using Luminance.Core.Sounds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.Projectiles;
 using NoxusBoss.Core.Graphics.GeneralScreenEffects;
-using Terraria.Audio;
-using static Luminance.Common.Utilities.Utilities;
-using HeavenlyArsenal.ArsenalPlayer;
-using HeavenlyArsenal.Common.utils;
 using System;
+using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
-using HeavenlyArsenal.Common.UI;
-using System.Threading;
-using Luminance.Core.Sounds;
-
-
-using System.Runtime.InteropServices;
-using System.Timers;
-using CalamityMod.Items.Weapons.Magic;
-using Microsoft.Xna.Framework.Input;
-using HeavenlyArsenal.Content.Buffs;
-using CalamityMod.Buffs.DamageOverTime;
-using CalamityMod.Projectiles.Rogue;
-using CalamityMod;
-using HeavenlyArsenal.Content.Items.Weapons.Rogue;
-using HeavenlyArsenal.Content.Items.Weapons.Melee;
-using HeavenlyArsenal.Content.Buffs.LifeAndCessation;
-using Terraria.Graphics.Effects;
-using Terraria.Graphics.Shaders;
+using Terraria.ID;
+using Terraria.ModLoader;
+using static Luminance.Common.Utilities.Utilities;
 
 
 
@@ -564,7 +550,7 @@ class HeldLifeCessationProjectile : ModProjectile
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         //target.HitSound = GennedAssets.Sounds.Avatar.Phase2IntroNeckSnap;
-      
+        //target.stat
         //target.AddBuff(ModContent.BuffType<ThermalShock>, 600, true);
     }
    

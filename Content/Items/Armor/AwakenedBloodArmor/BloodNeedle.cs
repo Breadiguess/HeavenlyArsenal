@@ -32,13 +32,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         }
         public override void SetDefaults()
         {
-            Projectile.damage = 4000;
+            Projectile.damage = 500;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.width = Projectile.height = 64;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 10;
+            Projectile.localNPCHitCooldown = 15;
         }
 
         public override void AI()
@@ -205,7 +205,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             {
                 Player.statLife++;
             }
-            for(int i = 0; i < 10; i++)
+            for(int i = 0; i < 2; i++)
                 Player.GetModPlayer<BloodArmorPlayer>().AddBloodUnit();
             base.OnHitNPC(target, hit, damageDone);
         }
