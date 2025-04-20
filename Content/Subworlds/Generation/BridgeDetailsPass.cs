@@ -25,9 +25,9 @@ public class BridgeDetailsPass : GenPass
         int decorationStartY = bridgeLowYPoint - bridgeThickness;
 
         PlaceBeams(groundLevelY, bridgeLowYPoint);
-        PlaceRopes(decorationStartY);
-        PlaceLanterns(decorationStartY, 3);
-        PlaceOfuda(decorationStartY, 5);
+        PlaceRopesUnderneathBridge(decorationStartY);
+        PlaceLanternsUnderneathBridge(decorationStartY, 3);
+        PlaceOfudaUnderneathBridge(decorationStartY, 5);
         GenerateRoof(bridgeLowYPoint);
     }
 
@@ -67,9 +67,9 @@ public class BridgeDetailsPass : GenPass
     }
 
     /// <summary>
-    /// Places ropes beneath arches.
+    /// Places ropes beneath bridges.
     /// </summary>
-    private static void PlaceRopes(int startY)
+    private static void PlaceRopesUnderneathBridge(int startY)
     {
         int bridgeWidth = ForgottenShrineGenerationHelpers.BridgeArchWidth;
         int innerRopeSpacing = (bridgeWidth - ForgottenShrineGenerationHelpers.BridgeUndersideRopeWidth) / 2;
@@ -98,9 +98,9 @@ public class BridgeDetailsPass : GenPass
     }
 
     /// <summary>
-    /// Places paper lanterns underneath the bridge.
+    /// Places paper lanterns underneath bridges.
     /// </summary>
-    private static void PlaceLanterns(int startY, int spacing)
+    private static void PlaceLanternsUnderneathBridge(int startY, int spacing)
     {
         int bridgeWidth = ForgottenShrineGenerationHelpers.BridgeArchWidth;
         for (int x = bridgeWidth / 2; x < Main.maxTilesX - bridgeWidth / 2; x += bridgeWidth)
@@ -127,9 +127,9 @@ public class BridgeDetailsPass : GenPass
     }
 
     /// <summary>
-    /// Places ofuda underneath the bridge.
+    /// Places ofuda underneath bridges.
     /// </summary>
-    private static void PlaceOfuda(int startY, int spacing)
+    private static void PlaceOfudaUnderneathBridge(int startY, int spacing)
     {
         int bridgeWidth = ForgottenShrineGenerationHelpers.BridgeArchWidth;
         int ofudaID = ModContent.TileType<PlacedOfuda>();
