@@ -5,6 +5,8 @@ namespace HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 
 public class BaseBridgePass : GenPass
 {
+    private static BridgeSetGenerator bridgeGenerator;
+
     /// <summary>
     /// The width of each bridge in the set.
     /// </summary>
@@ -13,7 +15,11 @@ public class BaseBridgePass : GenPass
     /// <summary>
     /// The manager used by the bridge generation algorithm.
     /// </summary>
-    public static readonly BridgeSetGenerator BridgeGenerator = CreateBridgeGenerator();
+    public static BridgeSetGenerator BridgeGenerator
+    {
+        get => bridgeGenerator ??= CreateBridgeGenerator();
+        private set => bridgeGenerator = value;
+    }
 
     /// <summary>
     /// The settings for the bridge generator.
