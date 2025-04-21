@@ -1,4 +1,5 @@
 ﻿using CalamityMod;
+using CalamityMod.Projectiles.Summon;
 using HeavenlyArsenal.Content.Buffs;
 using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
@@ -141,11 +142,6 @@ public class SolynWhip_BattleSolyn : ModProjectile
         // Prepare for the dash
         if (wrappedTimer <= dashPrepareTime)
         {
-            if (wrappedTimer == 1)
-            {
-
-            }
-
             float accelerationFactor = wrappedTimer / (float)dashPrepareTime;
             Projectile.velocity += Projectile.SafeDirectionTo(targetPosition) * accelerationFactor * 8f;
             // Main.NewText($"Preparing to dash toward target. OldPos:{Projectile.oldPos[0]}", Color.Orange);
@@ -153,7 +149,6 @@ public class SolynWhip_BattleSolyn : ModProjectile
         // Dash toward the target
         else if (wrappedTimer <= dashPrepareTime + dashTime)
         {
-            
             Projectile.velocity *= 1.67f;
             Projectile.velocity = Projectile.velocity.ClampLength(0f, 50f); 
         }
@@ -165,14 +160,13 @@ public class SolynWhip_BattleSolyn : ModProjectile
             {
                 for (int i = 0; i < 2; i++)
                 {
-                    Vector2 boltVelocity = Main.rand.NextVector2Circular(16f, 16f);
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, boltVelocity,
+                    Vector2 boltVelocity = Main.rand.NextVector2Circular(160f, 160f);
+                    int star = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, boltVelocity,
                         ModContent.ProjectileType<HomingStarBolt>(), SolynHomingStarBoltDamage, 0f, Main.myPlayer);
+                    Main.NewText($"Spawned homing star bolt!");
                 }
-                // Main.NewText($"Fired homing star bolts!", Color.Magenta);
             }
         }
-      
 
         else
         {
