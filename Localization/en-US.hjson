@@ -445,6 +445,7 @@ Mods: {
 
 			ForgottenShrineTeleporter: {
 				DisplayName: Forgotten Shrine Teleporter (DEBUG)
+				Tooltip: ""
 			}
 
 			Samsara: {
