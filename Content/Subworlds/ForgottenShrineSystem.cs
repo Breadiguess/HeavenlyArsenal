@@ -72,7 +72,7 @@ public class ForgottenShrineSystem : ModSystem
         if (WasInSubworldLastFrame)
         {
             spawnRate = 180;
-            maxSpawns = LumUtils.AnyBosses() ? 0 : 20;
+            maxSpawns = LumUtils.AnyBosses() ? 0 : 5;
         }
     }
 
