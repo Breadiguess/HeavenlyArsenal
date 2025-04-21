@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
+using Terraria;
 using Terraria.ID;
 using Terraria.IO;
 using Terraria.WorldBuilding;
@@ -24,10 +25,11 @@ public class CreateWaterbedPass : GenPass
             }
         }
 
+        int left = BaseBridgePass.BridgeGenerator.Left - ForgottenShrineGenerationHelpers.WaterCurveDipWidth;
         int waterDepth = ForgottenShrineGenerationHelpers.WaterDepth;
         for (int y = Main.maxTilesY - groundDepth - waterDepth; y < Main.maxTilesY - groundDepth; y++)
         {
-            for (int x = 0; x < Main.maxTilesX; x++)
+            for (int x = left; x < Main.maxTilesX; x++)
                 Main.tile[x, y].LiquidAmount = byte.MaxValue;
         }
     }

@@ -16,6 +16,11 @@ public static class ForgottenShrineGenerationHelpers
     public static int WaterDepth => 33;
 
     /// <summary>
+    /// The amount of tiles dedicated to make water caves curve downward.
+    /// </summary>
+    public static int WaterCurveDipWidth => 51;
+
+    /// <summary>
     /// The amount of tree structures to generate underwater.
     /// </summary>
     public static int UnderwaterTreeCount => Main.maxTilesX / 43;

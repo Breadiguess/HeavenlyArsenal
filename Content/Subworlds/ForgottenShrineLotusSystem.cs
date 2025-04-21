@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Subworlds.Generation;
+using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -49,7 +50,7 @@ public class ForgottenShrineLotusSystem : ModSystem
             float lotusSize = Main.rand.NextFloat(3f, 8.4f);
             float squish = Main.rand.NextFloat(1.1f, 1.5f);
             Vector2 lotusSpawnPosition = new Vector2(Main.rand.NextFloat(Main.maxTilesX * 16f), waterLevelY * 16f);
-            if (!Collision.SolidCollision(lotusSpawnPosition - Vector2.One * 8f, 16, 16))
+            if (!Collision.SolidCollision(lotusSpawnPosition - Vector2.One * 8f, 16, 16) && lotusSpawnPosition.X >= BaseBridgePass.BridgeGenerator.Left * 16f)
                 lotusParticleSystem.CreateNew(lotusSpawnPosition, Vector2.Zero, new Vector2(squish, 1f) * lotusSize, Color.Wheat);
         }
     }
