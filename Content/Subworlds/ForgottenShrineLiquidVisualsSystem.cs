@@ -184,7 +184,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         reflectionShader.TrySetParameter("reflectionStrength", 0.47f);
         reflectionShader.TrySetParameter("reflectionMaxDepth", 146f);
         reflectionShader.TrySetParameter("reflectionWaviness", 0.0023f);
-        reflectionShader.TrySetParameter("ripplePerspectiveSquishFactor", 1.76f);
+        reflectionShader.TrySetParameter("ripplePerspectiveSquishFactor", 2.36f);
         reflectionShader.SetTexture(TileTargetManagers.LiquidTarget, 2, SamplerState.LinearClamp);
         reflectionShader.SetTexture(WaterStepRippleTarget, 3, SamplerState.LinearClamp);
         reflectionShader.Activate();
