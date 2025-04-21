@@ -127,6 +127,9 @@ public partial class FadingSpirit : ModNPC
 
     private void HoverAboveGround(float desiredHoverDistance)
     {
+        if (NPC.Center.X <= 20f || NPC.Center.X >= Main.maxTilesX * 16f - 20f)
+            return;
+
         Vector2 groundPosition = LumUtils.FindGroundVertical(NPC.Center.ToTileCoordinates()).ToWorldCoordinates();
         Vector2 waterPosition = NPC.Center;
         while (waterPosition.Y < Main.maxTilesY * 16 - 16f && !Collision.WetCollision(waterPosition, 1, 1))
