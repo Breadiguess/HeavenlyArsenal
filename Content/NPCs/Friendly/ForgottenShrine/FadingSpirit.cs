@@ -263,7 +263,7 @@ public partial class FadingSpirit : ModNPC
         Main.spriteBatch.ResetToDefault();
 
         float glowScale = NPC.scale * MathHelper.Lerp(0.95f, 1.05f, LumUtils.Cos01(NPC.whoAmI + NPC.Center.X * 0.01f + Main.GlobalTimeWrappedHourly * 33f));
-        float hueShift = MathHelper.Lerp(-0.03f, 0.06f, NPC.whoAmI / 7 % 1f);
+        float hueShift = MathHelper.Lerp(-0.08f, 0.13f, NPC.whoAmI / 7f % 1f);
         Texture2D glow = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
         Vector2 glowDrawPosition = drawPosition - Vector2.UnitY.RotatedBy(NPC.rotation) * NPC.scale * 15f;
         Main.spriteBatch.Draw(glow, glowDrawPosition, null, NPC.GetAlpha(new Color(1f, 0.6f, 0.1f, 0f).HueShift(hueShift)) * 0.5f, 0f, glow.Size() * 0.5f, glowScale * 1.2f, 0, 0f);
