@@ -1,6 +1,7 @@
 ﻿using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Content.Particles;
 using HeavenlyArsenal.Content.Subworlds.Generation;
+using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 using HeavenlyArsenal.Content.Waters;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
@@ -119,34 +120,23 @@ public class ForgottenShrineSystem : ModSystem
 
     private static void CreateCandles()
     {
-        float spacingPerBridge = ForgottenShrineGenerationHelpers.BridgeArchWidth * 16f;
-        int horizontalCoverage = Main.maxTilesX - ForgottenShrineGenerationHelpers.BridgeStartX;
-        int candleCount = horizontalCoverage / ForgottenShrineGenerationHelpers.BridgeArchWidth;
+        BridgeGenerationSettings settings = BaseBridgePass.BridgeGenerator.Settings;
         int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth;
         int waterLevelY = groundLevelY - ForgottenShrineGenerationHelpers.WaterDepth;
-        int bridgeLowYPoint = waterLevelY - ForgottenShrineGenerationHelpers.BridgeBeamHeight - ForgottenShrineGenerationHelpers.BridgeThickness;
-        int bridgeIndex = 0;
-        int snappedBridgeStartX = ForgottenShrineGenerationHelpers.BridgeStartX;
-        snappedBridgeStartX -= snappedBridgeStartX % ForgottenShrineGenerationHelpers.BridgeArchWidth;
-
-        float x = spacingPerBridge * (ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge - 0.5f) + snappedBridgeStartX * 16f - spacingPerBridge * (ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge - 1f);
-        for (int i = 0; i < candleCount; i++)
+        int bridgeLowYPoint = waterLevelY - settings.BridgeBeamHeight - settings.BridgeThickness;
+        for (int tileX = BaseBridgePass.BridgeGenerator.Left; tileX < BaseBridgePass.BridgeGenerator.Right; tileX++)
         {
-            // Ensure that candles only appear on bridges without a roof.
-            if (x >= ForgottenShrineGenerationHelpers.BridgeStartX * 16f && bridgeIndex % ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge != 1)
+            if (BaseBridgePass.BridgeGenerator.InNonRooftopBridgeRange(tileX) &&
+                BaseBridgePass.BridgeGenerator.CalculateXWrappedBySingleBridge(tileX) == settings.BridgeArchWidth / 2)
             {
-                float verticalOffset = ForgottenShrineGenerationHelpers.CalculateArchHeight((int)(x / 16)) * -16f - 30f;
-                Vector2 candleSpawnPosition = new Vector2(x + 8f, bridgeLowYPoint * 16f + verticalOffset);
-
+                float worldX = tileX * 16f + 8f;
+                float verticalOffset = BaseBridgePass.BridgeGenerator.CalculateArchHeight(tileX) * -16f - 30f;
+                Vector2 candleSpawnPosition = new Vector2(worldX, bridgeLowYPoint * 16f + verticalOffset);
                 SpiritCandleParticle candle = SpiritCandleParticle.Pool.RequestParticle();
                 candle.Prepare(candleSpawnPosition, Vector2.Zero, 0f, Color.White, Vector2.One * 0.35f);
 
                 ParticleEngine.Particles.Add(candle);
             }
-
-            // Increment the bridge index and X position.
-            bridgeIndex++;
-            x += spacingPerBridge;
         }
     }
 

@@ -1,7 +1,4 @@
-﻿using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework;
 using Terraria;
 
 namespace HeavenlyArsenal.Content.Subworlds.Generation;
@@ -19,71 +16,6 @@ public static class ForgottenShrineGenerationHelpers
     public static int WaterDepth => 33;
 
     /// <summary>
-    /// The width of beams for the bridge before the shrine.
-    /// </summary>
-    public static int BridgeBeamWidth
-    {
-        get
-        {
-            // round(height * abs(sin(pi * x / width))) < 1
-            // height * abs(sin(pi * x / width)) < 1
-            // abs(sin(pi * x / width)) < 1 / height
-            // sin(pi * x / width) < 1 / height
-            // sin(pi * x / width) = 1 / height
-            // pi * x / width = arcsin(1 / height)
-            // x = arcsin(1 / height) * width / pi
-
-            // For a bit of artistic preference, 0.5 will be used instead of 1 like in the original equation, making the beams a bit thinner.
-            float intermediateArcsine = MathF.Asin(0.5f / BridgeArchHeight);
-            int beamWidth = (int)MathF.Round(intermediateArcsine * BridgeArchWidth / MathHelper.Pi);
-            if (BridgeArchHeight == 0)
-                beamWidth = BridgeArchWidth / 33;
-
-            return beamWidth;
-        }
-    }
-
-    /// <summary>
-    /// How much horizontal space is dedicated on the left side of the world to not having bridges and arches.
-    /// </summary>
-    public static int BridgeStartX => BridgeArchWidth * 6;
-
-    /// <summary>
-    /// The height of beams for the bridge before the shrine.
-    /// </summary>
-    public static int BridgeBeamHeight => 9;
-
-    /// <summary>
-    /// The width of arches on the bridge.
-    /// </summary>
-    public static int BridgeArchWidth => 84;
-
-    /// <summary>
-    /// The amount of horizontal coverage that ropes underneath the bridge have, in tile coordinates.
-    /// </summary>
-    public static int BridgeUndersideRopeWidth => (int)(BridgeArchWidth * 0.6f);
-
-    /// <summary>
-    /// The amount of vertical coverage that ropes beneath the bridge should have due to sag, in tile coordinates.
-    /// </summary>
-    public static int BridgeUndersideRopeSag => (int)(BridgeBeamHeight * 0.7f);
-
-    /// <summary>
-    /// The maximum height of arches on the bridge.
-    /// </summary>
-    public static int BridgeArchHeight => 3;
-
-    /// <summary>
-    /// The factor by which arches are exaggerated for big bridges with a rooftop.
-    /// </summary>
-    public static float BridgeArchHeightBigBridgeFactor => 2f;
-
-    /// <summary>
-    /// The vertical thickness of the bridge.
-    /// </summary>
-    public static int BridgeThickness => 5;
-
-    /// <summary>
     /// The amount of tree structures to generate underwater.
     /// </summary>
     public static int UnderwaterTreeCount => Main.maxTilesX / 43;
@@ -96,54 +28,12 @@ public static class ForgottenShrineGenerationHelpers
     /// <summary>
     /// The maximum height of cattails above the water line.
     /// </summary>
-    public static int MaxCattailHeight => (int)(BridgeBeamHeight * 0.65f);
+    public static int MaxCattailHeight => 6;
 
     /// <summary>
     /// The amount of lilypads to generate atop the water.
     /// </summary>
     public static int LilypadCount => 0;
-
-    /// <summary>
-    /// The amount of bridges it takes on a cyclical basis in order for a bridge to be created with a roof.
-    /// </summary>
-    public static int BridgeRooftopsPerBridge => 3;
-
-    /// <summary>
-    /// The amount of vertical space taken up by bottom of rooftops.
-    /// </summary>
-    public static int BridgeRooftopDynastyWoodLayerHeight => 2;
-
-    /// <summary>
-    /// The amount of vertical space dedicated to walls above pillars but below rooftops.
-    /// </summary>
-    public static int BridgeRoofWallUndersideHeight => 4;
-
-    /// <summary>
-    /// The baseline height of walls behind the bridge. Determines things such as how high rooftops are as a baseline.
-    /// </summary>
-    public static int BridgeBackWallHeight => 19;
-
-    /// <summary>
-    /// The set of possible rooftops that can be selected for a given roof on the bridge.
-    /// </summary>
-    public static List<ShrineRooftopSet> BridgeRooftopConfigurations =>
-    [
-        // Standard.
-        new ShrineRooftopSet().
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 1.3f), (int)(BridgeArchWidth / 2.3f), 0)).
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 2.1f), (int)(BridgeArchWidth / 2.05f), (int)(BridgeArchWidth / 8.1f))).
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 2.9f), (int)(BridgeArchWidth / 3.07f), (int)(BridgeArchWidth / 5.3f))),
-
-        // Pointy.
-        new ShrineRooftopSet().
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 1.3f), (int)(BridgeArchWidth / 2.2f), 0)).
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 3.1f), (int)(BridgeArchWidth / 0.9f), (int)(BridgeArchWidth / 5.6f))),
-
-        // Flat.
-        new ShrineRooftopSet().
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 0.65f), (int)(BridgeArchWidth / 2.9f), 0)).
-            Add(new ShrineRooftopInfo((int)(BridgeArchWidth / 1.4f), (int)(BridgeArchWidth / 1.5f), (int)(BridgeArchWidth / 7.2f))),
-    ];
 
     /// <summary>
     /// Calculates the point at which a starting point reaches open air upon moving downward.

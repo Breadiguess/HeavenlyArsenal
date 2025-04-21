@@ -1,5 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Subworlds;
-using HeavenlyArsenal.Content.Subworlds.Generation;
+using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -176,9 +176,9 @@ public partial class FadingSpirit : ModNPC
         float horizontalAcceleration = LumUtils.InverseLerp(0f, 60f, AITImer) * 0.08f;
         NPC.velocity.X = Math.Clamp(NPC.velocity.X + NPC.spriteDirection * horizontalAcceleration, -2f, 2f);
 
-        int bridgeWidth = ForgottenShrineGenerationHelpers.BridgeArchWidth;
+        int bridgeWidth = BaseBridgePass.BridgeGenerator.Settings.BridgeArchWidth;
         int xTileCoords = (int)(NPC.Center.X / 16f);
-        int tiledBridgeX = xTileCoords % (bridgeWidth * ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge);
+        int tiledBridgeX = BaseBridgePass.BridgeGenerator.CalculateXWrappedByBridgeSet(xTileCoords);
         bool nearCenterOfBridge = MathHelper.Distance(tiledBridgeX, bridgeWidth * 0.5f) <= 5 && SubworldSystem.IsActive<ForgottenShrineSubworld>();
         int lingerNearBridgeChance = 25;
         int randomLingerChance = 300;
