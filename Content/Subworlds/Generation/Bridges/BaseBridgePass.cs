@@ -49,7 +49,7 @@ public class BaseBridgePass : GenPass
             // Pointy.
             new ShrineRooftopSet().
                 Add(new ShrineRooftopInfo(64, 38, 0)).
-                Add(new ShrineRooftopInfo(27, 93, 15)),
+                Add(new ShrineRooftopInfo(27, 79, 15)),
 
             // Flat.
             new ShrineRooftopSet().
