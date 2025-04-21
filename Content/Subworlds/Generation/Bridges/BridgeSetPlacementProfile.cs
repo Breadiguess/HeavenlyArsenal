@@ -10,22 +10,22 @@ public class BridgeSetPlacementProfile
     /// <summary>
     /// The set of arch heights across the generation span.
     /// </summary>
-    public int[] ArchHeights;
+    public readonly int[] ArchHeights;
 
     /// <summary>
     /// The set of arch horizontal arch interpolants across the generation span.
     /// </summary>
-    public float[] ArchHeightInterpolants;
+    public readonly float[] ArchHeightInterpolants;
 
     /// <summary>
     /// A set of values across the generation span that determined how much higher fences should be at each point.
     /// </summary>
-    public int[] FenceExtraHeightMap;
+    public readonly int[] FenceExtraHeightMap;
 
     /// <summary>
     /// A set of flags that across the generation span that determine whether an arch has descended (gone down one or more in Y height) or ascended (gone up one or more in Y height).
     /// </summary>
-    public bool[] FenceDescendingFlags;
+    public readonly bool[] FenceDescendingFlags;
 
     public BridgeSetPlacementProfile(BridgeSetGenerator generator)
     {
