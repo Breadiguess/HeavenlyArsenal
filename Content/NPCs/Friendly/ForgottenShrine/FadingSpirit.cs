@@ -32,7 +32,7 @@ public partial class FadingSpirit : ModNPC
     /// <summary>
     /// The amount of standard names available for this spirit to chose.
     /// </summary>
-    public static int TotalStandardNames => 26;
+    public static int TotalStandardNames => 33;
 
     /// <summary>
     /// The amount of rare names available for this spirit to chose.
