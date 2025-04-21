@@ -3,14 +3,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.DataStructures;
-using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj;
@@ -30,7 +24,8 @@ public class AvatarRifleSuperBullet : GlobalProjectile
     }
     public override void SetDefaults(Projectile entity)
     {
-        entity.penetrate = -1;
+        // TODO -- Applying penetrate = -1 to every projectile ever seems a bit funny? I'm guessing this is just code that's unfinished.
+        // entity.penetrate = -1;
     }
     public override bool PreAI(Projectile projectile)
     {
@@ -60,7 +55,7 @@ public class AvatarRifleSuperBullet : GlobalProjectile
             ManagedShader trailShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleBulletAuroraEffect");
             trailShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * projectile.velocity.Length() / 8f + projectile.identity * 72.113f);
             trailShader.TrySetParameter("spin", 2f * Math.Sign(projectile.velocity.X));
-            trailShader.TrySetParameter("brightness", empowerment/1.5f);
+            trailShader.TrySetParameter("brightness", empowerment / 1.5f);
             trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 0, SamplerState.LinearWrap);
             trailShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoiseDetailed, 1, SamplerState.LinearWrap);
             trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);
