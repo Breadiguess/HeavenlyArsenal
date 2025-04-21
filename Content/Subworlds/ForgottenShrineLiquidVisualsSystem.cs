@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -45,6 +46,11 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
     /// Whether water effects for this system are active or not.
     /// </summary>
     public static bool WaterEffectsActive => ForgottenShrineSystem.WasInSubworldLastFrame;
+
+    /// <summary>
+    /// The sound played when players walk on water and create ripples.
+    /// </summary>
+    public static readonly SoundStyle RippleStepSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Environment/WaterRipple", 3);
 
     public override void OnModLoad()
     {
@@ -145,16 +151,22 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         Main.spriteBatch.Draw(texture, (Main.screenLastPosition - Main.screenPosition) * 0.25f, Color.White);
     }
 
-    public override void PostDrawTiles()
+    public override void PostUpdatePlayers()
     {
         foreach (Player p in Main.ActivePlayers)
         {
             bool headIsDry = !Collision.WetCollision(p.TopLeft, p.width, 16);
             bool waterAtFeet = Collision.WetCollision(p.TopLeft, p.width, p.height + 16);
-            if (headIsDry && waterAtFeet && p.velocity.Length() >= 0.2f && Main.rand.NextBool(3))
+            if (headIsDry && waterAtFeet && p.velocity.Length() >= 2f && Main.rand.NextBool(3))
+            {
+                SoundEngine.PlaySound(RippleStepSound with { MaxInstances = 1, PitchVariance = 0.15f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, p.Bottom);
                 PointsToAddRipplesAt.Enqueue(p.Bottom + Vector2.UnitY * 5f + Main.rand.NextVector2Circular(4f, 0f));
+            }
         }
+    }
 
+    public override void PostDrawTiles()
+    {
         ManagedScreenFilter mistShader = ShaderManager.GetFilter("HeavenlyArsenal.ForgottenShrineMistShader");
         ManagedScreenFilter reflectionShader = ShaderManager.GetFilter("HeavenlyArsenal.ForgottenShrineWaterReflectionShader");
         if (!WaterEffectsActive)

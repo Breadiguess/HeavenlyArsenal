@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Tiles.ForgottenShrine;
+using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using System;
 using System.Runtime.CompilerServices;
@@ -105,7 +106,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
         if (x == Left || x == Right)
         {
             fenceFrameX = 0;
-            fenceHeight += 2;
+            fenceHeight += 7;
         }
 
         int spanIndex = x - Left;
@@ -284,6 +285,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
         int roofWallUndersideHeight = Settings.BridgeRoofWallUndersideHeight;
         int roofBottomY = archTopY - wallHeight;
         int pillarSpacing = bridgeWidth / 3;
+        int pillarHeightCutoffWidth = bridgeWidth / 4;
 
         for (int x = Left; x < Right; x++)
         {
@@ -294,7 +296,9 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
             if (x <= Left + 5)
                 distanceFromPillar = x - Left + 1;
 
-            int localWallHeight = wallHeight;
+            float cutoffInterpolant = 1f - LumUtils.InverseLerpBump(Left, Left + pillarHeightCutoffWidth, Right - pillarHeightCutoffWidth, Right, x);
+            float easedCutoffInterpolant = 1f - MathF.Sqrt(1.001f - cutoffInterpolant.Squared());
+            int localWallHeight = (int)(wallHeight * (1f - easedCutoffInterpolant));
 
             int patternHeight = (int)MathF.Round(MathHelper.Lerp(3f, 1f, LumUtils.Cos01(MathHelper.TwoPi * x / bridgeWidth * 3f)));
             for (int y = archTopY; y >= roofBottomY; y--)
