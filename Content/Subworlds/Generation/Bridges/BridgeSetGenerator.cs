@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Tiles.ForgottenShrine;
+using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using System;
 using System.Runtime.CompilerServices;
@@ -278,7 +279,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
         int roofWallUndersideHeight = Settings.BridgeRoofWallUndersideHeight;
         int roofBottomY = archTopY - wallHeight;
         int pillarSpacing = bridgeWidth / 3;
-        int rooftopY = roofBottomY + 1;
+        int pillarHeightCutoffWidth = bridgeWidth / 4;
 
         for (int x = Left; x < Right; x++)
         {
@@ -289,29 +290,35 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
             if (x <= Left + 5)
                 distanceFromPillar = x - Left + 1;
 
+            float cutoffInterpolant = 1f - LumUtils.InverseLerpBump(Left, Left + pillarHeightCutoffWidth, Right - pillarHeightCutoffWidth, Right, x);
+            float easedCutoffInterpolant = 1f - MathF.Sqrt(1.001f - cutoffInterpolant.Squared());
+            int localWallHeight = (int)(wallHeight * (1f - easedCutoffInterpolant));
+
             int patternHeight = (int)MathF.Round(MathHelper.Lerp(3f, 1f, LumUtils.Cos01(MathHelper.TwoPi * x / bridgeWidth * 3f)));
             for (int y = archTopY; y >= roofBottomY; y--)
             {
                 int height = archTopY - y;
                 if (y >= archTopY - profile.ArchHeights[spanIndex])
                     continue;
+                if (height >= localWallHeight)
+                    continue;
 
                 // Create pillars.
                 if (distanceFromPillar == 1)
                     WorldGen.PlaceWall(x, y, WallID.WhiteDynasty);
-                if (distanceFromPillar <= 3 && height == wallHeight - roofWallUndersideHeight - 1)
+                if (distanceFromPillar <= 3 && height == localWallHeight - roofWallUndersideHeight - 1)
                     WorldGen.PlaceWall(x, y, WallID.WhiteDynasty);
-                if (distanceFromPillar == 2 && height == wallHeight - roofWallUndersideHeight - 2)
+                if (distanceFromPillar == 2 && height == localWallHeight - roofWallUndersideHeight - 2)
                     WorldGen.PlaceWall(x, y, WallID.WhiteDynasty);
                 if (distanceFromPillar == 0)
                     WorldGen.PlaceWall(x, y, WallID.Wood);
 
                 // Create painted white dynasty tiles at the top.
-                if (height >= wallHeight - roofWallUndersideHeight)
+                if (height >= localWallHeight - roofWallUndersideHeight)
                 {
                     WorldGen.KillWall(x, y);
 
-                    ushort wallID = height >= wallHeight - patternHeight && height < wallHeight ? WallID.AshWood : WallID.WhiteDynasty;
+                    ushort wallID = height >= localWallHeight - patternHeight && height < localWallHeight ? WallID.AshWood : WallID.WhiteDynasty;
                     WorldGen.PlaceWall(x, y, wallID);
                     WorldGen.paintWall(x, y, PaintID.SkyBluePaint);
                 }
@@ -326,7 +333,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
             {
                 var rooftopSet = WorldGen.genRand.Next(Settings.BridgeRooftopConfigurations);
                 foreach (var rooftop in rooftopSet.Rooftops)
-                    GenerateRooftop(x, rooftopY - rooftop.VerticalOffset, rooftop.Width, rooftop.Height);
+                    GenerateRooftop(x, roofBottomY - rooftop.VerticalOffset + 1, rooftop.Width, rooftop.Height);
             }
         }
 
