@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Graphics.LightingMask;
 using NoxusBoss.Core.Graphics.SpecificEffectManagers;
+using NoxusBoss.Core.Utilities;
 using SubworldLibrary;
 using System.Collections.Generic;
 using System.Linq;
@@ -159,7 +160,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
             bool waterAtFeet = Collision.WetCollision(p.TopLeft, p.width, p.height + 16);
             if (headIsDry && waterAtFeet && p.velocity.Length() >= 2f && Main.rand.NextBool(3))
             {
-                SoundEngine.PlaySound(RippleStepSound with { MaxInstances = 1, PitchVariance = 0.15f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, p.Bottom);
+                SoundEngine.PlaySound(RippleStepSound with { MaxInstances = 1, Volume = 0.2f, PitchVariance = 0.15f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, p.Bottom);
                 PointsToAddRipplesAt.Enqueue(p.Bottom + Vector2.UnitY * 5f + Main.rand.NextVector2Circular(4f, 0f));
             }
         }
