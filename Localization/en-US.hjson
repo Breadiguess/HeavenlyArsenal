@@ -514,7 +514,43 @@ Mods: {
 			Thistle_Proj.DisplayName: Thistle_ Proj
 		}
 
-		NPCs.AnAffrontToGod.DisplayName: Cravatar
+		NPCs: {
+			AnAffrontToGod.DisplayName: Cravatar
+
+			FadingSpirit: {
+				DisplayName: Spirit
+				BestiaryEntry: An impossibly old specter that was once blessed with the promise of an unending existence.
+				Name1: Fugen
+				Name2: Ozyymi
+				Name3: Opal
+				Name4: Roselle
+				Name5: Zyx
+				Name6: Elwyyr
+				Name7: Rayleigh
+				Name8: Kos
+				Name9: Hex
+				Name10: Verdyll
+				Name11: Auden
+				Name12: Lily
+				Name13: Azeal
+				Name14: Motii
+				Name15: Gage
+				Name16: Elven
+				Name17: Jure
+				Name18: Kenji
+				Name19: Idiis
+				Name20: Kioku
+				Name21: Onyx
+				Name22: Cordelia
+				Name23: Rayen
+				Name24: Tesille
+				Name25: Reverie
+				Name26: Ruelle
+				RareName1: Nyluus
+				RareName2: Noxus
+				RareName3: Corex
+			}
+		}
 
 		Biomes: {
 			ForgottenShrineBiome: {
