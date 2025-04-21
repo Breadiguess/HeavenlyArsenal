@@ -293,6 +293,11 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
         for (int x = Left; x < Right; x++)
         {
             int distanceFromPillar = TriangleWaveDistance(x - Left, pillarSpacing);
+
+            // Scuffed solution to make pillars partially generated the left side of the bridge set.
+            if (x <= Left + 5)
+                distanceFromPillar = x - Left + 1;
+
             int patternHeight = (int)MathF.Round(MathHelper.Lerp(3f, 1f, LumUtils.Cos01(MathHelper.TwoPi * x / bridgeWidth * 3f)));
             for (int y = archTopY; y >= roofBottomY; y--)
             {
