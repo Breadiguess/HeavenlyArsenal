@@ -1,5 +1,7 @@
 ﻿using HeavenlyArsenal.common;
+using HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue;
 using Luminance.Common.Utilities;
+using Luminance.Core.Sounds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
@@ -21,6 +23,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 {
     class PossibilitySeed: ModProjectile
     {
+        public LoopedSoundInstance FireLaserLoop
+        {
+            get;
+            set;
+        }
+        public static readonly SoundStyle LaserLoop = GennedAssets.Sounds.NamelessDeity.CosmicLaserLoop;
         public ref float Time => ref Projectile.ai[0];
         public ref float GrowthStage => ref Projectile.ai[1];
         public ref float Firing => ref Projectile.ai[2];
@@ -45,6 +53,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         public override void OnSpawn(IEntitySource source)
         {
             Firing = 0;
+            
         }
         public override void AI()
         {
@@ -69,12 +78,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             {
                 if (Main.netMode != NetmodeID.Server)
                 {
-                    CombatText.NewText(Projectile.Hitbox, Color.Gray, $"I'MMA FIRIN MAH LASER",true);
+                    
                     
                     
                 }
                 //yes, this is the code for 
-                NPC? target = Projectile.FindTargetWithinRange(800f);
+                NPC? target = Projectile.FindTargetWithinRange(1200f);
                 if (target is not null)
                     AttackTarget(target);
                 
@@ -90,23 +99,32 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
         public void AttackTarget(NPC target)
         {
-            //FIRE THE LASER
-            if(Firing == 0)
-            {
-                SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.PortalLaserShoot);
-                int s = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, 
-                    Projectile.rotation.ToRotationVector2()*2, 
-                    ModContent.ProjectileType<PossibilitySeed_Laser>(), 4039, 0f, Projectile.owner);
-            }
-            else
+            // FIRE THE LASER
+            if (Firing == 0)
             {
                 Vector2 directionToTarget = Projectile.SafeDirectionTo(target.Center);
                 Projectile.rotation = directionToTarget.ToRotation();
-            }
+                //CombatText.NewText(Projectile.Hitbox, Color.Gray, $"I'MMA FIRIN MAH LASER", true);
+                SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.PortalLaserShoot);
+                int laser = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center,
+                    Projectile.rotation.ToRotationVector2(),
+                    ModContent.ProjectileType<PossibilitySeed_Laser>(), 9039, 0f, Projectile.owner);
+
+                // Make the laser rotate with the original projectile
+                if (Main.projectile[laser] is Projectile modLaser)
+                {
+                    modLaser.rotation = Projectile.rotation;
+                }
+
                 Firing++;
-            //todo: fire only one laser. dumbass.
-            
-            //thunk.mp4
+            }
+            else
+            {
+                
+                Vector2 directionToTarget = Projectile.SafeDirectionTo(target.Center);
+                Projectile.rotation = directionToTarget.ToRotation();
+            }
+
         }
 
 
@@ -128,7 +146,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
 
             Vector2 drawPos = Projectile.Center - Main.screenPosition;
             //Main.NewText($"DrawPos: {drawPos}, Projectile center: {Projectile.Center}");
-            Main.spriteBatch.Draw(seed, drawPos, seedFrame, lightColor, Projectile.rotation, seedFrame.Size() / 2f, 4f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(seed, drawPos, seedFrame, lightColor, Projectile.rotation, seedFrame.Size() / 2f, 1f, SpriteEffects.None, 0);
 
             return false;
         }
