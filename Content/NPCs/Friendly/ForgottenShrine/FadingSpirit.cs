@@ -3,6 +3,7 @@ using HeavenlyArsenal.Content.Subworlds.Generation;
 using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
 using NoxusBoss.Core.Graphics.SpecificEffectManagers;
 using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
@@ -10,6 +11,7 @@ using ReLogic.Graphics;
 using SubworldLibrary;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
@@ -59,6 +61,8 @@ public partial class FadingSpirit : ModNPC
         get => (int)NPC.ai[1];
         set => NPC.ai[1] = value;
     }
+
+    public override void SetStaticDefaults() => NPCID.Sets.CountsAsCritter[Type] = true;
 
     public override void SetDefaults()
     {
@@ -123,7 +127,12 @@ public partial class FadingSpirit : ModNPC
     private void HoverAboveGround(float desiredHoverDistance)
     {
         Vector2 groundPosition = LumUtils.FindGroundVertical(NPC.Center.ToTileCoordinates()).ToWorldCoordinates();
-        float distanceToGround = NPC.Distance(groundPosition);
+        Vector2 waterPosition = NPC.Center;
+        while (waterPosition.Y < Main.maxTilesY * 16 - 16f && !Collision.WetCollision(waterPosition, 1, 1))
+            waterPosition.Y += 16f;
+        waterPosition.Y -= 24f;
+
+        float distanceToGround = MathF.Min(NPC.Distance(groundPosition), NPC.Distance(waterPosition));
         bool shouldAscend = distanceToGround < desiredHoverDistance;
 
         // Hover in place vertically if sufficiently close to being within the desired hover distance zone.
@@ -132,9 +141,9 @@ public partial class FadingSpirit : ModNPC
 
         // Descend if above the hover desired distance.
         else if (shouldAscend)
-            NPC.velocity.Y -= 0.1f;
+            NPC.velocity.Y -= 0.08f;
         else if (!shouldAscend)
-            NPC.velocity.Y += 0.1f;
+            NPC.velocity.Y += 0.02f;
 
         // Clamp vertical speed values so that acceleration doesn't get out of control.
         NPC.velocity.Y = Math.Clamp(NPC.velocity.Y, -2f, 2f);
@@ -171,7 +180,7 @@ public partial class FadingSpirit : ModNPC
         int tiledBridgeX = xTileCoords % (bridgeWidth * ForgottenShrineGenerationHelpers.BridgeRooftopsPerBridge);
         bool nearCenterOfBridge = MathHelper.Distance(tiledBridgeX, bridgeWidth * 0.5f) <= 5 && SubworldSystem.IsActive<ForgottenShrineSubworld>();
         int lingerNearBridgeChance = 25;
-        int randomLingerChance = 420;
+        int randomLingerChance = 300;
 
         bool canSwitchState = AITImer >= LumUtils.SecondsToFrames(1f);
 
@@ -209,10 +218,10 @@ public partial class FadingSpirit : ModNPC
         int lingerTime = LumUtils.SecondsToFrames(6.5f);
         int vanishChance = 4;
 
-        FadeTowards(0.6f);
+        FadeTowards(0.75f);
 
-        NPC.velocity.X *= 0.91f;
-        HoverAboveGround(20f);
+        NPC.velocity.X *= 0.97f;
+        HoverAboveGround(12f);
 
         // Randomly shift direction.
         if (AITImer % 60 == 59 && Main.rand.NextBool(3))
@@ -236,15 +245,39 @@ public partial class FadingSpirit : ModNPC
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
-        Main.spriteBatch.UseBlendState(BlendState.NonPremultiplied);
-
-        Texture2D texture = TextureAssets.Npc[Type].Value;
         Vector2 drawPosition = NPC.Center - screenPos;
-        SpriteEffects direciton = NPC.spriteDirection.ToSpriteDirection();
 
-        Main.spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(Color.White) * 0.6f, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, direciton, 0f);
-
+        Main.spriteBatch.UseBlendState(BlendState.NonPremultiplied);
+        Texture2D texture = TextureAssets.Npc[Type].Value;
+        SpriteEffects direction = NPC.spriteDirection.ToSpriteDirection();
+        Main.spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(Color.White) * 0.6f, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, direction, 0f);
         Main.spriteBatch.ResetToDefault();
+
+        float glowScale = NPC.scale * MathHelper.Lerp(0.95f, 1.05f, LumUtils.Cos01(NPC.whoAmI + NPC.Center.X * 0.01f + Main.GlobalTimeWrappedHourly * 33f));
+        float hueShift = MathHelper.Lerp(-0.03f, 0.06f, NPC.whoAmI / 7 % 1f);
+        Texture2D glow = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
+        Vector2 glowDrawPosition = drawPosition - Vector2.UnitY.RotatedBy(NPC.rotation) * NPC.scale * 15f;
+        Main.spriteBatch.Draw(glow, glowDrawPosition, null, NPC.GetAlpha(new Color(1f, 0.6f, 0.1f, 0f).HueShift(hueShift)) * 0.5f, 0f, glow.Size() * 0.5f, glowScale * 1.2f, 0, 0f);
+        Main.spriteBatch.Draw(glow, glowDrawPosition, null, NPC.GetAlpha(new Color(1f, 0.7f, 0.2f, 0f).HueShift(hueShift)) * 0.7f, 0f, glow.Size() * 0.5f, glowScale * 0.6f, 0, 0f);
+        Main.spriteBatch.Draw(glow, glowDrawPosition, null, NPC.GetAlpha(new Color(1f, 0.9f, 0.7f, 0f).HueShift(hueShift)) * 0.9f, 0f, glow.Size() * 0.5f, glowScale * 0.3f, 0, 0f);
+
         return false;
+    }
+
+    public override float SpawnChance(NPCSpawnInfo spawnInfo)
+    {
+        if (spawnInfo.Player.InModBiome<ForgottenShrineBiome>() && !LumUtils.AnyBosses())
+            return 1f;
+
+        return 0f;
+    }
+
+    public override int SpawnNPC(int tileX, int tileY)
+    {
+        Vector2 spawnPosition = new Vector2(tileX, tileY).ToWorldCoordinates();
+        while (Collision.WetCollision(spawnPosition, 1, 1))
+            spawnPosition.Y--;
+
+        return NPC.NewNPC(new EntitySource_SpawnNPC(), (int)spawnPosition.X, (int)spawnPosition.Y, Type);
     }
 }

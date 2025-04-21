@@ -321,11 +321,6 @@ namespace HeavenlyArsenal.Content.NPCs
         {
             return new Point((int)(worldPosition.X / 16), (int)(worldPosition.Y / 16));
         }
-
-        public static float Size(this Texture2D texture)
-        {
-            return (texture.Width + texture.Height) / 2f;
-        }
     }
 
 }

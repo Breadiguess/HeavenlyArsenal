@@ -6,15 +6,19 @@ using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Core.GlobalInstances;
 using NoxusBoss.Core.Graphics.LightingMask;
 using NoxusBoss.Core.Graphics.SpecificEffectManagers;
 using NoxusBoss.Core.Graphics.UI;
 using SubworldLibrary;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.GameContent.Events;
 using Terraria.GameContent.Shaders;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
@@ -46,6 +50,30 @@ public class ForgottenShrineSystem : ModSystem
         CellPhoneInfoModificationSystem.MoonPhaseReplacementTextEvent += UseMoonNotFoundText;
         CellPhoneInfoModificationSystem.PlayerXPositionReplacementTextEvent += UseParsecsPositionTextX;
         CellPhoneInfoModificationSystem.PlayerYPositionReplacementTextEvent += UseParsecsPositionTextY;
+        GlobalNPCEventHandlers.EditSpawnPoolEvent += OnlyAllowFriendlySpawnsInShrine;
+        GlobalNPCEventHandlers.EditSpawnRateEvent += IncreaseFriendlySpawnsInShrine;
+    }
+
+    private static void OnlyAllowFriendlySpawnsInShrine(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
+    {
+        if (!WasInSubworldLastFrame)
+            return;
+
+        // Get a collection of all NPC IDs in the spawn pool that are not critters.
+        IEnumerable<int> npcsToRemove = pool.Keys.Where(npcID => !NPCID.Sets.CountsAsCritter[npcID]);
+
+        // Use the above collection as a blacklist, removing all NPCs that are included in it, effectively ensuring only critters may spawn in the garden.
+        foreach (int npcIDToRemove in npcsToRemove)
+            pool.Remove(npcIDToRemove);
+    }
+
+    private static void IncreaseFriendlySpawnsInShrine(Player player, ref int spawnRate, ref int maxSpawns)
+    {
+        if (WasInSubworldLastFrame)
+        {
+            spawnRate = 180;
+            maxSpawns = LumUtils.AnyBosses() ? 0 : 20;
+        }
     }
 
     private string UseWeatherText(string originalText)
