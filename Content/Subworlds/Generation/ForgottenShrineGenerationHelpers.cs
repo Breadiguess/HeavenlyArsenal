@@ -71,7 +71,7 @@ public static class ForgottenShrineGenerationHelpers
     /// <summary>
     /// How much horizontal space is dedicated on the left side of the world to not having bridges and arches.
     /// </summary>
-    public static int BridgeStartX => (int)(BridgeArchWidth * 6f - BridgeBeamWidth);
+    public static int BridgeStartX => BridgeArchWidth * 6;
 
     /// <summary>
     /// The height of beams for the bridge before the shrine.
