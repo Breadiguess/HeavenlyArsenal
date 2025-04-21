@@ -24,18 +24,21 @@ public class WestFieldPass : GenPass
         int bridgeLowYPoint = bridgeBeamBottomPoint - bridgeSettings.BridgeThickness;
         int left = 1;
         int right = BaseBridgePass.BridgeGenerator.Left;
-        int maxBumpiness = 6;
+        int coverage = right - left;
+        int curveDipWidth = coverage / 8;
+        int maxTerrainBumpiness = 6;
+        int maxWallHeight = 3;
         float heightMapSeed = WorldGen.genRand.NextFloat(10000f);
 
         for (int x = left; x < right; x++)
         {
             int distanceFromEdge = Math.Abs(x - right);
             int bottom = Main.maxTilesY - 5;
-            float edgeCurveInterpolant = LumUtils.InverseLerp(0f, 40f, distanceFromEdge);
+            float edgeCurveInterpolant = LumUtils.InverseLerp(0f, curveDipWidth, distanceFromEdge);
             float easedCurveInterpolant = MathF.Sqrt(1.001f - edgeCurveInterpolant.Squared());
             bottom = (int)MathHelper.Lerp(bottom, waterLevelY, easedCurveInterpolant);
 
-            int heightOffset = (int)MathF.Round(UnholySine(x / 51.4f + heightMapSeed) * (1f - easedCurveInterpolant) * -maxBumpiness);
+            int heightOffset = (int)MathF.Round(UnholySine(x / 51.4f + heightMapSeed) * (1f - easedCurveInterpolant) * -maxTerrainBumpiness);
             int top = bridgeLowYPoint + heightOffset;
 
             for (int y = top; y < bottom; y++)
@@ -43,6 +46,13 @@ public class WestFieldPass : GenPass
                 Tile t = Main.tile[x, y];
                 t.HasTile = true;
                 t.TileType = y == top ? TileID.Grass : TileID.Dirt;
+            }
+
+            int wallHeight = (int)MathF.Round(UnholySine(x / 72.1f - heightMapSeed) * (1f - easedCurveInterpolant) * -maxWallHeight);
+            for (int dy = -wallHeight; dy <= 2; dy++)
+            {
+                Tile t = Main.tile[x, top + dy];
+                t.WallType = WallID.GrassUnsafe;
             }
         }
     }
