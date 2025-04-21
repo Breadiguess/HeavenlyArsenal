@@ -1,7 +1,9 @@
-﻿using Luminance.Common.Utilities;
+﻿using HeavenlyArsenal.Content.Subworlds;
+using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -10,7 +12,26 @@ namespace HeavenlyArsenal.Content.Tiles.ForgottenShrine;
 
 public class ShrineRopeSystem : ModSystem
 {
-    private static readonly List<ShrineRopeData> ropes = new List<ShrineRopeData>(8);
+    private static readonly List<ShrineRopeData> ropes = new List<ShrineRopeData>(32);
+
+    public override void OnModLoad()
+    {
+        ForgottenShrineSystem.OnEnter += SettleRopesOnEnteringWorldWrapper;
+    }
+
+    private static void SettleRopesOnEnteringWorldWrapper()
+    {
+        new Thread(SettleRopesOnEnteringWorld).Start();
+    }
+
+    private static void SettleRopesOnEnteringWorld()
+    {
+        foreach (ShrineRopeData rope in ropes)
+        {
+            for (int i = 0; i < 4; i++)
+                rope.VerletRope.Settle();
+        }
+    }
 
     /// <summary>
     /// Registers a new rope into the set of ropes maintained by the world.
