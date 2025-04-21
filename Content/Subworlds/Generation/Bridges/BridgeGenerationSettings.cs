@@ -13,7 +13,6 @@ public class BridgeGenerationSettings
     {
         get
         {
-
             /*
                 round(height * abs(sin(pi * x / width))) < 1
                 height * abs(sin(pi * x / width)) < 1
