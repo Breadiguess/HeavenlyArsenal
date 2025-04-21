@@ -24,7 +24,6 @@ public class BridgeDockPass : GenPass
         int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth;
         int waterLevelY = groundLevelY - ForgottenShrineGenerationHelpers.WaterDepth;
         int bridgeLowYPoint = waterLevelY - bridgeSettings.BridgeBeamHeight;
-        int bridgeTopY = bridgeLowYPoint - bridgeSettings.BridgeThickness + 1;
         int supportBeamPlaceRate = 17;
         int lampPostPlaceRate = supportBeamPlaceRate;
 
@@ -33,6 +32,7 @@ public class BridgeDockPass : GenPass
             float xInterpolant = LumUtils.InverseLerp(left, right, x);
             float depthFactor = MathHelper.Lerp(1f, 0.25f, xInterpolant);
             int depth = (int)MathF.Ceiling(baseDockDepth * depthFactor);
+            int bridgeTopY = bridgeLowYPoint - bridgeSettings.BridgeThickness + (int)MathF.Ceiling(LumUtils.Convert01To010(xInterpolant) * 2f) + 1;
 
             // Create the base of the dock.
             for (int dy = 0; dy < depth; dy++)
