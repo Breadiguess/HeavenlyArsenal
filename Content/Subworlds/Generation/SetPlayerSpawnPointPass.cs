@@ -1,5 +1,4 @@
-﻿using Terraria;
-using Terraria.IO;
+﻿using Terraria.IO;
 using Terraria.WorldBuilding;
 
 namespace HeavenlyArsenal.Content.Subworlds.Generation;
@@ -12,6 +11,7 @@ public class SetPlayerSpawnPointPass : GenPass
     {
         progress.Message = "Setting the player's spawn position.";
 
+        /* TODO -- Update.
         float spacingPerBridge = ForgottenShrineGenerationHelpers.BridgeArchWidth * 16f;
         int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth;
         int waterLevelY = groundLevelY - ForgottenShrineGenerationHelpers.WaterDepth;
@@ -21,5 +21,6 @@ public class SetPlayerSpawnPointPass : GenPass
 
         Main.spawnTileX = (int)(x / 16);
         Main.spawnTileY = (int)(y / 16);
+        */
     }
 }
