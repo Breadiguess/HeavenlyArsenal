@@ -24,9 +24,8 @@ public class WestFieldPass : GenPass
         int bridgeLowYPoint = bridgeBeamBottomPoint - bridgeSettings.BridgeThickness;
         int left = 1;
         int right = BaseBridgePass.BridgeGenerator.Left;
-        int coverage = right - left;
         int curveDipWidth = ForgottenShrineGenerationHelpers.WaterCurveDipWidth;
-        int maxTerrainBumpiness = 25;
+        int maxTerrainBumpiness = 14;
         int maxWallHeight = 3;
         float terrainHorizontalVariance = 0.009f;
         float wallHorizontalVariance = 0.013f;
