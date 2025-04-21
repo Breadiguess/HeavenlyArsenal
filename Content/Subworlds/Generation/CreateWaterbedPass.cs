@@ -5,13 +5,13 @@ using Terraria.WorldBuilding;
 
 namespace HeavenlyArsenal.Content.Subworlds.Generation;
 
-public class CreateGroundPass : GenPass
+public class CreateWaterbedPass : GenPass
 {
-    public CreateGroundPass() : base("Terrain", 1f) { }
+    public CreateWaterbedPass() : base("Terrain", 1f) { }
 
     protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
     {
-        progress.Message = "Placing ground.";
+        progress.Message = "Placing the waterbed.";
 
         int groundDepth = ForgottenShrineGenerationHelpers.GroundDepth;
         for (int y = Main.maxTilesY - groundDepth; y < Main.maxTilesY; y++)

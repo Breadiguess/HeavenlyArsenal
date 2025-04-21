@@ -31,7 +31,7 @@ public class ForgottenShrineSubworld : Subworld
     public override List<GenPass> Tasks =>
     [
         new DefineWorldLinePass(),
-        new CreateGroundPass(),
+        new CreateWaterbedPass(),
         new CreateUnderwaterVegetationPass(),
         new BaseBridgePass(),
         new SmoothenPass(),
