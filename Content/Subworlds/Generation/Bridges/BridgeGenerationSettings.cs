@@ -13,13 +13,16 @@ public class BridgeGenerationSettings
     {
         get
         {
-            // round(height * abs(sin(pi * x / width))) < 1
-            // height * abs(sin(pi * x / width)) < 1
-            // abs(sin(pi * x / width)) < 1 / height
-            // sin(pi * x / width) < 1 / height
-            // sin(pi * x / width) = 1 / height
-            // pi * x / width = arcsin(1 / height)
-            // x = arcsin(1 / height) * width / pi
+
+            /*
+                round(height * abs(sin(pi * x / width))) < 1
+                height * abs(sin(pi * x / width)) < 1
+                abs(sin(pi * x / width)) < 1 / height
+                sin(pi * x / width) < 1 / height
+                sin(pi * x / width) = 1 / height
+                pi * x / width = arcsin(1 / height)
+                x = arcsin(1 / height) * width / pi
+             */
 
             // For a bit of artistic preference, 0.5 will be used instead of 1 like in the original equation, making the beams a bit thinner.
             float intermediateArcsine = MathF.Asin(0.5f / BridgeArchHeight);
