@@ -4,10 +4,14 @@ using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.FirstPhaseForm;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
+using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
@@ -45,6 +49,15 @@ public class RocheLimitGlobalNPC : GlobalNPC
         set;
     }
 
+    /// <summary>
+    /// The set of NPCs that are immune to being lobotomized by the Roche Limit.
+    /// </summary>
+    public static bool[] ImmuneToLobotomy
+    {
+        get;
+        private set;
+    } = NPCID.Sets.Factory.CreateBoolSet(false);
+
     public override bool InstancePerEntity => true;
 
     public override void SetStaticDefaults()
@@ -53,6 +66,10 @@ public class RocheLimitGlobalNPC : GlobalNPC
         On_Main.DrawNPC += DecreaseTargetScale;
         On_Main.DrawNPCs += ApplyDisintegrationEffect;
         On_Item.NewItem_Inner += UseSpecialVelocity;
+
+        ImmuneToLobotomy[ModContent.NPCType<AvatarRift>()] = true;
+        ImmuneToLobotomy[ModContent.NPCType<AvatarOfEmptiness>()] = true;
+        ImmuneToLobotomy[ModContent.NPCType<NamelessDeityBoss>()] = true;
     }
 
     private static int UseSpecialVelocity(On_Item.orig_NewItem_Inner orig, IEntitySource source, int X, int Y, int Width, int Height, Item itemToClone, int Type, int Stack, bool noBroadcast, int pfix, bool noGrabDelay, bool reverseLookup)
@@ -135,7 +152,8 @@ public class RocheLimitGlobalNPC : GlobalNPC
     }
 
     // Lobotomize targets that are preoccupied with being fucking shredded to pieces by a black hole.
-    public override bool PreAI(NPC npc) => !BeingShredded;
+    // This doesn't apply to deities.
+    public override bool PreAI(NPC npc) => !BeingShredded || ImmuneToLobotomy[npc.type];
 
     public override void PostAI(NPC npc)
     {
@@ -170,7 +188,7 @@ public class RocheLimitGlobalNPC : GlobalNPC
             float suctionAcceleration = suctionInterpolant * 0.09f;
             npc.velocity = Vector2.Lerp(npc.velocity, npc.SafeDirectionTo(suctionOrigin) * suctionInterpolant * 80f, suctionAcceleration);
 
-            if (npc.realLife == -1)
+            if (npc.realLife == -1 && !ImmuneToLobotomy[npc.type])
             {
                 float idealDownscaling = EasingCurves.Exp.Evaluate(EasingType.Out, LumUtils.InverseLerp(150f, 700f, npc.Distance(suctionOrigin)));
                 DownscaleFactor = MathHelper.Lerp(1f, idealDownscaling, suctionInterpolant);
@@ -182,8 +200,11 @@ public class RocheLimitGlobalNPC : GlobalNPC
             {
                 BeingShredded = true;
 
-                npc.velocity = Vector2.Zero;
-                npc.Center = suctionOrigin;
+                if (!ImmuneToLobotomy[npc.type])
+                {
+                    npc.velocity = Vector2.Zero;
+                    npc.Center = suctionOrigin;
+                }
             }
 
             // Hits are inputted manually to ensure maximum control over the NPC's death, which needs to be more interesting than just splaying a bunch of gore and loot.
