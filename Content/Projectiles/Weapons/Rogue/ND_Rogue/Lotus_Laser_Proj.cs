@@ -28,7 +28,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue
         {
             Projectile.width = Projectile.height = 32;
             Projectile.friendly = true;
-            Projectile.DamageType = DamageClass.Magic;
+            Projectile.DamageType = DamageClass.Ranged;
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 5;
@@ -41,7 +41,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue
         public override void AI()
         {
             // If the owner is no longer able to cast the beam, kill it.
-
+            //Projectile.rotation += 10;
 
             // Grow bigger up to a point.
             Projectile.scale = MathHelper.Clamp(Projectile.scale + 0.15f, 0.05f, 2f);
@@ -49,7 +49,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue
             // Decide where to position the laserbeam.
             Vector2 circlePointDirection = Projectile.velocity.SafeNormalize(Vector2.UnitX * Owner.direction);
             //todo: find the projectile that spawned this laser, and set it to the center/angle/etc
-            Projectile.Center = Owner.Center;// FlowerShuriken_Proj.FlowerType.trowel;
+            //Projectile.Center = Owner.Center;// FlowerShuriken_Proj.FlowerType.trowel;
 
             // Update the laser length.
             float[] laserLengthSamplePoints = new float[24];
@@ -57,7 +57,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue
             LaserLength = laserLengthSamplePoints.Average();
 
             // Update aim.
-            UpdateAim();
+           // UpdateAim();
 
             // Adjust damage every frame. This is necessary to ensure that mana sickness and such are applied.
             //Projectile.damage = (int)Owner.GetTotalDamage<MagicDamageClass>().ApplyTo(MagicCircle.damage);
@@ -72,8 +72,9 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue
                 CreateTileHitEffects();
             */
             // Make the beam cast light along its length. The brightness of the light is reliant on the scale of the beam.
+            Vector2 rot = Projectile.rotation.ToRotationVector2();
             DelegateMethods.v3_1 = Color.DarkViolet.ToVector3() * Projectile.scale * 0.4f;
-            Utils.PlotTileLine(Projectile.Center, Projectile.Center + Projectile.velocity * LaserLength, Projectile.width * Projectile.scale, DelegateMethods.CastLight);
+            Utils.PlotTileLine(Projectile.Center, Projectile.Center + rot * LaserLength, Projectile.width * Projectile.scale, DelegateMethods.CastLight);
         }
 
         //this will be pointless later on. 
@@ -98,7 +99,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue
 
         public void CreateDustOnSurfaces()
         {
-            Vector2 endOfLaser = Projectile.Center + Projectile.velocity * LaserLength + Main.rand.NextVector2Circular(80f, 8f);
+            Vector2 rot = Projectile.rotation.ToRotationVector2();
+            Vector2 endOfLaser = Projectile.Center + rot * LaserLength + Main.rand.NextVector2Circular(80f, 8f);
             Vector2 idealCenter = endOfLaser;
             if (WorldUtils.Find(idealCenter.ToTileCoordinates(), Searches.Chain(new Searches.Down(5), new CustomConditions.SolidOrPlatform()), out Point result))
             {
@@ -128,11 +130,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue
 
         public override bool PreDraw(ref Color lightColor)
         {
+            Vector2 rot = Projectile.rotation.ToRotationVector2();
             GameShaders.Misc["CalamityMod:Flame"].UseImage1("Images/Misc/Perlin");
 
             Vector2[] basePoints = new Vector2[24];
             for (int i = 0; i < basePoints.Length; i++)
-                basePoints[i] = Projectile.Center + Projectile.velocity * i / (basePoints.Length - 1f) * LaserLength;
+                basePoints[i] = Projectile.Center + rot * i / (basePoints.Length - 1f) * LaserLength;
 
             PrimitiveRenderer.RenderTrail(basePoints, new(PrimitiveWidthFunction, PrimitiveColorFunction, shader: GameShaders.Misc["CalamityMod:Flame"]), 92);
             return false;
