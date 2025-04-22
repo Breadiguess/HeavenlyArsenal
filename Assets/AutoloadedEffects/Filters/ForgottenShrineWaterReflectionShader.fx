@@ -3,6 +3,7 @@ sampler noiseTexture : register(s1);
 sampler liquidTexture : register(s2);
 sampler rippleTexture : register(s3);
 sampler tileTexture : register(s4);
+sampler lightDistanceTexture : register(s5);
 
 float globalTime;
 float reflectionMaxDepth;
@@ -52,6 +53,9 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     // Determine how strong reflections should be at this pixel.
     // This effect is strongest at the top of water and tapers off from there.
     float reflectionInterpolant = smoothstep(reflectionMaxDepth, 0, depth) * smoothstep(-1, 0, depth);
+    
+    // Make reflections dissipate if the water is shallow.
+    reflectionInterpolant *= smoothstep(0.2, 0.35, tex2D(lightDistanceTexture, liquidTextureCoords).g);
     
     // Determine how much coordinates should be stretched vertically as a result of reflections.
     float stretch = 1 + (1 - reflectionInterpolant) * -0.4;

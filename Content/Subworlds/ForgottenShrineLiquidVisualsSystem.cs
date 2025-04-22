@@ -1,15 +1,18 @@
 ﻿using HeavenlyArsenal.Content.Waters;
+using Luminance.Assets;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Graphics.LightingMask;
+using NoxusBoss.Core.Graphics.RenderTargets;
 using NoxusBoss.Core.Graphics.SpecificEffectManagers;
 using NoxusBoss.Core.Utilities;
 using SubworldLibrary;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.Shaders;
@@ -20,6 +23,54 @@ namespace HeavenlyArsenal.Content.Subworlds;
 
 public class ForgottenShrineLiquidVisualsSystem : ModSystem
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    private struct VertexPositionVectorTexture : IVertexType
+    {
+        VertexDeclaration IVertexType.VertexDeclaration
+        {
+            get
+            {
+                return new VertexDeclaration(
+                    new VertexElement[]
+                    {
+                        new VertexElement(
+                            0,
+                            VertexElementFormat.Vector3,
+                            VertexElementUsage.Position,
+                            0
+                        ),
+                        new VertexElement(
+                            sizeof(float) * 3,
+                            VertexElementFormat.Vector4,
+                            VertexElementUsage.Color,
+                            0
+                        ),
+                        new VertexElement(
+                            sizeof(float) * 7,
+                            VertexElementFormat.Vector2,
+                            VertexElementUsage.TextureCoordinate,
+                            0
+                        )
+                    });
+            }
+        }
+
+        public Vector3 Position;
+        public Vector4 Color;
+        public Vector2 TextureCoordinate;
+
+        public VertexPositionVectorTexture(
+            Vector3 position,
+            Vector4 color,
+            Vector2 textureCoordinate
+        )
+        {
+            Position = position;
+            Color = color;
+            TextureCoordinate = textureCoordinate;
+        }
+    }
+
     /// <summary>
     /// A queue of points that determines where points in space should be converted to ripples, in world coordinates.
     /// </summary>
@@ -53,6 +104,119 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
     /// </summary>
     public static readonly SoundStyle RippleStepSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Environment/WaterRipple", 3);
 
+    internal static InstancedRequestableTarget liquidDistanceTarget = new InstancedRequestableTarget();
+
+    /// <summary>
+    /// The render target that holds vertical liquid distance information.
+    /// </summary>
+    public static Texture2D LiquidDistanceTarget
+    {
+        get
+        {
+            liquidDistanceTarget.Request(Main.instance.GraphicsDevice.Viewport.Width, Main.instance.GraphicsDevice.Viewport.Height, 0, () =>
+            {
+                int padding = 5;
+                int left = (int)(Main.screenPosition.X / 16f - padding);
+                int top = (int)(Main.screenPosition.Y / 16f - padding);
+                int right = (int)(left + Main.instance.GraphicsDevice.Viewport.Width / 16f + padding);
+                int bottom = (int)(top + Main.instance.GraphicsDevice.Viewport.Height / 16f + padding);
+                Rectangle tileArea = new Rectangle(left, top, right - left, bottom - top);
+
+                Vector3 screenPosition3 = new Vector3(Main.screenPosition, 0f);
+
+                int horizontalSamples = tileArea.Width / 2 + 1;
+                int verticalSamples = tileArea.Height / 2 + 1;
+                int meshWidth = tileArea.Width + 1;
+                int meshHeight = tileArea.Height + 1;
+                int vertexCount = meshWidth * meshHeight;
+                int indexCount = tileArea.Width * tileArea.Height * 6;
+                short[] indices = new short[indexCount];
+                VertexPositionVectorTexture[] vertices = new VertexPositionVectorTexture[vertexCount];
+                float[] waterLines = new float[horizontalSamples * 2];
+                float[] tileLines = new float[horizontalSamples * 2];
+
+                // Calculate samples.
+                for (int i = 0; i < horizontalSamples * 2; i++)
+                {
+                    int x = tileArea.X + i;
+                    float? waterLine = null;
+                    float? tileLine = null;
+                    for (int y = tileArea.Top - 5; y < tileArea.Bottom + 5; y++)
+                    {
+                        bool solidTile = Main.tile[x, y].HasTile && Main.tileSolid[Main.tile[x, y].TileType];
+                        if (Main.tile[x, y].LiquidAmount >= 200 && !solidTile && waterLine is null)
+                            waterLine = LumUtils.InverseLerp(tileArea.Top, tileArea.Bottom - 1f, y);
+                        if (solidTile && tileLine is null)
+                            tileLine = LumUtils.InverseLerp(tileArea.Top, tileArea.Bottom - 1f, y);
+                    }
+
+                    waterLines[i] = waterLine ?? 1f;
+                    tileLines[i] = tileLine ?? 2f;
+                }
+
+                for (int j = 0; j < verticalSamples; j++)
+                {
+                    float yInterpolant = j / (float)(verticalSamples - 1f);
+                    float nextYInterpolant = (j + 0.5f) / (float)(verticalSamples - 1f);
+                    for (int i = 0; i < horizontalSamples; i++)
+                    {
+                        float topLeftDistance = waterLines[i * 2] - yInterpolant;
+                        float topRightDistance = waterLines[i * 2 + 1] - yInterpolant;
+                        float bottomLeftDistance = waterLines[i * 2] - nextYInterpolant;
+                        float bottomRightDistance = waterLines[i * 2 + 1] - nextYInterpolant;
+
+                        float depthToGroundLeft = tileLines[i * 2] - waterLines[i * 2];
+                        float depthToGroundRight = tileLines[i * 2 + 1] - waterLines[i * 2 + 1];
+
+                        Vector4 topLeftColor = new Vector4(topLeftDistance, depthToGroundLeft, 0f, 1f);
+                        Vector4 topRightColor = new Vector4(topRightDistance, depthToGroundRight, 0f, 1f);
+                        Vector4 bottomLeftColor = new Vector4(bottomLeftDistance, depthToGroundLeft, 0f, 1f);
+                        Vector4 bottomRightColor = new Vector4(bottomRightDistance, depthToGroundRight, 0f, 1f);
+
+                        bool rightEdge = i * 2 == tileArea.Width;
+                        bool bottomEdge = j * 2 == tileArea.Height;
+
+                        Vector2 topLeftUv = new Vector2(i * 2f / (meshWidth - 1), j * 2f / (meshHeight - 1));
+                        Vector2 bottomRightUv = new Vector2((i * 2f + 1) / (meshWidth - 1), (j * 2f + 1) / (meshHeight - 1));
+
+                        vertices[i * 2 + j * 2 * meshWidth] = new VertexPositionVectorTexture(new Vector3(tileArea.X + i * 2, tileArea.Y + j * 2, 0f) * 16f - screenPosition3, topLeftColor, topLeftUv);
+                        if (!rightEdge)
+                            vertices[i * 2 + 1 + j * 2 * meshWidth] = new VertexPositionVectorTexture(new Vector3(tileArea.X + i * 2 + 1, tileArea.Y + j * 2, 0f) * 16f - screenPosition3, topRightColor, new Vector2(bottomRightUv.X, topLeftUv.Y));
+                        if (!bottomEdge)
+                            vertices[i * 2 + (j * 2 + 1) * meshWidth] = new VertexPositionVectorTexture(new Vector3(tileArea.X + i * 2, tileArea.Y + j * 2 + 1, 0f) * 16f - screenPosition3, bottomLeftColor, new Vector2(topLeftUv.X, bottomRightUv.Y));
+                        if (!bottomEdge && !rightEdge)
+                            vertices[i * 2 + 1 + (j * 2 + 1) * meshWidth] = new VertexPositionVectorTexture(new Vector3(tileArea.X + i * 2 + 1, tileArea.Y + j * 2 + 1, 0f) * 16f - screenPosition3, bottomRightColor, bottomRightUv);
+                    }
+                }
+                int currentIndex = 0;
+                for (int j = 0; j < meshHeight - 1; j++)
+                {
+                    for (int i = 0; i < meshWidth - 1; i++)
+                    {
+                        indices[currentIndex] = (short)(i + j * meshWidth);
+                        indices[currentIndex + 1] = (short)(i + 1 + j * meshWidth);
+                        indices[currentIndex + 2] = (short)(i + (j + 1) * meshWidth);
+                        indices[currentIndex + 3] = (short)(i + 1 + j * meshWidth);
+                        indices[currentIndex + 4] = (short)(i + 1 + (j + 1) * meshWidth);
+                        indices[currentIndex + 5] = (short)(i + (j + 1) * meshWidth);
+                        currentIndex += 6;
+                    }
+                }
+
+                ManagedShader shader = ShaderManager.GetShader("Luminance.StandardPrimitiveShader");
+                shader.TrySetParameter("uWorldViewProjection", Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, 0f, 1f));
+                shader.Apply();
+
+                Main.instance.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, currentIndex / 3);
+            });
+
+            if (liquidDistanceTarget.TryGetTarget(0, out RenderTarget2D? target) && target is not null)
+                return target;
+
+            return MiscTexturesRegistry.InvisiblePixel.Value;
+        }
+    }
+
     public override void OnModLoad()
     {
         if (Main.netMode != NetmodeID.Server)
@@ -65,6 +229,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
             {
                 return new RenderTarget2D(Main.instance.GraphicsDevice, width / 2, height / 2, true, SurfaceFormat.Vector4, DepthFormat.Depth24);
             });
+            Main.ContentThatNeedsRenderTargets.Add(liquidDistanceTarget);
         }
 
         On_Main.CalculateWaterStyle += ForceShrineWater;
@@ -191,6 +356,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         mistShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
         mistShader.SetTexture(TileTargetManagers.LiquidTarget, 2, SamplerState.LinearClamp);
         mistShader.SetTexture(LightingMaskTargetManager.LightTarget, 3, SamplerState.LinearClamp);
+        mistShader.SetTexture(LiquidDistanceTarget, 4, SamplerState.LinearClamp);
         mistShader.Activate();
 
         reflectionShader.TrySetParameter("targetSize", Main.ScreenSize.ToVector2());
@@ -203,6 +369,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         reflectionShader.SetTexture(TileTargetManagers.LiquidTarget, 2, SamplerState.LinearClamp);
         reflectionShader.SetTexture(WaterStepRippleTarget, 3, SamplerState.LinearClamp);
         reflectionShader.SetTexture(TileTargetManagers.TileTarget, 4, SamplerState.LinearClamp);
+        reflectionShader.SetTexture(LiquidDistanceTarget, 5, SamplerState.LinearClamp);
         reflectionShader.Activate();
     }
 }

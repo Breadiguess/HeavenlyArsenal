@@ -2,6 +2,7 @@
 sampler noiseTexture : register(s1);
 sampler liquidTexture : register(s2);
 sampler lightTexture : register(s3);
+sampler lightDistanceTexture : register(s4);
 
 float globalTime;
 float noiseAppearanceThreshold;
@@ -15,22 +16,7 @@ float4 mistColor;
 
 float DistanceToLiquidPixel(float2 coords)
 {
-    float top = 0;
-    float bottom = 1;
-
-    // Perform binary search to find the first Y with alpha > 0.
-    for (int i = 0; i < 15; i++)
-    {
-        float midpoint = (top + bottom) * 0.5;
-        float alpha = tex2D(liquidTexture, float2(coords.x, midpoint)).a;
-
-        // If transparent, look further down.
-        bool lookFurtherDown = alpha < 0.01;
-        top = lerp(top, midpoint, lookFurtherDown);
-        bottom = lerp(bottom, midpoint, !lookFurtherDown);
-    }
-    
-    return (bottom - coords.y) * targetSize.y;
+    return tex2D(lightDistanceTexture, coords).r * targetSize.y;
 }
 
 float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
@@ -50,6 +36,9 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     
     // Make mist dissipate if light is low.
     mistInterpolant *= smoothstep(0, 0.5, pow(light, 1.6));
+    
+    // Make mist dissipate if the water is shallow.
+    mistInterpolant *= smoothstep(0.1, 0.3, tex2D(lightDistanceTexture, liquidTextureCoords).g);
     
     // Do some standard noise calculations to determine the shape of the mist.
     float time = globalTime * 0.3;
