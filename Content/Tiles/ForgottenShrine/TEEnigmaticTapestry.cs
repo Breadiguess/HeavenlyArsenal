@@ -130,7 +130,7 @@ public class TEEnigmaticTapestry : ModTileEntity, IClientSideTileEntityUpdater
                 Vector3 pushForce = new Vector3(Main.LocalPlayer.velocity * pushInterpolant * 0.75f, 0f);
                 cloth.particleGrid[x, y].AddForce(pushForce);
 
-                if (pushInterpolant >= 0.67f)
+                if (pushInterpolant >= 0.67f && Main.LocalPlayer.velocity.Length() >= 3f)
                     interactedWith = true;
             }
         }

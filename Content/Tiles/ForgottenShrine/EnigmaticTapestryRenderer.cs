@@ -28,8 +28,8 @@ public class EnigmaticTapestryRenderer : ModSystem
             return;
 
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-        foreach (TEEnigmaticTapestry ofuda in placedTapestries)
-            ofuda.Render();
+        foreach (TEEnigmaticTapestry tapestry in placedTapestries)
+            tapestry.Render();
         Main.spriteBatch.End();
     }
 }
