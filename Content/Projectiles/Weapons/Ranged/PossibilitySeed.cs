@@ -87,9 +87,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 if (target is not null)
                     AttackTarget(target);
                 
-                //todo: summon an obnoxiously large and powerful laser.
-                //probably somewhat similar to the omegadeathlaser:tm: that ND uses?
-                // but like, localized, and probably differently colored.
+                
 
             }
             //hold it, space cowboy

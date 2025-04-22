@@ -8,7 +8,9 @@ using CalamityMod.Graphics.Primitives;
 using CalamityMod.World;
 using HeavenlyArsenal.Content.Buffs;
 using Microsoft.Xna.Framework;
+using NoxusBoss.Assets;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
@@ -52,7 +54,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
                 return Vector2.Lerp(currentRot, targetRot, 0.1f); // Adjust the lerp factor (0.1f) for desired smoothness
             }
         }
-        //todo: lerp this so that it doesnt instantly snap to a location
+        
         
         public override void OnSpawn(IEntitySource source)
         {
@@ -65,7 +67,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
         }
         public override void OnKill(int timeLeft)
         {
-            Main.NewText($"Laser {Projectile.whoAmI} was killed. time left: {timeLeft}");
+            SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.CosmicLaserObliteration);
+            //Main.NewText($"Laser {Projectile.whoAmI} was killed. time left: {timeLeft}");
             base.OnKill(timeLeft);
         }
         public override void AI()
@@ -75,7 +78,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged
             Projectile.rotation = rot.ToRotation();
             
             //WHY NOT
-            Main.NewText($"{Projectile.whoAmI} rotation: {Projectile.rotation}");
+            
             // Grow bigger up to a point.
             Projectile.scale = MathHelper.Clamp(Projectile.scale + 0.15f, 0.05f, 2f);
 
