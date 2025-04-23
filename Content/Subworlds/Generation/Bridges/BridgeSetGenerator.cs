@@ -60,7 +60,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
         int decorationStartY = bridgeLowYPoint - bridgeThickness;
         PlaceBeams(groundLevelY, bridgeLowYPoint);
         PlaceRopesUnderneathBridge(decorationStartY, profile);
-        PlaceLanternsUnderneathBridge(decorationStartY, 3, profile);
+        PlaceDecorationsUnderneathBridge(decorationStartY, 3, profile);
         PlaceOfudaUnderneathBridge(decorationStartY, 5, profile);
         GenerateRoof(bridgeLowYPoint, profile);
     }
@@ -222,9 +222,9 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
     }
 
     /// <summary>
-    /// Places paper lanterns underneath bridges.
+    /// Places decorations underneath bridges.
     /// </summary>
-    private void PlaceLanternsUnderneathBridge(int startY, int spacing, BridgeSetPlacementProfile profile)
+    private void PlaceDecorationsUnderneathBridge(int startY, int spacing, BridgeSetPlacementProfile profile)
     {
         int bridgeWidth = Settings.BridgeArchWidth;
         for (int x = Left + bridgeWidth / 2; x < Right - bridgeWidth / 2; x += bridgeWidth)
@@ -239,6 +239,11 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
             {
                 int tileID = TileID.ChineseLanterns;
                 int tileStyle = 0;
+                if (onlyPlaceInCenter)
+                {
+                    tileID = TileID.Banners;
+                    tileStyle = WorldGen.genRand.Next(4);
+                }
 
                 // DON'T place the center lantern by default.
                 if (dx == 0 && !onlyPlaceInCenter)
@@ -248,7 +253,8 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
                 if (dx != 0 && onlyPlaceInCenter)
                     continue;
 
-                Point lanternPoint = ForgottenShrineGenerationHelpers.DescendToAir(new Point(x + dx * spacing, startY - archOffset));
+                int xOffset = dx >= 1 ? 1 : 0;
+                Point lanternPoint = ForgottenShrineGenerationHelpers.DescendToAir(new Point(x + dx * spacing + xOffset, startY - archOffset));
                 WorldGen.PlaceObject(lanternPoint.X, lanternPoint.Y, tileID, false, tileStyle);
             }
         }
