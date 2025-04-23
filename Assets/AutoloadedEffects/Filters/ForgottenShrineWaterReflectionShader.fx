@@ -21,15 +21,15 @@ float CalculateLiquidPixelLineY(float2 coords)
     float bottom = 1;
 
     // Perform binary search to find the first Y with alpha > 0.
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < 30; i++)
     {
         float midpoint = (top + bottom) * 0.5;
         float alpha = tex2D(liquidTexture, float2(coords.x, midpoint)).a;
 
         // If transparent, look further down.
         bool lookFurtherDown = alpha < 0.01;
-        top = lerp(top, midpoint, lookFurtherDown);
-        bottom = lerp(bottom, midpoint, !lookFurtherDown);
+        top = lerp(top, midpoint, lookFurtherDown * 0.5);
+        bottom = lerp(bottom, midpoint, !lookFurtherDown * 0.5);
     }
     
     return bottom;
