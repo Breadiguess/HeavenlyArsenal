@@ -1,4 +1,5 @@
-﻿using Luminance.Common.Utilities;
+﻿using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
+using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -49,7 +50,7 @@ namespace HeavenlyArsenal.Content.NPCs
             }
         }
 
-
+        public override void SetStaticDefaults() => RocheLimitGlobalNPC.ImmuneToLobotomy[Type] = true;
 
         public override void SetDefaults()
         {
@@ -173,10 +174,10 @@ namespace HeavenlyArsenal.Content.NPCs
             Color glowmaskColor = new Color(2, 0, 156);
             //Main.NewText($"{LillyPos - Main.screenPosition}");
             Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, drawColor, wind, Lorigin, LillyScale, spriteEffects, 0f);
-            
+
             return false;
         }
     }
 
-   
+
 }
