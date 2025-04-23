@@ -607,5 +607,6 @@ Mods: {
 		}
 
 		CellPhoneInfoOverrides.ForgottenShrineText: Quiet Stillness
+		UI.GraphicalUniverseImager.ForgottenShrineBackground: A Perfect World
 	}
 }

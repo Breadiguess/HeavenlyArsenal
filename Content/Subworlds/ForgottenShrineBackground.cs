@@ -6,11 +6,13 @@ using NoxusBoss.Assets;
 using NoxusBoss.Core.DataStructures;
 using NoxusBoss.Core.Graphics.BackgroundManagement;
 using NoxusBoss.Core.Graphics.FastParticleSystems;
+using NoxusBoss.Core.Graphics.UI.GraphicalUniverseImager;
 using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
+using TextureAsset = NoxusBoss.Assets.LazyAsset<Microsoft.Xna.Framework.Graphics.Texture2D>;
 
 namespace HeavenlyArsenal.Content.Subworlds;
 
@@ -41,6 +43,8 @@ public class ForgottenShrineBackground : Background
     private static readonly Asset<Texture2D> skyLantern = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Subworlds/SkyLantern");
 
     private static readonly Asset<Texture2D> scarletMoon = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Subworlds/TheScarletMoon");
+
+    private static readonly TextureAsset icon = TextureAsset.FromPath("HeavenlyArsenal/Content/Subworlds/BiomeIcon");
 
     private static readonly Asset<Texture2D>[] backgroundLayers =
     [
@@ -78,6 +82,9 @@ public class ForgottenShrineBackground : Background
         {
             lanternSystem = new FramedFastParticleSystem(5, 8192, PrepareLanternParticleRendering, UpdateLanternParticles);
         });
+
+        GraphicalUniverseImagerOption option = new GraphicalUniverseImagerOption("Mods.HeavenlyArsenal.UI.GraphicalUniverseImager.ForgottenShrineBackground", true, icon, RenderGUIPortrait, RenderGUIBackground);
+        GraphicalUniverseImagerOptionManager.RegisterNew(option);
     }
 
     public override void Unload() => Main.QueueMainThreadAction(lanternSystem.Dispose);
@@ -116,16 +123,37 @@ public class ForgottenShrineBackground : Background
             return;
 
         if (minDepth < 0f && maxDepth > 0f)
+            RenderWrapper(false, true);
+    }
+
+    private static void RenderWrapper(bool justMoonAndGradient, bool includeMountains)
+    {
+        RenderGradient();
+        RenderMoon(justMoonAndGradient);
+
+        if (!justMoonAndGradient)
         {
-            RenderGradient();
-            RenderMoon();
             RenderLanternBackglowPath();
 
             Main.instance.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             lanternSystem.RenderAll();
 
-            RenderMountains(backgroundSize);
+            if (includeMountains)
+                RenderMountains(WotGUtils.ViewportSize);
         }
+    }
+
+    private static void RenderGUIPortrait(GraphicalUniverseImagerSettings settings)
+    {
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+        RenderWrapper(true, false);
+        Main.spriteBatch.End();
+    }
+
+    private static void RenderGUIBackground(float minDepth, float maxDepth, GraphicalUniverseImagerSettings settings)
+    {
+        if (minDepth < 0f && maxDepth > 0f)
+            RenderWrapper(false, false);
     }
 
     private static void ResetSpriteBatch()
@@ -175,12 +203,16 @@ public class ForgottenShrineBackground : Background
         RenderParallaxLayer(backgroundSize, 0.133f, Color.White, backgroundLayers[0].Value);
     }
 
-    private static void RenderMoon()
+    private static void RenderMoon(bool squishToFitRT)
     {
         ResetSpriteBatch();
 
+        Vector2 scale = Vector2.One * 0.8f;
+        if (squishToFitRT)
+            scale.X *= 0.7f;
+
         Texture2D moon = scarletMoon.Value;
-        Main.spriteBatch.Draw(moon, MoonPosition, null, Color.White, 0f, moon.Size() * 0.5f, 0.8f, 0, 0f);
+        Main.spriteBatch.Draw(moon, MoonPosition, null, Color.White, 0f, moon.Size() * 0.5f, scale, 0, 0f);
     }
 
     private static void RenderLanternBackglowPath()
