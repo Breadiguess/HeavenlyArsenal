@@ -29,7 +29,7 @@ public class WestFieldPass : GenPass
         int curveDipWidth = ForgottenShrineGenerationHelpers.WaterCurveDipWidth;
         int protrusionWidth = curveDipWidth / 3;
         int maxTerrainBumpiness = 14;
-        int maxWallHeight = 3;
+        int maxWallHeight = 4;
         float terrainHorizontalVariance = 0.0056f;
         float wallHorizontalVariance = 0.013f;
         float heightMapSeed = WorldGen.genRand.NextFloat(10000f);
@@ -55,7 +55,7 @@ public class WestFieldPass : GenPass
                 t.TileType = y == top ? grassID : TileID.Dirt;
             }
 
-            int wallHeight = (int)MathF.Round(UnholySine(x * wallHorizontalVariance - heightMapSeed) * (1f - easedCurveInterpolant) * -maxWallHeight);
+            int wallHeight = (int)MathF.Round(UnholySine(x * wallHorizontalVariance - heightMapSeed) * (1f - easedCurveInterpolant) * -maxWallHeight) + 1;
             for (int dy = -wallHeight; dy <= 2; dy++)
             {
                 Tile t = Main.tile[x, top + dy];
