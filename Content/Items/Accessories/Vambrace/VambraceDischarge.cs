@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CalamityMod;
 using CalamityMod.Dusts;
 using CalamityMod.Particles;
@@ -33,6 +34,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Vambrace
         public override string Texture => "CalamityMod/Projectiles/InvisibleProj";
         public Player Owner => Main.player[Projectile.owner];
         private static float ExplosionRadius = 150f;
+        internal List<int> hitnpc;
 
         public override void SetDefaults()
         {
@@ -57,12 +59,14 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Vambrace
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             target.AddBuff(BuffID.Electrified, 240);
-
+            /*    
             Particle pulse = new DirectionalPulseRing(Projectile.Center, Vector2.Zero, Color.AntiqueWhite, new Vector2(2f, 2f), Main.rand.NextFloat(12f, 25f), 0f, Main.rand.NextFloat(0.8f, 1.1f), 20);
             GeneralParticleHandler.SpawnParticle(pulse);
             Particle pulse2 = new DirectionalPulseRing(Projectile.Center, Vector2.Zero, Color.Blue, new Vector2(2f, 2f), Main.rand.NextFloat(12f, 25f), 0f, Main.rand.NextFloat(0.6f, 0.9f), 20);
             GeneralParticleHandler.SpawnParticle(pulse2);
-            
+            */
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<VambraceLightning>(), 5000, 0f, Projectile.owner);
+
         }
 
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CalamityUtils.CircularHitboxCollision(Projectile.Center, ExplosionRadius, targetHitbox);
@@ -78,17 +82,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Vambrace
 
 
 
-        public float BloodWidthFunction(float completionRatio)
-        {
-            float baseWidth = Projectile.width * 0.66f;
-            float smoothTipCutoff = MathHelper.SmoothStep(0f, 1f, InverseLerp(0.09f, 0.3f, completionRatio));
-            return smoothTipCutoff * baseWidth;
-        }
-
-        public Color BloodColorFunction(float completionRatio)
-        {
-            return Projectile.GetAlpha(new Color(82, 1, 23));
-        }
+      
 
 
 
