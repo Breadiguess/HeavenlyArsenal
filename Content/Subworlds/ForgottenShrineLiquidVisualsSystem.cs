@@ -257,7 +257,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
                 }
             }
             else
-                tileLines[i] = 2f;
+                tileLines[i] = 0f;
         }
 
         for (int j = 0; j < verticalSamples; j++)
