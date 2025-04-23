@@ -38,7 +38,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     mistInterpolant *= smoothstep(0, 0.5, pow(light, 1.6));
     
     // Make mist dissipate if the water is shallow.
-    mistInterpolant *= smoothstep(0.1, 0.3, tex2D(lightDistanceTexture, liquidTextureCoords).g);
+    mistInterpolant *= smoothstep(0.05, 0.15, tex2D(lightDistanceTexture, liquidTextureCoords).g);
     
     // Do some standard noise calculations to determine the shape of the mist.
     float time = globalTime * 0.3;
