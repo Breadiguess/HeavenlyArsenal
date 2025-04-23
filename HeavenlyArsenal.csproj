@@ -8,9 +8,13 @@
 	  <OutputType>Library</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <AdditionalFiles Remove="Content\Projectiles\Weapons\Holdout\**" />
 	  <AdditionalFiles Remove="Sounds\**" />
+	  <Compile Remove="Content\Projectiles\Weapons\Holdout\**" />
 	  <Compile Remove="Sounds\**" />
+	  <EmbeddedResource Remove="Content\Projectiles\Weapons\Holdout\**" />
 	  <EmbeddedResource Remove="Sounds\**" />
+	  <None Remove="Content\Projectiles\Weapons\Holdout\**" />
 	  <None Remove="Sounds\**" />
 	</ItemGroup>
 	<ItemGroup>
@@ -41,6 +45,7 @@
 	  <Folder Include="Content\Items\Weapons\Ranged\NewFolder\" />
 	  <Folder Include="Content\NPCs\Hostile\BloodMoon\" />
 	  <Folder Include="Content\Projectiles\Weapons\Holdout\" />
+	  <Folder Include="Content\Tiles\" />
 	  <Folder Include="Core\Autoloaders\SolynBooks\" />
 	</ItemGroup>
 	<ItemGroup>

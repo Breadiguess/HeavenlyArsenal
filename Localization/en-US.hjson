@@ -452,6 +452,11 @@ Mods: {
 				DisplayName: Samsara
 				Tooltip: ""
 			}
+
+			Rapture: {
+				DisplayName: Rapture
+				Tooltip: ""
+			}
 		}
 
 		Projectiles: {
@@ -519,6 +524,8 @@ Mods: {
 			Thistle_Proj.DisplayName: Thistle_ Proj
 			PossibilitySeed.DisplayName: Possibility Seed
 			PossibilitySeed_Laser.DisplayName: Possibility Seed_ Laser
+			RaptureProj.DisplayName: Rapture Proj
+			VambraceLightning.DisplayName: Vambrace Lightning
 		}
 
 		NPCs: {

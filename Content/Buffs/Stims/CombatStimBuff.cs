@@ -97,12 +97,12 @@ namespace HeavenlyArsenal.Content.Buffs.Stims
             {
                 player.statDefense += 2;
                 player.GetAttackSpeed<MeleeDamageClass>() += 0.5f;
-                player.GetDamage<GenericDamageClass>() += 0.325f;
+                player.GetDamage<GenericDamageClass>() += 0.255f;
                 player.GetCritChance<GenericDamageClass>() += 2f;
                 player.GetKnockback<SummonDamageClass>() += 0.5f;
 
 
-                player.moveSpeed += 0.99f;
+                player.moveSpeed += 0.68f;
                 player.pickSpeed -= 0.2f;
                 player.jumpSpeedBoost += 1f;
             }
