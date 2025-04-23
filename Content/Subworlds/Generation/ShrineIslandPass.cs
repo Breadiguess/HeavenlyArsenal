@@ -21,7 +21,7 @@ public class ShrineIslandPass : GenPass
 
         BridgeGenerationSettings bridgeSettings = BaseBridgePass.BridgeGenerator.Settings;
         int left = BaseBridgePass.BridgeGenerator.Right + ForgottenShrineGenerationHelpers.LakeWidth + bridgeSettings.DockWidth;
-        int right = left + ForgottenShrineGenerationHelpers.LakeWidth;
+        int right = left + ForgottenShrineGenerationHelpers.ShrineIslandWidth;
         int bottom = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth;
         int baseElevationAboveSeaLevel = 13;
         int maxBaseElevation = ForgottenShrineGenerationHelpers.WaterDepth + baseElevationAboveSeaLevel;

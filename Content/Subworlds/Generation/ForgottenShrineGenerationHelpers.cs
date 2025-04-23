@@ -46,6 +46,11 @@ public static class ForgottenShrineGenerationHelpers
     public static int LakeWidth => (int)(Main.maxTilesX * 0.1f);
 
     /// <summary>
+    /// The width of the shrine island.
+    /// </summary>
+    public static int ShrineIslandWidth => (int)(Main.maxTilesX * 0.15f);
+
+    /// <summary>
     /// Calculates the point at which a starting point reaches open air upon moving downward.
     /// </summary>
     internal static Point DescendToAir(Point p)
