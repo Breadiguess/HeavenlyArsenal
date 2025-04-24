@@ -70,6 +70,7 @@ public class SacredGrass : ModTile
         {
             Tile above = Framing.GetTileSafely(i, j - 1);
             bool grassAbove = above.HasTile && above.TileType == Type;
+            bool somethingNotGrassAbove = above.HasTile && above.TileType != Type;
             t.TileFrameX = (short)(horizontalChoiceX * 18 + 18);
             t.TileFrameY = 0;
             if (grassAbove)
@@ -77,6 +78,8 @@ public class SacredGrass : ModTile
                 bool dirtLayer = j % 3 != 0;
                 t.TileFrameY = (short)(dirtLayer ? 36 : 18);
             }
+            if (somethingNotGrassAbove)
+                t.TileFrameY = 36;
         }
 
         return false;

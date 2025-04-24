@@ -21,7 +21,25 @@ public class ShrinePass : GenPass
         int right = left + ForgottenShrineGenerationHelpers.ShrineIslandWidth;
 
         int gateLeft = (left + right) / 2;
+        TransformGroundIntoBricks(gateLeft - 27, gateLeft + 27);
         ConstructToriiGate(gateLeft - 18, gateLeft + 18, 41);
+    }
+
+    private static void TransformGroundIntoBricks(int left, int right)
+    {
+        for (int x = left; x <= right; x++)
+        {
+            float xInterpolant = LumUtils.InverseLerp(left, right, x);
+            int y = LumUtils.FindGroundVertical(new Point(x, 10)).Y + 1;
+            int depth = (int)MathHelper.Lerp(2f, 4.5f, LumUtils.Convert01To010(xInterpolant));
+            for (int dy = 0; dy < depth; dy++)
+            {
+                Tile t = Framing.GetTileSafely(x, y + dy);
+                t.HasTile = true;
+                t.TileType = TileID.RedStucco;
+                t.TileColor = PaintID.BlackPaint;
+            }
+        }
     }
 
     private static void ConstructToriiGate(int leftX, int rightX, int gateHeight)
@@ -37,8 +55,8 @@ public class ShrinePass : GenPass
         int middleArchY = upperArchY + 12;
         int upperArchSpread = 15;
         int middleArchSpread = upperArchSpread / 3;
-        PlaceToriiGateColumn(new Point(center.X - 11, middleArchY), middleArchY - upperArchY, false);
-        PlaceToriiGateColumn(new Point(center.X + 11, middleArchY), middleArchY - upperArchY, false);
+        PlaceToriiGateColumn(new Point(center.X - 11, middleArchY - 1), middleArchY - upperArchY - 2, false);
+        PlaceToriiGateColumn(new Point(center.X + 11, middleArchY - 1), middleArchY - upperArchY - 2, false);
 
         PlaceToriiGateMiddleArch(leftX - middleArchSpread, rightX + middleArchSpread, middleArchY);
         PlaceToriiGateUpperArch(leftX - upperArchSpread, rightX + upperArchSpread, upperArchY);

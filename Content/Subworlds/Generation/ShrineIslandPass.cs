@@ -78,7 +78,7 @@ public class ShrineIslandPass : GenPass
             int lilyX = (int)(WorldGen.genRand.NextFloat(left, right) * 16f);
             int lilyY = (int)(LumUtils.FindGroundVertical(new Point((int)(lilyX / 16f), 10)).Y * 16f);
             float distanceFromShrine = MathHelper.Distance(lilyX, shrineX);
-            float placementProbability = MathF.Pow(LumUtils.InverseLerp(210f, 750f, distanceFromShrine), 1.6f);
+            float placementProbability = MathF.Pow(LumUtils.InverseLerp(320f, 850f, distanceFromShrine), 1.6f);
             Point tileAbove = new Point(lilyX / 16, lilyY / 16);
             if (Framing.GetTileSafely(tileAbove).LiquidAmount >= 20 || !WorldGen.genRand.NextBool(placementProbability))
                 continue;
@@ -101,7 +101,7 @@ public class ShrineIslandPass : GenPass
             Point pillarSpawnPosition = new Point(pillarX, pillarY);
             float pillarRotation = WorldGen.genRand.NextFloat(0.23f) * rightOfShrine.ToDirectionInt();
             float pillarHeight = WorldGen.genRand.NextFloat(210f, 500f);
-            if (distanceFromShrine <= 480f ||
+            if (distanceFromShrine <= 640f ||
                 pillarsManager.TileObjects.Any(o => MathHelper.Distance(pillarX, o.Position.X) <= 100f))
             {
                 i--;
