@@ -88,7 +88,10 @@ public class WestFieldPass : GenPass
             if (Framing.GetTileSafely(tileAbove).LiquidAmount >= 20)
                 continue;
 
-            spiderLilies.Register(new SpiderLilyData(new Point(lilyX, lilyY)));
+            spiderLilies.Register(new SpiderLilyData(new Point(lilyX, lilyY))
+            {
+                ZPosition = 1.75f
+            });
         }
     }
 

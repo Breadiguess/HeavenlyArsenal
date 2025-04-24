@@ -86,15 +86,25 @@ public class ShrineIslandPass : GenPass
 
     private static void PlacePillars(int pillarCount, int left, int right)
     {
+        int shrineX = (left + right) * 8;
         ShrinePillarManager pillarsManager = ModContent.GetInstance<ShrinePillarManager>();
         for (int i = 0; i < pillarCount; i++)
         {
             int pillarX = (int)(WorldGen.genRand.NextFloat(left, right) * 16f);
             int pillarY = (int)(LumUtils.FindGroundVertical(new Point((int)(pillarX / 16f), 10)).Y * 16f) + 24;
+            float distanceFromShrine = MathHelper.Distance(pillarX, shrineX);
+            bool rightOfShrine = pillarX >= shrineX;
 
             Point pillarSpawnPosition = new Point(pillarX, pillarY);
-            float pillarRotation = WorldGen.genRand.NextFloatDirection() * 0.23f;
+            float pillarRotation = WorldGen.genRand.NextFloat(0.23f) * rightOfShrine.ToDirectionInt();
             float pillarHeight = WorldGen.genRand.NextFloat(210f, 500f);
+            if (distanceFromShrine <= 480f ||
+                pillarsManager.TileObjects.Any(o => MathHelper.Distance(pillarX, o.Position.X) <= 100f))
+            {
+                i--;
+                continue;
+            }
+
             pillarsManager.Register(new ShrinePillarData(pillarSpawnPosition, pillarRotation, pillarHeight));
         }
     }
