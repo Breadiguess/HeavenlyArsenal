@@ -101,8 +101,10 @@ public class ShrineIslandPass : GenPass
             ShrinePillarData previousPillar = pillarsByXPosition[i - 1];
             ShrinePillarData currentPillar = pillarsByXPosition[i];
             float horizontalDistanceBetweenPillars = MathHelper.Distance(previousPillar.Position.X, currentPillar.Position.X);
+            bool tooClose = horizontalDistanceBetweenPillars <= ForgottenShrineGenerationHelpers.MaxPillarAttachmentDistance * 0.33f;
+            bool tooFar = horizontalDistanceBetweenPillars >= ForgottenShrineGenerationHelpers.MaxPillarAttachmentDistance;
 
-            if (horizontalDistanceBetweenPillars <= ForgottenShrineGenerationHelpers.MaxPillarAttachmentDistance)
+            if (!tooClose && !tooFar)
             {
                 if (!previousPillar.HasRopeAnchor)
                     previousPillar.RopeAnchorYInterpolant = WorldGen.genRand.NextFloat(0.55f, 0.8f);
