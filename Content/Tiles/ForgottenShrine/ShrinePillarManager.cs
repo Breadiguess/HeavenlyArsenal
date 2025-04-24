@@ -1,5 +1,7 @@
 ﻿using HeavenlyArsenal.Content.Tiles.Generic;
-using Luminance.Common.Utilities;
+using Luminance.Core.Graphics;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Core.Graphics.LightingMask;
 using Terraria;
 
 namespace HeavenlyArsenal.Content.Tiles.ForgottenShrine;
@@ -12,7 +14,12 @@ public class ShrinePillarManager : WorldOrientedTileObjectManager<ShrinePillarDa
     {
         if (TileObjects.Count >= 1)
         {
-            Main.spriteBatch.ResetToDefault(false);
+            ManagedShader lightShader = ShaderManager.GetShader("HeavenlyArsenal.LightingShader");
+            lightShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
+            lightShader.TrySetParameter("screenSize", WotGUtils.ViewportSize);
+            lightShader.SetTexture(LightingMaskTargetManager.LightTarget, 1, SamplerState.LinearClamp);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, lightShader.Shader.Value, Main.GameViewMatrix.TransformationMatrix);
+
             foreach (ShrinePillarData lily in TileObjects)
                 lily.Render();
             Main.spriteBatch.End();

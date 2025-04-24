@@ -58,7 +58,7 @@ public class ShrinePillarData : WorldOrientedTileObject
             if (!HasRopeAnchor)
                 return null;
 
-            return Position.ToVector2() - Vector2.UnitY.RotatedBy(Rotation) * Height * RopeAnchorYInterpolant;
+            return Position.ToVector2() - Vector2.UnitY.RotatedBy(Rotation) * (Height * RopeAnchorYInterpolant - 24f);
         }
     }
 
@@ -72,7 +72,6 @@ public class ShrinePillarData : WorldOrientedTileObject
 
     public override void Update()
     {
-
     }
 
     public override void Render()

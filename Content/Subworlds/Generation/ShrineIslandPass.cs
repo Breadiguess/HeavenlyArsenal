@@ -85,7 +85,7 @@ public class ShrineIslandPass : GenPass
 
             Point pillarSpawnPosition = new Point(pillarX, pillarY);
             float pillarRotation = WorldGen.genRand.NextFloatDirection() * 0.23f;
-            float pillarHeight = WorldGen.genRand.NextFloat(100f, 250f);
+            float pillarHeight = WorldGen.genRand.NextFloat(210f, 500f);
             pillarsManager.Register(new ShrinePillarData(pillarSpawnPosition, pillarRotation, pillarHeight));
         }
     }
@@ -93,18 +93,27 @@ public class ShrineIslandPass : GenPass
     private static void AttachPillars()
     {
         ShrinePillarManager pillarsManager = ModContent.GetInstance<ShrinePillarManager>();
+        ShrinePillarRopeManager ropesManager = ModContent.GetInstance<ShrinePillarRopeManager>();
         List<ShrinePillarData> pillarsByXPosition = pillarsManager.TileObjects.OrderBy(o => o.Position.X).ToList();
 
         for (int i = 1; i < pillarsByXPosition.Count; i++)
         {
             ShrinePillarData previousPillar = pillarsByXPosition[i - 1];
             ShrinePillarData currentPillar = pillarsByXPosition[i];
-            float distanceBetweenPillars = MathHelper.Distance(previousPillar.Position.X, currentPillar.Position.X);
+            float horizontalDistanceBetweenPillars = MathHelper.Distance(previousPillar.Position.X, currentPillar.Position.X);
 
-            if (distanceBetweenPillars <= ForgottenShrineGenerationHelpers.MaxPillarAttachmentDistance)
+            if (horizontalDistanceBetweenPillars <= ForgottenShrineGenerationHelpers.MaxPillarAttachmentDistance)
             {
-                previousPillar.RopeAnchorYInterpolant = WorldGen.genRand.NextFloat(0.55f, 0.8f);
-                currentPillar.RopeAnchorYInterpolant = WorldGen.genRand.NextFloat(0.55f, 0.8f);
+                if (!previousPillar.HasRopeAnchor)
+                    previousPillar.RopeAnchorYInterpolant = WorldGen.genRand.NextFloat(0.55f, 0.8f);
+                if (!currentPillar.HasRopeAnchor)
+                    currentPillar.RopeAnchorYInterpolant = WorldGen.genRand.NextFloat(0.55f, 0.8f);
+
+                Point start = previousPillar.RopeAnchorPosition.Value.ToPoint();
+                Point end = currentPillar.RopeAnchorPosition.Value.ToPoint();
+                float distanceBetweenPillars = previousPillar.RopeAnchorPosition.Value.Distance(currentPillar.RopeAnchorPosition.Value);
+                float sagFactor = WorldGen.genRand.NextFloat(0.1f, 0.16f);
+                ropesManager.Register(new ShrinePillarRopeData(start, end, distanceBetweenPillars * sagFactor));
             }
         }
     }
