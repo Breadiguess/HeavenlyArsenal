@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Common.utils;
+using HeavenlyArsenal.Content.Tiles.Generic;
 using Luminance.Assets;
 using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
@@ -18,7 +19,7 @@ using Terraria.ModLoader.IO;
 
 namespace HeavenlyArsenal.Content.Tiles.ForgottenShrine;
 
-public class ShrineRopeData
+public class ShrineRopeData : WorldOrientedTileObject
 {
     private Point end;
 
@@ -47,7 +48,7 @@ public class ShrineRopeData
     /// <summary>
     /// The starting position of the rope.
     /// </summary>
-    public readonly Point Start;
+    public Point Start => Position;
 
     /// <summary>
     /// The end position of the rope.
@@ -85,13 +86,15 @@ public class ShrineRopeData
     /// </summary>
     public static float Gravity => 0.65f;
 
+    public ShrineRopeData() { }
+
     public ShrineRopeData(Point start, Point end, float sag)
     {
         Vector2 startVector = start.ToVector2();
         Vector2 endVector = end.ToVector2();
         Sag = sag;
 
-        Start = start;
+        Position = start;
         this.end = end;
 
         MaxLength = CalculateMaxLength();
@@ -167,13 +170,13 @@ public class ShrineRopeData
     /// <summary>
     /// Updates this rope.
     /// </summary>
-    public void Update_Standard()
+    public override void Update()
     {
         bool startHasNoTile = !Framing.GetTileSafely(Start.ToVector2().ToTileCoordinates()).HasTile;
         bool endHasNoTile = !Framing.GetTileSafely(End.ToVector2().ToTileCoordinates()).HasTile;
         if (startHasNoTile || endHasNoTile)
         {
-            ShrineRopeSystem.Remove(this);
+            ModContent.GetInstance<ShrineRopeSystem>().Remove(this);
             return;
         }
 
@@ -213,9 +216,9 @@ public class ShrineRopeData
     /// <summary>
     /// Renders this rope.
     /// </summary>
-    public void Render(bool emitLight, Color colorModifier)
+    public override void Render()
     {
-        Color ropeColorFunction(float completionRatio) => new Color(63, 22, 32).MultiplyRGBA(colorModifier);
+        Color ropeColorFunction(float completionRatio) => new Color(63, 22, 32);
         DrawProjectionButItActuallyWorks(MiscTexturesRegistry.Pixel.Value, -Main.screenPosition, false, ropeColorFunction, widthFactor: 2f);
 
         Vector2[] curveControlPoints = new Vector2[VerletRope.segments.Length];
@@ -233,9 +236,7 @@ public class ShrineRopeData
             float sampleInterpolant = MathHelper.Lerp(0.06f, 0.8f, i / (float)(ornamentCount - 1f));
             Vector2 ornamentWorldPosition = positionCurve.Evaluate(sampleInterpolant);
 
-            // Emit light at the point of the ornament.
-            if (emitLight)
-                Lighting.AddLight(ornamentWorldPosition, Color.Wheat.MultiplyRGBA(colorModifier).ToVector3() * 0.3f);
+            Lighting.AddLight(ornamentWorldPosition, Color.Wheat.ToVector3() * 0.4f);
 
             int windGridTime = 33;
             Point ornamentTilePosition = ornamentWorldPosition.ToTileCoordinates();
@@ -248,7 +249,7 @@ public class ShrineRopeData
             float windForce = windForceWave * LumUtils.InverseLerp(0f, 0.75f, MathF.Abs(Main.windSpeedCurrent)) * 0.4f;
             float spiralRotation = WindTime + ornamentWorldPosition.X * 0.02f;
             Vector2 spiralDrawPosition = ornamentWorldPosition - Main.screenPosition + Vector2.UnitY * 3f;
-            Main.spriteBatch.Draw(spiralTexture.Value, spiralDrawPosition, null, colorModifier, spiralRotation, spiralTexture.Size() * 0.5f, 1f, 0, 0f);
+            Main.spriteBatch.Draw(spiralTexture.Value, spiralDrawPosition, null, Color.White, spiralRotation, spiralTexture.Size() * 0.5f, 1f, 0, 0f);
 
             // Draw lanterns.
             Texture2D lanternTexture = TextureAssets.Projectile[ProjectileID.ReleaseLantern].Value;
@@ -274,7 +275,7 @@ public class ShrineRopeData
                 lanternScale = 0.6f;
             }
 
-            Main.spriteBatch.Draw(lanternTexture, lanternDrawPosition, lanternFrame, colorModifier, lanternRotation, lanternFrame.Size() * new Vector2(0.5f, 0f), lanternScale, 0, 0f);
+            Main.spriteBatch.Draw(lanternTexture, lanternDrawPosition, lanternFrame, Color.White, lanternRotation, lanternFrame.Size() * new Vector2(0.5f, 0f), lanternScale, 0, 0f);
             Main.spriteBatch.Draw(glowTexture, lanternGlowDrawPosition, null, lanternGlowColor * lanternGlowOpacity, 0f, glowTexture.Size() * 0.5f, lanternGlowScaleFactor * 0.5f, 0, 0f);
             Main.spriteBatch.Draw(glowTexture, lanternGlowDrawPosition, null, lanternGlowColor * lanternGlowOpacity * 0.6f, 0f, glowTexture.Size() * 0.5f, lanternGlowScaleFactor * 1.1f, 0, 0f);
         }
@@ -283,7 +284,7 @@ public class ShrineRopeData
     /// <summary>
     /// Serializes this rope data as a tag compound for world saving.
     /// </summary>
-    public TagCompound Serialize()
+    public override TagCompound Serialize()
     {
         return new TagCompound()
         {
@@ -298,7 +299,7 @@ public class ShrineRopeData
     /// <summary>
     /// Deserializes a tag compound containing data for a rope back into said rope.
     /// </summary>
-    public static ShrineRopeData Deserialize(TagCompound tag)
+    public override ShrineRopeData Deserialize(TagCompound tag)
     {
         ShrineRopeData rope = new ShrineRopeData(tag.Get<Point>("Start"), tag.Get<Point>("End"), tag.GetFloat("Sag"))
         {
