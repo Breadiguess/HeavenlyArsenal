@@ -2,7 +2,6 @@
 using HeavenlyArsenal.Content.Subworlds.Generation;
 using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 using Luminance.Assets;
-using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
@@ -10,6 +9,7 @@ using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Core.CrossCompatibility.Inbound;
 using NoxusBoss.Core.World.WorldSaving;
 using SubworldLibrary;
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader.IO;
@@ -94,7 +94,10 @@ public class ForgottenShrineSubworld : Subworld
                     break;
                 }
             }
-            color = Vector3.One * LumUtils.InverseLerp(4f, 1f, distanceToSurface).Squared() * islandInterpolant * 0.63f;
+
+            float baseShadow = LumUtils.InverseLerp(4f, 1f, distanceToSurface);
+            float easedShadow = MathF.Pow(baseShadow, 2.3f);
+            color = Vector3.One * easedShadow * islandInterpolant * 0.6f;
         }
 
         return false;
