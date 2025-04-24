@@ -58,7 +58,7 @@ public static class ForgottenShrineGenerationHelpers
     /// <summary>
     /// The amount of lilies on the shrine island.
     /// </summary>
-    public static int ShrineIslandLilyCount => 1700;
+    public static int ShrineIslandLilyCount => 1600;
 
     /// <summary>
     /// The amount of pillars on the shrine island.
