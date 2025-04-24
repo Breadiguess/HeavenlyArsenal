@@ -44,6 +44,21 @@ public class ShrineIslandPass : GenPass
                 t.TileType = grassID;
             }
         }
+        SacredGrass grassTemplate = ModContent.GetInstance<SacredGrass>();
+        for (int x = left; x <= right; x++)
+        {
+            float xInterpolant = LumUtils.InverseLerp(left, right, x);
+            float heightInterpolant = LumUtils.InverseLerpBump(0f, 0.1f, 0.9f, 1f, xInterpolant);
+            float easedHeightInterpolant = MathF.Pow(heightInterpolant, 0.66f);
+            int top = bottom - maxBaseElevation - 1; ;
+
+            for (int y = top; y <= bottom; y++)
+            {
+                Tile t = Main.tile[x, y];
+                bool _ = false;
+                grassTemplate.TileFrame(x, y, ref _, ref _);
+            }
+        }
 
         int lilyCount = ForgottenShrineGenerationHelpers.ShrineIslandLilyCount;
         PlaceLillies(lilyCount, left, right);
