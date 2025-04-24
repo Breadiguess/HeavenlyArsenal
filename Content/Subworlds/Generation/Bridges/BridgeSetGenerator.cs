@@ -216,7 +216,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
                 start.Y -= 11f;
                 end.Y -= 11f;
 
-                ModContent.GetInstance<ShrineRopeSystem>().Register(new ShrineRopeData(start.ToPoint(), end.ToPoint(), Settings.BridgeUndersideRopeSag * 16f));
+                ModContent.GetInstance<OrnamentalShrineRopeSystem>().Register(new OrnamentalShrineRopeData(start.ToPoint(), end.ToPoint(), Settings.BridgeUndersideRopeSag * 16f));
             }
         }
     }

@@ -61,6 +61,11 @@ public static class ForgottenShrineGenerationHelpers
     public static int ShrineIslandLilyCount => 2400;
 
     /// <summary>
+    /// The amount of pillars on the shrine island.
+    /// </summary>
+    public static int ShrineIslandPillarCount => 20;
+
+    /// <summary>
     /// The width of the subworld.
     /// </summary>
     public static int SubworldWidth => 3372;

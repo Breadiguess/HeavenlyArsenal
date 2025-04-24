@@ -62,5 +62,19 @@ public class ShrineIslandPass : GenPass
 
             spiderLilies.Register(new SpiderLilyData(new Point(lilyX, lilyY)));
         }
+
+        // Place pillars.
+        int pillarCount = ForgottenShrineGenerationHelpers.ShrineIslandPillarCount;
+        ShrinePillarManager pillars = ModContent.GetInstance<ShrinePillarManager>();
+        for (int i = 0; i < pillarCount; i++)
+        {
+            int pillarX = (int)(WorldGen.genRand.NextFloat(left, right) * 16f);
+            int pillarY = (int)(LumUtils.FindGroundVertical(new Point((int)(pillarX / 16f), Main.maxTilesY - 10)).Y * 16f) + 24;
+
+            Point pillarSpawnPosition = new Point(pillarX, pillarY);
+            float pillarRotation = WorldGen.genRand.NextFloatDirection() * 0.23f;
+            float pillarScale = WorldGen.genRand.NextFloat(0.6f, 1.3f);
+            pillars.Register(new ShrinePillarData(pillarSpawnPosition, pillarRotation, pillarScale));
+        }
     }
 }
