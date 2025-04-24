@@ -19,7 +19,7 @@ using Terraria.ModLoader.IO;
 
 namespace HeavenlyArsenal.Content.Tiles.ForgottenShrine;
 
-public class ShrineRopeData : WorldOrientedTileObject
+public class OrnamentalShrineRopeData : WorldOrientedTileObject
 {
     private Point end;
 
@@ -86,9 +86,9 @@ public class ShrineRopeData : WorldOrientedTileObject
     /// </summary>
     public static float Gravity => 0.65f;
 
-    public ShrineRopeData() { }
+    public OrnamentalShrineRopeData() { }
 
-    public ShrineRopeData(Point start, Point end, float sag)
+    public OrnamentalShrineRopeData(Point start, Point end, float sag)
     {
         Vector2 startVector = start.ToVector2();
         Vector2 endVector = end.ToVector2();
@@ -176,7 +176,7 @@ public class ShrineRopeData : WorldOrientedTileObject
         bool endHasNoTile = !Framing.GetTileSafely(End.ToVector2().ToTileCoordinates()).HasTile;
         if (startHasNoTile || endHasNoTile)
         {
-            ModContent.GetInstance<ShrineRopeSystem>().Remove(this);
+            ModContent.GetInstance<OrnamentalShrineRopeSystem>().Remove(this);
             return;
         }
 
@@ -299,9 +299,9 @@ public class ShrineRopeData : WorldOrientedTileObject
     /// <summary>
     /// Deserializes a tag compound containing data for a rope back into said rope.
     /// </summary>
-    public override ShrineRopeData Deserialize(TagCompound tag)
+    public override OrnamentalShrineRopeData Deserialize(TagCompound tag)
     {
-        ShrineRopeData rope = new ShrineRopeData(tag.Get<Point>("Start"), tag.Get<Point>("End"), tag.GetFloat("Sag"))
+        OrnamentalShrineRopeData rope = new OrnamentalShrineRopeData(tag.Get<Point>("Start"), tag.Get<Point>("End"), tag.GetFloat("Sag"))
         {
             MaxLength = tag.GetFloat("MaxLength")
         };
