@@ -51,12 +51,18 @@ public class BrutalForgivenessProjectile : ModProjectile
 
         if (Time % 6f == 5f)
         {
-            ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 1.7f);
-            SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.SliceTelegraph with { MaxInstances = 16, PitchVariance = 0.3f }, Projectile.Center).WithVolumeBoost(0.5f);
-            if (Main.myPlayer == Projectile.owner)
+            if (!Owner.CheckMana(Owner.HeldMouseItem(), -1, true))
+                Projectile.Kill();
+
+            else
             {
-                Vector2 vineVelocity = Projectile.SafeDirectionTo(Main.MouseWorld).RotatedByRandom(0.006f) * Main.rand.NextFloat(10f, 11f);
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, vineVelocity, ModContent.ProjectileType<BrutalVine>(), Projectile.damage, 0f, Projectile.owner);
+                ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 1.7f);
+                SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.SliceTelegraph with { MaxInstances = 16, PitchVariance = 0.3f }, Projectile.Center).WithVolumeBoost(0.5f);
+                if (Main.myPlayer == Projectile.owner)
+                {
+                    Vector2 vineVelocity = Projectile.SafeDirectionTo(Main.MouseWorld).RotatedByRandom(0.006f) * Main.rand.NextFloat(10f, 11f);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, vineVelocity, ModContent.ProjectileType<BrutalVine>(), Projectile.damage, 0f, Projectile.owner);
+                }
             }
         }
 
