@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -50,14 +51,10 @@ public abstract class WorldOrientedTileObjectManager<TTileObject> : ModSystem wh
 
     public sealed override void PostUpdatePlayers()
     {
-        for (int i = 0; i < TileObjects.Count; i++)
+        Parallel.For(0, TileObjects.Count, i =>
         {
             TTileObject tileObject = TileObjects[i];
             tileObject.Update();
-
-            // Account for the case in which an object gets removed in the middle of the loop.
-            if (!TileObjects.Contains(tileObject))
-                i--;
-        }
+        });
     }
 }

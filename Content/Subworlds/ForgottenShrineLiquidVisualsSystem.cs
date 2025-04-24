@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.Shaders;
@@ -226,7 +227,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         float[] tileLines = new float[horizontalSamples * 2];
 
         // Calculate samples.
-        for (int i = 0; i < horizontalSamples * 2; i++)
+        Parallel.For(0, horizontalSamples * 2, i =>
         {
             int x = tileArea.X + i;
             int waterLineY = 0;
@@ -260,7 +261,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
             }
             else
                 tileLines[i] = 0f;
-        }
+        });
 
         for (int j = 0; j < verticalSamples; j++)
         {

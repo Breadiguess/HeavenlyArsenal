@@ -126,6 +126,11 @@ public class OrnamentalShrineRopeData : WorldOrientedTileObject
             return;
         }
 
+        // Only do tile collision checks if a player is close, to save on performance.
+        Vector2 segmentCenter = VerletRope.segments[VerletRope.segments.Length / 2].position;
+        bool playerNearby = Main.player[Player.FindClosest(segmentCenter, 1, 1)].WithinRange(segmentCenter, 1900f);
+        VerletRope.tileCollide = !playerNearby;
+
         for (int i = 0; i < VerletRope.segments.Length; i++)
         {
             Rope.RopeSegment ropeSegment = VerletRope.segments[i];
