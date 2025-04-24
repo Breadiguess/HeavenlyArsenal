@@ -96,7 +96,7 @@ public class TEPlacedOfuda : ModTileEntity, IClientSideTileEntityUpdater
             overlayShader.TrySetParameter("screenSize", WotGUtils.ViewportSize);
             overlayShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
             overlayShader.TrySetParameter("pixelationLevels", new Vector2(75f, 37.5f));
-            overlayShader.SetTexture(texture, 1, SamplerState.AnisotropicClamp);
+            overlayShader.SetTexture(texture, 1, SamplerState.PointClamp);
 
             Vector2 offsetToRTCenter = -rope.segments[0].position + WotGUtils.ViewportSize * 0.5f + Main.screenPosition;
             PrimitiveSettings settings = new PrimitiveSettings(WidthFunction, ColorFunction, Shader: overlayShader, OffsetFunction: _ => offsetToRTCenter, UseUnscaledMatrix: true, ProjectionAreaWidth: 240, ProjectionAreaHeight: 240);
