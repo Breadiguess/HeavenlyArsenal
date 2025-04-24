@@ -338,7 +338,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
                 {
                     WorldGen.KillWall(x, y);
 
-                    ushort wallID = height >= localWallHeight - patternHeight && height < localWallHeight ? WallID.Pearlwood : WallID.WhiteDynasty;
+                    ushort wallID = height >= localWallHeight - patternHeight && height < localWallHeight ? WallID.AshWood : WallID.WhiteDynasty;
                     WorldGen.PlaceWall(x, y, wallID);
                     WorldGen.paintWall(x, y, PaintID.SkyBluePaint);
                 }
