@@ -101,7 +101,7 @@ public class ShrineIslandPass : GenPass
             ShrinePillarData previousPillar = pillarsByXPosition[i - 1];
             ShrinePillarData currentPillar = pillarsByXPosition[i];
             float horizontalDistanceBetweenPillars = MathHelper.Distance(previousPillar.Position.X, currentPillar.Position.X);
-            bool tooClose = horizontalDistanceBetweenPillars <= ForgottenShrineGenerationHelpers.MaxPillarAttachmentDistance * 0.33f;
+            bool tooClose = horizontalDistanceBetweenPillars <= ForgottenShrineGenerationHelpers.MinPillarAttachmentDistance;
             bool tooFar = horizontalDistanceBetweenPillars >= ForgottenShrineGenerationHelpers.MaxPillarAttachmentDistance;
 
             if (!tooClose && !tooFar)
@@ -113,9 +113,13 @@ public class ShrineIslandPass : GenPass
 
                 Point start = previousPillar.RopeAnchorPosition.Value.ToPoint();
                 Point end = currentPillar.RopeAnchorPosition.Value.ToPoint();
+                int beadCount = 0;
+                if (WorldGen.genRand.NextBool())
+                    beadCount = WorldGen.genRand.Next(3) + 1;
+
                 float distanceBetweenPillars = previousPillar.RopeAnchorPosition.Value.Distance(currentPillar.RopeAnchorPosition.Value);
                 float sagFactor = WorldGen.genRand.NextFloat(0.1f, 0.16f);
-                ropesManager.Register(new ShrinePillarRopeData(start, end, distanceBetweenPillars * sagFactor));
+                ropesManager.Register(new ShrinePillarRopeData(start, end, beadCount, distanceBetweenPillars * sagFactor));
             }
         }
     }

@@ -63,7 +63,12 @@ public static class ForgottenShrineGenerationHelpers
     /// <summary>
     /// The amount of pillars on the shrine island.
     /// </summary>
-    public static int ShrineIslandPillarCount => 20;
+    public static int ShrineIslandPillarCount => ShrineIslandWidth / 34;
+
+    /// <summary>
+    /// The minimum horizontal distance pillars can be from each other before it becomes impossible for them to have attached ropes.
+    /// </summary>
+    public static float MinPillarAttachmentDistance => 111f;
 
     /// <summary>
     /// The maximum horizontal distance pillars can be from each other before it becomes impossible for them to have attached ropes.

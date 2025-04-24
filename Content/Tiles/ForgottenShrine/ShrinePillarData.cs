@@ -58,7 +58,7 @@ public class ShrinePillarData : WorldOrientedTileObject
             if (!HasRopeAnchor)
                 return null;
 
-            return Position.ToVector2() - Vector2.UnitY.RotatedBy(Rotation) * (Height * RopeAnchorYInterpolant - 24f);
+            return Position.ToVector2() - Vector2.UnitY.RotatedBy(Rotation) * Height * RopeAnchorYInterpolant;
         }
     }
 
@@ -91,7 +91,7 @@ public class ShrinePillarData : WorldOrientedTileObject
         {
             Texture2D ropeAnchor = ropeAnchorTexture.Value;
             Vector2 ropePosition = RopeAnchorPosition.Value - Main.screenPosition;
-            Main.spriteBatch.Draw(ropeAnchor, ropePosition, null, Color.White, Rotation, ropeAnchor.Size() * new Vector2(0.5f, 1f), 1f, 0, 0f);
+            Main.spriteBatch.Draw(ropeAnchor, ropePosition, null, Color.White, Rotation, new Vector2(27f, 24f), 1f, 0, 0f);
         }
     }
 
