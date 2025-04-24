@@ -310,7 +310,11 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
             float easedCutoffInterpolant = 1f - MathF.Sqrt(1.001f - cutoffInterpolant.Squared());
             int localWallHeight = (int)(wallHeight * (1f - easedCutoffInterpolant));
 
-            int patternHeight = (int)MathF.Round(MathHelper.Lerp(3f, 1f, LumUtils.Cos01(MathHelper.TwoPi * (x - Left) / bridgeWidth * 3f)));
+            float patternSinusoid = MathF.Pow(6.1f, MathF.Cos(MathHelper.TwoPi * (x - Left) / bridgeWidth * 3f) - 1f);
+            int patternHeight = (int)MathF.Round(MathHelper.Lerp(3f, 1f, patternSinusoid));
+            if (InRooftopBridgeRange(x))
+                patternHeight++;
+
             for (int y = archTopY; y >= roofBottomY; y--)
             {
                 int height = archTopY - y;
@@ -334,7 +338,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
                 {
                     WorldGen.KillWall(x, y);
 
-                    ushort wallID = height >= localWallHeight - patternHeight && height < localWallHeight ? WallID.AshWood : WallID.WhiteDynasty;
+                    ushort wallID = height >= localWallHeight - patternHeight && height < localWallHeight ? WallID.Pearlwood : WallID.WhiteDynasty;
                     WorldGen.PlaceWall(x, y, wallID);
                     WorldGen.paintWall(x, y, PaintID.SkyBluePaint);
                 }
