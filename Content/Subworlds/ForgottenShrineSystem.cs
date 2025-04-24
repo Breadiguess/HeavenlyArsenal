@@ -44,6 +44,8 @@ public class ForgottenShrineSystem : ModSystem
         GlobalNPCEventHandlers.EditSpawnPoolEvent += OnlyAllowFriendlySpawnsInShrine;
         GlobalNPCEventHandlers.EditSpawnRateEvent += IncreaseFriendlySpawnsInShrine;
         On_Main.DrawBlack += ForceDrawBlack;
+        GlobalTileEventHandlers.IsTileUnbreakableEvent += MakeShrineUnbreakable;
+        GlobalWallEventHandlers.IsWallUnbreakableEvent += MakeShrineUnbreakable;
     }
 
     private static void OnlyAllowFriendlySpawnsInShrine(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
@@ -75,6 +77,8 @@ public class ForgottenShrineSystem : ModSystem
 
         orig(self, force);
     }
+
+    private bool MakeShrineUnbreakable(int x, int y, int type) => SubworldSystem.IsActive<ForgottenShrineSubworld>();
 
     private string UseWeatherText(string originalText)
     {
