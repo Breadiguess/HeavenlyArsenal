@@ -60,12 +60,12 @@ public class ShrineIslandPass : GenPass
         for (int i = 0; i < lilyCount; i++)
         {
             int lilyX = (int)(WorldGen.genRand.NextFloat(left, right) * 16f);
-            int lilyY = (int)(LumUtils.FindGroundVertical(new Point((int)(lilyX / 16f), 10)).Y * 16f) + 18;
-            Point tileAbove = new Point(lilyX / 16, lilyY / 16 - 1);
+            int lilyY = (int)(LumUtils.FindGroundVertical(new Point((int)(lilyX / 16f), 10)).Y * 16f);
+            Point tileAbove = new Point(lilyX / 16, lilyY / 16);
             if (Framing.GetTileSafely(tileAbove).LiquidAmount >= 20)
                 continue;
 
-            spiderLilies.Register(new SpiderLilyData(new Point(lilyX, lilyY)));
+            spiderLilies.Register(new SpiderLilyData(new Point(lilyX, lilyY + 18)));
         }
     }
 

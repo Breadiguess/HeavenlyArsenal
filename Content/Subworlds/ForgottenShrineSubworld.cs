@@ -41,6 +41,7 @@ public class ForgottenShrineSubworld : Subworld
         new ShrinePass(),
         new CreateUnderwaterVegetationPass(),
         new SmoothenPass(),
+        new ReorientShrineIslandLilyPass(),
         new SetPlayerSpawnPointPass()
     ];
 
