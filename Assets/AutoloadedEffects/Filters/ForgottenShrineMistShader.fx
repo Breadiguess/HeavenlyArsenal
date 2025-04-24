@@ -3,6 +3,7 @@ sampler noiseTexture : register(s1);
 sampler liquidTexture : register(s2);
 sampler lightTexture : register(s3);
 sampler lightDistanceTexture : register(s4);
+sampler tileTexture : register(s5);
 
 float globalTime;
 float noiseAppearanceThreshold;
@@ -39,6 +40,8 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     
     // Make mist dissipate if the water is shallow.
     mistInterpolant *= smoothstep(0.05, 0.15, tex2D(lightDistanceTexture, liquidTextureCoords).g);
+    
+    mistInterpolant *= 1 - tex2D(tileTexture, liquidTextureCoords).a;
     
     // Do some standard noise calculations to determine the shape of the mist.
     float time = globalTime * 0.3;

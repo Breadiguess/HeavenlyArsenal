@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -33,6 +32,15 @@ public class SpiderLilyData : WorldOrientedTileObject
     }
 
     /// <summary>
+    /// The Z position of this lily.
+    /// </summary>
+    public float ZPosition
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
     /// The direction of this lily.
     /// </summary>
     public SpriteEffects Direction
@@ -55,9 +63,6 @@ public class SpiderLilyData : WorldOrientedTileObject
     public override void Update()
     {
         WindTime = (WindTime + MathF.Abs(Main.windSpeedCurrent) * 0.11f) % (MathHelper.TwoPi * 5000f);
-        Point tilePosition = new Point(Position.X / 16, Position.Y / 16);
-        if (!WorldGen.SolidTile(tilePosition) || Main.tile[tilePosition].Slope != SlopeType.Solid)
-            ModContent.GetInstance<SpiderLilyManager>().Remove(this);
     }
 
     /// <summary>
@@ -69,7 +74,8 @@ public class SpiderLilyData : WorldOrientedTileObject
             return;
 
         int frameY = (Position.X + Position.Y * 13) % 3;
-        Color color = Lighting.GetColor(Position.ToVector2().ToTileCoordinates());
+        float brightness = 1.5f - ZPosition / 5.1f;
+        Color color = new Color(brightness, brightness, brightness);
 
         int windPushTime = 30;
         Main.instance.TilesRenderer.Wind.GetWindTime(Position.X / 16, Position.Y / 16, windPushTime, out int windTimeLeft, out int direction, out _);
@@ -89,7 +95,8 @@ public class SpiderLilyData : WorldOrientedTileObject
     {
         return new TagCompound()
         {
-            ["Start"] = Position
+            ["Start"] = Position,
+            ["ZPosition"] = ZPosition,
         };
     }
 
@@ -98,7 +105,10 @@ public class SpiderLilyData : WorldOrientedTileObject
     /// </summary>
     public override SpiderLilyData Deserialize(TagCompound tag)
     {
-        SpiderLilyData lily = new SpiderLilyData(tag.Get<Point>("Start"));
+        SpiderLilyData lily = new SpiderLilyData(tag.Get<Point>("Start"))
+        {
+            ZPosition = tag.GetFloat("ZPosition")
+        };
         return lily;
     }
 }

@@ -43,11 +43,13 @@ public class ForgottenShrineWater : ModWaterStyle
         {
             if (liquidType == LiquidID.Water && Main.liquidAlpha[Slot] > 0f)
             {
-                float opacity = MathHelper.Lerp(1f, 1.63f, Main.liquidAlpha[Slot]);
-                liquidColor.TopLeftColor *= opacity;
-                liquidColor.TopRightColor *= opacity;
-                liquidColor.BottomLeftColor *= opacity;
-                liquidColor.BottomRightColor *= opacity;
+                float colorFade = Main.liquidAlpha[Slot] * 0.85f;
+                Color idealColor = new Color(255, 255, 255);
+
+                liquidColor.TopLeftColor = Color.Lerp(liquidColor.TopLeftColor, idealColor, colorFade);
+                liquidColor.TopRightColor = Color.Lerp(liquidColor.TopRightColor, idealColor, colorFade);
+                liquidColor.BottomLeftColor = Color.Lerp(liquidColor.BottomLeftColor, idealColor, colorFade);
+                liquidColor.BottomRightColor = Color.Lerp(liquidColor.BottomRightColor, idealColor, colorFade);
             }
         });
     }

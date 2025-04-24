@@ -26,8 +26,8 @@ public class ShrinePass : GenPass
 
     private static void ConstructToriiGate(int leftX, int rightX, int gateHeight)
     {
-        int leftY = LumUtils.FindGroundVertical(new Point(leftX, Main.maxTilesY - 10)).Y;
-        int rightY = LumUtils.FindGroundVertical(new Point(rightX, Main.maxTilesY - 10)).Y;
+        int leftY = LumUtils.FindGroundVertical(new Point(leftX, 10)).Y + 1;
+        int rightY = LumUtils.FindGroundVertical(new Point(rightX, 10)).Y + 1;
         Point center = new Point((leftX + rightX) / 2, (leftY + rightY) / 2);
 
         PlaceToriiGateColumn(new Point(leftX, leftY), gateHeight, true);

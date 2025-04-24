@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
-using Terraria.ID;
 using Terraria.IO;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
@@ -24,10 +23,10 @@ public class ShrineIslandPass : GenPass
         BridgeGenerationSettings bridgeSettings = BaseBridgePass.BridgeGenerator.Settings;
         int left = BaseBridgePass.BridgeGenerator.Right + ForgottenShrineGenerationHelpers.LakeWidth + bridgeSettings.DockWidth;
         int right = left + ForgottenShrineGenerationHelpers.ShrineIslandWidth;
-        int bottom = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth;
-        int baseElevationAboveSeaLevel = 24;
-        int maxBaseElevation = ForgottenShrineGenerationHelpers.WaterDepth + baseElevationAboveSeaLevel;
-        int basinDepth = 12;
+        int bottom = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth - ForgottenShrineGenerationHelpers.WaterDepth;
+        int baseElevationAboveSeaLevel = 12;
+        int maxBaseElevation = baseElevationAboveSeaLevel;
+        int basinDepth = 9;
         ushort grassID = (ushort)ModContent.TileType<SacredGrass>();
 
         // Create the island.
@@ -37,17 +36,12 @@ public class ShrineIslandPass : GenPass
             float heightInterpolant = LumUtils.InverseLerpBump(0f, 0.1f, 0.9f, 1f, xInterpolant);
             float easedHeightInterpolant = MathF.Pow(heightInterpolant, 0.66f);
             int top = (int)(bottom - maxBaseElevation * easedHeightInterpolant + LumUtils.Convert01To010(xInterpolant) * basinDepth * 0.999f);
-            int stoneDepth = (int)MathHelper.Lerp(3f, 5f, LumUtils.AperiodicSin(xInterpolant * 23f).Squared());
 
             for (int y = top; y <= bottom; y++)
             {
                 Tile t = Main.tile[x, y];
                 t.HasTile = true;
-                t.TileType = TileID.Dirt;
-                if (y == top)
-                    t.TileType = grassID;
-                if (y >= top + stoneDepth)
-                    t.TileType = TileID.Stone;
+                t.TileType = grassID;
             }
         }
 
@@ -66,12 +60,12 @@ public class ShrineIslandPass : GenPass
         for (int i = 0; i < lilyCount; i++)
         {
             int lilyX = (int)(WorldGen.genRand.NextFloat(left, right) * 16f);
-            int lilyY = (int)(LumUtils.FindGroundVertical(new Point((int)(lilyX / 16f), Main.maxTilesY - 10)).Y * 16f);
-            Point tileAbove = new Point(lilyX / 16, lilyY / 16 - 1);
+            int lilyY = (int)(LumUtils.FindGroundVertical(new Point((int)(lilyX / 16f), 10)).Y * 16f);
+            Point tileAbove = new Point(lilyX / 16, lilyY / 16);
             if (Framing.GetTileSafely(tileAbove).LiquidAmount >= 20)
                 continue;
 
-            spiderLilies.Register(new SpiderLilyData(new Point(lilyX, lilyY)));
+            spiderLilies.Register(new SpiderLilyData(new Point(lilyX, lilyY + 18)));
         }
     }
 
@@ -81,7 +75,7 @@ public class ShrineIslandPass : GenPass
         for (int i = 0; i < pillarCount; i++)
         {
             int pillarX = (int)(WorldGen.genRand.NextFloat(left, right) * 16f);
-            int pillarY = (int)(LumUtils.FindGroundVertical(new Point((int)(pillarX / 16f), Main.maxTilesY - 10)).Y * 16f) + 24;
+            int pillarY = (int)(LumUtils.FindGroundVertical(new Point((int)(pillarX / 16f), 10)).Y * 16f) + 24;
 
             Point pillarSpawnPosition = new Point(pillarX, pillarY);
             float pillarRotation = WorldGen.genRand.NextFloatDirection() * 0.23f;

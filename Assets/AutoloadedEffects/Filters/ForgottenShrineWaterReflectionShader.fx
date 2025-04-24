@@ -78,12 +78,8 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     float reflectionBrightness = dot(reflectedColor.rgb, float3(0.3, 0.6, 0.1));
     reflectedColor *= 1 + smoothstep(0.5, 1, reflectionBrightness) * 0.93;
     
-    // Disable reflections if there's a tile right above the water line.
-    bool tileAboveReflection = tex2D(tileTexture, float2(liquidTextureCoords.x, reflectionLineY) - float2(0, 0.0001)).a > 0;
-    baseColor *= 1 + (tileAboveReflection * reflectionInterpolant) * reflectionStrength * 0.5;
-    
     // Combine things together.
-    return baseColor + reflectionInterpolant * reflectedColor * reflectionStrength * edgeOfScreenTaper * (1 - tileAboveReflection) + rippleLight;
+    return baseColor + reflectionInterpolant * reflectedColor * reflectionStrength * edgeOfScreenTaper + rippleLight;
 }
 
 technique Technique1

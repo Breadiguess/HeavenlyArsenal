@@ -53,17 +53,17 @@ public static class ForgottenShrineGenerationHelpers
     /// <summary>
     /// The amount of lilies on the west island.
     /// </summary>
-    public static int WestIslandLilyCount => 700;
+    public static int WestIslandLilyCount => 600;
 
     /// <summary>
     /// The amount of lilies on the shrine island.
     /// </summary>
-    public static int ShrineIslandLilyCount => 2400;
+    public static int ShrineIslandLilyCount => 1600;
 
     /// <summary>
     /// The amount of pillars on the shrine island.
     /// </summary>
-    public static int ShrineIslandPillarCount => ShrineIslandWidth / 34;
+    public static int ShrineIslandPillarCount => ShrineIslandWidth / 44;
 
     /// <summary>
     /// The minimum horizontal distance pillars can be from each other before it becomes impossible for them to have attached ropes.

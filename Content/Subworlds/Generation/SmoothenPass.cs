@@ -30,7 +30,10 @@ public class SmoothenPass : GenPass
                 Point p = new Point(x, y);
                 Tile t = Main.tile[p];
                 if (t.HasTile && t.LiquidAmount <= 0 && !PointsToNotSmoothen.Contains(p))
+                {
                     Tile.SmoothSlope(x, y, false);
+                    WorldGen.TileFrame(x, y);
+                }
             }
         }
         PointsToNotSmoothen.Clear();

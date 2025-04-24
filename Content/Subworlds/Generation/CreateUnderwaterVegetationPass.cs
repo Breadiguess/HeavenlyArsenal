@@ -1,4 +1,5 @@
-﻿using HeavenlyArsenal.Content.Tiles.ForgottenShrine;
+﻿using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
+using HeavenlyArsenal.Content.Tiles.ForgottenShrine;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
@@ -17,6 +18,9 @@ public class CreateUnderwaterVegetationPass : GenPass
     {
         progress.Message = "Creating underwater vegetation.";
 
+        int shrineIslandLeft = BaseBridgePass.BridgeGenerator.Right + ForgottenShrineGenerationHelpers.LakeWidth + BaseBridgePass.GenerationSettings.DockWidth;
+        int shrineIslandRight = shrineIslandLeft + ForgottenShrineGenerationHelpers.ShrineIslandWidth;
+
         // Create underwater trees.
         ushort treeID = (ushort)ModContent.TileType<UnderwaterTree>();
         for (int i = 0; i < ForgottenShrineGenerationHelpers.UnderwaterTreeCount; i++)
@@ -24,6 +28,9 @@ public class CreateUnderwaterVegetationPass : GenPass
             float xInterpolant = i / (float)(ForgottenShrineGenerationHelpers.UnderwaterTreeCount - 1f);
             int x = (int)MathHelper.Lerp(50f, Main.maxTilesX - 50f, xInterpolant) + WorldGen.genRand.Next(-24, 24);
             int y = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth - 1;
+            if (x >= shrineIslandLeft && y <= shrineIslandRight)
+                continue;
+
             Tile t = Main.tile[x, y];
 
             if (!t.HasTile)
@@ -41,8 +48,10 @@ public class CreateUnderwaterVegetationPass : GenPass
             float xInterpolant = i / (float)(cattailCount - 1f);
             int x = (int)MathHelper.Lerp(20f, Main.maxTilesX - 20f, xInterpolant) + WorldGen.genRand.Next(-20, 20);
             int y = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth - 1;
-            int height = ForgottenShrineGenerationHelpers.WaterDepth + WorldGen.genRand.Next(1, ForgottenShrineGenerationHelpers.MaxCattailHeight);
+            if (x >= shrineIslandLeft && y <= shrineIslandRight)
+                continue;
 
+            int height = ForgottenShrineGenerationHelpers.WaterDepth + WorldGen.genRand.Next(1, ForgottenShrineGenerationHelpers.MaxCattailHeight);
             Tile t = Main.tile[x, y];
             if (!t.HasTile)
                 GenerateCattail(x, y, height);
@@ -53,8 +62,10 @@ public class CreateUnderwaterVegetationPass : GenPass
         {
             int x = WorldGen.genRand.Next(10, Main.maxTilesX - 10);
             int y = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth - ForgottenShrineGenerationHelpers.WaterDepth;
-            Tile t = Main.tile[x, y];
+            if (x >= shrineIslandLeft && y <= shrineIslandRight)
+                continue;
 
+            Tile t = Main.tile[x, y];
             if (t.HasTile || t.LiquidAmount == 0)
                 continue;
 
