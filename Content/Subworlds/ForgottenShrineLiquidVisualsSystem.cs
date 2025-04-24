@@ -384,6 +384,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         mistShader.SetTexture(TileTargetManagers.LiquidTarget, 2, SamplerState.LinearClamp);
         mistShader.SetTexture(LightingMaskTargetManager.LightTarget, 3, SamplerState.LinearClamp);
         mistShader.SetTexture(LiquidDistanceTarget, 4, SamplerState.LinearClamp);
+        mistShader.SetTexture(TileTargetManagers.TileTarget, 5, SamplerState.LinearClamp);
         mistShader.Activate();
 
         reflectionShader.TrySetParameter("targetSize", Main.ScreenSize.ToVector2());
