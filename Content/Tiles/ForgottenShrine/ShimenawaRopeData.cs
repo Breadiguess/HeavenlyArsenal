@@ -33,7 +33,7 @@ public class ShimenawaRopeData : WorldOrientedTileObject
         }
 
         /// <summary>
-        /// The position of this rope ornament.
+        /// The position of this ornament.
         /// </summary>
         public Vector2 Position
         {
@@ -60,7 +60,7 @@ public class ShimenawaRopeData : WorldOrientedTileObject
         }
 
         /// <summary>
-        /// The current rotation of this rope.
+        /// The current rotation of this ornament.
         /// </summary>
         public float Rotation
         {
@@ -69,9 +69,18 @@ public class ShimenawaRopeData : WorldOrientedTileObject
         }
 
         /// <summary>
-        /// The angular velocity of this rope.
+        /// The angular velocity of this ornament.
         /// </summary>
         public float AngularVelocity
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The scale of this ornament.
+        /// </summary>
+        public float Scale
         {
             get;
             set;
@@ -86,11 +95,12 @@ public class ShimenawaRopeData : WorldOrientedTileObject
             set;
         }
 
-        public ShimenawaRopeOrnament(Asset<Texture2D> texture, float positionInterpolant, Action<ShimenawaRopeOrnament, Player, float> interactionAction)
+        public ShimenawaRopeOrnament(Asset<Texture2D> texture, float positionInterpolant, float scale, Action<ShimenawaRopeOrnament, Player, float> interactionAction)
         {
             TextureAsset = texture;
             PositionInterpolant = positionInterpolant;
             InteractionAction = interactionAction;
+            Scale = scale;
         }
 
         public void Update()
@@ -109,7 +119,7 @@ public class ShimenawaRopeData : WorldOrientedTileObject
         public void Render(Vector2 drawPosition, Color color)
         {
             Texture2D texture = TextureAsset.Value;
-            Main.spriteBatch.Draw(texture, drawPosition, null, color, Rotation, texture.Size() * new Vector2(0.5f, 0f), 0.6f, 0, 0f);
+            Main.spriteBatch.Draw(texture, drawPosition, null, color, Rotation, texture.Size() * new Vector2(0.5f, 0f), Scale, 0, 0f);
         }
     }
 
@@ -168,13 +178,13 @@ public class ShimenawaRopeData : WorldOrientedTileObject
     /// The set of ornaments on this rope.
     /// </summary>
     public ShimenawaRopeOrnament[] Ornaments =
-        [
-            new ShimenawaRopeOrnament(shideTexture, 0.15f, StandardOrnamentInteraction),
-            new ShimenawaRopeOrnament(shideTexture, 0.33f, StandardOrnamentInteraction),
-            new ShimenawaRopeOrnament(bellTexture, 0.5f, BellOrnamentInteraction),
-            new ShimenawaRopeOrnament(shideTexture, 0.67f, StandardOrnamentInteraction),
-            new ShimenawaRopeOrnament(shideTexture, 0.85f, StandardOrnamentInteraction),
-        ];
+    [
+        new ShimenawaRopeOrnament(shideTexture, 0.15f, 0.6f, StandardOrnamentInteraction),
+        new ShimenawaRopeOrnament(shideTexture, 0.33f, 0.6f, StandardOrnamentInteraction),
+        new ShimenawaRopeOrnament(bellTexture, 0.5f, 0.76f, BellOrnamentInteraction),
+        new ShimenawaRopeOrnament(shideTexture, 0.67f, 0.6f, StandardOrnamentInteraction),
+        new ShimenawaRopeOrnament(shideTexture, 0.85f, 0.6f, StandardOrnamentInteraction),
+    ];
 
     /// <summary>
     /// The amount of gravity imposed on this rope.
@@ -203,7 +213,7 @@ public class ShimenawaRopeData : WorldOrientedTileObject
 
     private static void StandardOrnamentInteraction(ShimenawaRopeOrnament ornament, Player player, float playerProximityInterpolant)
     {
-        ornament.AngularVelocity -= player.velocity.X * playerProximityInterpolant * 0.0051f;
+        ornament.AngularVelocity -= player.velocity.X * playerProximityInterpolant * 0.0021f;
     }
 
     private static void BellOrnamentInteraction(ShimenawaRopeOrnament ornament, Player player, float playerProximityInterpolant)
@@ -251,10 +261,14 @@ public class ShimenawaRopeData : WorldOrientedTileObject
         {
             Vector2 ornamentPosition = ropeCurve.Evaluate(ornament.PositionInterpolant);
             ornament.Position = ornamentPosition;
+            Vector2 top = ornamentPosition;
+            Vector2 bottom = ornamentPosition + Vector2.UnitY.RotatedBy(ornament.Rotation) * ornament.TextureAsset.Height() * ornament.Scale;
 
             foreach (Player player in Main.ActivePlayers)
             {
-                float playerProximityInterpolant = LumUtils.InverseLerp(45f, 10f, player.Distance(ornamentPosition));
+                float playerProximityInterpolantTop = LumUtils.InverseLerp(45f, 10f, player.Distance(top));
+                float playerProximityInterpolantBottom = LumUtils.InverseLerp(45f, 10f, player.Distance(bottom));
+                float playerProximityInterpolant = MathF.Max(playerProximityInterpolantTop, playerProximityInterpolantBottom);
                 if (playerProximityInterpolant > 0f && player.velocity.Length() >= 1f)
                 {
                     ornament.InteractionAction(ornament, player, playerProximityInterpolant);
