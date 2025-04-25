@@ -1,9 +1,11 @@
 ﻿using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
+using HeavenlyArsenal.Content.Tiles.ForgottenShrine;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.IO;
+using Terraria.ModLoader;
 using Terraria.WorldBuilding;
 
 namespace HeavenlyArsenal.Content.Subworlds.Generation;
@@ -57,6 +59,10 @@ public class ShrinePass : GenPass
         int middleArchSpread = upperArchSpread / 3;
         PlaceToriiGateColumn(new Point(center.X - 11, middleArchY - 1), middleArchY - upperArchY - 2, false);
         PlaceToriiGateColumn(new Point(center.X + 11, middleArchY - 1), middleArchY - upperArchY - 2, false);
+
+        Point ropeLeft = new Point((center.X - 13) * 16, middleArchY * 16 + 8);
+        Point ropeRight = new Point((center.X + 13) * 16, middleArchY * 16 + 8);
+        ModContent.GetInstance<ShimenawaRopeManager>().Register(new ShimenawaRopeData(ropeLeft, ropeRight, 32f));
 
         PlaceToriiGateMiddleArch(leftX - middleArchSpread, rightX + middleArchSpread, middleArchY);
         PlaceToriiGateUpperArch(leftX - upperArchSpread, rightX + upperArchSpread, upperArchY);
