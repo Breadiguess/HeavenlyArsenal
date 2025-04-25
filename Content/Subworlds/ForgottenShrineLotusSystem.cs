@@ -1,4 +1,5 @@
-﻿using HeavenlyArsenal.Content.Subworlds.Generation;
+﻿using HeavenlyArsenal.Common.Graphics;
+using HeavenlyArsenal.Content.Subworlds.Generation;
 using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
