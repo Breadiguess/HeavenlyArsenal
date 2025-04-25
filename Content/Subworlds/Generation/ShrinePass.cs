@@ -47,6 +47,7 @@ public class ShrinePass : GenPass
         }
     }
 
+    // TODO -- Calculations pertaining to this gate and its shrine are littered with hardcoded numbers that do not generalize. Create new constants and replace such math with them.
     private static void ConstructToriiGate(int leftX, int rightX, int gateHeight)
     {
         int leftY = LumUtils.FindGroundVertical(new Point(leftX, 10)).Y + 1;
