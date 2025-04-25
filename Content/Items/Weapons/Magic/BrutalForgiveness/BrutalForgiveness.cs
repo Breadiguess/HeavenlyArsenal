@@ -11,7 +11,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Magic.BrutalForgiveness;
 
 public class BrutalForgiveness : ModItem
 {
-    // TODO -- This doesn't actually consume mana right now. Fix that.
     public override void SetStaticDefaults()
     {
         GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>
@@ -42,7 +41,7 @@ public class BrutalForgiveness : ModItem
         Item.useTime = 25;
         Item.useAnimation = 25;
         Item.autoReuse = true;
-        Item.mana = 15;
+        Item.mana = 11;
         Item.holdStyle = 0;
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.channel = true;
