@@ -1,4 +1,8 @@
-﻿using Terraria.IO;
+﻿using HeavenlyArsenal.Common.Graphics;
+using HeavenlyArsenal.Content.Particles;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.IO;
 using Terraria.WorldBuilding;
 
 namespace HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
@@ -73,5 +77,32 @@ public class BaseBridgePass : GenPass
         progress.Message = "Creating the bridge.";
 
         BridgeGenerator.Generate();
+    }
+
+    /// <summary>
+    /// Places candles along the bridge.
+    /// </summary>
+    internal static void CreateCandles()
+    {
+        BridgeGenerationSettings settings = BridgeGenerator.Settings;
+        int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth;
+        int waterLevelY = groundLevelY - ForgottenShrineGenerationHelpers.WaterDepth;
+        int bridgeLowYPoint = waterLevelY - settings.BridgeBeamHeight - settings.BridgeThickness;
+        for (int tileX = BridgeGenerator.Left; tileX < BridgeGenerator.Right; tileX++)
+        {
+            if (BridgeGenerator.InNonRooftopBridgeRange(tileX) &&
+                BridgeGenerator.CalculateXWrappedBySingleBridge(tileX) == settings.BridgeArchWidth / 2)
+            {
+                float worldX = tileX * 16f + 8f;
+                float verticalOffset = BridgeGenerator.CalculateArchHeight(tileX) * -16f - 30f;
+                Vector2 candleSpawnPosition = new Vector2(worldX, bridgeLowYPoint * 16f + verticalOffset);
+
+                SpiritCandleParticle candle = SpiritCandleParticle.Pool.RequestParticle();
+                candle.Behavior = SpiritCandleParticle.AIType.Bounce;
+                candle.Prepare(candleSpawnPosition, Vector2.Zero, 0f, Color.White, Vector2.One);
+
+                ParticleEngine.Particles.Add(candle);
+            }
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using HeavenlyArsenal.Core;
+﻿using HeavenlyArsenal.Content.Subworlds;
+using HeavenlyArsenal.Core;
+using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
@@ -12,6 +14,12 @@ namespace HeavenlyArsenal.Content.Particles;
 
 public class SpiritCandleParticle : BaseParticle
 {
+    public enum AIType
+    {
+        Bounce,
+        DanceInAir
+    }
+
     /// <summary>
     /// The particle pool responsible for candle particles.
     /// </summary>
@@ -19,7 +27,25 @@ public class SpiritCandleParticle : BaseParticle
     {
         get;
         private set;
-    } = new ParticlePool<SpiritCandleParticle>(128, GetNewParticle<SpiritCandleParticle>);
+    } = new ParticlePool<SpiritCandleParticle>(512, GetNewParticle<SpiritCandleParticle>);
+
+    /// <summary>
+    /// A unique time offset value used for flickers to ensure variance.
+    /// </summary>
+    public float FlickerTimeOffset
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// The type of behavior that this candle should use.
+    /// </summary>
+    public AIType Behavior
+    {
+        get;
+        set;
+    }
 
     /// <summary>
     /// The position of this candle.
@@ -65,6 +91,7 @@ public class SpiritCandleParticle : BaseParticle
         Rotation = rotation;
         Color = color;
         BaseScale = scale;
+        FlickerTimeOffset = Main.rand.NextFloat();
     }
 
     public override void FetchFromPool()
@@ -77,14 +104,31 @@ public class SpiritCandleParticle : BaseParticle
     {
         Position += Velocity;
 
-        float squishRate = 54f;
-        float squishWave = MathF.Sin(MathHelper.TwoPi * Time / squishRate);
-        float horizontalSquish = MathF.Pow(squishWave * 0.5f + 0.5f, 2.3f) * 0.75f;
-        horizontalSquish -= LumUtils.InverseLerp(0.4f, 0f, horizontalSquish) * 0.55f;
-        horizontalSquish *= 0.05f;
+        if (Behavior == AIType.Bounce)
+        {
+            float squishRate = 54f;
+            float squishWave = MathF.Sin(MathHelper.TwoPi * Time / squishRate);
+            float horizontalSquish = MathF.Pow(squishWave * 0.5f + 0.5f, 2.3f) * 0.75f;
+            horizontalSquish -= LumUtils.InverseLerp(0.4f, 0f, horizontalSquish) * 0.55f;
+            horizontalSquish *= 0.05f;
 
-        Scale = new Vector2(1f + horizontalSquish, 1f - horizontalSquish) * BaseScale;
-        Velocity = Vector2.UnitY * squishWave * -0.7f;
+            Scale = new Vector2(1f + horizontalSquish, 1f - horizontalSquish) * BaseScale;
+            Velocity = Vector2.UnitY * squishWave * -0.7f;
+        }
+        else if (Behavior == AIType.DanceInAir)
+        {
+            Scale = BaseScale;
+            float timeOffset = MathHelper.TwoPi * FlickerTimeOffset;
+            float squishRate = 54f;
+            float squishWave = MathF.Sin(MathHelper.TwoPi * Time / squishRate + timeOffset);
+            float horizontalSquish = MathF.Pow(squishWave * 0.5f + 0.5f, 2.3f) * 0.75f;
+            horizontalSquish -= LumUtils.InverseLerp(0.4f, 0f, horizontalSquish) * 0.55f;
+            horizontalSquish *= 0.225f;
+
+            Scale = new Vector2(1f + horizontalSquish, 1f - horizontalSquish) * BaseScale;
+            Velocity = Vector2.UnitY * squishWave * -0.7f;
+            Rotation = squishWave * 0.04f;
+        }
 
         Time++;
     }
@@ -97,11 +141,16 @@ public class SpiritCandleParticle : BaseParticle
         Main.spriteBatch.Draw(texture, Position + settings.AnchorPosition, texture.Frame(), Color.MultiplyRGB(light), Rotation, texture.Size() * new Vector2(0.5f, 1f), Scale, 0, 0);
 
         Vector2 glowDrawPosition = Position + settings.AnchorPosition - Vector2.UnitY.RotatedBy(Rotation) * Scale.Y * 38f;
-        float glowFlicker = MathHelper.Lerp(0.9f, 1.1f, LumUtils.Cos01(Main.GlobalTimeWrappedHourly * 30f + Position.X * 0.01f)) * LumUtils.Saturate(1f - (1f - Scale.Y / BaseScale.Y) * 4.4f) * 0.7f;
+        float glowFlicker = MathHelper.Lerp(0.9f, 1.1f, LumUtils.Cos01(Main.GlobalTimeWrappedHourly * 20f + MathHelper.TwoPi * FlickerTimeOffset)) * LumUtils.Saturate(1f - (1f - Scale.Y / BaseScale.Y) * 3.3f) * 0.7f;
         Texture2D glow = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint.Value;
         Vector2 glowOrigin = glow.Size() * 0.5f;
         Main.spriteBatch.Draw(glow, glowDrawPosition, null, new Color(1f, 0.97f, 0.9f, 0f) * 0.9f, Rotation, glowOrigin, new Vector2(0.5f, Scale.Y * 1.2f) * glowFlicker * 0.2f, 0, 0f);
         Main.spriteBatch.Draw(glow, glowDrawPosition, null, new Color(1f, 0.95f, 0.4f, 0f) * 0.6f, Rotation, glowOrigin, glowFlicker * 0.4f, 0, 0f);
         Main.spriteBatch.Draw(glow, glowDrawPosition, null, new Color(1f, 0.61f, 0.2f, 0f) * 0.4f, Rotation, glowOrigin, glowFlicker * 0.7f, 0, 0f);
+
+        ForgottenShrineDarknessSystem.GlowActionsQueue.Enqueue(() =>
+        {
+            Main.spriteBatch.Draw(glow, glowDrawPosition, null, new Color(1f, 1f, 1f, 0f) * 0.9f, Rotation, glowOrigin, glowFlicker * 1.1f, 0, 0f);
+        });
     }
 }

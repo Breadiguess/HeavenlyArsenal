@@ -1,6 +1,4 @@
-﻿using HeavenlyArsenal.Common.Graphics;
-using HeavenlyArsenal.Content.Particles;
-using HeavenlyArsenal.Content.Subworlds.Generation;
+﻿using HeavenlyArsenal.Content.Subworlds.Generation;
 using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 using Microsoft.Xna.Framework;
 using NoxusBoss.Core.GlobalInstances;
@@ -35,7 +33,8 @@ public class ForgottenShrineSystem : ModSystem
 
     public override void OnModLoad()
     {
-        OnEnter += CreateCandles;
+        OnEnter += BaseBridgePass.CreateCandles;
+        OnEnter += ShrinePass.CreateCandles;
 
         CellPhoneInfoModificationSystem.WeatherReplacementTextEvent += UseWeatherText;
         CellPhoneInfoModificationSystem.MoonPhaseReplacementTextEvent += UseMoonNotFoundText;
@@ -110,28 +109,6 @@ public class ForgottenShrineSystem : ModSystem
             return Language.GetText($"Mods.NoxusBoss.CellPhoneInfoOverrides.ParsecText").Format($"{7233858412997:n0}");
 
         return null;
-    }
-
-    private static void CreateCandles()
-    {
-        BridgeGenerationSettings settings = BaseBridgePass.BridgeGenerator.Settings;
-        int groundLevelY = Main.maxTilesY - ForgottenShrineGenerationHelpers.GroundDepth;
-        int waterLevelY = groundLevelY - ForgottenShrineGenerationHelpers.WaterDepth;
-        int bridgeLowYPoint = waterLevelY - settings.BridgeBeamHeight - settings.BridgeThickness;
-        for (int tileX = BaseBridgePass.BridgeGenerator.Left; tileX < BaseBridgePass.BridgeGenerator.Right; tileX++)
-        {
-            if (BaseBridgePass.BridgeGenerator.InNonRooftopBridgeRange(tileX) &&
-                BaseBridgePass.BridgeGenerator.CalculateXWrappedBySingleBridge(tileX) == settings.BridgeArchWidth / 2)
-            {
-                float worldX = tileX * 16f + 8f;
-                float verticalOffset = BaseBridgePass.BridgeGenerator.CalculateArchHeight(tileX) * -16f - 30f;
-                Vector2 candleSpawnPosition = new Vector2(worldX, bridgeLowYPoint * 16f + verticalOffset);
-                SpiritCandleParticle candle = SpiritCandleParticle.Pool.RequestParticle();
-                candle.Prepare(candleSpawnPosition, Vector2.Zero, 0f, Color.White, Vector2.One);
-
-                ParticleEngine.Particles.Add(candle);
-            }
-        }
     }
 
     public override void PreUpdateEntities()
