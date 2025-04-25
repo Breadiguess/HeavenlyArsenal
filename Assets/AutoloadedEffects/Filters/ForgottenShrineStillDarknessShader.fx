@@ -21,6 +21,8 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     
     float darknessInterpolant = smoothstep(islandLeft, islandLeft + darknessTaperDistance, worldPosition.x) *
                                 smoothstep(islandRight, islandRight - darknessTaperDistance, worldPosition.x);
+    darknessInterpolant = pow(darknessInterpolant, 1.75);
+    
     float darkness = lerp(1, baseDarkness, darknessInterpolant * opacity);
     float brightness = lerp(darkness, 1, glowInterpolant * 1.75);
     

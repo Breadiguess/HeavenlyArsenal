@@ -83,7 +83,7 @@ public class ForgottenShrineDarknessSystem : ModSystem
             darknessShader.TrySetParameter("islandLeft", left * 16f);
             darknessShader.TrySetParameter("islandRight", right * 16f);
             darknessShader.TrySetParameter("uvToWorld", uvToWorld);
-            darknessShader.TrySetParameter("darknessTaperDistance", 2000f);
+            darknessShader.TrySetParameter("darknessTaperDistance", 3300f);
             darknessShader.SetTexture(glowTarget, 1, SamplerState.LinearClamp);
             darknessShader.Activate();
         }
