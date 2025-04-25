@@ -123,13 +123,16 @@ public class HangingLanternRopeData : WorldOrientedTileObject
         // Draw the lantern at the bottom of the rope.
         Texture2D lantern = OrnamentalShrineRopeData.PaperLanternTexture.Value;
         Texture2D glowTexture = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
+        float flickerInterpolant = LumUtils.Cos01(Main.GlobalTimeWrappedHourly * 5f + VerletRope.segments[0].position.X * 0.1f);
+        float flicker = MathHelper.Lerp(0.93f, 1.07f, flickerInterpolant);
         float lanternScale = 0.8f;
+        float glowScale = lanternScale * flicker;
         float lanternRotation = VerletRope.segments[0].position.AngleTo(VerletRope.segments[^1].position);
         Vector2 lanternDrawPosition = VerletRope.segments[^1].position - Main.screenPosition;
         Color lanternGlowColor = new Color(1f, 0.44f, 0.15f, 0f) * 0.75f;
         Main.spriteBatch.Draw(lantern, lanternDrawPosition, null, Color.White, lanternRotation + MathHelper.PiOver2, lantern.Size() * 0.5f, lanternScale, Direction.ToSpriteDirection(), 0f);
-        Main.spriteBatch.Draw(glowTexture, lanternDrawPosition, null, lanternGlowColor, 0f, glowTexture.Size() * 0.5f, lanternScale * 1.05f, 0, 0f);
-        Main.spriteBatch.Draw(glowTexture, lanternDrawPosition, null, lanternGlowColor * 0.6f, 0f, glowTexture.Size() * 0.5f, lanternScale * 1.4f, 0, 0f);
+        Main.spriteBatch.Draw(glowTexture, lanternDrawPosition, null, lanternGlowColor, 0f, glowTexture.Size() * 0.5f, glowScale * 1.05f, 0, 0f);
+        Main.spriteBatch.Draw(glowTexture, lanternDrawPosition, null, lanternGlowColor * 0.6f, 0f, glowTexture.Size() * 0.5f, glowScale * 1.4f, 0, 0f);
 
         // Draw the knot above the rope.
         Texture2D knot = KnotTexture.Value;
