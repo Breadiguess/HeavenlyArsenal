@@ -174,7 +174,6 @@ public class ShrinePass : GenPass
                 candleSpawnPosition.Y -= 16f;
 
             float candleSocialDistancing = 36f;
-            float candleGroundY = LumUtils.FindGroundVertical(candleSpawnPosition.ToTileCoordinates()).Y * 16f;
 
             // Keep the shrine free of candles.
             if (MathHelper.Distance(candleSpawnPosition.X, gateCenterWorldCoords.X) <= ForgottenShrineGenerationHelpers.ShrineIslandGatePillarDistance * 16f + 50f)
@@ -183,9 +182,9 @@ public class ShrinePass : GenPass
                 continue;
             }
 
-            // Otherwise, only partially ground the candles.
-            else
-                candleSpawnPosition.Y = MathHelper.Lerp(candleSpawnPosition.Y, candleGroundY, 0.5f);
+            // Partially ground the candles.
+            float candleGroundY = LumUtils.FindGroundVertical(candleSpawnPosition.ToTileCoordinates()).Y * 16f;
+            candleSpawnPosition.Y = MathHelper.Lerp(candleSpawnPosition.Y, candleGroundY, 0.33f);
 
             // Try again if the candle position is too close to a candle that was already placed.
             if (placedCandlePositions.Any(p => p.WithinRange(candleSpawnPosition, candleSocialDistancing)))

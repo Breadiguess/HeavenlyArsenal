@@ -156,7 +156,7 @@ public class SpiritCandleParticle : BaseParticle
 
         ForgottenShrineDarknessSystem.QueueGlowAction(() =>
         {
-            Main.spriteBatch.Draw(glow, glowDrawPosition, null, new Color(1f, 0.8f, 0.4f, 0f), Rotation, glowOrigin, glowFlicker * 1.1f, 0, 0f);
+            Main.spriteBatch.Draw(glow, glowDrawPosition, null, new Color(1f, 0.8f, 0.4f, 0f) * 0.84f, Rotation, glowOrigin, glowFlicker * 0.99f, 0, 0f);
         });
     }
 }
