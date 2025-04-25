@@ -295,7 +295,7 @@ public class ShimenawaRopeData : WorldOrientedTileObject
         overlayShader.SetTexture(LightingMaskTargetManager.LightTarget, 2);
         overlayShader.Apply();
 
-        PrimitiveSettings settings = new PrimitiveSettings((float _) => projection.Width * widthFactor * 0.2f, colorFunction.Invoke, (float _) => drawOffset + Main.screenPosition, Smoothen: true, Pixelate: false, overlayShader, projectionWidth, projectionHeight, unscaledMatrix);
+        PrimitiveSettings settings = new PrimitiveSettings((float _) => projection.Width * widthFactor * 0.25f, colorFunction.Invoke, (float _) => drawOffset + Main.screenPosition, Smoothen: true, Pixelate: false, overlayShader, projectionWidth, projectionHeight, unscaledMatrix);
         PrimitiveRenderer.RenderTrail(positions, settings, 40);
     }
 

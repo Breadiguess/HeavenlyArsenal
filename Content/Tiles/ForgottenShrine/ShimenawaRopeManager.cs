@@ -56,7 +56,7 @@ public class ShimenawaRopeManager : WorldOrientedTileObjectManager<ShimenawaRope
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 
             ManagedShader pixelationShader = ShaderManager.GetShader("Luminance.PixelationShader");
-            pixelationShader.TrySetParameter("pixelationFactor", Vector2.One * 1.25f / target.Size());
+            pixelationShader.TrySetParameter("pixelationFactor", Vector2.One / target.Size());
             pixelationShader.Apply();
 
             Main.spriteBatch.Draw(target, Main.screenLastPosition - Main.screenPosition, Color.White);
