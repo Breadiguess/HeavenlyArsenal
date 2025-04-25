@@ -25,8 +25,6 @@ public class OrnamentalShrineRopeData : WorldOrientedTileObject
 
     private static readonly Asset<Texture2D> spiralTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Tiles/ForgottenShrine/RopeSpiral");
 
-    private static readonly Asset<Texture2D> paperLanternTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Tiles/ForgottenShrine/PaperLantern");
-
     /// <summary>
     /// A general-purpose timer used for wind movement on the baubles attached to this rope.
     /// </summary>
@@ -85,6 +83,11 @@ public class OrnamentalShrineRopeData : WorldOrientedTileObject
     /// The amount of gravity imposed on this rope.
     /// </summary>
     public static float Gravity => 0.65f;
+
+    /// <summary>
+    /// The asset for the paper lantern texture used by this rope.
+    /// </summary>
+    public static readonly Asset<Texture2D> PaperLanternTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Tiles/ForgottenShrine/PaperLantern");
 
     public OrnamentalShrineRopeData() { }
 
@@ -216,7 +219,7 @@ public class OrnamentalShrineRopeData : WorldOrientedTileObject
             float lanternScale = 0.8f;
             if (i == ornamentCount / 2)
             {
-                lanternTexture = paperLanternTexture.Value;
+                lanternTexture = PaperLanternTexture.Value;
                 lanternFrame = lanternTexture.Frame();
                 lanternGlowColor = new Color(1f, 0.44f, 0.15f, 0f);
                 lanternGlowOpacity = 0.5f;

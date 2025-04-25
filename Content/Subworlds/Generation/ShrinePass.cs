@@ -60,9 +60,20 @@ public class ShrinePass : GenPass
         PlaceToriiGateColumn(new Point(center.X - 11, middleArchY - 1), middleArchY - upperArchY - 2, false);
         PlaceToriiGateColumn(new Point(center.X + 11, middleArchY - 1), middleArchY - upperArchY - 2, false);
 
-        Point ropeLeft = new Point((center.X - 13) * 16, middleArchY * 16 + 8);
-        Point ropeRight = new Point((center.X + 13) * 16, middleArchY * 16 + 8);
-        ModContent.GetInstance<ShimenawaRopeManager>().Register(new ShimenawaRopeData(ropeLeft, ropeRight, 32f));
+        Point shimenawaLeftPosition = new Point((center.X - 13) * 16, middleArchY * 16 + 8);
+        Point shimenawaRightPosition = new Point((center.X + 13) * 16, middleArchY * 16 + 8);
+        ModContent.GetInstance<ShimenawaRopeManager>().Register(new ShimenawaRopeData(shimenawaLeftPosition, shimenawaRightPosition, 32f));
+
+        Point leftLanternPosition = new Point(shimenawaLeftPosition.X - 8, shimenawaLeftPosition.Y + 8);
+        Point rightLanternPosition = new Point(shimenawaRightPosition.X + 8, shimenawaRightPosition.Y + 8);
+        ModContent.GetInstance<HangingLanternRopeManager>().Register(new HangingLanternRopeData(leftLanternPosition, gateHeight * 6f)
+        {
+            Direction = 1
+        });
+        ModContent.GetInstance<HangingLanternRopeManager>().Register(new HangingLanternRopeData(rightLanternPosition, gateHeight * 6f)
+        {
+            Direction = -1
+        });
 
         PlaceToriiGateMiddleArch(leftX - middleArchSpread, rightX + middleArchSpread, middleArchY);
         PlaceToriiGateUpperArch(leftX - upperArchSpread, rightX + upperArchSpread, upperArchY);
