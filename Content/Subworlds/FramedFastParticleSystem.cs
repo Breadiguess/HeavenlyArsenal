@@ -9,6 +9,7 @@ using Vector2SIMD = System.Numerics.Vector2;
 
 namespace HeavenlyArsenal.Content.Subworlds;
 
+// TODO -- Move this file somewhere else, it should not be in the Subworlds directory.
 [Autoload(Side = ModSide.Client)]
 public class FramedFastParticleSystem(int totalFrames, int maxParticles, Action renderPreparations, FastParticleSystem.ParticleUpdateAction extraUpdates = null) :
     FastParticleSystem(maxParticles, renderPreparations, extraUpdates)
