@@ -73,7 +73,7 @@ public static class ForgottenShrineGenerationHelpers
     /// <summary>
     /// The amount of candles to generate on the shrine island, near the shrine itself.
     /// </summary>
-    public static int ShrineIslandCandleCount => 71;
+    public static int ShrineIslandCandleCount => 51;
 
     /// <summary>
     /// The minimum horizontal distance pillars can be from each other before it becomes impossible for them to have attached ropes.
