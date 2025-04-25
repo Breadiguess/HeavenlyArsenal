@@ -225,7 +225,11 @@ public class ShimenawaRopeData : WorldOrientedTileObject
 
         if (ornament.InteractionTimer >= 45)
         {
-            SoundEngine.PlaySound(SoundID.Item35 with { Pitch = 0f, MaxInstances = 3, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, ornament.Position);
+            // Queuing this on the main thread is necessary to prevent potential deadlock bugs.
+            Main.QueueMainThreadAction(() =>
+            {
+                SoundEngine.PlaySound(SoundID.Item35 with { Pitch = 0f, MaxInstances = 3, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, ornament.Position);
+            });
 
             for (int i = -1; i <= 1; i += 2)
             {
