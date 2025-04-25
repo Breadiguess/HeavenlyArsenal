@@ -225,7 +225,7 @@ public class ShimenawaRopeData : WorldOrientedTileObject
 
         if (ornament.InteractionTimer >= 45)
         {
-            // Queuing this on the main thread is necessary to prevent potential deadlock bugs.
+            // Queuing this on the main thread is necessary to prevent potential deadlock bugs since tile objects are updated in parallel.
             Main.QueueMainThreadAction(() =>
             {
                 SoundEngine.PlaySound(SoundID.Item35 with { Pitch = 0f, MaxInstances = 3, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, ornament.Position);
