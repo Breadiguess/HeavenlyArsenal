@@ -38,7 +38,7 @@ public static class ForgottenShrineGenerationHelpers
     /// <summary>
     /// The amount of lilypads to generate atop the water.
     /// </summary>
-    public static int LilypadCount => 0;
+    public static int LilypadCount => Main.maxTilesX / 17;
 
     /// <summary>
     /// The width of the lake before the shrine.
