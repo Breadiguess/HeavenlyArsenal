@@ -150,7 +150,7 @@ namespace HeavenlyArsenal.Content.NPCs
             Texture2D bodyTexture = TextureAssets.Npc[NPC.type].Value;
             Texture2D Glow = GennedAssets.Textures.FirstPhaseForm.AvatarRift;
             Vector2 bodyOrigin = new Vector2(bodyTexture.Width / 2f, bodyTexture.Height / 2f);
-            float scale = 0.4f;
+            float scale = 0.1f;
 
 
             Main.spriteBatch.Draw(Glow, NPC.Center - screenPos, null, drawColor, NPC.rotation, bodyOrigin, scale, SpriteEffects.None, 0f);
@@ -170,7 +170,7 @@ namespace HeavenlyArsenal.Content.NPCs
             Vector2 Lorigin = new Vector2(Lillyframe.Width / 2, Lillyframe.Height + 54 * Math.Sign(NPC.gravity));
             float LillySquish = MathF.Cos(Main.GlobalTimeWrappedHourly * 10.5f + NPC.Center.X + NPC.Center.Y) * 1f;
             float LillyScale = 0.1f;
-            Vector2 LillyPos = NPC.Center;
+            Vector2 LillyPos = NPC.Center + new Vector2(0f,-20f);
             Color glowmaskColor = new Color(2, 0, 156);
             //Main.NewText($"{LillyPos - Main.screenPosition}");
             Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, drawColor, wind, Lorigin, LillyScale, spriteEffects, 0f);

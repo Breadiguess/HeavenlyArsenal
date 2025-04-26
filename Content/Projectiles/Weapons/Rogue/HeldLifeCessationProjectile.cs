@@ -1,6 +1,6 @@
 ﻿using CalamityMod;
 using HeavenlyArsenal.ArsenalPlayer;
-using HeavenlyArsenal.Common.UI;
+using HeavenlyArsenal.Common.Ui;
 using HeavenlyArsenal.Content.Buffs.LifeAndCessation;
 using HeavenlyArsenal.Content.Items.Weapons.Rogue;
 using Luminance.Core.Graphics;
@@ -658,10 +658,6 @@ class HeldLifeCessationProjectile : ModProjectile
         }
         
         Color glowmaskColor = new Color(2, 0, 156);
-
-
-        //Main.spriteBatch.Draw(LillyTexture, LillyPos- Main.screenPosition, null, lightColor, wind,LillyTexture.Size() * new Vector2(0.5f, 1f), LillyScale, 0, 0f);
-         
         Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, lightColor, wind, Lorigin, LillyScale, spriteEffects, 0f);
         /*
         ManagedShader psychedelicShader = ShaderManager.GetShader("HeavenlyArsenal.ColdShader");

@@ -39,7 +39,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
         public int Iframe;
         public int rechargeDelay;
         public int rechargeRate;
-        public float barrierDamageReduction = 0.75f;
+        public float barrierDamageReduction = 0.7f;
         public bool ShadowShieldVisible = true;
         public bool ShadowVeil;
         internal float barrierShieldPartialRechargeProgress = 0f;

@@ -364,7 +364,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         {
             Vector2 targetCenter = targetHitbox.Center();
             Vector2 circle = Projectile.Center + Projectile.DirectionTo(targetCenter).SafeNormalize(Vector2.Zero) * Math.Min(Projectile.Distance(targetCenter), Projectile.width);
-            Dust.QuickDust(circle, Color.Cyan);
+            //Dust.QuickDust(circle, Color.Cyan);
             return targetHitbox.Contains(circle.ToPoint());
         }
 

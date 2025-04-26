@@ -31,34 +31,28 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 	[AutoloadEquip(EquipType.Body)]
 	public class ShintoArmorBreastplate : ModItem
 	{
-        
-        public static int BarrierCooldown = 20 * 60;
 
-        public static readonly int MaxManaIncrease = 200;
+        public static int BarrierCooldown = 20 * 60;
+        public static readonly int MaxManaIncrease = 150;
 		public static readonly int MaxMinionIncrease = 10;
-        public static int ShieldDurabilityMax = 340;
+        public static int ShieldDurabilityMax = 200;
         public static int ShieldRechargeDelay = 400;
         public static int ShieldRechargeRate = 25;
-        public static int TotalShieldRechargeTime = 200;
+        public static int TotalShieldRechargeTime = 220;
 
         public static int AbyssDash_Iframes = 10 * 60;
         public static int AbyssDash_Cooldown = 60;
-
         public static readonly SoundStyle AbyssDash_Start = GennedAssets.Sounds.Avatar.AngryDistant with { PitchVariance = 0.4f, Volume = 0.6f, MaxInstances = 0 };
-
         public static readonly SoundStyle ShieldHurtSound = GennedAssets.Sounds.Avatar.DeadStarCoreCrack with { PitchVariance = 0.6f, Volume = 0.6f, MaxInstances = 0 };
         public static readonly SoundStyle ActivationSound = GennedAssets.Sounds.Avatar.DeadStarCoreCritical with { PitchVariance = 0.6f, Volume = 0.6f, MaxInstances = 0 };
         public static readonly SoundStyle BreakSound = GennedAssets.Sounds.Avatar.DeadStarCoreExplode with { PitchVariance = 0.6f, Volume = 0.6f, MaxInstances = 0 };
-
-
-
-        public static Texture2D tex = ModContent.Request<Texture2D>("CalamityMod/Items/Accessories/TheSpongeShield").Value;
         public static Texture2D NoiseTex = GennedAssets.Textures.Noise.TurbulentNoise;
         public static Texture2D GFB = GennedAssets.Textures.Extra.Ogscule;
+
         public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MaxManaIncrease, MaxMinionIncrease);
 
 
-        public new string LocalizationCategory => "Items.Armor";
+        public new string LocalizationCategory => "Items.ShintoArmor.Armor";
         public override void SetStaticDefaults()
         {
             var equipSlot = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Body);
@@ -79,9 +73,9 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         {
             var modPlayer = player.Calamity();
             modPlayer.shadeRegen = true;
-            player.thorns += 100f;
+            player.thorns += 50f;
             player.statLifeMax2 += 350;
-            player.statManaMax2 += 400;
+            player.statManaMax2 += 350;
             player.GetDamage<GenericDamageClass>() += 0.15f;
             player.GetCritChance<GenericDamageClass>() += 18;
             player.GetAttackSpeed<GenericDamageClass>() += 0.25f;
@@ -94,12 +88,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
         // Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.
         public float RenderDepth => IDyeableShaderRenderer.SpongeShieldDepth;
-
-      
-        // Renders the bubble shield over the item in the world.
-     
-
-
         public static void DrawDyeableShader(SpriteBatch spriteBatch)
         {
           

@@ -1,19 +1,14 @@
 ﻿using CalamityMod;
 using CalamityMod.Buffs.Potions;
-using CalamityMod.Items.Armor.OmegaBlue;
 using CalamityMod.Particles;
-using CalamityMod.Projectiles.Typeless;
-using HeavenlyArsenal.Common.UI;
+using HeavenlyArsenal.Common.Ui;
 using HeavenlyArsenal.Content.Buffs;
-using HeavenlyArsenal.Content.Buffs.Stims;
 using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
 using Microsoft.Xna.Framework;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Armor.NewFolder

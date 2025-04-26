@@ -11,10 +11,13 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Particles;
+using NoxusBoss.Core.Graphics.GeneralScreenEffects;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using System;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
+using Terraria.Graphics.CameraModifiers;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Particle = Luminance.Core.Graphics.Particle;
@@ -50,10 +53,10 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
         public ref float ChargeTimer => ref Projectile.ai[1];
         public ref float ShootDelay => ref Projectile.localAI[0];
         public override int AssociatedItemID => ModContent.ItemType<FusionRifle>();
-        public override int IntendedProjectileType => ModContent.ProjectileType<FusionRifle_Projectile>();
+        public override int IntendedProjectileType => ModContent.ProjectileType<    ColdBurst>();
         public float Time { get; private set; }
 
-        public static float CurrentChargeTime = 60;//FusionRifle.MaxChargeTime; // Default to MaxChargeTime
+        public static float CurrentChargeTime = FusionRifle.MaxChargeTime; // Default to MaxChargeTime
 
         public override void SetStaticDefaults()
         {
@@ -65,31 +68,33 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             base.SetStaticDefaults();
         }
 
+        public static readonly SoundStyle Charging = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/FusionRifle/fusionrifle_charge3");
+        public static readonly SoundStyle Fire = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/FusionRifle/fusionrifle_fire2");
         public override void SetDefaults()
         {
-            chargingSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/FusionRifle/fusionrifle_charge3").Value;
-            firingSoundEffect = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/Ranged/FusionRifle/fusionrifle_fire2").Value;
-
+            
             Projectile.width = Projectile.height = 60;
             Projectile.friendly = true;
             Projectile.penetrate = -1;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
             Projectile.DamageType = DamageClass.Ranged;
-            Projectile.MaxUpdates = 2;
+            Projectile.MaxUpdates = 4;
         }
 
-        public static int BurstCount = 0; // Tracks how many projectiles are left in the burst
+        //todo: make this not static
+        public static int BurstCount = 0; 
 
         private enum FusionRifleState
         {
+            Idle,
             Charging,  
             Firing,    
             Delay      
         }
 
-        private FusionRifleState CurrentState = FusionRifleState.Charging;
-        private int StateTimer = 0; // Timer to control transitions between states
+        private FusionRifleState CurrentState = FusionRifleState.Idle;
+        private int StateTimer = 0; 
 
 
 
@@ -101,6 +106,13 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
             switch (CurrentState)
             {
+                case FusionRifleState.Idle:
+                    ChargeTimer = 0;
+                    if (Owner.controlUseItem)
+                    {
+                        CurrentState = FusionRifleState.Charging;
+                    }
+                    break;
                 case FusionRifleState.Charging:
                     HandleCharging();
                     break;
@@ -108,7 +120,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
                 case FusionRifleState.Firing:
                     HandleFiring();
                     break;
-
+                    
                 case FusionRifleState.Delay:
                     HandleDelay();
                     break;
@@ -121,125 +133,102 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
         }
 
 
-        private SoundEffectInstance chargingSoundInstance; // Instance for playing sound
-        private SoundEffect chargingSoundEffect;           // Preloaded sound effect
-
-        private SoundEffectInstance firingSoundInstance;
-        private SoundEffect firingSoundEffect;
+        
         private void HandleCharging()
         {
-
-
-            if (Main.mouseLeft && Owner.channel)
+            if (Owner.controlUseItem && Owner.channel)
             {
-                if (ChargeTimer < CurrentChargeTime)
-                    ChargeTimer++;
-
-
-
-
-                // Handle the charging sound
-                if (chargingSoundInstance == null) // If no sound is currently playing
+                if(ChargeTimer == 0)
                 {
-                    chargingSoundInstance = chargingSoundEffect.CreateInstance();
-                    chargingSoundInstance.IsLooped = false;
-                    chargingSoundInstance.Volume = 1f; // Adjust volume if necessary
-                    chargingSoundInstance.Play(); // Start playing the sound
+                    Owner.GetModPlayer<FusionRiflePlayer>().BurstCounter = 0;
+                    ActiveSound activeSound = SoundEngine.FindActiveSound(Charging);
+                    if (activeSound != null)
+                    {
+                        activeSound.Stop();
+                    }
+                    SoundEngine.PlaySound(Charging with { MaxInstances = 0 , Volume = 0.5f}, Projectile.Center);
                 }
-                else if (chargingSoundInstance.State != SoundState.Playing)
-                {
-                    chargingSoundInstance.Play(); // Restart if it’s stopped
-                }
-
-                // Add gun shake effect as the rifle charges
-                float shakeIntensity = 2f * ChargeupInterpolant;
-                Projectile.position += new Vector2(
-                    Main.rand.NextFloat(-shakeIntensity, shakeIntensity),
-                    Main.rand.NextFloat(-shakeIntensity, shakeIntensity)
-                );
-
-                // Add inward swirling dust effect with consistent 3D Y-axis tilt, no Z-axis distortion
-                float initialDustRadius = 50f; // Starting radius (adjust as needed)
-                float finalDustRadius = 10f;   // Ending radius near the target (adjust as needed)
-                float dustRadius = MathHelper.Lerp(initialDustRadius, finalDustRadius, ChargeTimer / CurrentChargeTime);
-
-                // Adjustable offset for the barrel (change these values to position the swirl effect)
-                Vector2 barrelOffset = new Vector2(45f, Projectile.direction * -7f); // Customize the base position of the dust effect
-                barrelOffset = barrelOffset.RotatedBy(Projectile.rotation); // Rotate the offset based on the projectile's rotation
-
-                // Define rotation angle for Y-axis tilt (in radians)
-                float yAxisTilt = MathHelper.ToRadians(50f); // 20-degree tilt for the 3D plane
-
-                // Add the swirling effect with the corrected Y-axis tilt
-                float dustAngle = Main.GameUpdateCount * 0.1f; // Rotate based on time
-                for (int i = 0; i < 3; i++) // Add multiple dust particles
-                {
-                    float angle = dustAngle + MathHelper.TwoPi / 3 * i; // Spread particles equally
-
-                    // Calculate the swirl offset before applying the Y-axis tilt
-                    float unrotatedX = (float)Math.Cos(angle) * dustRadius;
-                    float unrotatedY = (float)Math.Sin(angle) * dustRadius;
-
-                    // Apply only the desired Y-axis tilt
-                    float tiltedX = unrotatedX * (float)Math.Cos(yAxisTilt); // Apply X-axis scaling for the tilt
-                    float tiltedY = unrotatedY; // Retain Y without Z influence
-                    float adjustedY = tiltedY + unrotatedX * (float)Math.Sin(yAxisTilt) * 0.5f; // Minimal Z-axis impact on Y
-
-                    // Finalize the swirl position by rotating it with the projectile's orientation
-                    Vector2 finalSwirlOffset = new Vector2(tiltedX, adjustedY).RotatedBy(Projectile.rotation);
-
-                    // Combine the barrel offset and the rotated swirl offset
-                    Vector2 dustPosition = Projectile.Center + barrelOffset + finalSwirlOffset;
-
-                    // Create the dust particle
-                    Dust dust = Dust.NewDustPerfect(dustPosition, DustID.UnusedWhiteBluePurple, Vector2.Zero, 100, Color.Cyan, 1.5f);
-                    dust.noGravity = true;
-                }
-                //Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
-                //Vector2 spawnPosition = armPosition + Projectile.velocity.SafeNormalize(Vector2.Zero) * 50f;
-
-
-
-
-
-                //
+                ChargeVFX();
+                
+                ChargeTimer +=  1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier/7;
+                Math.Clamp(ChargeTimer, 0, 120f);
             }
 
-            // Stop the charging sound when charge is complete or interrupted
             if (ChargeTimer >= FusionRifle.MaxChargeTime)
             {
-                //SoundEngine.PlaySound(FusionRifle.FullyChargedSound, Projectile.Center);
-                CurrentState = FusionRifleState.Firing; // Transition to firing state
+                
+                CurrentState = FusionRifleState.Firing;
                 StateTimer = 0;
                 BurstCount = FusionRifle.BoltsPerBurst;
-
-                if (chargingSoundInstance != null)
-                {
-                    chargingSoundInstance.Stop(); // Stop the sound when charge is complete
-                    chargingSoundInstance = null; // Reset to allow new sound creation
-                }
             }
 
-            if (!Main.mouseLeft || !Owner.channel) // Handle charging interruption
+            if (!Owner.controlUseItem || !Owner.channel)
             {
-                if (chargingSoundInstance != null)
-                {
-                    chargingSoundInstance.Stop(); // Stop the charging sound
-                    chargingSoundInstance = null; // Clear the instance to allow new creation
-                }
 
-                if (ChargeTimer > 0) // Rapidly drain the charge
+                if (ChargeTimer > 0)
                 {
-                    float intensity = ChargeupInterpolant * 0.5f; // Reduce glow intensity
-                    Dust dust = Dust.NewDustPerfect(Projectile.Center, DustID.RuneWizard, Vector2.Zero, 100, Color.Cyan, intensity * 10);
+                    float intensity = ChargeupInterpolant * 0.5f;
+                    Dust dust = Dust.NewDustPerfect(Projectile.Center, DustID.RuneWizard, -Projectile.velocity* 10, 100, Color.Cyan, intensity * 10);
                     dust.noGravity = false;
-                    ChargeTimer -= 10;
+                    ChargeTimer -= MathHelper.Lerp(ChargeTimer, 0, 0.1f);
                     if (ChargeTimer < 0)
+                    {
+                        ScreenShakeSystem.StartShake(28f, shakeStrengthDissipationIncrement: 0.4f);
+                        GeneralScreenEffectSystem.ChromaticAberration.Start(Owner.Center, 3f, 90);
+                        GeneralScreenEffectSystem.HighContrast.Start(Owner.Center, 3, 33);
                         ChargeTimer = 0;
+                        CurrentState = FusionRifleState.Idle;
+                    }
+
                 }
             }
+
+            
         }
 
+        private void ChargeVFX()
+        {
+            
+            float shakeIntensity = 2f * ChargeupInterpolant;
+            Projectile.position += new Vector2(
+                Main.rand.NextFloat(-shakeIntensity, shakeIntensity),
+                Main.rand.NextFloat(-shakeIntensity, shakeIntensity)
+            );
+
+            // Add inward swirling dust effect with consistent 3D Y-axis tilt, no Z-axis distortion
+            float initialDustRadius = 50f; // Starting radius (adjust as needed)
+            float finalDustRadius = 10f;   // Ending radius near the target (adjust as needed)
+            float dustRadius = MathHelper.Lerp(initialDustRadius, finalDustRadius, ChargeTimer / CurrentChargeTime);
+
+            // Adjustable offset for the barrel (change these values to position the swirl effect)
+            Vector2 barrelOffset = new Vector2(45f, Projectile.direction * -7f); // Customize the base position of the dust effect
+            barrelOffset = barrelOffset.RotatedBy(Projectile.rotation); // Rotate the offset based on the projectile's rotation
+
+            // Define rotation angle for Y-axis tilt (in radians)
+            float yAxisTilt = MathHelper.ToRadians(50f); // 20-degree tilt for the 3D plane
+
+            // Add the swirling effect with the corrected Y-axis tilt
+            float dustAngle = Main.GameUpdateCount * 0.1f; // Rotate based on time
+            for (int i = 0; i < 3; i++) // Add multiple dust particles
+            {
+                float angle = dustAngle + MathHelper.TwoPi / 3 * i; // Spread particles equally
+
+                // Calculate the swirl offset before applying the Y-axis tilt
+                float unrotatedX = (float)Math.Cos(angle) * dustRadius;
+                float unrotatedY = (float)Math.Sin(angle) * dustRadius;
+
+                // Apply only the desired Y-axis tilt
+                float tiltedX = unrotatedX * (float)Math.Cos(yAxisTilt); // Apply X-axis scaling for the tilt
+                float tiltedY = unrotatedY; // Retain Y without Z influence
+                float adjustedY = tiltedY + unrotatedX * (float)Math.Sin(yAxisTilt) * 0.5f; // Minimal Z-axis impact on Y
+
+                // Finalize the swirl position by rotating it with the projectile's orientation
+                Vector2 finalSwirlOffset = new Vector2(tiltedX, adjustedY).RotatedBy(Projectile.rotation);
+                Vector2 dustPosition = Projectile.Center + barrelOffset + finalSwirlOffset;
+                Dust dust = Dust.NewDustPerfect(dustPosition, DustID.UnusedWhiteBluePurple, Vector2.Zero, 100, Color.Cyan, 1.5f);
+                dust.noGravity = true;
+            }
+        }
         private void ConstrainParticle(Vector2 anchor, ClothPoint point, float angleOffset)
         {
             if (point is null)
@@ -291,56 +280,75 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
         private void HandleFiring()
         {
-            
+            //todo: if playing charging sound, stop
+            ActiveSound activeSound = SoundEngine.FindActiveSound(Charging);
+            if (activeSound != null)
+            {
+                activeSound.Stop();
+            }
             //Owner.itemAnimation = Owner.itemAnimationMax;
             if (BurstCount == FusionRifle.BoltsPerBurst)
             {
-                firingSoundInstance = firingSoundEffect.CreateInstance();
-                firingSoundInstance.Play();
+                SoundEngine.PlaySound(Fire with { MaxInstances = 0, PitchVariance = 0.3f }, Projectile.Center);
                 DisipateHeat(true);
+                Main.instance.CameraModifiers.Add(new PunchCameraModifier(Owner.Center * 2f, Projectile.velocity, 10, 3, 10, -0.5f, null));
             }
             if (BurstCount > 0)
             {
                 if (StateTimer <= 0)
                 {
-                   
+                    Owner.PickAmmo(Owner.HeldItem, out _, out _, out _, out _, out _);
                     FireBurstProjectile();
                     BurstCount--;
                     //Main.NewText($"BurstCount: {BurstCount}, state: {CurrentState}", Color.AntiqueWhite);
-                    StateTimer = 5; // Cycle between burst projectiles (adjust as needed)
+                    StateTimer = 5; 
                 }
                 else
                 {
                     StateTimer--; // Count down the delay timer
                 }
+
+                if(BurstCount %3 == 0)
+                {
+                   
+                }
             }
             else
             {
+
                 //Main.NewText($"Bolts fired: {countburst}", Color.AliceBlue);
-                Owner.PickAmmo(Owner.HeldItem, out _, out _, out _, out _, out _);
+                
                 CurrentState = FusionRifleState.Delay; // Transition to delay state after the burst
-                StateTimer = 60; // Cycle duration after firing
-                ChargeTimer = 0; // Reset charge
+                StateTimer = 60 - (int)Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7  * 2; 
+                //ChargeTimer = 0; // Reset charge
             }
         }
 
         private void HandleDelay()
         {
+            if (StateTimer == 60)
+            {
+                
+            }
             if (StateTimer > 0)
             {
                 StateTimer--; // Count down the delay
                 DisipateHeat(false);
+                //todo: make it so that by the time state is zero, Charge has been fully disipated
 
+                ChargeTimer = MathHelper.Lerp(0,ChargeTimer, StateTimer / 60f); 
+               
             }
             else
             {
+                ChargeTimer = 0;
                 CurrentState = FusionRifleState.Charging; // Transition back to charging
             }
         }
 
         private void DisipateHeat(bool CreateSmoke)
         {
-
+            
             // Create heat-like dissipating dust for each vent
             int numberOfVents = 4; // Adjust this to match the number of vents
             float ventSpacing = 10f; // Adjust the spacing between vents
@@ -372,29 +380,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
                 ventOffset = ventOffset.RotatedBy(Projectile.rotation); // Rotate the offset by the projectile's rotation
                 
                 Vector2 ventPosition = Projectile.Center + initialOffset.RotatedBy(Projectile.rotation) + ventOffset;
-                /*
-                if (CreateSmoke == true)
-                {
-                    if (TopExhaust)
-                    {
-                        baseExhaustDirection += new Vector2(0, 0.5f); // Slight upward adjustment for top exhaust
-                    }
-                    else
-                    {
-                        baseExhaustDirection += new Vector2(0, -0.5f); // Slight downward adjustment for bottom exhaust
-                    }
-
-                    // Spawn the exhaust projectile
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), ventPosition,
-                        baseExhaustDirection * 3f, // Multiply direction by exhaust speed
-                        ModContent.ProjectileType<FusionRifle_Exhaust>(),
-                        -1, // No damage
-                        0, // No knockback
-                        Projectile.owner);
-                }
-                */
-
-                // Only create dust at intervals determined by the loop
+                
                 if (StateTimer % numberOfVents == i) // Stagger the dust creation
                 {
                     // Create dissipating heat dust
@@ -416,50 +402,17 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
 
         }
-        private void CreateMuzzleFlash(Vector2 muzzlePosition, Vector2 projectileVelocity)
-        {
-            int numParticles = 10; // Number of particles in the muzzle flash
-            float angleVariance = MathHelper.ToRadians(15f); // Spread angle for the muzzle flash particles
-            float particleSpeed = 6f; // Speed of particles moving outward
-
-            for (int i = 0; i < numParticles; i++)
-            {
-                // Randomize particle direction within a cone based on the projectile's direction
-                float randomAngle = Main.rand.NextFloat(-angleVariance, angleVariance);
-                Vector2 direction = projectileVelocity.RotatedBy(randomAngle).SafeNormalize(Vector2.UnitX); // Normalize the direction
-                Vector2 velocity = direction * particleSpeed * Main.rand.NextFloat(0.7f, 1.2f); // Randomize speed slightly
-
-                // Create the dust at the muzzle position
-                Particle deltaruneExplosionParticle = new DeltaruneExplosionParticle(muzzlePosition, Vector2.Zero, Color.AntiqueWhite, 48, 1);
-
-                Dust dust = Dust.NewDustPerfect(muzzlePosition, DustID.Torch, velocity, 100, GetRandomFlashColor(), Main.rand.NextFloat(1.5f, 2f));
-                dust.noGravity = true; // Floaty effect for the flash
-                dust.fadeIn = 1f; // Makes the flash brighter initially
-            }
-        }
-
-        // Helper function to randomize flash colors
-        private Color GetRandomFlashColor()
-        {
-            // Randomize between white, yellow, and orange
-            switch (Main.rand.Next(3))
-            {
-                case 0: return Color.White;
-                case 1: return Color.Yellow;
-                case 2: return Color.Orange;
-                default: return Color.White; // Default fallback
-            }
-        }
-
-
-
-
+       
         public void FireBurstProjectile()
         {
             Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
 
             float chargePower = ChargeupInterpolant;
-            int damage = Projectile.damage;
+            
+            
+            int damage = Projectile.damage * 1+ (int)Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 14;
+            
+            
             float knockback = Projectile.knockBack;
             Vector2 spawnPosition = armPosition + Projectile.velocity.SafeNormalize(Vector2.Zero) * 50f;
 
@@ -469,8 +422,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             Vector2 adjustedVelocity = Projectile.velocity.RotatedBy(randomAngle); // Apply the random angle to the velocity
 
             // Spawn the projectile with the adjusted velocity
-            Projectile.NewProjectile(Projectile.GetSource_FromThis(), spawnPosition, adjustedVelocity * (40f + chargePower),
-                ModContent.ProjectileType<FusionRifle_Projectile>(),
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(), spawnPosition, adjustedVelocity * (70f + chargePower),
+                ModContent.ProjectileType<ColdBurst>(),
                 damage,
                 knockback,
                 Projectile.owner
@@ -478,48 +431,20 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
 
             Vector2 MuzzleFlashPosition = spawnPosition + Projectile.velocity.SafeNormalize(Vector2.Zero) * 70f;
-
-            //CreateMuzzleFlash(MuzzleFlashPosition, Projectile.velocity);
-
-
-
-
-            DeltaruneExplosionParticle deltaruneExplosionParticle = new DeltaruneExplosionParticle(spawnPosition, Vector2.Zero, Color.AntiqueWhite, 48, 1);
-
-
-
-
-            // Trigger the recoil effect
-            recoilIntensity = maxRecoil; // Set the recoil to its maximum value
-
-
-            //PunchCameraModifier = new Vector2(Main.rand.NextFloat(-50f, 50f), Main.rand.NextFloat(-50f, 50f));
-            //replace recoilVector with something else later
-
-            //Main.instance.CameraModifiers.Add(new PunchCameraModifier(spawnPosition*2f, -recoilVector,10,1,2,-1,null));
+            recoilIntensity = maxRecoil;
         }
-
-
         private static float recoilIntensity = 0f; // Tracks the current recoil intensity
         private const float maxRecoil = 10f; // Maximum recoil amount
         private float recoilRecoverySpeed = 0.99f; // Speed at which recoil eases out
+        public Vector2 Recoil => -Projectile.velocity.SafeNormalize(Vector2.Zero) * recoilIntensity;
 
-        public static Vector2 RecoilOffset = new Vector2(-recoilIntensity, 0);
-
-
+        public static Vector2 RecoilOffset = new Vector2(-recoilIntensity, 0);  
         public void UpdateProjectileHeldVariables(Vector2 armPosition)
         {
             if (Main.myPlayer == Projectile.owner)
             {
                 float aimInterpolant = Utils.GetLerpValue(0.1f, 1f, Projectile.Distance(Main.MouseWorld), true);
                 Vector2 oldVelocity = Projectile.velocity;
-
-                //Vector2 newDirection = Projectile.SafeDirectionTo(Main.MouseWorld);
-                //if (!newDirection.Equals(Vector2.Zero))
-                //{
-                //    Projectile.velocity = Vector2.Lerp(Projectile.velocity, newDirection, aimInterpolant);
-                //}
-
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Main.MouseWorld), aimInterpolant);
                 if (Projectile.velocity != oldVelocity)
                 {
@@ -536,8 +461,10 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             }
 
             Vector2 recoilOffset = -Projectile.velocity.SafeNormalize(Vector2.Zero) * recoilIntensity;
-            Projectile.position = armPosition - Projectile.Size * 0.5f + Projectile.velocity.SafeNormalize(Vector2.UnitY) * 34f + recoilOffset;
+            
+            //Projectile.position = armPosition - Projectile.Size * 0.5f + Projectile.velocity.SafeNormalize(Vector2.UnitY) * 34f + recoilOffset;
             Projectile.rotation = Projectile.velocity.ToRotation();
+            Projectile.Center = Owner.MountedCenter;
             Projectile.spriteDirection = Projectile.direction;
             Projectile.timeLeft = 2;
         }
@@ -548,17 +475,23 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             Owner.heldProj = Projectile.whoAmI;
 
 
-            float frontArmRotation = Projectile.rotation * 0.5f;
+            float frontArmRotation = Projectile.rotation;//* 0.5f;
             if (Owner.direction == -1)
-                frontArmRotation += MathHelper.PiOver2;
+            {
+                frontArmRotation -= MathHelper.PiOver2;
+            }
+            
             else
-                frontArmRotation = MathHelper.PiOver2 - frontArmRotation;
-            frontArmRotation += Projectile.rotation + MathHelper.Pi + Owner.direction * MathHelper.PiOver2 + 0.12f;
+            {
+                frontArmRotation -= MathHelper.PiOver2;
+            }
+                //frontArmRotation = MathHelper.PiOver2;// - frontArmRotation;
+            //frontArmRotation += Projectile.rotation + MathHelper.Pi + Owner.direction * MathHelper.PiOver2 + 0.12f;
             Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, frontArmRotation);
-            Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, Projectile.velocity.ToRotation() - MathHelper.PiOver2);
+            Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, frontArmRotation);// Projectile.velocity.ToRotation() - MathHelper.PiOver2);
         }
 
-
+      
 
         public void AdjustVisualValues(ref float scale, ref float opacity, ref float rotation, float time)
         {
@@ -569,7 +502,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
         private void DrawCloth()
         {
-            Matrix world = Matrix.CreateTranslation(-Projectile.Center.X + WotGUtils.ViewportSize.X * 0.5f, -Projectile.Center.Y + WotGUtils.ViewportSize.Y * 0.5f, 0f);
+            Matrix world = Matrix.CreateTranslation(-Projectile.Center.X + 25.5f * Projectile.direction + WotGUtils.ViewportSize.X * 0.5f, -Projectile.Center.Y + Projectile.velocity.Y * 40 +WotGUtils.ViewportSize.Y * 0.5f, 0f);
             Matrix projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -1000f, 1000f);
             Matrix matrix = world * projection;
 
@@ -583,6 +516,24 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
         public override bool PreDraw(ref Color lightColor)
         {
+
+            Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
+
+
+            Rectangle frame = texture.Frame(1, 1, 0, 0);
+
+
+            float rotation = Projectile.rotation;
+            //SpriteEffects direction = SpriteEffects.None;
+
+            SpriteEffects spriteEffects = Projectile.direction * Owner.gravDir < 0 ? SpriteEffects.FlipVertically : 0;
+            Vector2 origin = new Vector2(frame.Width / 2 - 24 * Projectile.direction, frame.Height / 2 * Owner.gravDir);
+
+            Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+            float chargeOffset = ChargeupInterpolant * Projectile.scale * 5f;
+            Color chargeColor = Color.Lerp(Color.Crimson, Color.Gold, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 7.1f) * 0.5f + 0.5f) * ChargeupInterpolant * 0.6f;
+            chargeColor.A = 0;
+
             ClothTarget.Request(350, 350, Projectile.whoAmI, DrawCloth);
             if (ClothTarget.TryGetTarget(Projectile.whoAmI, out RenderTarget2D clothTarget) && clothTarget is not null)
             {
@@ -599,19 +550,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
             }
 
-            Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
-            //Texture2D textureGlow = ModContent.Request<Texture2D>("CalamityMod/Projectiles/Ranged/HeavenlyGaleProjGlow").Value;
-            Vector2 origin = texture.Size() * 0.5f;
-            Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 
-
-
-
-            float chargeOffset = ChargeupInterpolant * Projectile.scale * 5f;
-            Color chargeColor = Color.Lerp(Color.Crimson, Color.Gold, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 7.1f) * 0.5f + 0.5f) * ChargeupInterpolant * 0.6f;
-            chargeColor.A = 0;
-
-            float rotation = Projectile.rotation;
             SpriteEffects direction = SpriteEffects.None;
             if (Math.Cos(rotation) < 0f)
             {
@@ -619,21 +558,183 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
                 rotation += MathHelper.Pi;
             }
 
+            if (CurrentState == FusionRifleState.Firing)
+            {
+                Texture2D Corona = GennedAssets.Textures.GreyscaleTextures.Corona;
+
+                Vector2 CoronaScale = new Vector2(0.1f, 0.2f);
+                Vector2 Corigin = new Vector2(Corona.Size().X / 2, Corona.Size().Y / 2);
+
+
+                Vector2 CoronaPosition = new Vector2(Projectile.Center.X, Projectile.Center.Y) - Main.screenPosition;//Projectile.Center - Main.screenPosition;
+
+                {
+                    // Main.spriteBatch.Draw(Glowball, Projectile.Center + Projectile.velocity / 2 - Main.screenPosition, null, lightColor.MultiplyRGB(Color.AntiqueWhite), Projectile.rotation, Gorigin, glowScale, SpriteEffects.None, 0f);
+                    Main.spriteBatch.Draw(Corona, CoronaPosition, null, (Color.Violet with { A = 0 }) * 0.4f, Projectile.rotation, Corona.Size() * 0.5f, CoronaScale, 0, 0f);
+
+                }
+                //Main.GlobalTimeWrappedHourly
+            }
             Color stringColor = new(129, 18, 42);
 
-            
+
             for (int i = 0; i < 5; i++)
             {
                 Vector2 drawOffset = (MathHelper.TwoPi * i / 6f).ToRotationVector2() * chargeOffset;
                 Main.spriteBatch.Draw(texture, drawPosition + drawOffset, null, chargeColor, rotation, origin, Projectile.scale, direction, 0f);
             }
-            Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
+
+
+            Main.spriteBatch.Draw(texture, drawPosition - Recoil, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
             Main.spriteBatch.ExitShaderRegion();
+
+            Texture2D Glowball = AssetDirectory.Textures.BigGlowball.Value;
+            float GlowScale = ChargeupInterpolant * 0.1f;
+            Vector2 Gorigin = new Vector2(Glowball.Size().X / 2, Glowball.Size().Y / 2);
+            if (ChargeTimer > 1)
+            {
+
+
+                Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
+
+
+
+                Vector2 tipPosition = armPosition + Projectile.velocity * Projectile.width * 1.55f + new Vector2(3, -3);
+                //todo: atone for my sins
+                Main.spriteBatch.Draw(Glowball, tipPosition - Main.screenPosition, null,
+                    lightColor.MultiplyRGB(Color.Crimson),
+                    rotation, Gorigin, GlowScale, direction, 0f);
+            }
+
+
+            Utils.DrawBorderString(Main.spriteBatch, "|State: " + CurrentState.ToString() + " | State Timer: " + StateTimer.ToString(), Projectile.Center - Vector2.UnitY * 90 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|Charge: " + ChargeTimer.ToString() + " | Charge iter: " + (1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7).ToString() + " | 120/chargeiter " + (120 / (1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7)).ToString(), Projectile.Center - Vector2.UnitY * 110 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|MaxCharge: " + FusionRifle.MaxChargeTime.ToString(), Projectile.Center - Vector2.UnitY * 130 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|BurstCounter: " + Owner.GetModPlayer<FusionRiflePlayer>().BurstCounter.ToString() + " | BurstTier: " + Owner.GetModPlayer<FusionRiflePlayer>().BurstTier, Projectile.Center - Vector2.UnitY * 150 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|Controlled burst active: " + Owner.GetModPlayer<FusionRiflePlayer>().ControlledBurstActive + " | ControlledBurst Timer: " + Owner.GetModPlayer<FusionRiflePlayer>().ControlledBurstTimer.ToString(), Projectile.Center - Vector2.UnitY * 170 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|Recoil Offset: " + RecoilOffset.ToString(), Projectile.Center - Vector2.UnitY * 190 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|Estimated damage: " + (Projectile.damage * (1 + Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 14)).ToString(), Projectile.Center - Vector2.UnitY * 210 - Main.screenPosition, Color.White);
+
+            Utils.DrawBorderString(Main.spriteBatch, "|VolatileRound Chance " + Owner.GetModPlayer<FusionRiflePlayer>().VolCount.ToString() + " | Volatile Rounds: " + Owner.GetModPlayer<FusionRiflePlayer>().VolatileRounds.ToString(), Projectile.Center - Vector2.UnitY * 230 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|VolatileTimer " + Owner.GetModPlayer<FusionRiflePlayer>().VolatileRoundTimer.ToString(), Projectile.Center - Vector2.UnitY * 250 - Main.screenPosition, Color.White);
+
             return false;
         }
-
-        // The bow itself should not do contact damage.
         public override bool? CanDamage() => false;
+    }
+
+
+    public class VolatileRounds : GlobalNPC
+    {
+        
+        public void ChainExplosion(Player owner, NPC target, int Damage, float Radius, bool Chaining)
+        {
+
+            // chose the target
+            // radius of the explosion
+            // deal damage of the explosion
+            // decide whether it should also trigger more volatile explosions on nearby targets.
+            Projectile.NewProjectile(owner.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<VolatileExplosion>(), Damage,0, owner.whoAmI);
+            
+            popVolatile(target);
+        }
+        public override bool InstancePerEntity => true;
+        public int VolatileCooldown; // when volatile is triggered, enter a cooldown which will prevent this npc from recieving volatile again until the cooldown expires.
+        public bool VolatileActive = false; // when true, npc will explode after taking some damage 
+        public int VolatileTimer = 0; // this tracks how long the npc has had volatile for. after it reaches zero, remove volatile.
+        public float VolatileSafe; //if this is above zero, then volatile cannot be triggered.
+        public void popVolatile(NPC target)
+        {
+            target.GetGlobalNPC<VolatileRounds>().VolatileActive = false;
+            target.GetGlobalNPC<VolatileRounds>().VolatileCooldown = 120;
+            target.GetGlobalNPC<VolatileRounds>().VolatileTimer = 0;
+            target.GetGlobalNPC<VolatileRounds>().VolatileSafe = 0;
+
+
+        }
+        public override void ResetEffects(NPC npc)
+        {
+            if(VolatileActive == false)
+            {
+                VolatileTimer = 0;
+                VolatileSafe = 0;
+            }
+
+        }
+        public override void UpdateLifeRegen(NPC npc, ref int damage)
+        {
+            base.UpdateLifeRegen(npc, ref damage);
+        }
+
+        public override void AI(NPC npc)
+        {
+         
+            base.AI(npc);
+        }
+        public override void PostAI(NPC npc)
+        {
+            if (VolatileActive)
+            {
+                if (VolatileSafe > 0)
+                {
+                    VolatileSafe--;
+                }
+                if (VolatileTimer > 0 && VolatileSafe == 0)
+                {
+                    VolatileTimer--;
+                }
+                if (VolatileTimer == 0)
+                {
+                    VolatileActive = false;
+                }
+            }
+            else if (VolatileCooldown > 0)
+            {
+                if (VolatileActive)
+                    VolatileActive = false;
+                VolatileCooldown--;
+            }
+            base.PostAI(npc);
+        }
+        public override void HitEffect(NPC npc, NPC.HitInfo hit)
+        {
+            if (VolatileActive)
+            {
+                if(VolatileSafe == 0 && hit.Damage >= npc.lifeMax/1000)
+                {
+
+                    ChainExplosion(Main.player[npc.target], npc, npc.lifeMax*(int)0.3f, 100, true);
+                    
+                }
+            }
+            base.HitEffect(npc, hit);
+        }
+
+
+        public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            
+            Utils.DrawBorderString(Main.spriteBatch, "Is Volatile: " + VolatileActive.ToString(), npc.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+
+            Utils.DrawBorderString(Main.spriteBatch, "Volatile Timer: " + VolatileTimer.ToString(), npc.Center - Vector2.UnitY * 180 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "VolatileSafe: " + VolatileSafe.ToString(), npc.Center - Vector2.UnitY * 200 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "Volatile Cooldown: " + VolatileCooldown.ToString(), npc.Center - Vector2.UnitY * 220 - Main.screenPosition, Color.White);
+            
+
+
+            if (VolatileActive)
+            {
+                Texture2D texture = AssetDirectory.Textures.BigGlowball.Value;
+                float GlowScale = 0.3f;
+                Vector2 Gorigin = new Vector2(texture.Size().X / 2, texture.Size().Y / 2);
+
+                Main.spriteBatch.Draw(texture, npc.Center - Main.screenPosition, null,
+                    drawColor.MultiplyRGB(Color.Purple),
+                    npc.rotation, Gorigin, GlowScale, SpriteEffects.None, 0f);
+            }
+           
+            base.PostDraw(npc, spriteBatch, screenPos, drawColor);
+        }
     }
 }
 

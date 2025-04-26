@@ -5,7 +5,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace HeavenlyArsenal.Common.UI;
+namespace HeavenlyArsenal.Common.Ui;
 
 public class WeaponBar : ModSystem
 {
@@ -45,9 +45,9 @@ public class WeaponBar : ModSystem
         WeaponBar.showTime = showTime;
         WeaponBar.baseColor = baseColor;
         WeaponBar.fillColor = fillColor;
-        WeaponBar.fillPercent = percent;
+        fillPercent = percent;
         WeaponBar.style = style;
-        WeaponBar.Baroffset = BarOffset;
+        Baroffset = BarOffset;
 
         ActiveBars.Add(new WeaponBarInfo(baseColor, fillColor, percent, showTime, style, BarOffset));
     }
@@ -85,10 +85,10 @@ public class WeaponBar : ModSystem
                             Texture2D bar = AssetDirectory.Textures.Bars.Bar[barInfo.Style].Value;
                             Texture2D barCharge = AssetDirectory.Textures.Bars.BarFill[barInfo.Style].Value;
 
-                            int fillAmount = (barInfo.FillPercent > 0.99f) ? barCharge.Width : (int)(barCharge.Width * barInfo.FillPercent);
+                            int fillAmount = barInfo.FillPercent > 0.99f ? barCharge.Width : (int)(barCharge.Width * barInfo.FillPercent);
                             Rectangle fillFrame = new Rectangle(0, 0, fillAmount, barCharge.Height);
 
-                            Vector2 position = ((Main.LocalPlayer.Center - Main.screenPosition) + barInfo.Offset) - new Vector2(barCharge.Width / 2f, 48f / Main.UIScale);
+                            Vector2 position = Main.LocalPlayer.Center - Main.screenPosition + barInfo.Offset - new Vector2(barCharge.Width / 2f, 48f / Main.UIScale);
 
                             Main.spriteBatch.Draw(bar, position, bar.Frame(), barInfo.BaseColor * fade, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                             Main.spriteBatch.Draw(barCharge, position, fillFrame, barInfo.FillColor * fade, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);

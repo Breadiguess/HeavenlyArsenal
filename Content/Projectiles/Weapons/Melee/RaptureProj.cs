@@ -136,7 +136,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Melee
 			modifiers.Knockback *= Main.player[Projectile.owner].velocity.Length() / 7f;
 
 			// This will increase or decrease the damage of the Jousting Lance depending on how fast the player is moving.
-			modifiers.SourceDamage *= 0.1f + Main.player[Projectile.owner].velocity.Length() / 7f * 0.9f;
+			modifiers.SourceDamage *= 0.1f + Main.player[Projectile.owner].velocity.Length() / 5f * 0.9f;
 		}
 
 		// This is the custom collision that Jousting Lances uses. 
@@ -150,7 +150,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Melee
 			// You will need to modify the last two numbers if you have a bigger or smaller Jousting Lance.
 			// Vanilla uses (0, 0, 300, 300) which that is quite large for the size of the Jousting Lance.
 			// The size doesn't matter too much because this rectangle is only a basic check for the collision (the hit-line is much more important).
-			Rectangle lanceHitboxBounds = new Rectangle(0, 0, 300, 300);
+			Rectangle lanceHitboxBounds = new Rectangle(0, 0, 600, 600);
 
 			// Set the position of the large rectangle.
 			lanceHitboxBounds.X = (int)Projectile.position.X - lanceHitboxBounds.Width / 2;

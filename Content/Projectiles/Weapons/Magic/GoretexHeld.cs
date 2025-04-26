@@ -1,4 +1,5 @@
-﻿using HeavenlyArsenal.Common.utils;
+﻿using CalamityMod.Items.Weapons.Rogue;
+using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
 using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
@@ -13,7 +14,7 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Projectiles.Weapons.Magic;
 
-public class Succ : ModProjectile
+public class GoretexHeld : ModProjectile
 {
     public override void SetDefaults()
     {
@@ -36,11 +37,10 @@ public class Succ : ModProjectile
 
 
 
-    public static float Charge = 0f;
+    public ref float Charge => ref Projectile.ai[2];
     public ref Player Owner => ref Main.player[Projectile.owner];
 
 
-    public int numberOfProjectiles = 1 + (int)Charge / 200;
 
     public override void AI()
     {
@@ -75,71 +75,29 @@ public class Succ : ModProjectile
                 Owner.CheckMana(15, true);
 
 
-                for (int i = 0; i < numberOfProjectiles; i++)
-                {
-                    // Calculate a slight spread for each projectile
-                    float spread = MathHelper.ToRadians(10) * (i - (numberOfProjectiles - 1) / 2f); // Spread based on the number of projectiles
-                    Vector2 sparklePos = Projectile.Center + new Vector2(12, 0).RotatedBy(Projectile.rotation);
-                    if (i % 2 == 0)
-                    {
-                        Projectile.NewProjectile(
-                        Projectile.GetSource_FromThis(),
-                        sparklePos,
-                        Projectile.velocity * 1,
-                        ModContent.ProjectileType<Succ_Blood>(),
-                        Projectile.damage, /// 1.75f + Charge / 50f), // Increase damage based on charge
-                        Projectile.knockBack + Charge / 500f,          // Adjust knockback based on charge
-                         Main.myPlayer = Projectile.owner,
-                         0);
-                    }
-                    else
-                    {
-                        Projectile.NewProjectile(
-                        Projectile.GetSource_FromThis(),
-                        sparklePos,
-                        Projectile.velocity * 1,
-                        ModContent.ProjectileType<Succ_Blood>(),
-                        Projectile.damage, /// 1.75f + Charge / 50f), // Increase damage based on charge
-                        Projectile.knockBack + Charge / 500f,          // Adjust knockback based on charge
-                         Main.myPlayer = Projectile.owner,
-                         1);
-                    }
-                }
-
             }
         }
-        //if ((Time - 8) % 5 == 1)
-        //{
-        //    Vector2 piercerVelocity = Projectile.velocity;
-
-        //    if (Main.myPlayer == Projectile.owner)
-        //    {
-        //        piercerVelocity = (Main.MouseWorld - Projectile.Center).RotatedByRandom(0.2f) * (0.06f / MathHelper.E);
-        //        Projectile.netUpdate = true;
-        //    }
-        //    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.velocity * 5f + Main.rand.NextVector2Circular(10, 10), piercerVelocity, ModContent.ProjectileType<CrystalPiercer>(), Owner.HeldItem.damage, 1f, Owner.whoAmI, ai1: Projectile.whoAmI);
-        //}
-
-
-
-        if (Owner.channel == true) // Player is using the item
+        if ((Time - 8) % 5 == 1)
         {
-            if (Charge < 1000 && Charge != 0) // Prevent Charge from exceeding the max value
+            Vector2 piercerVelocity = Projectile.velocity;
+
+            if (Main.myPlayer == Projectile.owner)
             {
-                Charge += 1 * (1+ Charge / 1000);
+                piercerVelocity = (Main.MouseWorld - Projectile.Center).RotatedByRandom(0.2f) * (0.06f / MathHelper.E);
+                Projectile.netUpdate = true;
             }
-            else if (Charge == 0)
-            {
-                Charge = 1;
-            }
+           // Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.velocity * 5f + Main.rand.NextVector2Circular(10, 10), piercerVelocity, ModContent.ProjectileType<CrystalPiercer>(), Owner.HeldItem.damage, 1f, Owner.whoAmI, ai1: Projectile.whoAmI);
         }
-        else // Player is not using the item
+
+
+
+        if (Owner.channel == true)
         {
-            Charge -= 10; // Decrease Charge gradually
-            if (Charge < 0) // Prevent Charge from going below 0
-            {
-                Charge = 0;
-            }
+           
+        }
+        else
+        {
+
         }
 
 
@@ -164,7 +122,7 @@ public class Succ : ModProjectile
 
 
         // guess: controls the rate of book rotation
-        Projectile.ai[2] = MathF.Sqrt(Utils.GetLerpValue(0, 50, Time, true) * Utils.GetLerpValue(10, 30, Projectile.timeLeft, true));
+        Projectile.localAI[2] = MathF.Sqrt(Utils.GetLerpValue(0, 50, Time, true) * Utils.GetLerpValue(10, 30, Projectile.timeLeft, true));
         Size = 500;
         Projectile.spriteDirection = Owner.direction;
 
@@ -176,13 +134,9 @@ public class Succ : ModProjectile
 
         newRot = newRot.AngleLerp(Projectile.rotation, 0.90f);
 
-
-        //HandleSound();
-        //RibbonPhysics();
-
         if (Projectile.frameCounter++ > 5)
         {
-            if (Projectile.ai[2] > 0.7f)
+            if (Projectile.localAI[2] > 0.7f)
             {
                 if (++Projectile.frame > 7)
                 {
@@ -193,7 +147,7 @@ public class Succ : ModProjectile
             }
             else
             {
-                Projectile.frame = (int)(Projectile.ai[2] * 3);
+                Projectile.frame = (int)(Projectile.localAI[2] * 3);
             }
         }
         //suck gore i think?
@@ -214,7 +168,7 @@ public class Succ : ModProjectile
             if (gore.position.Distance(Projectile.Center) < 40)
             {
                 gore.active = false;
-                Poof();
+                
             }
         }
 
@@ -250,43 +204,15 @@ public class Succ : ModProjectile
 
         Vector2 inward = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(0.5f) * Main.rand.NextFloat(Size * Projectile.ai[2] * 1.5f);
         ShadowEffect(Projectile.Center - Main.screenPosition, inward, new Vector2(40, 40));
-        //
-        //     CalamityHunt.particles.Add(Particle.Create<ChromaticEnergyDust>(particle => {
-        //            particle.position = Projectile.Center + inward;
-        //           particle.velocity = -inward * 0.03f;
-        //          particle.scale = Main.rand.NextFloat(1f, 2f);
-        //         particle.color = glowColor;
-        //    }));
-        //Dust d = Dust.NewDustPerfect(Projectile.Center + inward, DustID.Sand, -inward * 0.04f, 10, Color.Black, 1f + Main.rand.NextFloat());
-        //d.noGravity = true;
+       
     }
-
-    public void Poof()
-    {
-        //Color glowColor = new GradientColor(SlimeUtils.GoozOilColors, 0.2f, 0.2f).ValueAt(Time + 10);
-
-        //for (int i = 0; i < 5; i++)
-        //{
-        //   CalamityHunt.particles.Add(Particle.Create<ChromaticEnergyDust>(particle => {
-        //       particle.position = Projectile.Center;
-        //      particle.velocity = Main.rand.NextVector2Circular(3, 3);
-        //      particle.scale = 2;
-        //      particle.color = glowColor;
-        //  }));
-        // }
-    }
-
-    //  private Vector2[] ribbonPoints;
-    //  private Vector2[] ribbonVels;
-
-
-
+    
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
 
         //Dust.NewDustPerfect(Projectile.Center+new Vector2(targetHitbox.Width + Projectile.ai[2]*(Size*(Charge/10000)),0), DustID.Adamantite, Vector2.Zero, 100,Color.AntiqueWhite,1);
 
-        return targetHitbox.IntersectsConeFastInaccurate(Projectile.Center, Size * (Charge / 1000) * Projectile.ai[2], Projectile.rotation, MathHelper.Pi / 7f);
+        return targetHitbox.IntersectsConeFastInaccurate(Projectile.Center, Size * Projectile.ai[2], Projectile.rotation, MathHelper.Pi / 7f);
 
     }
 
@@ -334,31 +260,7 @@ public class Succ : ModProjectile
     }
 
 
-    //private void DrawRibbon(Color lightColor)
-    //{
-    //    if (ribbonPoints != null)
-    //    {
-    //        for (int i = 0; i < ribbonPoints.Length - 1; i++)
-    //        {
-    //            int style = 0;
-    //           if (i == ribbonPoints.Length - 3)
-    //            {
-    //                style = 1;
-    //            }
-    //
-    //            if (i > ribbonPoints.Length - 3)
-    //            {
-    //                style = 2;
-    //            }
-
-    //            Rectangle frame = BeadRopeTexture.Value.Frame(1, 3, 0, style);
-    //           float rotation = ribbonPoints[i].AngleTo(ribbonPoints[i + 1]);
-    //            Vector2 stretch = new Vector2(0.5f + Utils.GetLerpValue(0, ribbonPoints.Length - 2, i, true) * 0.4f, ribbonPoints[i].Distance(ribbonPoints[i + 1]) / (frame.Height - 5));
-    //           Main.EntitySpriteDraw(BeadRopeTexture.Value, ribbonPoints[i] - Main.screenPosition, frame, lightColor.MultiplyRGBA(Color.Lerp(Color.DimGray, Color.White, (float)i / ribbonPoints.Length)), rotation - MathHelper.PiOver2, frame.Size() * new Vector2(0.5f, 0f), stretch, 0, 0);
-    //        }
-    //   }
-    //}
-
+    
     private float newRot;
 
     private void ShadowEffect(Vector2 pos, Vector2 Velocity, Vector2 Scale)
@@ -391,7 +293,7 @@ public class Succ : ModProjectile
         for (int i = 0; i < 500; i++)
         {
             rotations[i] = newRot.AngleLerp(Projectile.rotation, MathF.Sqrt(i / 500f)) + MathF.Sin(Time * 0.2f - i / 50f) * 0.1f * (1f - i / 500f) * Projectile.ai[2];
-            positions[i] = sparklePos + new Vector2(Size * Charge / 500 * (i / 500f) * Projectile.ai[2], 0).RotatedBy(rotations[i]);
+            positions[i] = sparklePos + new Vector2(Size * (i / 500f) * Projectile.ai[2], 0).RotatedBy(rotations[i]);
 
 
         }
@@ -411,7 +313,7 @@ public class Succ : ModProjectile
         lightningEffect.Parameters["uTexture3"].SetValue(laserTexture3.Value);
         lightningEffect.Parameters["uTime"].SetValue(Projectile.localAI[0] * 0.1f);
         lightningEffect.Parameters["uFreq"].SetValue(2f);
-        lightningEffect.Parameters["uMiddleBrightness"].SetValue(Charge / 1000);
+        lightningEffect.Parameters["uMiddleBrightness"].SetValue(1);
         lightningEffect.Parameters["uBackPhaseShift"].SetValue(0.5f);
         lightningEffect.Parameters["uSlant"].SetValue(0f);
         lightningEffect.CurrentTechnique.Passes[0].Apply();
@@ -430,7 +332,7 @@ public class Succ : ModProjectile
         Silly.Parameters["uTexture3"].SetValue(laserTexture3.Value);
         Silly.Parameters["uTime"].SetValue(Projectile.localAI[0] * -0.1f);
         Silly.Parameters["uFreq"].SetValue(2f);
-        Silly.Parameters["uMiddleBrightness"].SetValue(Charge / 1000);
+        Silly.Parameters["uMiddleBrightness"].SetValue(1);
         Silly.Parameters["uBackPhaseShift"].SetValue(0.5f);
         Silly.Parameters["uSlant"].SetValue(0f);
         Silly.CurrentTechnique.Passes[0].Apply();
@@ -473,6 +375,6 @@ public class Succ : ModProjectile
             -1f,
             2, progress);
         float grow = (float)Math.Pow(Projectile.ai[2], 3f);
-        return start * grow * Size * Math.Clamp(Charge / 500, 0, 3);
+        return start * grow * Size * Math.Clamp(1, 0, 3);
     }
 }

@@ -1,36 +1,27 @@
-﻿using NoxusBoss.Content.Rarities;
+﻿using CalamityMod;
+using HeavenlyArsenal.common;
+using HeavenlyArsenal.Common.Utilities;
+using HeavenlyArsenal.Common.utils;
+using HeavenlyArsenal.Content.Items.Misc;
+using HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj;
+using Luminance.Common.Utilities;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
+using NoxusBoss.Content.Items;
+using NoxusBoss.Content.Rarities;
+using NoxusBoss.Content.Tiles;
+using NoxusBoss.Core.Graphics;
+using ReLogic.Content;
+using System.Collections.Generic;
+using System.Linq;
 using Terraria;
-using Terraria.GameContent.UI;
+using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using NoxusBoss.Assets.Fonts;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.UI.Chat;
-using System.Collections.Generic;
-using NoxusBoss.Content.Items;
-using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using NoxusBoss.Content.Tiles;
-using CalamityMod;
 using static NoxusBoss.Assets.GennedAssets.Sounds;
-using System.Runtime.CompilerServices;
-using Terraria.Audio;
-using HeavenlyArsenal.Content.Items.Misc;
-using System;
-using Terraria.DataStructures;
-using ReLogic.Content;
-using HeavenlyArsenal.Common.utils;
-using HeavenlyArsenal.Common.Utilities;
-using ReLogic.Graphics;
-using Terraria.GameContent;
-using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
-using NoxusBoss.Core.Graphics;
-using NoxusBoss.Core.World.WorldSaving;
-using System.Linq;
-using Terraria.Localization;
-using HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj;
+using Player = Terraria.Player;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
 {
@@ -47,49 +38,35 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
 
         public const int BoltsPerBurst= 5;
 
-        public static int CurrentCharge = CurrentCharge;
-
         public const int ArrowShootRate = 4;
-
-        //public const int ArrowShootTime = ArrowsPerBurst * ArrowShootRate;
 
         public const int MaxChargeTime = 120;
  
 
         public override void SetStaticDefaults()
         { 
+
         }
-        // The Display Name and Tooltip of this item can be edited in the 'Localization/en-US_Mods.HeavenlyArsenal.hjson' file.
+
         public override void SetDefaults()
         {
             
             Item.rare = ModContent.RarityType<NamelessDeityRarity>();
 
-            Item.damage = 50000;
+            Item.damage = 6543;
             Item.DamageType = DamageClass.Ranged;
             Item.shootSpeed = 40f;
-            Item.width = 40;
-            Item.height = 32;
+            Item.width = Item.height = 40;
             Item.useTime = 4;
             Item.reuseDelay = 0;
-
-            
-
             Item.useAmmo = AmmoID.Gel;
-
-            //Item.consumeAmmoOnFirstShotOnly = true;
             Item.useAnimation = 0;
             Item.noUseGraphic = true;
             Item.useTurn = true;
             Item.channel = true;
-
-
             Item.useStyle = ItemUseStyleID.Shoot;
             Item.knockBack = 6;
-            
-            //Item.UseSound = SoundID.Item1;
             Item.autoReuse = true;
-            
             Item.shoot = ModContent.ProjectileType<FusionRifleHoldout>();
             Item.ChangePlayerDirectionOnShoot = true;
             Item.crit = 662;
@@ -97,57 +74,22 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             Item.Calamity().devItem = true;
            
         }
-        private bool fusionOut = false;
-        
+        public bool FusionOut(Player player) => player.ownedProjectileCounts[Item.shoot] > 0;
+
+
         public override void HoldItem(Player player)
         {
-            if (!fusionOut)
+            if (player.whoAmI == Main.myPlayer)
             {
-                // Check if there is already a projectile of this type owned by the player
-                bool projectileExists = false;
-                for (int i = 0; i < Main.projectile.Length; i++)
+                if (!FusionOut(player))
                 {
-                    if (Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].type == ModContent.ProjectileType<FusionRifleHoldout>())
-                    {
-                        projectileExists = true;
-                        break;
-                    }
-                }
-
-                if (!projectileExists)
-                {
-                    // Spawn the projectile
-                    Projectile.NewProjectile(
-                        player.GetSource_ItemUse(Item), // Source of the projectile
-                        player.Center.X,               // X coordinate of the spawn location
-                        player.Center.Y,               // Y coordinate of the spawn location
-                        0f, 0f,                        // Velocity (set to 0 for stationary)
-                        ModContent.ProjectileType<FusionRifleHoldout>(), // Type of the projectile
-                        Item.damage,                   // Damage of the projectile
-                        Item.knockBack,                // Knockback of the projectile
-                        player.whoAmI                  // Owner of the projectile
-                    );
-                    fusionOut = true; // Set the flag to true to prevent further spawns
+                    Projectile spear = Projectile.NewProjectileDirect(player.GetSource_ItemUse(Item), player.Center, Vector2.Zero, Item.shoot, Item.damage, Item.knockBack, player.whoAmI);
+                    spear.rotation = -MathHelper.PiOver2 + 1f * player.direction;
                 }
             }
         }
-
-
-        public override void UpdateInventory(Player player)
-        {
-            // Reset the flag if the item is not being held
-            if (player.HeldItem.type != Item.type)
-            {
-                fusionOut = false;
-            }
-        }
-   
-
-       
 
         public override bool CanShoot(Player player) => false;
-
-      
         public override void AddRecipes()
         {
             CreateRecipe().
@@ -239,9 +181,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             drawInfo.DrawDataCache.Add(item);
         }
     }
-
-
-
     public class FusionRifle_ShiftText : ModSystem
     {
        // private static ulong textID
@@ -313,5 +252,78 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
         }
     }
 
+    public class FusionRiflePlayer : ModPlayer
+    {
+        public bool FusionRifleHeld
+        => ModContent
+           .GetInstance<FusionRifle>()
+           .FusionOut(Player);
+        public bool ControlledBurstActive;
+
+        public float BurstCounter;
+
+        public float ControlledBurstTimer;
+
+        public float BurstTier;
+
+        public int MaxBurstTier = 7;
+        public float VolCount; //something that says "you need to hit this amount of bursts before getting volatile rounds
+        public bool VolatileRounds;
+        public float VolatileRoundTimer;
+        public override void PreUpdate()
+        {
+            
+
+        }
+        public override void PostUpdateMiscEffects()
+        {
+            if (VolatileRounds)
+            {
+                if(VolatileRoundTimer < 1)
+                {
+                    VolatileRounds = false;
+                }
+                VolatileRoundTimer--;
+                
+            }
+            //Main.NewText($"FusionRifleHeld: {FusionRifleHeld} | BurstCounter: {BurstCounter} | Controlled Burst Active: {ControlledBurstActive} | ");
+            if (FusionRifleHeld && (BurstCounter % FusionRifle.BoltsPerBurst == 0 && BurstCounter != 0))
+            {
+                BurstCounter = 0;
+                ControlledBurstTimer = 120f;
+                ControlledBurstActive = true;
+                if(BurstTier < MaxBurstTier)
+                    BurstTier++;
+                if (!VolatileRounds)
+                {
+                    VolCount+= 0.025f + BurstTier/100;
+                    
+                }
+            }
+
+            if(VolCount > 0.6 && !VolatileRounds && Main.rand.NextBool(VolCount))
+            {
+                VolatileRounds = true;
+                VolatileRoundTimer = 360;
+                VolCount = 0;
+            }
+            if (ControlledBurstTimer > 0 && ControlledBurstActive)
+            {
+                ControlledBurstTimer--;
+            }
+            if(ControlledBurstActive && ControlledBurstTimer== 0)
+            {
+                BurstTier = 0;
+                SoundEngine.PlaySound(GennedAssets.Sounds.Genesis.Grow);
+                ControlledBurstActive = false;
+
+
+            }
+            if (VolCount > 0)
+                VolCount -= 0.0005f;
+            else
+                VolCount =0;
+        }
+    }
 
 }

@@ -2,7 +2,7 @@
 using CalamityMod.Projectiles.BaseProjectiles;
 using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Common.Graphics;
-using HeavenlyArsenal.Common.UI;
+using HeavenlyArsenal.Common.Ui;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Gores;
 using HeavenlyArsenal.Content.Items.Weapons.Ranged;

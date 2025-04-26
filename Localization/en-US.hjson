@@ -121,7 +121,7 @@ Mods: {
 			}
 
 			FusionRifle: {
-				DisplayName: Evanescent Keepsake
+				DisplayName: Cold Fusion
 				Tooltip: A jurry-rigged weapon that opens portals to the avatar's domain.
 				ShiftTooltip:
 					'''
@@ -367,6 +367,21 @@ Mods: {
 				Tooltip: ""
 			}
 
+			Samsara: {
+				DisplayName: Samsara
+				Tooltip: ""
+			}
+
+			Rapture: {
+				DisplayName: Rapture
+				Tooltip: ""
+			}
+
+			UmbralLeechBanner: {
+				DisplayName: Umbral Leech Banner
+				Tooltip: ""
+			}
+
 			ShintoArmorBreastplate: {
 				DisplayName: Mantle of Dimming Radiance
 				Tooltip:
@@ -443,13 +458,8 @@ Mods: {
 					'''
 			}
 
-			Samsara: {
-				DisplayName: Samsara
-				Tooltip: ""
-			}
-
-			Rapture: {
-				DisplayName: Rapture
+			Goretex: {
+				DisplayName: Goretex
 				Tooltip: ""
 			}
 		}
@@ -521,9 +531,18 @@ Mods: {
 			PossibilitySeed_Laser.DisplayName: Possibility Seed_ Laser
 			RaptureProj.DisplayName: Rapture Proj
 			VambraceLightning.DisplayName: Vambrace Lightning
+			GoretexHeld.DisplayName: Goretex Held
+			GoretexHeld_Chunk.DisplayName: Goretex Held_ Chunk
+			ColdBurst.DisplayName: Cold Burst
+			VolatileExplosion.DisplayName: Volatile Explosion
 		}
 
-		NPCs.AnAffrontToGod.DisplayName: Cravatar
+		NPCs: {
+			AnAffrontToGod.DisplayName: Cravatar
+			UmbralLeech.DisplayName: Umbral Leech
+			UmbralLeech_Body.DisplayName: Umbral Leech_ Body
+			UmbralLeech_Tail.DisplayName: Umbral Leech_ Tail
+		}
 
 		Keybinds: {
 			"Quick Dash.DisplayName": Quick  Dash

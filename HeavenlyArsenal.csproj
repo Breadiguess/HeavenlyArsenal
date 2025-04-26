@@ -18,12 +18,19 @@
 	  <None Remove="Sounds\**" />
 	</ItemGroup>
 	<ItemGroup>
+	  <AdditionalFiles Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.png" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Common\utils\Debug.cs" />
 	  <Compile Remove="Common\utils\MusicKiller.cs" />
 	  <Compile Remove="Content\Items\Accessories\NDWings.cs" />
 	  <Compile Remove="Content\Items\Accessories\Vambrace\ElectricVambraceDash.cs" />
+	  <Compile Remove="Content\Items\Weapons\Ranged\AvatarBow.cs" />
 	  <Compile Remove="Content\Items\Weapons\Rogue\LifeAndCessationGlobalNPC.cs" />
+	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\NobleWorm.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\ZombeReskin.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\CosmicWatergun_proj.cs" />
+	  <Compile Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.cs" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Content\Items\auric_catalyst.png" />
@@ -36,13 +43,12 @@
 	  <None Remove="Content\Projectiles\fusionrifleHoldout.png" />
 	  <None Remove="Content\Projectiles\incomplete_gunHoldout.png" />
 	  <None Remove="Content\Projectiles\nadir2_Holdout.png" />
+	  <None Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.png" />
 	  <None Remove="Shaders\shittyshader.fx" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Assets\Textures\Backpacks\" />
 	  <Folder Include="Content\Items\Weapons\Ranged\NewFolder\" />
-	  <Folder Include="Content\NPCs\Hostile\BloodMoon\" />
-	  <Folder Include="Content\Tiles\" />
 	  <Folder Include="Core\Autoloaders\SolynBooks\" />
 	</ItemGroup>
 	<ItemGroup>
