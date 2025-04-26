@@ -50,7 +50,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
             PlaceBaseTiles(x, archStartingY, extraThickness);
 
             // Create walls underneath the bridge.
-            PlaceWalls(x, archHeightInterpolant, archStartingY, extraThickness);
+            PlaceUndersideWalls(x, archHeightInterpolant, archStartingY, extraThickness);
 
             // Place fences atop the bridge.
             PlaceFence(x, archStartingY, profile);
@@ -143,7 +143,7 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
     /// <summary>
     /// Places walls below the bridge.
     /// </summary>
-    private void PlaceWalls(int x, float archHeightInterpolant, int archStartingY, int extraThickness)
+    private void PlaceUndersideWalls(int x, float archHeightInterpolant, int archStartingY, int extraThickness)
     {
         int bridgeThickness = Settings.BridgeThickness;
         int wallHeight = (int)MathF.Round(MathHelper.Lerp(8f, 2f, MathF.Pow(archHeightInterpolant, 1.7f)));
