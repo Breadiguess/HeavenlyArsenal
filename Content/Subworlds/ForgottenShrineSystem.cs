@@ -135,7 +135,7 @@ public class ForgottenShrineSystem : ModSystem
 
     private static void EnableBackground()
     {
-        if (WasInSubworldLastFrame)
+        if (SubworldSystem.IsActive<ForgottenShrineSubworld>())
         {
             ModContent.GetInstance<ForgottenShrineBackground>().ShouldBeActive = true;
             ModContent.GetInstance<ForgottenShrineBackground>().Opacity = 1f;
