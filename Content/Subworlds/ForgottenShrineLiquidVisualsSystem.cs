@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Waters;
+using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,6 +8,7 @@ using NoxusBoss.Core.Graphics.LightingMask;
 using NoxusBoss.Core.Graphics.SpecificEffectManagers;
 using NoxusBoss.Core.Utilities;
 using SubworldLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -388,6 +390,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         mistShader.SetTexture(TileTargetManagers.TileTarget, 5, SamplerState.LinearClamp);
         mistShader.Activate();
 
+        float perturbationStrength = LumUtils.InverseLerp(0f, 1.2f, MathF.Abs(Main.windSpeedCurrent)) * 0.015f;
         reflectionShader.TrySetParameter("targetSize", Main.ScreenSize.ToVector2());
         reflectionShader.TrySetParameter("oldScreenPosition", Main.screenLastPosition);
         reflectionShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
@@ -395,6 +398,9 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         reflectionShader.TrySetParameter("reflectionMaxDepth", 276f);
         reflectionShader.TrySetParameter("reflectionWaviness", 0.0023f);
         reflectionShader.TrySetParameter("ripplePerspectiveSquishFactor", 2.36f);
+        reflectionShader.TrySetParameter("perturbationStrength", perturbationStrength);
+        reflectionShader.TrySetParameter("perturbationScroll", Main.GlobalTimeWrappedHourly * new Vector2(Main.windSpeedCurrent.NonZeroSign() * 2f, 0.2f));
+        reflectionShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
         reflectionShader.SetTexture(TileTargetManagers.LiquidTarget, 2, SamplerState.LinearClamp);
         reflectionShader.SetTexture(WaterStepRippleTarget, 3, SamplerState.LinearClamp);
         reflectionShader.SetTexture(TileTargetManagers.TileTarget, 4, SamplerState.LinearClamp);

@@ -39,6 +39,15 @@ public class HangingLanternRopeData : WorldOrientedTileObject
     }
 
     /// <summary>
+    /// A general-purpose timer used for wind movement on the baubles attached to this rope.
+    /// </summary>
+    public float WindTime
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
     /// The verlet segments associated with this rope.
     /// </summary>
     public readonly Rope VerletRope;
@@ -102,6 +111,12 @@ public class HangingLanternRopeData : WorldOrientedTileObject
         }
 
         Lighting.AddLight(VerletRope.segments[^1].position, Color.Orange.ToVector3());
+
+        WindTime += Main.windSpeedCurrent;
+
+        float windSpeed = Math.Clamp(Main.WindForVisuals * 8f, -1.3f, 1.3f);
+        Vector2 wind = Vector2.UnitX * (LumUtils.AperiodicSin(WindTime * 0.021f + VerletRope.segments[0].position.Length()) * 0.46f + windSpeed) * -2f;
+        VerletRope.segments[^1].position += wind * LumUtils.InverseLerp(0f, 0.5f, windSpeed);
 
         VerletRope.damping = 0.01f;
         VerletRope.Update();

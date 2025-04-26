@@ -42,7 +42,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     darknessPositionInterpolant = pow(darknessPositionInterpolant, 1.75);
     
     float darkness = lerp(1, baseDarkness, darknessPositionInterpolant * opacity);
-    float brightness = lerp(darkness, 1, glowInterpolant * 1.75);
+    float brightness = max(darkness, lerp(darkness, 1, glowInterpolant * 1.75));
     
     return baseColor * brightness;
 }

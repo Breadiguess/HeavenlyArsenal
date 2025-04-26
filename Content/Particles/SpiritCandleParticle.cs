@@ -73,6 +73,11 @@ public class SpiritCandleParticle : BaseParticle
     public int Time;
 
     /// <summary>
+    /// A general-purpose animation timer for this candle.
+    /// </summary>
+    public float AnimationTimer;
+
+    /// <summary>
     /// The scale of this candle.
     /// </summary>
     public Vector2 Scale;
@@ -98,16 +103,18 @@ public class SpiritCandleParticle : BaseParticle
     {
         base.FetchFromPool();
         Time = 0;
+        AnimationTimer = 0f;
     }
 
     public override void Update(ref ParticleRendererSettings settings)
     {
         Position += Velocity;
 
+        float windSpeed = MathF.Abs(Main.windSpeedCurrent);
         if (Behavior == AIType.Bounce)
         {
             float squishRate = 54f;
-            float squishWave = MathF.Sin(MathHelper.TwoPi * Time / squishRate);
+            float squishWave = MathF.Sin(MathHelper.TwoPi * AnimationTimer / squishRate);
             float horizontalSquish = MathF.Pow(squishWave * 0.5f + 0.5f, 2.3f) * 0.75f;
             horizontalSquish -= LumUtils.InverseLerp(0.4f, 0f, horizontalSquish) * 0.55f;
             horizontalSquish *= 0.05f;
@@ -121,19 +128,20 @@ public class SpiritCandleParticle : BaseParticle
             float timeOffset = MathHelper.TwoPi * FlickerTimeOffset;
             float squishRate = 54f;
             float spinRate = 127f;
-            float squishWave = MathF.Sin(MathHelper.TwoPi * Time / squishRate + timeOffset);
+            float squishWave = MathF.Sin(MathHelper.TwoPi * AnimationTimer / squishRate + timeOffset);
             float horizontalSquish = MathF.Pow(squishWave * 0.5f + 0.5f, 2.3f) * 0.75f;
             horizontalSquish -= LumUtils.InverseLerp(0.4f, 0f, horizontalSquish) * 0.55f;
             horizontalSquish *= 0.225f;
 
-            float spin = MathF.Sin(MathHelper.TwoPi * Time / spinRate + timeOffset);
+            float spin = MathF.Sin(MathHelper.TwoPi * AnimationTimer / spinRate + timeOffset);
 
             Scale = new Vector2(1f + horizontalSquish, 1f - horizontalSquish) * BaseScale;
-            Velocity = new Vector2(spin * 1.12f, squishWave * -0.9f);
+            Velocity = new Vector2(spin * 1.12f, squishWave * -0.9f) * new Vector2(1f + windSpeed * 2.12f, 1f + windSpeed * 3.2f);
             Rotation = spin * 0.18f + squishWave * 0.04f;
         }
 
         Time++;
+        AnimationTimer += 1f + windSpeed * 0.432f;
     }
 
     public override void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch)

@@ -3,6 +3,7 @@ using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 using Microsoft.Xna.Framework;
 using NoxusBoss.Core.GlobalInstances;
 using NoxusBoss.Core.Graphics.UI;
+using NoxusBoss.Core.Utilities;
 using SubworldLibrary;
 using System;
 using System.Collections.Generic;
@@ -137,7 +138,7 @@ public class ForgottenShrineSystem : ModSystem
         EnableBackground();
         Main.time = Main.nightLength * 0.71;
         Main.dayTime = false;
-        Main.windSpeedCurrent = 0f;
+        Main.windSpeedCurrent = Main.windSpeedCurrent.StepTowards(0f, 0.01f);
         Sandstorm.Happening = false;
     }
 

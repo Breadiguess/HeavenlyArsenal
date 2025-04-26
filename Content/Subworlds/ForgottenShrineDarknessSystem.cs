@@ -5,6 +5,7 @@ using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Core.Graphics.RenderTargets;
+using NoxusBoss.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -32,6 +33,20 @@ public class ForgottenShrineDarknessSystem : ModSystem
         get;
         private set;
     } = new Queue<Action>(256);
+
+    /// <summary>
+    /// The darkness factor for use with the darkening effect on the island.
+    /// </summary>
+    public static float Darkness
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// The standard darkness factor for the darkening effect on the island.
+    /// </summary>
+    public static float StandardDarkness => 0.56f;
 
     /// <summary>
     /// Whether the darkening effect should be applied.
@@ -79,7 +94,7 @@ public class ForgottenShrineDarknessSystem : ModSystem
             darknessShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
             darknessShader.TrySetParameter("screenOffset", (Main.screenPosition - Main.screenLastPosition) / glowTarget.Size());
             darknessShader.TrySetParameter("targetSize", glowTarget.Size());
-            darknessShader.TrySetParameter("baseDarkness", 0.6f);
+            darknessShader.TrySetParameter("baseDarkness", Darkness);
             darknessShader.TrySetParameter("islandLeft", left * 16f);
             darknessShader.TrySetParameter("islandRight", right * 16f);
             darknessShader.TrySetParameter("uvToWorld", uvToWorld);
@@ -97,6 +112,8 @@ public class ForgottenShrineDarknessSystem : ModSystem
         if (EffectShouldBeActive)
             GlowActionsQueue.Enqueue(action);
     }
+
+    public override void PreUpdatePlayers() => Darkness = MathHelper.Lerp(Darkness, StandardDarkness, 0.05f).StepTowards(StandardDarkness, 0.01f);
 
     public override void PostUpdatePlayers() => UpdateDarknessOverlay();
 

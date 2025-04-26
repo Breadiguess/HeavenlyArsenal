@@ -6,11 +6,13 @@ sampler tileTexture : register(s4);
 sampler lightDistanceTexture : register(s5);
 
 float globalTime;
+float perturbationStrength;
 float reflectionMaxDepth;
 float reflectionStrength;
 float reflectionWaviness;
 float ripplePerspectiveSquishFactor;
 float2 zoom;
+float2 perturbationScroll;
 float2 screenPosition;
 float2 oldScreenPosition;
 float2 targetSize;
@@ -33,6 +35,11 @@ float CalculateLiquidPixelLineY(float2 coords)
     }
     
     return bottom;
+}
+
+float2 CalculatePerturbation(float2 coords)
+{
+    return tex2D(noiseTexture, coords * 10 + perturbationScroll) * perturbationStrength;
 }
 
 float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
@@ -65,7 +72,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     float reflectionWave = sin(worldStableCoords.y * 300 - globalTime * 3) * (1 - reflectionInterpolant) * reflectionWaviness;
     float2 reflectionCoords = float2(coords.x + reflectionWave, (reflectedY - 0.5) * stretch + 0.5);
     float edgeOfScreenTaper = smoothstep(0, 0.1, reflectionCoords.y) * smoothstep(1, 0.9, reflectionCoords.y);
-    float4 reflectedColor = tex2D(baseTexture, reflectionCoords);
+    float4 reflectedColor = tex2D(baseTexture, reflectionCoords + CalculatePerturbation(worldStableCoords));
     
     // Calculate the influence of ripples.
     float2 rippleCorrectiveOffset = float2(0.5, reflectionLineY);

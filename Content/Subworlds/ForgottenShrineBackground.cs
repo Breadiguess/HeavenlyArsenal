@@ -9,6 +9,7 @@ using NoxusBoss.Core.DataStructures;
 using NoxusBoss.Core.Graphics.BackgroundManagement;
 using NoxusBoss.Core.Graphics.FastParticleSystems;
 using NoxusBoss.Core.Graphics.UI.GraphicalUniverseImager;
+using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
 using System;
 using Terraria;
@@ -53,6 +54,35 @@ public class ForgottenShrineBackground : Background
         ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Subworlds/BackgroundFront"),
         ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Subworlds/BackgroundMid"),
         ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Subworlds/BackgroundBack"),
+    ];
+
+    /// <summary>
+    /// A 0-1 interpolant which dictates the extent to which the sky gradient shifts.
+    /// </summary>
+    public static float AltSkyGradientInterpolant
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// The alternate palette to use in accordance with <see cref="AltSkyGradientInterpolant"/>.
+    /// </summary>
+    public static Color[] AltSkyGradient
+    {
+        get;
+        set;
+    } = new Color[4];
+
+    /// <summary>
+    /// The standard palette of the background gradient.
+    /// </summary>
+    public static Color[] StandardPalette =>
+    [
+        new Color(108, 42, 80),
+        new Color(55, 39, 72),
+        new Color(29, 26, 47),
+        new Color(7, 6, 12),
     ];
 
     /// <summary>
@@ -208,9 +238,16 @@ public class ForgottenShrineBackground : Background
     {
         SetSpriteSortMode(SpriteSortMode.Immediate, Matrix.Identity);
 
+        Color[] standardPalette = StandardPalette;
+        Vector3[] gradient = new Vector3[standardPalette.Length];
+        for (int i = 0; i < gradient.Length; i++)
+            gradient[i] = Color.Lerp(standardPalette[i], AltSkyGradient[i], AltSkyGradientInterpolant).ToVector3();
+
         ManagedShader gradientShader = ShaderManager.GetShader("HeavenlyArsenal.ShrineSkyGradientShader");
         gradientShader.TrySetParameter("gradientSteepness", 1.5f);
         gradientShader.TrySetParameter("gradientYOffset", Main.screenPosition.Y / Main.maxTilesY / 16f - 0.2f);
+        gradientShader.TrySetParameter("gradient", gradient);
+        gradientShader.TrySetParameter("gradientCount", gradient.Length);
         gradientShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
         gradientShader.SetTexture(skyColorGradient.Value, 2, SamplerState.LinearClamp);
         gradientShader.Apply();
@@ -259,6 +296,8 @@ public class ForgottenShrineBackground : Background
     {
         SkyManager.Instance["Ambience"].Deactivate();
         SkyManager.Instance["Party"].Deactivate();
+
+        AltSkyGradientInterpolant = (AltSkyGradientInterpolant * 0.975f).StepTowards(0f, 0.005f);
 
         for (int i = 0; i < 40; i++)
         {
