@@ -79,12 +79,15 @@ public class BridgeSetGenerator(int left, int right, BridgeGenerationSettings se
         }
     }
 
-    internal static int DetermineBaseTileIDByHeight(int y, int height)
+    /// <summary>
+    /// Chooses the type of tile that should be generated on the bridge based on its Y position, relative to the thickness of said bridge.
+    /// </summary>
+    internal static int DetermineBaseTileIDByHeight(int y, int thickness)
     {
         int tileID = TileID.GrayBrick;
-        if (y >= height - 2)
+        if (y >= thickness - 2)
             tileID = TileID.RedDynastyShingles;
-        else if (y >= height - 4)
+        else if (y >= thickness - 4)
             tileID = TileID.DynastyWood;
 
         return tileID;
