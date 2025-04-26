@@ -221,12 +221,12 @@ public class OrnamentalShrineRopeData : WorldOrientedTileObject
             {
                 lanternTexture = PaperLanternTexture.Value;
                 lanternFrame = lanternTexture.Frame();
-                lanternGlowColor = new Color(1f, 0.44f, 0.15f, 0f);
+                lanternGlowColor = new Color(1f, 0.2f, 0f, 0f);
                 lanternGlowOpacity = 0.5f;
                 lanternRotation *= 0.33f;
                 lanternGlowDrawPosition = lanternDrawPosition + Vector2.UnitY.RotatedBy(lanternRotation) * 26f;
                 lanternGlowScaleFactor = 1.6f;
-                lanternScale = 0.6f;
+                lanternScale = 0.8f;
             }
 
             Main.spriteBatch.Draw(lanternTexture, lanternDrawPosition, lanternFrame, Color.White, lanternRotation, lanternFrame.Size() * new Vector2(0.5f, 0f), lanternScale, 0, 0f);
