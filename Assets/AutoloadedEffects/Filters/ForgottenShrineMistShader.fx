@@ -7,6 +7,7 @@ sampler tileTexture : register(s5);
 
 float globalTime;
 float noiseAppearanceThreshold;
+float noiseAppearanceSmoothness;
 float mistHeight;
 float2 zoom;
 float2 mistCoordinatesZoom;
@@ -32,8 +33,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     
     // Determine how much mist should be present. Only pixels above liquid may receive mist.
     float distanceToLiquid = DistanceToLiquidPixel(liquidTextureCoords);
-    float modulatedDistanceToLiquid = distanceToLiquid;
-    float mistInterpolant = smoothstep(0, 30, modulatedDistanceToLiquid) * smoothstep(mistHeight, mistHeight * 0.45, modulatedDistanceToLiquid);
+    float mistInterpolant = smoothstep(0, 30, distanceToLiquid) * smoothstep(mistHeight, mistHeight * 0.45, distanceToLiquid);
     
     // Make mist dissipate if light is low.
     mistInterpolant *= smoothstep(0, 0.5, pow(light, 1.6));
@@ -41,17 +41,19 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     // Make mist dissipate if the water is shallow.
     mistInterpolant *= smoothstep(0.05, 0.15, tex2D(lightDistanceTexture, liquidTextureCoords).g);
     
+    // Make mist dissipate if it's inside of tiles.
     mistInterpolant *= 1 - tex2D(tileTexture, liquidTextureCoords).a;
     
-    // Do some standard noise calculations to determine the shape of the mist.
+    // Do some standard noise-warping-noise calculations to determine the shape of the mist.
     float time = globalTime * 0.3;
     float2 noiseCoords = worldStableCoords * mistCoordinatesZoom;
     float warpNoise = tex2D(noiseTexture, noiseCoords * float2(0.3, 2.76) + float2(time * 0.02, 0)) * 0.045;
     float mistNoiseA = tex2D(noiseTexture, noiseCoords * float2(0.6, 1.1) + float2(time * -0.03, 0.3) - warpNoise);
     float mistNoiseB = tex2D(noiseTexture, noiseCoords * float2(0.2, 1.4) + float2(time * 0.02, 0.5) + warpNoise + mistNoiseA * 0.1);
-    float mistNoise = smoothstep(0, 0.6, sqrt(mistNoiseA * mistNoiseB) - noiseAppearanceThreshold);
+    float mistNoise = smoothstep(0, noiseAppearanceSmoothness, sqrt(mistNoiseA * mistNoiseB) - noiseAppearanceThreshold);
     
-    return tex2D(baseTexture, coords) + mistColor * mistInterpolant * mistNoise;
+    float4 baseColor = tex2D(baseTexture, coords);
+    return baseColor + mistColor * mistInterpolant * mistNoise;
 }
 
 technique Technique1

@@ -381,6 +381,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         mistShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
         mistShader.TrySetParameter("mistColor", new Color(84, 74, 154).ToVector4());
         mistShader.TrySetParameter("noiseAppearanceThreshold", 0.3f);
+        mistShader.TrySetParameter("noiseAppearanceSmoothness", 0.59f);
         mistShader.TrySetParameter("mistCoordinatesZoom", new Vector2(1f, 0.4f));
         mistShader.TrySetParameter("mistHeight", 160f);
         mistShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.LinearWrap);
