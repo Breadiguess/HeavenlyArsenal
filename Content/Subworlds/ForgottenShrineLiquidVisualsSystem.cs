@@ -72,6 +72,15 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
     internal static ManagedRenderTarget liquidDistanceTarget;
 
     /// <summary>
+    /// A general purpose timer used for water perturbations that increments based on wind speed and direction.
+    /// </summary>
+    public static float WindTimer
+    {
+        get;
+        private set;
+    }
+
+    /// <summary>
     /// A queue of points that determines where points in space should be converted to ripples, in world coordinates.
     /// </summary>
     public static readonly Queue<Vector2> PointsToAddRipplesAt = new Queue<Vector2>(32);
@@ -156,14 +165,20 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         // However, at the same time, if the subworld is active, apply a separate water distortion shader, so that the water can be rendered completely still by default.
         if (SubworldSystem.IsActive<ForgottenShrineSubworld>())
         {
+            float perturbationStrength = LumUtils.InverseLerp(0f, 1f, MathF.Abs(Main.windSpeedCurrent)) * 0.023f;
+            Vector2 perturbationScroll = WindTimer * new Vector2(2.3f, 0.98f);
             Vector2 screenSize = Main.ScreenSize.ToVector2();
             RenderTarget2D distortionTarget = (RenderTarget2D)typeof(WaterShaderData).GetField("_distortionTarget", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
             ManagedShader waterShader = ShaderManager.GetShader("HeavenlyArsenal.ShrineWaterShader");
             waterShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
             waterShader.TrySetParameter("screenOffset", (Main.screenPosition - Main.screenLastPosition) / screenSize);
             waterShader.TrySetParameter("targetSize", screenSize);
+            waterShader.TrySetParameter("perturbationStrength", perturbationStrength);
+            waterShader.TrySetParameter("perturbationScroll", perturbationScroll);
+            waterShader.TrySetParameter("screenPosition", Main.screenPosition);
             waterShader.SetTexture(distortionTarget, 1);
             waterShader.SetTexture(TileTargetManagers.LiquidTarget, 2, SamplerState.LinearClamp);
+            waterShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 3, SamplerState.LinearWrap);
             waterShader.Apply();
 
             Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
@@ -407,5 +422,9 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         reflectionShader.SetTexture(TileTargetManagers.TileTarget, 4, SamplerState.LinearClamp);
         reflectionShader.SetTexture(LiquidDistanceTarget, 5, SamplerState.LinearClamp);
         reflectionShader.Activate();
+
+        WindTimer += Main.windSpeedCurrent / 60f;
+        if (MathF.Abs(WindTimer) >= 1000f)
+            WindTimer = 0f;
     }
 }
