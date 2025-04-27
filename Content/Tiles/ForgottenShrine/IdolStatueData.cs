@@ -82,7 +82,7 @@ public class IdolStatueData : WorldOrientedTileObject
 
         ForgottenShrineDarknessSystem.QueueGlowAction(() =>
         {
-            Main.spriteBatch.Draw(waterGlowTexture.Value, bottom, waterFrame, Color.White, rotation, waterFrame.Size() * new Vector2(0.5f, 1f), 1f, 0, 0f);
+            Main.spriteBatch.Draw(waterGlowTexture.Value, bottom + Main.screenLastPosition - Main.screenPosition, waterFrame, Color.White, rotation, waterFrame.Size() * new Vector2(0.5f, 1f), 1f, 0, 0f);
         });
     }
 
