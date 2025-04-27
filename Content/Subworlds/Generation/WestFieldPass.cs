@@ -60,6 +60,7 @@ public class WestFieldPass : GenPass
             {
                 Tile t = Main.tile[x, top + dy];
                 t.WallType = WallID.GrassUnsafe;
+                t.WallColor = PaintID.PurplePaint;
             }
         }
 
