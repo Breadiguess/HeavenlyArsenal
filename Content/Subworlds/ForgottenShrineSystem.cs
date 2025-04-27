@@ -68,7 +68,7 @@ public class ForgottenShrineSystem : ModSystem
         // Get a collection of all NPC IDs in the spawn pool that are not critters.
         IEnumerable<int> npcsToRemove = pool.Keys.Where(npcID => !NPCID.Sets.CountsAsCritter[npcID]);
 
-        // Use the above collection as a blacklist, removing all NPCs that are included in it, effectively ensuring only critters may spawn in the garden.
+        // Use the above collection as a blacklist, removing all NPCs that are included in it, effectively ensuring only critters may spawn in the shrine.
         foreach (int npcIDToRemove in npcsToRemove)
             pool.Remove(npcIDToRemove);
     }
