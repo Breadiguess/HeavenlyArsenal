@@ -37,7 +37,7 @@ public class ForgottenShrineSystem : ModSystem
     /// <summary>
     /// The horizontal distance in parsecs displayed if the player has the appropriate info accessory.
     /// </summary>
-    public static ulong HorizontalDistanceParsecs => 7411267996481;
+    public static ulong HorizontalDistanceParsecs => 7411267481601;
 
     /// <summary>
     /// The vertical distance in parsecs displayed if the player has the appropriate info accessory.
