@@ -136,8 +136,8 @@ public class SpiritCandleParticle : BaseParticle
             float spin = MathF.Sin(MathHelper.TwoPi * AnimationTimer / spinRate + timeOffset);
 
             Scale = new Vector2(1f + horizontalSquish, 1f - horizontalSquish) * BaseScale;
-            Velocity = new Vector2(spin * 1.12f, squishWave * -0.9f) * new Vector2(1f + windSpeed * 2.12f, 1f + windSpeed * 3.2f);
-            Rotation = spin * 0.18f + squishWave * 0.04f;
+            Velocity = new Vector2(spin * 1.12f, squishWave * -0.9f);
+            Rotation = spin * 0.18f + squishWave * 0.04f - Main.windSpeedCurrent * 0.23f;
         }
 
         Time++;

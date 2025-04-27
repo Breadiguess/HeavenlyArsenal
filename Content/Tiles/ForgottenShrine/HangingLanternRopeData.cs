@@ -112,10 +112,13 @@ public class HangingLanternRopeData : WorldOrientedTileObject
 
         Lighting.AddLight(VerletRope.segments[^1].position, Color.Orange.ToVector3());
 
-        WindTime += Main.windSpeedCurrent;
+        WindTime += Main.windSpeedCurrent / 60f;
+        if (MathF.Abs(WindTime) >= 4000f)
+            WindTime = 0f;
 
         float windSpeed = Math.Clamp(Main.WindForVisuals * 8f, -1.3f, 1.3f);
-        Vector2 wind = Vector2.UnitX * (LumUtils.AperiodicSin(WindTime * 0.021f + VerletRope.segments[0].position.Length()) * 0.46f + windSpeed) * -2f;
+        float windWave = MathF.Cos(WindTime * 3.42f + VerletRope.segments[0].position.Length() * 0.06f);
+        Vector2 wind = Vector2.UnitX * (windWave + Main.windSpeedCurrent) * -3f;
         VerletRope.segments[^1].position += wind * LumUtils.InverseLerp(0f, 0.5f, windSpeed);
 
         VerletRope.damping = 0.01f;

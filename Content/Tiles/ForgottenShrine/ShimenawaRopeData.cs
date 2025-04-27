@@ -106,7 +106,7 @@ public class ShimenawaRopeData : WorldOrientedTileObject
         public void Update()
         {
             float windTug = LumUtils.InverseLerp(0f, 0.85f, MathF.Abs(Main.windSpeedCurrent)) * 0.0061f;
-            AngularVelocity += (Main.windSpeedCurrent + LumUtils.AperiodicSin(InteractionTimer / 24f + Position.Length()) * 0.6f) * windTug;
+            AngularVelocity += (Main.windSpeedCurrent * 1.2f + LumUtils.AperiodicSin(InteractionTimer / 14f + Position.Length()) * 2.6f) * windTug;
 
             // An ODE of the form d^2u/dt^2 = -au (aka acceleration being determined by the negative of current angle) results in oscillating sinusoidal motion, which is
             // ideal for swaying rope ornaments that respond to the environment.

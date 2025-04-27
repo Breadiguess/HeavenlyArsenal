@@ -26,9 +26,6 @@ public partial class IdolSummoningRitualSystem : ModSystem
         ForgottenShrineBackground.MoonBackglow = MathHelper.SmoothStep(0f, 1.5f, backglowFadeIn);
         ForgottenShrineBackground.LanternsCanSpawn = animationCompletion < 0.8f;
 
-        HarshWindSoundVolume = LumUtils.InverseLerp(0f, 0.6f, animationCompletion);
-        BaseWindSoundVolume = LumUtils.Saturate(1.2f - HarshWindSoundVolume);
-
         IdolStatueManager.WaterFlowCutoffInterpolant = 1f;
         IdolStatueManager.ExtraDrawAction = p => DrawGlowOnStatueEye(1f, p);
     }
