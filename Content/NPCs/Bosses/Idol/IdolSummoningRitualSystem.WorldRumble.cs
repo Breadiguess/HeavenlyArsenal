@@ -18,7 +18,9 @@ public partial class IdolSummoningRitualSystem : ModSystem
     private void Perform_WorldRumble()
     {
         int rumbleBuildupTime = 180;
-        RumbleInterpolant = MathHelper.SmoothStep(0f, 1f, Timer / (float)rumbleBuildupTime).Cubed();
+        float animationCompletion = Timer / (float)rumbleBuildupTime;
+        RumbleInterpolant = MathHelper.SmoothStep(0f, 1f, animationCompletion).Cubed();
+        BaseWindSoundVolume = LumUtils.InverseLerp(0f, 0.75f, animationCompletion);
 
         if (Timer >= rumbleBuildupTime)
             SwitchState(IdolSummoningRitualState.OpenStatueEye);
