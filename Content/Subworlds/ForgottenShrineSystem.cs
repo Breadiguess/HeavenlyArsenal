@@ -55,9 +55,9 @@ public class ForgottenShrineSystem : ModSystem
         CellPhoneInfoModificationSystem.PlayerYPositionReplacementTextEvent += UseParsecsPositionTextY;
         GlobalNPCEventHandlers.EditSpawnPoolEvent += OnlyAllowFriendlySpawnsInShrine;
         GlobalNPCEventHandlers.EditSpawnRateEvent += IncreaseFriendlySpawnsInShrine;
-        On_Main.DrawBlack += ForceDrawBlack;
         GlobalTileEventHandlers.IsTileUnbreakableEvent += MakeShrineUnbreakable;
         GlobalWallEventHandlers.IsWallUnbreakableEvent += MakeShrineUnbreakable;
+        On_Main.DrawBlack += ForceDrawBlack;
     }
 
     private static void OnlyAllowFriendlySpawnsInShrine(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
