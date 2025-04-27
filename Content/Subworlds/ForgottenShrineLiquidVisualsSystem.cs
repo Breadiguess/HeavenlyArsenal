@@ -374,6 +374,7 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
                 PointsToAddRipplesAt.Enqueue(p.Bottom + Vector2.UnitY * 5f + Main.rand.NextVector2Circular(4f, 0f));
             }
         }
+        UpdateWaterShaders();
     }
 
     public override void PostDrawTiles()
@@ -391,6 +392,17 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
             return;
         }
 
+        UpdateWaterShaders();
+
+        WindTimer += Main.windSpeedCurrent / 60f;
+        if (MathF.Abs(WindTimer) >= 1000f)
+            WindTimer = 0f;
+    }
+
+    private static void UpdateWaterShaders()
+    {
+        ManagedScreenFilter mistShader = ShaderManager.GetFilter("HeavenlyArsenal.ForgottenShrineMistShader");
+        ManagedScreenFilter reflectionShader = ShaderManager.GetFilter("HeavenlyArsenal.ForgottenShrineWaterReflectionShader");
         mistShader.TrySetParameter("targetSize", Main.ScreenSize.ToVector2());
         mistShader.TrySetParameter("oldScreenPosition", Main.screenLastPosition);
         mistShader.TrySetParameter("zoom", Main.GameViewMatrix.Zoom);
@@ -422,9 +434,5 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
         reflectionShader.SetTexture(TileTargetManagers.TileTarget, 4, SamplerState.LinearClamp);
         reflectionShader.SetTexture(LiquidDistanceTarget, 5, SamplerState.LinearClamp);
         reflectionShader.Activate();
-
-        WindTimer += Main.windSpeedCurrent / 60f;
-        if (MathF.Abs(WindTimer) >= 1000f)
-            WindTimer = 0f;
     }
 }
