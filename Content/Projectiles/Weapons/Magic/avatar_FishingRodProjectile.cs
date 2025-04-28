@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.Graphics.CameraModifiers;
 using Terraria.ID;
@@ -288,20 +289,25 @@ public class avatar_FishingRodProjectile : ModProjectile
 
             if (Main.myPlayer == Projectile.owner)
             {
-                const int waitTimeBetweenGrabs = 17;
-                const float maxDistance = 1000;
-
-                if (Time % waitTimeBetweenGrabs == 0)
+                if (true)
+                    Fish();
+                else
                 {
-                    canUse = Player.CheckMana(Player.HeldItem.mana, true);
+                    const int waitTimeBetweenGrabs = 17;
+                    const float maxDistance = 1000;
 
-                    NPC[] target = Main.npc.Where(t => t.active && t.CanBeChasedBy(Player) && t.Distance(Player.MountedCenter) < maxDistance).ToArray();
-
-                    for (int i = 0; i < target.Length; i += Main.rand.Next(1, 4))
+                    if (Time % waitTimeBetweenGrabs == 0)
                     {
-                        Vector2 randomDirection = Main.rand.NextVector2CircularEdge(1, 1);
-                        Projectile shadowHand = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target[i].Center, randomDirection, ModContent.ProjectileType<avatar_FishingRodVoid>(), Projectile.damage, 0, Player.whoAmI, ai1: target[i].whoAmI);
-                        shadowHand.scale *= Main.rand.NextFloat(0.5f, 1.5f);
+                        canUse = Player.CheckMana(Player.HeldItem.mana, true);
+
+                        NPC[] target = Main.npc.Where(t => t.active && t.CanBeChasedBy(Player) && t.Distance(Player.MountedCenter) < maxDistance).ToArray();
+
+                        for (int i = 0; i < target.Length; i += Main.rand.Next(1, 4))
+                        {
+                            Vector2 randomDirection = Main.rand.NextVector2CircularEdge(1, 1);
+                            Projectile shadowHand = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target[i].Center, randomDirection, ModContent.ProjectileType<avatar_FishingRodVoid>(), Projectile.damage, 0, Player.whoAmI, ai1: target[i].whoAmI);
+                            shadowHand.scale *= Main.rand.NextFloat(0.5f, 1.5f);
+                        }
                     }
                 }
             }
@@ -320,7 +326,47 @@ public class avatar_FishingRodProjectile : ModProjectile
         }
     }
 
-    public override bool? CanCutTiles() => false;
+    public delegate void RollDropLevelsDelegate(Projectile proj, int fishingLevel, out bool common, out bool uncommon, out bool rare, out bool veryrare, out bool legendary, out bool crate);
+	public static RollDropLevelsDelegate FishingCheck_RollDropLevels;
+
+    public delegate void ProbeForQuestFishDelegate(Projectile proj, ref FishingAttempt fisher);
+    public static ProbeForQuestFishDelegate FishingCheck_ProbeForQuestFish;
+
+    public delegate void RollEnemySpawnsDelegate(Projectile proj, ref FishingAttempt fisher);
+    public static RollEnemySpawnsDelegate FishingCheck_RollEnemySpawns;
+
+    public delegate void RollItemDropDelegate(Projectile proj, ref FishingAttempt fisher);
+    public static RollItemDropDelegate FishingCheck_RollItemDrop;
+
+	private void Fish()
+	{
+		Rope.RopeSegment bell = bellRope.segments[^1];
+        FishingAttempt fisher = new FishingAttempt();
+		fisher.X = (int)(Projectile.Center.X / 16f);
+		fisher.Y = (int)(Projectile.Center.Y / 16f);
+        fisher.CanFishInLava = true;
+        fisher.fishingLevel = 65535;
+
+        FishingCheck_RollDropLevels?.Invoke(Projectile, fisher.fishingLevel, out fisher.common, out fisher.uncommon, out fisher.rare, out fisher.veryrare, out fisher.legendary, out fisher.crate);
+        FishingCheck_ProbeForQuestFish?.Invoke(Projectile, ref fisher);
+        FishingCheck_RollEnemySpawns?.Invoke(Projectile, ref fisher);
+        FishingCheck_RollItemDrop?.Invoke(Projectile, ref fisher);
+
+        AdvancedPopupRequest sonar = new AdvancedPopupRequest();
+		Vector2 sonarPosition = bell.position; // Bobber position as default
+		PlayerLoader.CatchFish(Player, fisher, ref fisher.rolledItemDrop, ref fisher.rolledEnemySpawn, ref sonar, ref sonarPosition);
+
+        if (fisher.rolledItemDrop > 0)
+			Player.QuickSpawnItem(Projectile.GetSource_FromThis(), fisher.rolledItemDrop);
+
+        if (fisher.rolledEnemySpawn > 0 && fisher.rolledEnemySpawn != NPCID.TownSlimeRed)
+		{
+            NPC.NewNPCDirect(Projectile.GetSource_FromThis(), bell.position, fisher.rolledEnemySpawn);
+
+        }
+	}
+
+	public override bool? CanCutTiles() => false;
 
     // Don't do damage directly
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => false;
@@ -334,7 +380,16 @@ public class avatar_FishingRodProjectile : ModProjectile
         bellTexture = ModContent.Request<Texture2D>(Texture + "_Bell");
 
         Main.ContentThatNeedsRenderTargets.Add(riftLakeTargets = new InstancedRequestableTarget());
-    }
+
+		FishingCheck_RollDropLevels = typeof(Projectile).GetMethod("FishingCheck_RollDropLevels", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .CreateDelegate<RollDropLevelsDelegate>(null);
+		FishingCheck_ProbeForQuestFish = typeof(Projectile).GetMethod("FishingCheck_ProbeForQuestFish", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .CreateDelegate<ProbeForQuestFishDelegate>(null);
+		FishingCheck_RollEnemySpawns = typeof(Projectile).GetMethod("FishingCheck_RollEnemySpawns", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .CreateDelegate<RollEnemySpawnsDelegate>(null);
+		FishingCheck_RollItemDrop = typeof(Projectile).GetMethod("FishingCheck_RollItemDrop", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .CreateDelegate<RollItemDropDelegate>(null);
+	}
 
     public static InstancedRequestableTarget riftLakeTargets;
 
