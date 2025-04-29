@@ -1,1 +1,14 @@
+BloodArmorBody: {
+	DisplayName: Blood Armor Body
+	Tooltip: ""
+}
 
+BloodArmorHead: {
+	DisplayName: Blood Armor Head
+	Tooltip: ""
+}
+
+BloodArmorLegs: {
+	DisplayName: Blood Armor Legs
+	Tooltip: ""
+}
