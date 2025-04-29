@@ -204,10 +204,16 @@ class HeldLifeCessationProjectile : ModProjectile
     //todo: make it update properly with the Player's velocity
     public void AbsorbHeat()
     {
-
+        Vector2 toMouse = Main.MouseWorld - Owner.Center;
         // Increase and clamp heat.
         Heat = MathHelper.Clamp(Heat + heatIncrement / 10, minHeat, maxHeat);
-
+        Projectile.NewProjectile(Projectile.GetSource_FromThis(),
+                    Projectile.Center,
+                    toMouse,
+                    ModContent.ProjectileType<LifeCessationLance>(),
+                    Projectile.damage,
+                    0f,
+                    Owner.whoAmI);
         // Ensure our dust array is initialized.
         if (heatDusts == null || heatDusts.Length == 0)
         {
@@ -253,7 +259,7 @@ class HeldLifeCessationProjectile : ModProjectile
 
             }
 
-            // Optional: tweak visual properties for a smooth effect.
+            
             heatDusts[i].scale = 1.2f;
             heatDusts[i].noGravity = true;
         }

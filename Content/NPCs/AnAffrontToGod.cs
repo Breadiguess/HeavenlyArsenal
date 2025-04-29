@@ -4,6 +4,8 @@ using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.Items.MiscOPTools;
+using NoxusBoss.Core.CrossCompatibility.Inbound;
 using NoxusBoss.Core.World.GameScenes.AvatarAppearances;
 using System;
 using Terraria;
@@ -50,7 +52,16 @@ namespace HeavenlyArsenal.Content.NPCs
             }
         }
 
-        public override void SetStaticDefaults() => RocheLimitGlobalNPC.ImmuneToLobotomy[Type] = true;
+        public override void SetStaticDefaults() 
+        {
+            EmptinessSprayer.NPCsToNotDelete[Type] = true;
+            RocheLimitGlobalNPC.ImmuneToLobotomy[Type] = true;
+            if (ModReferences.CalamityRemixMod is not null)
+            {
+                //LaRugaID = ModReferences.CalamityRemixMod.Find<ModNPC>("LaRuga").Type;
+                //NPCsThatReflectSpray[LaRugaID] = true;
+            }
+        } 
 
         public override void SetDefaults()
         {

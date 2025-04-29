@@ -7,7 +7,7 @@ using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj;
+namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge;
 
 public class AvatarRifleSuperBullet : GlobalProjectile
 {
@@ -61,6 +61,9 @@ public class AvatarRifleSuperBullet : GlobalProjectile
             trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);
 
             PrimitiveRenderer.RenderTrail(oldPos, new PrimitiveSettings(WidthFunction, ColorFunction, _ => Vector2.Zero, Shader: trailShader, Smoothen: false), oldPos.Length);
+            Utils.DrawBorderString(Main.spriteBatch, "Empowerment: " + empowerment.ToString(), projectile.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "Empowerment: " + hasEmpowerment.ToString(), projectile.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
+
         }
     }
 }

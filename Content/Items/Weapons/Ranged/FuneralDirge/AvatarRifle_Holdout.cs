@@ -1,13 +1,10 @@
 ﻿using CalamityMod;
-using CalamityMod.Projectiles.BaseProjectiles;
 using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.Ui;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Gores;
-using HeavenlyArsenal.Content.Items.Weapons.Ranged;
 using HeavenlyArsenal.Content.Particles;
-using HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
@@ -19,12 +16,11 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using static Luminance.Common.Utilities.Utilities;
 
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
+namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
 {
     public class AvatarRifle_Holdout : ModProjectile
     {
@@ -42,11 +38,6 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
         public static readonly SoundStyle CycleSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle_Dronnor1");
         public static readonly SoundStyle CycleEmptySound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_Cycle");
         public static readonly SoundStyle MagEmptySound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/AvatarRifle/AvatarRifle_ClipEject");      
-        public float Time 
-        { 
-          get;
-          private set;
-        }
 
 
         public int ExistenceTimer
@@ -55,14 +46,20 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
             set;
         }
         private Rope rope;
-        
+
+        private Vector2[] ribbonPoints;
+        private Vector2[] ribbonVels;
+        public static Asset<Texture2D> BeadRopeTexture;
+        public static Asset<Texture2D> StringRopeTexture;
+
 
         public ref Player Owner => ref Main.player[Projectile.owner];
 
         private AvatarRifleState CurrentState = AvatarRifleState.Firing;
         private float StateTimer = 0;
 
-
+        
+        public ref float Time => ref Projectile.ai[0];
         public const float MaxAmmo = 7;
         public int AmmoCount = 7; // Total shots before reload
         public int ReloadDuration = AvatarRifle.ReloadTime; // Duration for reload (in frames)
@@ -78,7 +75,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
 
         public override void SetStaticDefaults()
         {
-            Main.projFrames[Projectile.type] = 18;
+            Main.projFrames[Projectile.type] = 19;
             ProjectileID.Sets.TrailingMode[Type] = 2;
             ProjectileID.Sets.TrailCacheLength[Type] = 10;
         }
@@ -96,7 +93,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
         }
         public override void OnSpawn(IEntitySource source)
         {
-            AmmoCount = Math.Abs(Owner.GetModPlayer<HeavenlyArsenalPlayer>().AvatarRifleCounter);
+            AmmoCount = Math.Abs(Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleCounter);
             Vector2 RopeStart = Projectile.Center + new Vector2(-19, 10); // Adjust offsets as needed
             Vector2 endPoint = Projectile.Center + new Vector2(78 * Projectile.direction, 10);
             rope = new Rope(RopeStart, endPoint, segmentCount: 30, segmentLength: 5f, gravity: new Vector2(0, 10f));
@@ -116,7 +113,14 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
         {
             WeaponBar.DisplayBar(Color.SlateBlue, Color.Lerp(Color.DeepSkyBlue, Color.Crimson, Utils.GetLerpValue(0.3f, 0.8f, (float)Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().AvatarRifleCounter/7, true)), (float)Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().AvatarRifleCounter/7, 10, 1,new Vector2(0,-40));
             RibbonPhysics();
-            CreateDustAtOrigin();
+            Vector2 RopeStart = Projectile.Center + new Vector2(-40, Projectile.direction * 10).RotatedBy(Projectile.rotation);
+            Vector2 endPoint = Projectile.Center + new Vector2(83, Projectile.direction * 2).RotatedBy(Projectile.rotation);
+
+            rope.segments[0].position = RopeStart;
+            rope.segments[^1].position = endPoint;
+            rope.gravity = new Vector2(0f, 0.5f);
+            rope.Update();
+            //CreateDustAtOrigin();
             Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter);
             UpdateProjectileHeldVariables(armPosition);
             ManipulatePlayerVariables();
@@ -145,17 +149,13 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
                 StateTimer = 0;
                 Projectile.Kill();
             }
-            Vector2 RopeStart = Projectile.Center + new Vector2(-40, Projectile.direction * 10).RotatedBy(Projectile.rotation);
-            Vector2 endPoint = Projectile.Center + new Vector2(83, Projectile.direction * 2).RotatedBy(Projectile.rotation);
-
-            rope.segments[0].position = RopeStart;
-            rope.segments[^1].position = endPoint;
-            rope.gravity = new Vector2(0f, 0.5f);
-            rope.Update();
+            
             Time++;
         }
 
-        
+        public bool Cycled = false;
+        private float CycleOffset = 0f;
+        public bool HasShellToEject = true;
 
         private void HandleFiring()
         {
@@ -166,9 +166,14 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
                 var sound = baseSound.WithVolumeScale(AmmoCount == 1 ? 2 : 1).WithPitchOffset(AmmoCount == 1 ? 0 : MaxAmmo - AmmoCount / 10);
 
                 SoundEngine.PlaySound(sound, Projectile.position);
-                var player = Owner.GetModPlayer<HeavenlyArsenalPlayer>();
-                player.AvatarRifleCounter--;
-                AmmoCount--;
+                var player = Owner.GetModPlayer<AvatarRiflePlayer>();
+               // player.AvatarRifleCounter--;
+
+
+              //  AmmoCount--;// = (int)MaxAmmo;
+
+                
+               // AmmoCount = (int)Math.Floor(MaxAmmo);
                 FireProjectile();
 
                 Cycled = false;
@@ -177,8 +182,37 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
             }
 
         }
+        private void FireProjectile()
+        {
+
+            int bulletAMMO = ProjectileID.Bullet;
+            Owner.PickAmmo(Owner.ActiveItem(), out bulletAMMO, out float SpeedNoUse, out int bulletDamage, out float kBackNoUse, out int _);
+
+            Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
 
 
+
+            Vector2 tipPosition = armPosition + Projectile.velocity * Projectile.width * 1.55f + new Vector2(3, -3);
+            CreateMuzzleFlash(tipPosition, Projectile.velocity);
+
+            //float AmmoDifference = MaxAmmo - AmmoCount;
+            RecoilRotation += Projectile.spriteDirection * MathHelper.ToRadians(34f); // Spread angle for the muzzle flash particles
+            Projectile shot = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity * 12, bulletAMMO, Projectile.damage, Projectile.knockBack, Projectile.owner);
+            shot.GetGlobalProjectile<AvatarRifleSuperBullet>().hasEmpowerment = true;
+            shot.GetGlobalProjectile<AvatarRifleSuperBullet>().empowerment = 7;//(int)MathHelper.Lerp((int)MathF.Pow(MaxAmmo - AmmoCount, 2), 2, (7 - AmmoCount) / MaxAmmo);
+            AvatarRifle_MuzzleFlash darkParticle = AvatarRifle_MuzzleFlash.pool.RequestParticle();
+            darkParticle.Prepare(tipPosition, Projectile.velocity, Projectile.velocity.ToRotation() 
+                + MathHelper.PiOver2, 30, Color.Crimson, Color.AntiqueWhite, 3f);
+
+
+            ParticleEngine.Particles.Add(darkParticle);
+
+            recoilIntensity = maxRecoil;
+            if (AmmoCount > 0)
+            {
+
+            }
+        }
         private void HandlePostFire()
         {
            if (StateTimer > 0)
@@ -209,32 +243,23 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
                 StateTimer = ReloadDuration;
             }
         }
-
-
-
-
-
-        private void EjectShell(int SparkCount, Vector2 ShellPosition, float ShellVelocityMin, float ShellVelocityMax)
-        {
-            int BulletVariation = (int)Main.rand.NextFloat(ShellVelocityMin, ShellVelocityMax);
-            Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Left, new Vector2(Projectile.direction * -5f, -10f), ModContent.GoreType<BulletGore>(), 1);
-            for (int i = 0; i <= SparkCount; i++)
-            {
-                float CasingVariation = Main.rand.NextFloat(ShellVelocityMin, ShellVelocityMax);
-                Dust.NewDust(ShellPosition, 1, 1, DustID.GoldFlame, Projectile.velocity.X + CasingVariation, Projectile.velocity.Y + CasingVariation, 150, default, 1);
-            }
-        }
-
-        public bool Cycled = false;
-        private float CycleOffset = 0f;
-        public bool HasShellToEject = true;
         private void HandleCycle()
         {
-            float SpeedMulti = 0.78f;
-            float attackSpeed = Owner.GetAttackSpeed(DamageClass.Ranged);
-            int baseHoldCyclePosition = 50; // base duration in ticks
-            float holdCyclePosition = baseHoldCyclePosition*SpeedMulti; 
+            float attackSpeed = Owner.GetAttackSpeed(DamageClass.Generic);
+
+            float SpeedMulti = 1f;
+            if (Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpowered)
+            {
+                SpeedMulti = 0.67f;
+            }
+            //SpeedMulti += 1-attackSpeed;
             
+           
+            //soft cap at 50, hard cap at 30
+
+            int baseHoldCyclePosition = 50; // base duration in ticks
+            float holdCyclePosition = baseHoldCyclePosition*SpeedMulti;
+            Math.Clamp(holdCyclePosition, 30, 1000);
             Owner.SetDummyItemTime(14);
 
             // Animation frame calculations
@@ -243,7 +268,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
 
             if (!Cycled)
             {
-                StateTimer = AvatarRifle.CycleTime * SpeedMulti;
+                StateTimer = MathHelper.Clamp(AvatarRifle.CycleTime * SpeedMulti,30,1999);
                 Main.NewText($"StateTimer: {StateTimer}");
                 SoundEngine.PlaySound(CycleSound.WithVolumeScale(1.5f).WithPitchOffset(Main.rand.NextFloat(-0.1f,0.1f)), Projectile.position);
                 Cycled = true;
@@ -259,7 +284,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
                     if (HasShellToEject)
                     {
                         HasShellToEject = false;
-                        EjectShell(2039, origin, -40, 40);
+                        EjectShell(2039, origin, -20, 20);
                     }
                 }
                 if (++Projectile.frameCounter > frameDuration * SpeedMulti) 
@@ -294,16 +319,15 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
 
             StateTimer--;
         }
-
         private void HandleReload()
         {
            
-            int totalFrames = 7; // Total frames for the projectile
+            int totalFrames = 8; // Total frames for the projectile
             int frameDuration = totalFrames;
             if (StateTimer == ReloadDuration)
             {
                 Owner.SetDummyItemTime(ReloadDuration);
-                Projectile.frame = 10;
+                Projectile.frame = 11;
 
                 //Main.NewText($"Reloading", Color.AntiqueWhite);
                 Gore.NewGore(Projectile.GetSource_FromThis(),
@@ -316,18 +340,12 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
             if (StateTimer == ReloadDuration / 3)
             {
                 SoundEngine.PlaySound(ReloadSound, Projectile.Center).WithVolumeBoost(1.2f);
-                //reloadSoundInstance = reloadSoundEffect.CreateInstance();
-                //reloadSoundInstance.Play();
-
-              
             }
 
             if (StateTimer > 0)
             {
                 StateTimer--; // Count down the reload timer
                 CycleOffset = Projectile.spriteDirection * MathHelper.ToRadians(15f);
-
-                // Animation logic: Start playing only after half the reload time has passed
                 if (StateTimer <= ReloadDuration / 3)
                 {
                     if (++Projectile.frameCounter > frameDuration)
@@ -335,7 +353,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
                         Projectile.frameCounter = 0;
 
                         if (Projectile.frame < 17)
-                            Projectile.frame++; // Move to next frame in reload animation
+                            Projectile.frame++;
 
                         // Eject the magazine when reaching frame 14
                         if (Projectile.frame == 14)
@@ -361,62 +379,24 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
 
             }
         }
+        private void EjectShell(int SparkCount, Vector2 ShellPosition, float ShellVelocityMin, float ShellVelocityMax)
+        {
+            int BulletVariation = (int)Main.rand.NextFloat(ShellVelocityMin, ShellVelocityMax);
+            Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Left, new Vector2(Projectile.direction * -5f, -10f), ModContent.GoreType<BulletGore>(), 1);
+            for (int i = 0; i <= SparkCount; i++)
+            {
+                float CasingVariation = Main.rand.NextFloat(ShellVelocityMin, ShellVelocityMax);
+                Dust.NewDust(ShellPosition, 1, 1, DustID.GoldFlame, Projectile.velocity.X + CasingVariation, Projectile.velocity.Y + CasingVariation, 150, default, 1);
+            }
+        }
+
 
         private float recoilIntensity = 0f; // Tracks the current recoil intensity
         private float RecoilRotation = 0f;
 
         private const float maxRecoil = 20f; // Maximum recoil amount
         private float recoilRecoverySpeed = 0.5f; // Speed at which recoil eases out
-        private void FireProjectile()
-        {
-           
-            int bulletAMMO = ProjectileID.Bullet;
-            Owner.PickAmmo(Owner.ActiveItem(), out bulletAMMO, out float SpeedNoUse, out int bulletDamage, out float kBackNoUse, out int _);
-
-            Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
-            
-
-
-            Vector2 tipPosition = armPosition + Projectile.velocity * Projectile.width * 1.55f + new Vector2(3, -3);
-            CreateMuzzleFlash(tipPosition, Projectile.velocity);
-
-            float AmmoDifference = MaxAmmo - AmmoCount;
-            //Main.NewText($"{Projectile.damage} + {(int)(MathF.Pow(AmmoDifference, MaxAmmo))} Damage", Color.AntiqueWhite);
-
-            RecoilRotation += Projectile.spriteDirection * MathHelper.ToRadians(34f); // Spread angle for the muzzle flash particles
-            Projectile shot = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity *12, bulletAMMO, Projectile.damage + (int)MathF.Pow(AmmoDifference,MaxAmmo), Projectile.knockBack, Projectile.owner);
-            shot.GetGlobalProjectile<AvatarRifleSuperBullet>().hasEmpowerment = true;
-            shot.GetGlobalProjectile<AvatarRifleSuperBullet>().empowerment = (int)MathHelper.Lerp((int)MathF.Pow(MaxAmmo -AmmoCount,2),2,(7-AmmoCount)/MaxAmmo);
-            //SoundEngine.PlaySound(SoundID.Item41 with { Volume = 0.75f }, Projectile.Center);
-            //Dust.NewDust(tipPosition, 1, 1, DustID.Firefly, Projectile.spriteDirection*5, 0, 100, default, 1);
-
-            AvatarRifle_MuzzleFlash darkParticle = AvatarRifle_MuzzleFlash.pool.RequestParticle();
-            darkParticle.Prepare(
-                //position
-                tipPosition,
-                //velocity
-                Projectile.velocity,//.ToRotation(),
-                  //rotaiton
-                Projectile.velocity.ToRotation() + MathHelper.PiOver2,// + Main.rand.NextFloat(-1f, 1f),
-                                                                      //lifetime
-                30,//Main.rand.Next(20, 40),
-                   //color normal
-                Color.Crimson,//Color.DarkCyan * 0.5f,
-                                   //color glow
-                 Color.AntiqueWhite,//Color.Black * 0.33f,
-                                    //scale
-                3f);
-
-
-            ParticleEngine.Particles.Add(darkParticle);
-
-            recoilIntensity = maxRecoil;
-            if (AmmoCount > 0)
-            {
-
-            }
-        }
-
+        
         private void CreateMuzzleFlash(Vector2 muzzlePosition, Vector2 projectileVelocity)
         {
             int numParticles = 40; // Number of particles in the muzzle flash
@@ -506,11 +486,6 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
 
         }
 
-
-         private Vector2[] ribbonPoints;
-         private Vector2[] ribbonVels;
-        public static Asset<Texture2D> BeadRopeTexture;
-        public static Asset<Texture2D> StringRopeTexture;
 
 
         private void DrawRibbon(Color lightColor)
@@ -627,7 +602,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
                 if (i == ribbonPoints.Length - 1)
                 {
                     // Store or apply the rotation for the last segment
-                    ribbonVels[i] = segmentRotation.ToRotationVector2() * ribbonVels[i].Length(); // Optional: align velocity
+                    ribbonVels[i] = segmentRotation.ToRotationVector2() * ribbonVels[i].Length(); 
                 }
                 ribbonPoints[0] = AnchorPosition();
             }
@@ -684,35 +659,58 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
             DrawRibbon(lightColor);
 
 
-            Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;//ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/AvatarRifleProj/AvatarRifle_HoldoutN").Value;//
-            Texture2D Roots = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/AvatarRifleProj/AvatarRifle_Holdout_Roots").Value;
+            Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;//ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/AvatarRifleProj/AvatarRifle_HoldoutN").Value;//
+            //Texture2D Roots = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Ranged/FuneralDirge/AvatarRifle_Holdout_Roots").Value;
 
 
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 
-            Rectangle frame = texture.Frame(1, 18, 0, Projectile.frame);
+            Rectangle frame = texture.Frame(1, 19, 0, Projectile.frame);
 
           
             float rotation = Projectile.rotation;
-            //SpriteEffects direction = SpriteEffects.None;
-
             SpriteEffects spriteEffects = Projectile.direction * Owner.gravDir < 0 ? SpriteEffects.FlipVertically : 0;
-            Vector2 origin = new Vector2(frame.Width / 2 - 24, frame.Height / 2 - 4* Projectile.direction * Owner.gravDir);
+            Vector2 origin = new Vector2(frame.Width / 2 - 46, frame.Height / 2 - -2* Projectile.direction * Owner.gravDir);
 
-            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation, origin, Projectile.scale, spriteEffects, 0);
-
+            
             float wind = Projectile.rotation+AperiodicSin(Main.GlobalTimeWrappedHourly * 0.56f + Projectile.Center.X + Projectile.Center.Y) *
             //clamps rotation kinda
             0.033f
             + Main.windSpeedCurrent * 0.17f;
 
             
-            Rectangle Lillyframe = Roots.Frame(1, 1, 0, 0);
-            //Vector2 Lorigin = new Vector2(texture.Width/2 +13 * Projectile.direction, Lillyframe.Height - 20* Owner.gravDir);
+            //Rectangle Lillyframe = Roots.Frame(1, 1, 0, 0);
             float LillyScale = 1f;
             Vector2 LillyPos = new Vector2(Projectile.Center.X, Projectile.Center.Y);
             //Main.EntitySpriteDraw(Roots, LillyPos - Main.screenPosition, Lillyframe, lightColor, wind,new Vector2(origin.X, origin.Y - 15 * Projectile.spriteDirection), LillyScale, spriteEffects, 0f);
             Vector2 Bulletorigin = new Vector2(frame.Width / 2 - 24, frame.Height / 2 - 7 * Projectile.direction * Owner.gravDir);
+            if (Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpowered)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+
+                    float glowsize = 1.05f;
+                    Vector2 drawOffset = (MathHelper.TwoPi * i / 6f).ToRotationVector2() * Projectile.scale;    
+                    Main.spriteBatch.Draw(texture, drawPosition + drawOffset, frame, Color.Crimson with { A = 20}, rotation, origin, glowsize, spriteEffects, 0f);
+                }
+            }
+
+            
+
+
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation, origin, Projectile.scale, spriteEffects, 0);
+
+
+
+            Utils.DrawBorderString(Main.spriteBatch, "| Is empowered: " + Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpowered.ToString(), Projectile.Center - Vector2.UnitY * 60 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "| Rifle Charge : " + Owner.GetModPlayer<AvatarRiflePlayer>().RifleCharge.ToString() + " | RifleCharge Decay: " + Owner.GetModPlayer<AvatarRiflePlayer>().RifleChargeDecay, Projectile.Center - Vector2.UnitY * 80 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "| Empowerment Timer: " + Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpoweredTimer.ToString(), Projectile.Center - Vector2.UnitY * 100 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "| State: " + CurrentState.ToString() + " | StateTimer: " + StateTimer, Projectile.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "| AttackSpeed: " + Owner.GetTotalAttackSpeed<RangedDamageClass>().ToString(), Projectile.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "| AmmoType: " + Owner.coinLuck.ToString(), Projectile.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+
+
+
             return false;
         }
 
@@ -839,4 +837,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.AvatarRifleProj
         */
         public override bool? CanDamage() => false;
     }
+
+    
+    
 }

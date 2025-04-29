@@ -20,13 +20,13 @@ using System.Linq;
 using Luminance.Assets;
 
 using HeavenlyArsenal.common;
-using HeavenlyArsenal.Content.Items.Weapons.Ranged;
 using NoxusBoss.Content.Particles.Metaballs;
 using Dust = Terraria.Dust;
 using HeavenlyArsenal.Content.Particles.Metaballs;
+using Terraria.GameContent.Tile_Entities;
 
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
+namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
 {
     internal class ColdBurst : ModProjectile//, IPixelatedPrimitiveRenderer
     {
@@ -83,7 +83,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.width = Projectile.height = 78;
-            Projectile.aiStyle = 0;
+
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.penetrate = -1;
@@ -94,13 +94,22 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             Projectile.localNPCHitCooldown =100; // 20 ticks before the same npc can be hit again
 
 
-            AIType = ProjectileID.Bullet;
+            
+            //Projectile.aiStyle = -1;
             Projectile.idStaticNPCHitCooldown = 8;
             
            
         }
+
+        public override void PostAI()
+        {
+            base.PostAI();
+        }
+
         public override void AI()
         {
+            //todo: homing projectile ai
+        
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
             float homingRange = 600f;
             float closestDist = homingRange;
@@ -126,6 +135,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
                 Projectile.velocity = Vector2.Normalize(Projectile.velocity + toTarget * homingStrength) * Projectile.velocity.Length();
             }
             Projectile.velocity *= 1.51f;
+        
+
         }
 
 
@@ -140,6 +151,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             }
 
             oldPos[0] = Projectile.Center + Projectile.velocity * 2;
+
+            Projectile.light = 0.5f;
             return false;
         }
 
@@ -147,6 +160,11 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
+            if(target.life < damageDone && target.type != NPCID.TargetDummy)
+            {
+                Owner.GetModPlayer<FusionRiflePlayer>().BurstCounter++;
+                return;
+            }
             //target.AddBuff(ModContent.BuffType<MiracleBlight>(), 600);
             if (FirstHit)
             {
@@ -158,7 +176,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
                 Projectile.velocity = Vector2.Zero;
                 for (int i = oldPos.Length - 2; i > 0; i--)
                 {
-                    oldPos[i] = target.Center + Projectile.oldVelocity;
+                    //oldPos[i] = target.Center + Projectile.oldVelocity;
+                    oldPos[i] = target.Center +  Projectile.oldVelocity * 0.5f;
                 }
 
                 oldPos[0] = target.Center;
@@ -188,6 +207,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             for (int i = 0; i< 4; i++)
             {
                 Dust.NewDust(target.Center - Projectile.oldVelocity, 40, 40, DustID.Snow, Projectile.velocity.X*10, Projectile.velocity.Y*10, 100, Color.AntiqueWhite, 1);
+                Dust.NewDustPerfect(target.Center - Projectile.oldVelocity, DustID.Snow, Projectile.velocity * 10, 0, Color.AntiqueWhite, 1);
             }
         }
             
@@ -203,7 +223,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D Glowball = GennedAssets.Textures.GreyscaleTextures.BloomFlare;
+            Texture2D Glowball = GreyscaleTextures.BloomFlare;
             float GlowScale = 0.1f;
             Vector2 glowScale = new Vector2(0.4f, 0.2f);
             Vector2 Gorigin = new Vector2(Glowball.Size().X / 2, Glowball.Size().Y / 2);

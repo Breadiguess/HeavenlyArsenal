@@ -56,6 +56,11 @@ Mods: {
 				DisplayName: Blood Armor Frenzy
 				Description: Mods.HeavenlyArsenal.Buffs.BloodArmorFrenzy.Description
 			}
+
+			LeechBuff: {
+				DisplayName: Leech Buff
+				Description: Mods.HeavenlyArsenal.Buffs.LeechBuff.Description
+			}
 		}
 
 		Items: {
@@ -122,7 +127,14 @@ Mods: {
 
 			FusionRifle: {
 				DisplayName: Cold Fusion
-				Tooltip: A jurry-rigged weapon that opens portals to the avatar's domain.
+				Tooltip:
+					'''
+					Hold left click to charge the weapon. 
+					It will automatically fire upon reaching max charge.
+					landing consecutive hits grants a stacking charge rate and damage increase
+					additionally, after a certain amount of hits, shots will apply volatile to enemies.
+					any hit afterwards will trigger volatile.
+					'''
 				ShiftTooltip:
 					'''
 					Teeth, sharper than your own.
@@ -291,7 +303,7 @@ Mods: {
 				Tooltip:
 					'''
 					Don't worry — stims have zero addictive properties*!
-					\n
+
 					*study paid for by draedon.inc
 					Please stim responsibly.
 
@@ -358,7 +370,7 @@ Mods: {
 
 			TaxidermyBook: {
 				DisplayName: Taxidermy for dummies
-				ObtainmentHint: "[c/F79BC6:Creates with new players]"
+				ObtainmentHint: "[c/F79BC6:Perhaps I should enter the Rift with a book?]"
 				Tooltip: Its a dusty guide to taxidermy.
 			}
 
@@ -468,13 +480,13 @@ Mods: {
 				Tooltip: ""
 			}
 
-			Samsara: {
-				DisplayName: Samsara
+			Goretex: {
+				DisplayName: Goretex
 				Tooltip: ""
 			}
 
-			Rapture: {
-				DisplayName: Rapture
+			Temp: {
+				DisplayName: Temp
 				Tooltip: ""
 			}
 		}
@@ -550,9 +562,20 @@ Mods: {
 			GoretexHeld_Chunk.DisplayName: Goretex Held_ Chunk
 			ColdBurst.DisplayName: Cold Burst
 			VolatileExplosion.DisplayName: Volatile Explosion
+			CombatStim_Held.DisplayName: Combat Stim_ Held
+			LifeCessationLance.DisplayName: Life Cessation Lance
 		}
 
-		NPCs.AnAffrontToGod.DisplayName: Cravatar
+		NPCs: {
+			AnAffrontToGod.DisplayName: Cravatar
+			FadingSpirit.DisplayName: Fading Spirit
+			UmbralLeech.DisplayName: Umbral Leech
+			UmbralLeech_Body.DisplayName: Umbral Leech_ Body
+			UmbralLeech_Tail.DisplayName: Umbral Leech_ Tail
+			ArtilleryCrab.DisplayName: Artillery Crab
+			BloodMortar.DisplayName: Blood Mortar
+			UmbralLeech2.DisplayName: Umbral Leech2
+		}
 
 		Keybinds: {
 			"Quick Dash.DisplayName": Quick Dash
@@ -572,5 +595,12 @@ Mods: {
 		}
 
 		UI.GraphicalUniverseImager.ForgottenShrineBackground: A Perfect World
+
+		Biomes: {
+			ForgottenShrineBiome: {
+				DisplayName: Forgotten Shrine Biome
+				TownNPCDialogueName: the Forgotten Shrine Biome
+			}
+		}
 	}
 }

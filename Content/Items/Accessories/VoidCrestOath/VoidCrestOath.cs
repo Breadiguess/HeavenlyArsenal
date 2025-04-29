@@ -140,7 +140,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
     {
         public override Position GetDefaultPosition() => new AfterParent(PlayerDrawLayers.Head);
 
-        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.head == EquipLoader.GetEquipSlot(Mod, nameof(VoidCrestOath), EquipType.Head);
+        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.balloonFront == EquipLoader.GetEquipSlot(Mod, nameof(VoidCrestOath), EquipType.Balloon);
      
 
         public override bool IsHeadLayer => true;
@@ -171,6 +171,10 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
             riftShader.Apply();
 
             Main.spriteBatch.Draw(innerRiftTexture, particleDrawCenter, null, Color.White, 0 + MathHelper.Pi, innerRiftTexture.Size() * 0.5f, new Vector2(0.1f, 0.05f), 0, 0);
+
+            //Utils.DrawBorderString(Main.spriteBatch, ", drawInfo.drawPlayer.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+
+
 
             Main.spriteBatch.End();
 

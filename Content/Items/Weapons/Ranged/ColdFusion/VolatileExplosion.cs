@@ -14,7 +14,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
+namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
 {
     class VolatileExplosion : ModProjectile
     {
@@ -68,7 +68,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
         {
             triggered = false;
             Time = 0;
-            SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.AngryDistant);
+            SoundEngine.PlaySound(GennedAssets.Sounds.Common.Twinkle);
             // see todo above Owner = source.
         }
         public override void SetStaticDefaults()

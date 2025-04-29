@@ -1,7 +1,7 @@
 ﻿using CalamityMod;
 using CalamityMod.Projectiles.BaseProjectiles;
 using CalamityMod.Tiles;
-using HeavenlyArsenal.Content.Items.Weapons.Ranged;
+using HeavenlyArsenal.Content.Items.Weapons.Melee;
 using HeavenlyArsenal.Content.Projectiles.Misc;
 using HeavenlyArsenal.Core.Physics.ClothManagement;
 using Luminance.Common.Utilities;
@@ -24,9 +24,9 @@ using Particle = Luminance.Core.Graphics.Particle;
 
 
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
+namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
 {
-    public class FusionRifleHoldout : BaseIdleHoldoutProjectile
+    public class FusionRifleHoldout : ModProjectile
     {
         /// <summary>
         /// The cloth simulation attached to the front of this rifle.
@@ -45,6 +45,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             get;
             private set;
         }
+        public ref Player Owner => ref Main.player[Projectile.owner];
 
         public new string LocalizationCategory => "Projectiles.Ranged";
         public bool OwnerCanShoot => Owner.HasAmmo(Owner.ActiveItem()) && !Owner.noItems && !Owner.CCed;
@@ -52,8 +53,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
         public ref float CurrentChargingFrames => ref Projectile.ai[0];
         public ref float ChargeTimer => ref Projectile.ai[1];
         public ref float ShootDelay => ref Projectile.localAI[0];
-        public override int AssociatedItemID => ModContent.ItemType<FusionRifle>();
-        public override int IntendedProjectileType => ModContent.ProjectileType<    ColdBurst>();
+        //public override int AssociatedItemID => ModContent.ItemType<FusionRifle>();
+        //public override int IntendedProjectileType => ModContent.ProjectileType<    ColdBurst>();
         public float Time { get; private set; }
 
         public static float CurrentChargeTime = FusionRifle.MaxChargeTime; // Default to MaxChargeTime
@@ -68,8 +69,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             base.SetStaticDefaults();
         }
 
-        public static readonly SoundStyle Charging = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/FusionRifle/fusionrifle_charge3");
-        public static readonly SoundStyle Fire = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/FusionRifle/fusionrifle_fire2");
+        public static readonly SoundStyle Charging = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/FusionRifle/ZealotsCharge");
+        public static readonly SoundStyle Fire = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Ranged/FusionRifle/ZealotsFire");
         public override void SetDefaults()
         {
             
@@ -98,12 +99,18 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
 
 
-        public override void SafeAI()
+        public override void AI()
         {
             Cloth ??= new ClothSimulation(new Vector3(Projectile.Center, 0f), 11, 15, 3f, 60f, 0.02f);
 
             Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
 
+
+            if (Owner.HeldItem.type != ModContent.ItemType<FusionRifle>() || Owner.CCed || Owner.dead)
+            {
+                Projectile.Kill();
+                return;
+            }
             switch (CurrentState)
             {
                 case FusionRifleState.Idle:
@@ -142,11 +149,11 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
                 {
                     Owner.GetModPlayer<FusionRiflePlayer>().BurstCounter = 0;
                     ActiveSound activeSound = SoundEngine.FindActiveSound(Charging);
-                    if (activeSound != null)
+                    if (activeSound == null)
                     {
-                        activeSound.Stop();
+                        //activeSound.Stop();
                     }
-                    SoundEngine.PlaySound(Charging with { MaxInstances = 0 , Volume = 0.5f}, Projectile.Center);
+                    SoundEngine.PlaySound(Charging with { MaxInstances = 0 , Volume = 1f, Type = SoundType.Sound}, Projectile.Center);
                 }
                 ChargeVFX();
                 
@@ -289,7 +296,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             //Owner.itemAnimation = Owner.itemAnimationMax;
             if (BurstCount == FusionRifle.BoltsPerBurst)
             {
-                SoundEngine.PlaySound(Fire with { MaxInstances = 0, PitchVariance = 0.3f }, Projectile.Center);
+                SoundEngine.PlaySound(Fire with { MaxInstances = 0, PitchVariance = 0.1f, Pitch = Owner.GetModPlayer<FusionRiflePlayer>().BurstTier/20 }, Projectile.Center);
                 DisipateHeat(true);
                 Main.instance.CameraModifiers.Add(new PunchCameraModifier(Owner.Center * 2f, Projectile.velocity, 10, 3, 10, -0.5f, null));
             }
@@ -424,7 +431,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             // Spawn the projectile with the adjusted velocity
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), spawnPosition, adjustedVelocity * (70f + chargePower),
                 ModContent.ProjectileType<ColdBurst>(),
-                damage,
+                damage + 500 * (int)Owner.GetModPlayer<FusionRiflePlayer>().BurstTier,
                 knockback,
                 Projectile.owner
             );
@@ -436,7 +443,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
         private static float recoilIntensity = 0f; // Tracks the current recoil intensity
         private const float maxRecoil = 10f; // Maximum recoil amount
         private float recoilRecoverySpeed = 0.99f; // Speed at which recoil eases out
-        public Vector2 Recoil => -Projectile.velocity.SafeNormalize(Vector2.Zero) * recoilIntensity;
+        public Vector2 Recoil => Projectile.velocity.SafeNormalize(Vector2.Zero) * recoilIntensity;
 
         public static Vector2 RecoilOffset = new Vector2(-recoilIntensity, 0);  
         public void UpdateProjectileHeldVariables(Vector2 armPosition)
@@ -518,22 +525,14 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
         {
 
             Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
-
-
             Rectangle frame = texture.Frame(1, 1, 0, 0);
-
-
             float rotation = Projectile.rotation;
-            //SpriteEffects direction = SpriteEffects.None;
-
             SpriteEffects spriteEffects = Projectile.direction * Owner.gravDir < 0 ? SpriteEffects.FlipVertically : 0;
             Vector2 origin = new Vector2(frame.Width / 2 - 24 * Projectile.direction, frame.Height / 2 * Owner.gravDir);
-
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
             float chargeOffset = ChargeupInterpolant * Projectile.scale * 5f;
             Color chargeColor = Color.Lerp(Color.Crimson, Color.Gold, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 7.1f) * 0.5f + 0.5f) * ChargeupInterpolant * 0.6f;
             chargeColor.A = 0;
-
             ClothTarget.Request(350, 350, Projectile.whoAmI, DrawCloth);
             if (ClothTarget.TryGetTarget(Projectile.whoAmI, out RenderTarget2D clothTarget) && clothTarget is not null)
             {
@@ -588,7 +587,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
             Main.spriteBatch.Draw(texture, drawPosition - Recoil, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
             Main.spriteBatch.ExitShaderRegion();
 
-            Texture2D Glowball = AssetDirectory.Textures.BigGlowball.Value;
+            Texture2D Glowball = GennedAssets.Textures.GreyscaleTextures.Corona;
             float GlowScale = ChargeupInterpolant * 0.1f;
             Vector2 Gorigin = new Vector2(Glowball.Size().X / 2, Glowball.Size().Y / 2);
             if (ChargeTimer > 1)
@@ -602,11 +601,11 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
                 Vector2 tipPosition = armPosition + Projectile.velocity * Projectile.width * 1.55f + new Vector2(3, -3);
                 //todo: atone for my sins
                 Main.spriteBatch.Draw(Glowball, tipPosition - Main.screenPosition, null,
-                    lightColor.MultiplyRGB(Color.Crimson),
+                    (Color.Violet with { A = 0 }) * 0.4f,
                     rotation, Gorigin, GlowScale, direction, 0f);
             }
 
-
+            
             Utils.DrawBorderString(Main.spriteBatch, "|State: " + CurrentState.ToString() + " | State Timer: " + StateTimer.ToString(), Projectile.Center - Vector2.UnitY * 90 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|Charge: " + ChargeTimer.ToString() + " | Charge iter: " + (1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7).ToString() + " | 120/chargeiter " + (120 / (1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7)).ToString(), Projectile.Center - Vector2.UnitY * 110 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|MaxCharge: " + FusionRifle.MaxChargeTime.ToString(), Projectile.Center - Vector2.UnitY * 130 - Main.screenPosition, Color.White);
@@ -617,7 +616,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
             Utils.DrawBorderString(Main.spriteBatch, "|VolatileRound Chance " + Owner.GetModPlayer<FusionRiflePlayer>().VolCount.ToString() + " | Volatile Rounds: " + Owner.GetModPlayer<FusionRiflePlayer>().VolatileRounds.ToString(), Projectile.Center - Vector2.UnitY * 230 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|VolatileTimer " + Owner.GetModPlayer<FusionRiflePlayer>().VolatileRoundTimer.ToString(), Projectile.Center - Vector2.UnitY * 250 - Main.screenPosition, Color.White);
-
+            
             return false;
         }
         public override bool? CanDamage() => false;
@@ -700,7 +699,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
         {
             if (VolatileActive)
             {
-                if(VolatileSafe == 0 && hit.Damage >= npc.lifeMax/1000)
+                if (VolatileSafe == 0 && hit.Damage >= Math.Max(500, npc.lifeMax / 100))
                 {
 
                     ChainExplosion(Main.player[npc.target], npc, npc.lifeMax*(int)0.3f, 100, true);
@@ -713,13 +712,13 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj
 
         public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            
+            /*
             Utils.DrawBorderString(Main.spriteBatch, "Is Volatile: " + VolatileActive.ToString(), npc.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
 
             Utils.DrawBorderString(Main.spriteBatch, "Volatile Timer: " + VolatileTimer.ToString(), npc.Center - Vector2.UnitY * 180 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "VolatileSafe: " + VolatileSafe.ToString(), npc.Center - Vector2.UnitY * 200 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "Volatile Cooldown: " + VolatileCooldown.ToString(), npc.Center - Vector2.UnitY * 220 - Main.screenPosition, Color.White);
-            
+            */
 
 
             if (VolatileActive)

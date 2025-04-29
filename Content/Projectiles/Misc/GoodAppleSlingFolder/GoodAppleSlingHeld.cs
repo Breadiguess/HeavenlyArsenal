@@ -53,9 +53,9 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc.GoodAppleSlingFolder
             Projectile.tileCollide = false;
         }
 
-        public override void AutoStaticDefaults()
+        public override void SetStaticDefaults()
         {
-            base.AutoStaticDefaults();
+            Main.projFrames[Projectile.type] = 5;
         }
 
         public override void OnSpawn(IEntitySource source)
@@ -85,7 +85,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc.GoodAppleSlingFolder
                 return;
             }
 
-            // Use a simple state machine based on our enum.
+           
             switch (currentState)
             {
                 case GoodAppleSlingState.Idle:
@@ -98,6 +98,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc.GoodAppleSlingFolder
                     break;
 
                 case GoodAppleSlingState.Charge:
+                    int totalFrames = 3;
+                    int frameDuration = 30;
                     if (!Player.controlUseItem)
                     {
                         currentState = GoodAppleSlingState.Idle;
@@ -105,10 +107,26 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc.GoodAppleSlingFolder
                     }
                     else
                     {
-                        // Increase charge time.
+                            
+                        Projectile.frame = 0; // Start animation from the first frame
+                        Projectile.frameCounter = 0; // Reset frame counter
+
+
+
+
                         Time++;
                         if (Time >= 60)
                         {
+                            if (++Projectile.frameCounter > frameDuration)
+                            {
+
+                                Projectile.frameCounter = 0; // Reset the counter
+                                Projectile.frame++; // Move to the next frame
+
+                                if (Projectile.frame >= totalFrames)
+                                    Projectile.frame = totalFrames;
+                            }
+
                             currentState = GoodAppleSlingState.Fire;
                         }
                     }
@@ -149,8 +167,6 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc.GoodAppleSlingFolder
                     break;
             }
 
-            // (Optional) Additional behaviours such as string recoil could be placed here.
-            // For now, we always increment Time in Charge and react on transition events.
         }
 
         // This method is no longer directly used in AI because we handle firing in our state machine.
@@ -171,6 +187,8 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc.GoodAppleSlingFolder
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D texture = Terraria.GameContent.TextureAssets.Projectile[Projectile.type].Value;
+            Rectangle frame = texture.Frame(1, 5, 0, 0);
+
 
             Vector2 topOfBow = Projectile.Center + Vector2.UnitX.RotatedBy(Projectile.rotation + topStringOffset.ToRotation()) * topStringOffset.Length();
             Vector2 bottomOfBow = Projectile.Center + Vector2.UnitX.RotatedBy(Projectile.rotation + bottomStringOffset.ToRotation()) * bottomStringOffset.Length();
@@ -186,10 +204,10 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc.GoodAppleSlingFolder
             SpriteEffects flipEffect = direction > 0 ? SpriteEffects.None : SpriteEffects.FlipVertically;
 
             // Draw the bow's strings connecting the bow to the projectile direction
-            Main.spriteBatch.DrawLineBetter(topOfBow, endOfString, stringColor, 2f);
-            Main.spriteBatch.DrawLineBetter(bottomOfBow, endOfString, stringColor, 2f);
+            //Main.spriteBatch.DrawLineBetter(topOfBow, endOfString, stringColor, 2f);
+            //Main.spriteBatch.DrawLineBetter(bottomOfBow, endOfString, stringColor, 2f);
 
-            Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, flipEffect, 0f);
+            Main.spriteBatch.Draw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, flipEffect, 0f);
 
             return false;
         }

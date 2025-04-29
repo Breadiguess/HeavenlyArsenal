@@ -6,6 +6,7 @@ using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Content.Buffs.Stims;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using NoxusBoss.Core.Graphics.GeneralScreenEffects;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Consumables
@@ -34,7 +36,7 @@ namespace HeavenlyArsenal.Content.Items.Consumables
             Item.useAnimation = 17;
             Item.useTime = 17;
             Item.consumable = true;
-            Item.maxStack = 999;
+            Item.maxStack = 9999;
             Item.value = Item.buyPrice(0, 43, 10, 0);
             Item.rare = ItemRarityID.Quest;
             Item.autoReuse = true;
@@ -45,34 +47,59 @@ namespace HeavenlyArsenal.Content.Items.Consumables
         //public override void 
         public override void OnConsumeItem(Player player)
         {
-            player.AddBuff(ModContent.BuffType<CombatStimBuff>(), (int)(Math.Abs(player.GetModPlayer<StimPlayer>().stimsUsed-160) * 10), true, false);
-
             
-            player.statLife -= 50;
+            
+            
             if (Main.myPlayer == player.whoAmI)
             {
                 if (player.GetModPlayer<StimPlayer>().Addicted)
                 {
                     player.HealEffect(-150, true);
+                    player.statLife -= 150;
+
                 }
-                else
+                else 
+                {
                     player.HealEffect(-50, true);
+                    player.statLife -= 50;
+                }
                 GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, 3f, 10);
                 GeneralScreenEffectSystem.RadialBlur.Start(player.Center, 1, 60);
                 //player.GetModPlayer<StimPlayer>().UseStim();
             }
             if (player.statLife <= 0)
             {
-               player.KillMe(PlayerDeathReason.ByCustomReason(CalamityUtils.GetText("Status.Death.AstralInjection" + Main.rand.Next(1, 2 + 1)).Format(player.name)), 1000.0, 0, false);
-                ;
+
+
+                if (player.GetModPlayer<StimPlayer>().Addicted)
+                {
+                    string deathMessage = Language.GetTextValue("Mods.HeavenlyArsenal.PlayerDeathMessages.CombatStimAddicted" + Main.rand.Next(1, 5 + 1), player.name);
+                    player.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral(deathMessage)), 1000.0, 0, false);
+                }
+                else if (player.GetModPlayer<StimPlayer>().Withdrawl)
+                {
+                    string deathMessage = Language.GetTextValue("Mods.HeavenlyArsenal.PlayerDeathMessages.CombatStim" + Main.rand.Next(1, 3 + 1), player.name);
+                    player.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral(deathMessage)), 1000.0, 0, false);
+                }
+                else
+                {
+                    string deathMessage = Language.GetTextValue("Mods.HeavenlyArsenal.PlayerDeathMessages.CombatStim" + Main.rand.Next(1, 3 + 1), player.name);
+                    player.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral(deathMessage)), 1000.0, 0, false);
+                }
+
+
+
             }
+            player.AddBuff(ModContent.BuffType<CombatStimBuff>(), (int)(Math.Abs(player.GetModPlayer<StimPlayer>().stimsUsed - 160) * 10), true, false);
+
         }
 
         public override void UseAnimation(Player player)
         {
-           player.itemLocation = new Vector2(player.Center.X-40, player.Center.Y+10);
+           player.itemLocation = new Vector2(player.Center.X-40, player.Center.Y+30);
            player.itemRotation = MathHelper.ToRadians(45f*player.direction);
            player.itemWidth = 14;
+            
             
            
         }

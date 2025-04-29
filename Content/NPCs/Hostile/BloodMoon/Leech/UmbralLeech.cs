@@ -3,9 +3,9 @@ using CalamityMod.Items.Materials;
 using CalamityMod.NPCs.NormalNPCs;
 using CalamityMod.NPCs.Yharon;
 using CalamityMod.Projectiles.Melee;
-
 using HeavenlyArsenal.Content.Items.Armor.NewFolder;
 using HeavenlyArsenal.Content.Items.Weapons.Ranged;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
 using HeavenlyArsenal.Content.Tiles.Banners;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,7 +24,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Utilities;
 
-namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
+namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 {
     public enum UmbralLeechAI
     {
@@ -87,9 +87,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
 
         // Target storage
         private Entity currentTarget;
-        public static int[] ValidTargets = { ModContent.NPCType<AnAffrontToGod>(), ModContent.NPCType<Yharon>(),ModContent.NPCType<SuperDummyNPC>() };
+        public static int[] ValidTargets = { ModContent.NPCType<AnAffrontToGod>(), ModContent.NPCType<Yharon>(),ModContent.NPCType<SuperDummyNPC>(), ModContent.NPCType<ArtilleryCrab>() };
 
-        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/UmbralLeech";
+        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech";
         public new string LocalizationCategory => "NPC.Hostile.Bloodmoon";
 
         public override void OnKill()
@@ -102,7 +102,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
             Main.npcFrameCount[NPC.type] = 6;
             var drawModifier = new NPCID.Sets.NPCBestiaryDrawModifiers()
             {
-                CustomTexturePath = "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/UmbralLeech_Bestiary",
+                CustomTexturePath = "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech_Bestiary",
                 Position = new Vector2(10f, 24f)
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, drawModifier);
@@ -121,6 +121,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
             NPC.aiStyle = -1;
             NPC.noGravity = true;
             Banner = Type;
+
             BannerItem = ModContent.ItemType<UmbralLeechBanner>();
 
             
@@ -140,7 +141,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
             // spawn body segments + tail
             for (int i = 0; i < SegmentCount; i++)
             {
-                int type = (i < SegmentCount - 1) ? ModContent.NPCType<UmbralLeech_Body>() : ModContent.NPCType<UmbralLeech_Tail>();
+                int type = i < SegmentCount - 1 ? ModContent.NPCType<UmbralLeech_Body>() : ModContent.NPCType<UmbralLeech_Tail>();
                 int idx = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.position.X, (int)NPC.position.Y, type);
                 NPC npcSegment = Main.npc[idx];
                 // link prev->current, current.prev=prev
@@ -270,7 +271,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         {
             if (currentTarget == null) return true;
             if (currentTarget is Player p && (p.dead || !p.active)) return true;
-            if (currentTarget is NPC n && (!n.active)) return true;
+            if (currentTarget is NPC n && !n.active) return true;
             return false;
         }
 
@@ -279,9 +280,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         {
             Vector2 toTarget = currentTarget.Center - NPC.Center;
             float dist = toTarget.Length();
-            //Vector2 dir = toTarget.SafeNormalize(Vector2.Zero);
-            //NPC.velocity = Vector2.Lerp(NPC.velocity, dir * speed, dist/1000f);
-            //NPC.spriteDirection = dir.X > 0 ? -1 : 1;
+            Vector2 dir = toTarget.SafeNormalize(Vector2.Zero);
+            NPC.velocity = Vector2.Lerp(NPC.velocity, dir * speed, dist/1000f);
+            NPC.spriteDirection = dir.X > 0 ? -1 : 1;
             if (dist < 30f)
             {
                 //todo: make latch actually create and use latch offset
@@ -350,7 +351,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             
             Rectangle frame = texture.Frame(1, 6, 0, (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 3);
-            Vector2 origin = new Vector2(texture.Frame().Width/2, (texture.Height/6)/2);
+            Vector2 origin = new Vector2(texture.Frame().Width/2, texture.Height/6/2);
             SpriteEffects effect = NPC.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
             spriteBatch.Draw(texture, NPC.Center - screenPos, frame, drawColor, NPC.rotation - MathHelper.PiOver2, origin, 1f, effect, 0f);
             return false;
@@ -432,7 +433,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
             NPCID.Sets.NPCBestiaryDrawOffset.Add(NPC.type, value);
             NPCID.Sets.RespawnEnemyID[NPC.type] = ModContent.NPCType<UmbralLeech>();
         }
-        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/UmbralLeech_Body";
+        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech_Body";
 
         public override void SetDefaults()
         {
@@ -448,7 +449,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Rectangle frame = texture.Frame(1, 6, 0, (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 3);
-            Vector2 origin = new Vector2(texture.Frame().Width / 2, (texture.Height / 6) / 2);
+            Vector2 origin = new Vector2(texture.Frame().Width / 2, texture.Height / 6 / 2);
             SpriteEffects effect = NPC.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
             spriteBatch.Draw(texture, NPC.Center - screenPos, frame, drawColor, NPC.rotation + MathHelper.PiOver2, origin, 1f, effect, 0f);
             return false;
@@ -464,7 +465,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
     {
        
 
-        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/UmbralLeech_Tail";
+        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech_Tail";
 
         public override void SetStaticDefaults()
         {
@@ -497,7 +498,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Rectangle frame = texture.Frame(1, 6, 0, (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 3);
-            Vector2 origin = new Vector2(0, (texture.Height / 6)/1.5f);
+            Vector2 origin = new Vector2(0, texture.Height / 6/1.5f);
             //todo: refer to the head for sprite direction
             SpriteEffects effect = NPC.spriteDirection == 1 ? SpriteEffects.FlipVertically : SpriteEffects.FlipHorizontally;
             spriteBatch.Draw(texture, NPC.Center - screenPos, frame, drawColor, NPC.rotation + MathHelper.PiOver2, origin, 1f, effect, 0f);

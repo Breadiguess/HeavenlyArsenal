@@ -23,13 +23,18 @@
 	<ItemGroup>
 	  <Compile Remove="Common\utils\Debug.cs" />
 	  <Compile Remove="Common\utils\MusicKiller.cs" />
+	  <Compile Remove="Content\Buffs\ShintoArmorEnrage.cs" />
 	  <Compile Remove="Content\Items\Accessories\NDWings.cs" />
 	  <Compile Remove="Content\Items\Accessories\Vambrace\ElectricVambraceDash.cs" />
 	  <Compile Remove="Content\Items\Weapons\Ranged\AvatarBow.cs" />
 	  <Compile Remove="Content\Items\Weapons\Rogue\LifeAndCessationGlobalNPC.cs" />
+	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\NobleWorm.cs" />
+	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\wormEnemy.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\ZombeReskin.cs" />
+	  <Compile Remove="Content\Projectiles\Misc\CombatStim_Held.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\CosmicWatergun_proj.cs" />
+	  <Compile Remove="Content\Projectiles\Weapons\Melee\FileName.cs" />
 	  <Compile Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.cs" />
 	</ItemGroup>
 	<ItemGroup>
@@ -48,9 +53,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Assets\Textures\Backpacks\" />
-	  <Folder Include="Content\Items\Weapons\Ranged\NewFolder\" />
-	  <Folder Include="Content\NPCs\Hostile\BloodMoon\" />
-	  <Folder Include="Content\Projectiles\Weapons\Holdout\" />
 	  <Folder Include="Core\Autoloaders\SolynBooks\" />
 	</ItemGroup>
 	<ItemGroup>

@@ -99,18 +99,6 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Vambrace
 
             //SoundEffect VambraceHit = ModContent.Request<SoundEffect>("HeavenlyArsenal/Assets/Sounds/Items/fusionrifle_fire2").Value;
             SoundEngine.PlaySound(SoundID.DD2_LightningBugZap with { Volume = 0.6f, PitchVariance = 0.4f }, Projectile.Center);
-            
-            //for (int i = 0; i <= 8; i++)
-            //{
-            //    Dust dust = Dust.NewDustPerfect(target.Center, Main.rand.NextBool() ? 174 : 127, new Vector2(0, -2).RotatedByRandom(MathHelper.ToRadians(30f)) * Main.rand.NextFloat(2f, 4.5f), 0, default, Main.rand.NextFloat(2.8f, 3.4f));
-            //    dust.noGravity = false;
-            //}
-            //for (int i = 0; i <= 5; i++)
-            //{
-            //    Dust dust2 = Dust.NewDustPerfect(target.Center, Main.rand.NextBool() ? 174 : 127, new Vector2(0, -3).RotatedByRandom(MathHelper.ToRadians(8f)) * Main.rand.NextFloat(1f, 5f), 0, default, Main.rand.NextFloat(2.8f, 3.4f));
-            //    dust2.noGravity = false;
-            //}
-
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<VambraceDischarge>(), Projectile.damage / 2, 15f, Projectile.owner);
         }
 
@@ -128,9 +116,8 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Vambrace
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D BloomCircleSmall = ModContent.Request<Texture2D>("NoxusBoss/Assets/Textures/Extra/TrailStreaks/StreakMagma").Value;
-            
 
-            float scaleFactor = Projectile.width / 50f;
+             float scaleFactor = Projectile.width / 50f;
             Vector2 drawPosition = Projectile.Center - Main.screenPosition + Projectile.velocity;
             //Main.spriteBatch.Draw(BloomCircleSmall, drawPosition, null, Projectile.GetAlpha(Color.DarkRed) with { A = 0 } * 0.2f, 0f, BloomCircleSmall.Size() * 0.5f, scaleFactor * 1.2f, 0, 0f);
             //Main.spriteBatch.Draw(BloomCircleSmall, drawPosition, null, Projectile.GetAlpha(Color.Red) with { A = 0 } * 0.4f, 0f, BloomCircleSmall.Size() * 0.5f, scaleFactor * 0.64f, 0, 0f);

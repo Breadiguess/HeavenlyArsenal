@@ -33,10 +33,6 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
         public override void PostUpdate()
         { 
-            if (hasAvatarRifle)
-            {
-
-            }
         }
 
 

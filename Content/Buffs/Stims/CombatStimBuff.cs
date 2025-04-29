@@ -13,6 +13,8 @@ using ReLogic.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Buffs.Stims
 {
@@ -57,7 +59,7 @@ namespace HeavenlyArsenal.Content.Buffs.Stims
             }
         }
 
-
+       
         public override void Update(Player player, ref int buffIndex)
         {
             /* Exquisitely stuffed stats, for reference.
@@ -96,7 +98,7 @@ namespace HeavenlyArsenal.Content.Buffs.Stims
             if (player.GetModPlayer<StimPlayer>().Addicted)
             {
                 player.statDefense += 2;
-                player.GetAttackSpeed<MeleeDamageClass>() += 0.5f;
+                player.GetAttackSpeed<GenericDamageClass>() += 0.5f;
                 player.GetDamage<GenericDamageClass>() += 0.255f;
                 player.GetCritChance<GenericDamageClass>() += 2f;
                 player.GetKnockback<SummonDamageClass>() += 0.5f;
@@ -109,7 +111,7 @@ namespace HeavenlyArsenal.Content.Buffs.Stims
             else
             {
                 player.statDefense += 5;
-                player.GetAttackSpeed<MeleeDamageClass>() += 1f;
+                player.GetAttackSpeed<GenericDamageClass>() += 1f;
                 player.GetDamage<GenericDamageClass>() += 0.425f;
                 player.GetCritChance<GenericDamageClass>() += 5f;
                 player.GetKnockback<SummonDamageClass>() += 1f;
@@ -119,16 +121,15 @@ namespace HeavenlyArsenal.Content.Buffs.Stims
                 player.pickSpeed -= 0.2f;
                 player.jumpSpeedBoost += 1f;
             }
-           
-
-            player.ClearBuff(BuffID.WellFed);
-            player.ClearBuff(BuffID.WellFed2);
-            player.ClearBuff(BuffID.WellFed3);
             player.ClearBuff(ModContent.BuffType<StimWithdrawl_Debuff>());
 
         }
 
+        public override void PostDraw(SpriteBatch spriteBatch, int buffIndex, BuffDrawParams drawParams)
+        {
 
+            base.PostDraw(spriteBatch, buffIndex, drawParams);
+        }
 
 
     }

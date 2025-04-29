@@ -7,18 +7,15 @@ using static Luminance.Luminance;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.Projectiles;
+using NoxusBoss.Content.NPCs.Bosses.NamelessDeity.Projectiles;
+using HeavenlyArsenal.Common.Ui;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
 {
     public class VoidCrestOathPlayer : ModPlayer
     {
-        /*
-        public List<T> Blacklist
-        {
-            get;
-            set;
-        }
-        */
+     
         /// <summary>
         /// True if the accessory is actively equipped in an accessory slot.
         /// (Not in a vanity slot.)
@@ -49,12 +46,12 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
         /// <summary>
         /// How much resource is consumed per intercept.
         /// </summary>
-        public float InterceptCost = 1f;
+        public float InterceptCost = 10f;
 
         /// <summary>
         /// How much resource is regenerated per tick if no intercept is occurring.
         /// </summary>
-        public float InterceptRegenRate = 10f;
+        public float InterceptRegenRate = 0.5f;
 
         /// <summary>
         /// A list to keep track of hostile projectile indices that we are watching.
@@ -86,6 +83,16 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
             get;
             set;
         }
+
+
+        private static readonly HashSet<int> BlacklistedProjectiles = new HashSet<int>
+        {
+            ModContent.ProjectileType<DeadStar>(), ModContent.ProjectileType<DeadStarIron>(),
+            ModContent.ProjectileType<FrostColumn>(), ModContent.ProjectileType<OtherworldlyThorn>(),
+            ModContent.ProjectileType<BlackHoleHostile>(), ModContent.ProjectileType<SwordConstellation>(),
+            ModContent.ProjectileType<ControlledStar>()
+            // Add other projectile IDs here
+        };
         public override void ResetEffects()
         {
             
@@ -95,16 +102,17 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
         }
 
         public override void PostUpdate()
-        { 
+        {
 
+            WeaponBar.DisplayBar(Color.White, Color.Red, InterceptCount / MaxInterceptCount, 0);
             trackedProjectileIndices.Clear();
             // If the conflicting accessory is equipped, skip all interception logic.
             if (warBannerOftheSunEquipped|| !voidCrestOathEquipped || NotVanity)
                 return;
             
-
-            // Rebuild the tracking list each tick.
             
+            // Rebuild the tracking list each tick.
+
             //shit implementation i know
 
             for (int i = 0; i < Main.maxProjectiles; i++)
@@ -113,7 +121,14 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                 //  • Are hostile (enemy projectiles)
                 //  • Are not friendly (not shot by player)
                 //  • Were not spawned by the player (owner check)
+
+
                 Projectile proj = Main.projectile[i];
+
+
+                if (BlacklistedProjectiles.Contains(proj.type))
+                    continue;
+
                 if (proj.active&& proj.hostile && proj.owner != Player.whoAmI )
                     continue;
                 float distance = Vector2.Distance(proj.Center, Player.Center);
@@ -129,11 +144,8 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                
             }
 
-           // Main.NewText($"{trackedProjectileIndices}");
-            //SHUT UP
             bool interceptedSomethingThisTick = false;
-
-            //sort the tracked projectiles by distance to the player
+           //sort the tracked projectiles by distance to the player
             trackedProjectileIndices.Sort((a, b) => Vector2.Distance(Main.projectile[a].Center, Player.Center).CompareTo(Vector2.Distance(Main.projectile[b].Center, Player.Center)));  
             
 
@@ -146,69 +158,33 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                     continue;
 
                 float distance = Vector2.Distance(proj.Center, Player.Center);
-
-                //Main.NewText($"tracking:{proj.whoAmI}, count:{trackedProjectileIndices.Count}");
-                if (Main.myPlayer == Player.whoAmI)
-                {
-                    try
-                    {
-
-                        //CombatText.NewText(Player.Hitbox, Color.Cyan, $"Tracking: {proj.Name} ({proj.type}) [{distance:F0}px]");
-                       //Main.NewText($"Hostile projectiles in range: {trackedProjectileIndices.Count}", Color.Yellow);
-                       
-                    }
-                    catch
-                    {
-                        // Fails silently to prevent crash
-                    }
-                }
-                //The method you're looking for is Remove I think
-                //(But also you can't use that in a foreach since that modifies the state of the iteration in the middle of the loop) 
-
+                float sizeFactor = (proj.width * proj.height) / 10000f;
+                float cost = InterceptCost * Math.Max(1f, sizeFactor);
 
                 if (distance <= InterceptDistance && proj.type != interceptorType && !proj.friendly && proj.active)
                 {
-                    if (InterceptCount >= InterceptCost)
+                    if (InterceptCount >= cost)
                     {
-                        if (Main.myPlayer == Player.whoAmI)
-                        {
-                            Main.NewText($"{interceptorType} Intercepted {proj.Name}!", Color.Red);
-                        }
-
+                        // Spawn interceptor at the projectile's center
                         Projectile.NewProjectile(
                             Player.GetSource_FromThis(),
-                            proj.Center,
-                            Vector2.Zero,
-                            interceptorType,
-                            -1,
+                            proj.Center, Vector2.Zero, interceptorType, -1,
                             1f,
-                            Player.whoAmI
-                        );
-                        
+                            Player.whoAmI);
+
                         CreateInterceptVisualEffect(proj.Center);
-                        InterceptCount -= InterceptCost;
-                        Main.NewText($"Projectile {proj} killed");
-                        //todo: remove this projectile from the server 
+                        InterceptCount -= cost;
                         proj.Kill();
                         interceptedSomethingThisTick = true;
-                        // :derp:
-                        
                     }
-                    else
-                    {
-                        
-                        if (Main.myPlayer == Player.whoAmI)
-                        {
-                            Main.NewText("[VoidCrest] Not enough InterceptCount!", Color.OrangeRed);
-                        }
-                    }
+                    
                 }
             }
-
-            // If no intercept happened this tick, regenerate the intercept resource.
             if (!interceptedSomethingThisTick)
                 RegenerateInterceptCount();
         }
+
+       
 
         /// <summary>
         /// Regenerates InterceptCount until it reaches the maximum.

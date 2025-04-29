@@ -125,11 +125,11 @@ namespace HeavenlyArsenal.Content.Projectiles
         public const float DistanceFromTarget = 160;
         public override void OnSpawn(IEntitySource source)
         {
-            Rift darkParticle = Rift.pool.RequestParticle();
-            darkParticle.Prepare(Projectile.Center - Projectile.velocity, Projectile.velocity, Color.AntiqueWhite, new Vector2(1,1), Projectile.velocity.ToRotation(), 3, 3, 300);
+           // Rift darkParticle = Rift.pool.RequestParticle();
+           // darkParticle.Prepare(Projectile.Center - Projectile.velocity, Projectile.velocity, Color.AntiqueWhite, new Vector2(1,1), Projectile.velocity.ToRotation(), 1,1 ,60);
 
 
-            ParticleEngine.Particles.Add(darkParticle);
+           // ParticleEngine.Particles.Add(darkParticle);
         }
         public override bool PreDraw(ref Color lightColor)
         {

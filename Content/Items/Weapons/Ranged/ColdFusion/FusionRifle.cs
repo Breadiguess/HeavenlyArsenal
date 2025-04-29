@@ -3,7 +3,6 @@ using HeavenlyArsenal.common;
 using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Items.Misc;
-using HeavenlyArsenal.Content.Projectiles.Weapons.Ranged.FusionRifleProj;
 using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,24 +22,22 @@ using Terraria.ModLoader;
 using static NoxusBoss.Assets.GennedAssets.Sounds;
 using Player = Terraria.Player;
 
-namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
+namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
 {
     // This is a basic item template.
     // Please see tModLoader's ExampleMod for every other example:
     // https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod
     public class FusionRifle : ModItem
     {
-        public new string LocalizationCategory => "Items.Weapons.Ranged";
+        public new string LocalizationCategory => "Items.Weapons.Ranged.ColdFusion";
 
         public Texture2D FusionRifle_Backpack { get; private set; }
 
-        public const int ShootDelay = 32;
+        public static int ShootDelay = 32;
 
-        public const int BoltsPerBurst= 5;
+        public static int BoltsPerBurst= 5;
 
-        public const int ArrowShootRate = 4;
-
-        public const int MaxChargeTime = 120;
+        public static int MaxChargeTime = 110;
  
 
         public override void SetStaticDefaults()
@@ -175,7 +172,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
            // drawInfo.DrawDataCache.Add(swirl);
 
             Rectangle itemFrame = texture.Frame(1, 1, 0, 
-                (int)(drawInfo.drawPlayer.legFrame.Y / drawInfo.drawPlayer.legFrame.Height));
+                drawInfo.drawPlayer.legFrame.Y / drawInfo.drawPlayer.legFrame.Height);
 
             DrawData item = new DrawData(texture, vec5, itemFrame, Lighting.GetColor(drawInfo.drawPlayer.MountedCenter.ToTileCoordinates()) * (1f - drawInfo.shadow), drawInfo.drawPlayer.bodyRotation, itemFrame.Size() * 0.5f, 1f, drawInfo.playerEffect);
             drawInfo.DrawDataCache.Add(item);
@@ -266,7 +263,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
 
         public float BurstTier;
 
-        public int MaxBurstTier = 7;
+        public int MaxBurstTier = 10;
         public float VolCount; //something that says "you need to hit this amount of bursts before getting volatile rounds
         public bool VolatileRounds;
         public float VolatileRoundTimer;
@@ -287,7 +284,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
                 
             }
             //Main.NewText($"FusionRifleHeld: {FusionRifleHeld} | BurstCounter: {BurstCounter} | Controlled Burst Active: {ControlledBurstActive} | ");
-            if (FusionRifleHeld && (BurstCounter % FusionRifle.BoltsPerBurst == 0 && BurstCounter != 0))
+            if (FusionRifleHeld && BurstCounter % FusionRifle.BoltsPerBurst == 0 && BurstCounter != 0)
             {
                 BurstCounter = 0;
                 ControlledBurstTimer = 120f;
@@ -314,7 +311,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged
             if(ControlledBurstActive && ControlledBurstTimer== 0)
             {
                 BurstTier = 0;
-                SoundEngine.PlaySound(GennedAssets.Sounds.Genesis.Grow);
+                SoundEngine.PlaySound(Genesis.Grow);
                 ControlledBurstActive = false;
 
 
