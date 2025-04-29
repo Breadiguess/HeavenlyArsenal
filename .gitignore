@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /Content/NPCs/Hostile/BloodMoon/NobleWorm.cs
 /Common/utils/Debug.cs
+/Content/Buffs/ShintoArmorEnrage.cs
