@@ -592,45 +592,6 @@ class HeldLifeCessationProjectile : ModProjectile
         Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, frame, lightColor, rotation, origin, Projectile.scale, spriteEffects, 0);
         // this is making me annoyed just to look at it tbh
 
-        /*
-        Texture2D LillyTexture = GennedAssets.Textures.SecondPhaseForm.SpiderLily;
-        Rectangle Lillyframe = LillyTexture.Frame(1, 3, 0, Projectile.frame);
-
-        
-        Vector2 Lorigin = new Vector2(Lillyframe.Width/2, Lillyframe.Height*1.5f  * Player.gravDir);
-
-
-
-
-
-        /*
-         * 
-   public void Render_Stage1()
-         {
-        Texture2D bulb = GennedAssets.Textures.SeedlingStage1.Bulb;
-        Texture2D bulbGlowmask = GennedAssets.Textures.SeedlingStage1.BulbGlow;
-
-        Vector2 bulbPosition = new Vector2(Main.instance.GraphicsDevice.Viewport.Width * 0.5f, Main.instance.GraphicsDevice.Viewport.Height + 2f);
-
-        // Add a touch of wind to the bulb.
-        float wind = AperiodicSin(Main.GlobalTimeWrappedHourly * 0.56f + Anchor.X + Anchor.Y) * 0.033f + Main.windSpeedCurrent * 0.17f;
-
-        // Draw the bulb. This is done before the upper stem is rendered to ensure that it draws behind it.
-        float LillySquish = Cos(Main.GlobalTimeWrappedHourly * 4.5f + Anchor.X + Anchor.Y) * 0.011f;
-        Vector2 LillyScale = new Vector2(1f - LillySquish, 1f + LillySquish);
-        Color glowmaskColor = new Color(2, 0, 156);
-        ManagedShader shader = ShaderManager.GetShader("NoxusBoss.GenesisGlowmaskShader");
-        shader.SetTexture(bulbGlowmask, 1);
-        shader.Apply();
-        Main.spriteBatch.Draw(bulb, bulbPosition, null, glowmaskColor, wind, bulb.Size() * new Vector2(0.5f, 1f), LillyScale, 0, 0f);
-    }
-        //anchor is point in world questiomark? should be able to just put it to the same place
-        //so the ublb itself is stationary,then the shader is drawn over it, i think? hmm no
-        glow is just the lines on it
-
-
-         */
-
         float wind = AperiodicSin(Main.GlobalTimeWrappedHourly * 0.56f + Projectile.Center.X + Projectile.Center.Y) *
             //clamps rotation kinda
             0.033f
