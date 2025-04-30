@@ -29,11 +29,20 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Vambrace
             Item.rare = ModContent.RarityType<HotPink>();
             Item.accessory = true;
         }
-        
+        public override void SetStaticDefaults()
+        {
+            Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(6, 8));
+            ItemID.Sets.AnimatesAsSoul[Type] = true;
+        }
+
+
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             player.GetModPlayer<ElectricVambracePlayer>().ElectricVambrace = true;
             var modPlayer = player.Calamity();
+            modPlayer.transformer = true;
+            modPlayer.aSpark = true;
+
             //modPlayer.DashID = ElectricVambraceDash.ID;
         }
 
@@ -193,56 +202,15 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Vambrace
 
         public override void AI()
         {
-            // On first tick, ensure hit list exists
-            if (hitNPCs == null && Time == 0)
-            {
-                hitNPCs = new List<int>();
-
-            }
-
-
-            // Add some electric dust
-            //Dust.NewDustPerfect(Projectile.Center, DustID.Electric, new Vector2(0, 0), 100, Color.AntiqueWhite, 1f);
-            //Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Electric, 0f, 0f, 100, default, 1.5f);
-            //Lighting.AddLight(Projectile.Center, 0.1f, 0.4f, 0.7f);
-            Projectile.velocity = Vector2.Zero;
-
-            NPC nextTarget = null;
-            float closestDist = JumpRange;
-            foreach (NPC npc in Main.npc)
-            {
-                if (npc.active && !npc.friendly && !npc.dontTakeDamage && npc.life > 0)
-                {
-                    float dist = Vector2.Distance(npc.Center, Projectile.Center);
-                    if (dist < closestDist && !hitNPCs.Contains(npc.whoAmI))
-                    {
-                        closestDist = dist;
-                        nextTarget = npc;
-                    }
-                    else
-                    {
-                        //Projectile.Kill();
-                    }
-                }
-
-            }
-            Time++;
+            //todo: check global npc VambraceLightningNPC for a list of npcs that have been hit already.
+            //then, run a check find the nearst npc to hit.
+            // this projectile should then be teleported instantly to the npc.
         }
 
 
         public override void OnSpawn(IEntitySource source)
         {
-            // this scares me 
-            if (source is EntitySource_Parent parentSource && parentSource.Entity is Projectile parentProjectile)
-            {
-                ParentProjID = parentProjectile.whoAmI;
-                Main.NewText($"I'm here!! source: {parentProjectile}, {ParentProjID}");
-            }
-            else
-            {
-                ParentProjID = -1; // Default to an invalid ID if the source is not a parent projectile
-            }
-            base.OnSpawn(source);
+            //get the projectile that created this one.it should be another vambrace lightning projectile.
         }
         public override void OnKill(int timeLeft)
         {
@@ -316,15 +284,9 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Vambrace
 
         public override bool PreDraw(ref Color lightColor)
         {
-            if (ParentProjID != -1)
-                Main.spriteBatch.DrawLineBetter(Projectile.Center, ParentCenter, Color.AntiqueWhite, 20f);
+            //todo: draw chaining lightning between vambrace lightning projecitles.
 
-            Utils.DrawBorderString(Main.spriteBatch, Projectile.timeLeft.ToString(), Projectile.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-
-
-            Vector2 drawPosition = Projectile.Center - Main.screenPosition + Projectile.velocity;
-            //Main.spriteBatch.Draw(BloomCircleSmall, drawPosition, null, Projectile.GetAlpha(Color.AntiqueWhite) with { A = 0 } * 0.2f, 0f, BloomCircleSmall.Size() * 0.5f, scaleFactor * 1.2f, 0, 0f);
-            return false;
+           return false;
         }
     }
 

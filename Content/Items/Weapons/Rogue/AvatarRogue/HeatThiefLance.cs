@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue
+namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
 {
-    class LifeCessationLance : ModProjectile
+    class HeatThiefLance : ModProjectile
     {
         public ref Player Owner => ref Main.player[Projectile.owner];
         public ref float Time => ref Projectile.ai[0];

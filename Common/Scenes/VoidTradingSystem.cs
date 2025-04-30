@@ -16,7 +16,6 @@ using Luminance.Core.Graphics;
 using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using CalamityMod.Items.Accessories.Wings;
 using CalamityMod.Items;
-using HeavenlyArsenal.Content.Items.Weapons.Rogue;
 using Terraria.ID;
 using HeavenlyArsenal.Content.Items.Weapons.Summon;
 
@@ -32,6 +31,7 @@ using HeavenlyArsenal.Content.Items.Accessories.Cosmetic;
 using NoxusBoss.Core.Autoloaders.SolynBooks;
 using CalamityMod.Items.Weapons.Rogue;
 using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
+using HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
 
 namespace HeavenlyArsenal.Common.Scenes
 {

@@ -1,4 +1,5 @@
 ﻿using CalamityMod;
+using HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -117,7 +118,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue
                 int stealth = Projectile.NewProjectile(Projectile.GetSource_FromThis(),
                     Projectile.Center,
                     Vector2.Zero,
-                    ModContent.ProjectileType<HeldLifeCessation_StealthStrike>(),
+                    ModContent.ProjectileType<LifeCessationStealthStrike>(),
                     Projectile.damage,
                     0f,
                     Owner.whoAmI);

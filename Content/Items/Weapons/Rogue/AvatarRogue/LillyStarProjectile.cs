@@ -13,7 +13,6 @@ using NoxusBoss.Content.NPCs.Bosses.Avatar.Projectiles;
 using NoxusBoss.Core.Graphics.GeneralScreenEffects;
 using Terraria.Audio;
 using System;
-using HeavenlyArsenal.Content.Projectiles.Weapons.Rogue;
 using Luminance.Assets;
 using Terraria.GameContent;
 using NoxusBoss.Content.Particles.Metaballs;
@@ -25,7 +24,7 @@ using Terraria.WorldBuilding;
 
 
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue;
+namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
 
 public class LillyStarProjectile : ModProjectile, IDrawSubtractive
 {
@@ -199,13 +198,13 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
        
         Projectile.frame = Projectile.identity % Main.projFrames[Type];
         Projectile.Opacity = InverseLerp(45f, 90f, Time);
-        Projectile.scale = Projectile.Opacity * (MathHelper.Lerp(0.6f, 0.9f, Cos01(MathHelper.TwoPi / 10f + Projectile.identity * 0.3f)) );
+        Projectile.scale = Projectile.Opacity * MathHelper.Lerp(0.6f, 0.9f, Cos01(MathHelper.TwoPi / 10f + Projectile.identity * 0.3f)) ;
         Projectile.Opacity *= FadeOutInterpolant;
         Projectile.scale += (1f - FadeOutInterpolant) * 2f;
 
        
         float pulseInterpolant = Sin01(MathHelper.TwoPi * Time / 54f);
-        Projectile.rotation = (pulseInterpolant <= 0.5f) ? MathHelper.PiOver4 : 0f;
+        Projectile.rotation = pulseInterpolant <= 0.5f ? MathHelper.PiOver4 : 0f;
         Projectile.scale *= MathF.Pow(pulseInterpolant, 0.1f);
 
 
@@ -215,8 +214,8 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
         if (Time < 200f || target == null)
         {
        
-            float hoverOffsetFactor = MathHelper.Lerp(0.69f, 1.3f, (Projectile.identity / 13f) % 1f);
-            float ropeLength = MathHelper.Lerp(840f, 990f, (Projectile.identity / 14f) % 2f);
+            float hoverOffsetFactor = MathHelper.Lerp(0.69f, 1.3f, Projectile.identity / 13f % 1f);
+            float ropeLength = MathHelper.Lerp(840f, 990f, Projectile.identity / 14f % 2f);
             
             float verticalOffset = Utils.Remap(Time, 0f, 30f, -1750f, -ropeLength * 1.32f - DangleVerticalOffset);
             Vector2 dangleTop = Main.MouseWorld + DangleTopOffset + new Vector2(0, verticalOffset);
@@ -264,7 +263,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
             }
             
             if ((HasDetached || Time >= 240f)
-                && (target == null || (!Projectile.WithinRange(target.Center, 400f) && Time >= 180f))
+                && (target == null || !Projectile.WithinRange(target.Center, 400f) && Time >= 180f)
                 && Main.rand.NextBool(10))
                 {
                 

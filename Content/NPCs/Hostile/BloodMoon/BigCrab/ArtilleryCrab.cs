@@ -275,7 +275,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
             if (Main.bloodMoon && DownedBossSystem.downedYharon)
-                return SpawnCondition.OverworldNightMonster.Chance * 0.1f;
+                return SpawnCondition.OverworldNightMonster.Chance * 0.01f;
             return 0f;
         }
     }

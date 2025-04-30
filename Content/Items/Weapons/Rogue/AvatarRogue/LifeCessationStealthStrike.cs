@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Luminance.Assets;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using System;
@@ -10,14 +11,18 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue
+namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
 {
-    class HeldLifeCessation_StealthStrike : ModProjectile
+    class LifeCessationStealthStrike : ModProjectile
     {
-        public override string Texture => "CalamityMod/Projectiles/InvisibleProj";
+        public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
+        public ref float Time => ref Projectile.ai[0];
+
+
         public override void SetStaticDefaults()
         {
-            //Projectile.
+            ProjectileID.Sets.CultistIsResistantTo[Projectile.type] = false;
+            
         }
         public override void SetDefaults()
         {

@@ -156,9 +156,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
                     SoundEngine.PlaySound(Charging with { MaxInstances = 0 , Volume = 1f, Type = SoundType.Sound}, Projectile.Center);
                 }
                 ChargeVFX();
-                
-                ChargeTimer +=  1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier/7;
-                Math.Clamp(ChargeTimer, 0, 120f);
+
+                ChargeTimer +=  1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier/7; 
+                //Math.Clamp(ChargeTimer, 0, 120f);
+                //ChargeTimer
             }
 
             if (ChargeTimer >= FusionRifle.MaxChargeTime)
@@ -528,8 +529,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             Rectangle frame = texture.Frame(1, 1, 0, 0);
             float rotation = Projectile.rotation;
             SpriteEffects spriteEffects = Projectile.direction * Owner.gravDir < 0 ? SpriteEffects.FlipVertically : 0;
-            Vector2 origin = new Vector2(frame.Width / 2 - 24 * Projectile.direction, frame.Height / 2 * Owner.gravDir);
+            Vector2 origin = new Vector2(frame.Width / 2 - 24 * Projectile.direction, frame.Height / 2 +4 * Owner.gravDir);
+
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+
+
             float chargeOffset = ChargeupInterpolant * Projectile.scale * 5f;
             Color chargeColor = Color.Lerp(Color.Crimson, Color.Gold, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 7.1f) * 0.5f + 0.5f) * ChargeupInterpolant * 0.6f;
             chargeColor.A = 0;

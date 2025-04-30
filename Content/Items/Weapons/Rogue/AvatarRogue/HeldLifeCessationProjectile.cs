@@ -2,7 +2,6 @@
 using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Common.Ui;
 using HeavenlyArsenal.Content.Buffs.LifeAndCessation;
-using HeavenlyArsenal.Content.Items.Weapons.Rogue;
 using Luminance.Core.Graphics;
 using Luminance.Core.Sounds;
 using Microsoft.Xna.Framework;
@@ -20,7 +19,7 @@ using static Luminance.Common.Utilities.Utilities;
 
 
 
-namespace HeavenlyArsenal.Content.Projectiles.Weapons.Rogue;
+namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
 
 class HeldLifeCessationProjectile : ModProjectile
 {
@@ -80,7 +79,7 @@ class HeldLifeCessationProjectile : ModProjectile
         Projectile.localNPCHitCooldown = 5;
         
     }
-    public Vector2 SpiderLilyPosition => (Main.MouseWorld + new Vector2(0,40f))+ Main.rand.NextVector2CircularEdge(2600/2f, 2600/2f);//Player.Center - Vector2.UnitY * 1f * LilyScale * 140f;
+    public Vector2 SpiderLilyPosition => Main.MouseWorld + new Vector2(0,40f)+ Main.rand.NextVector2CircularEdge(2600/2f, 2600/2f);//Player.Center - Vector2.UnitY * 1f * LilyScale * 140f;
 
     public static readonly SoundStyle HeatReleaseLoopStart = GennedAssets.Sounds.Avatar.UniversalAnnihilationCharge;
     public static readonly SoundStyle HeatReleaseLoop = GennedAssets.Sounds.Environment.DivineStairwayStep;
@@ -98,7 +97,7 @@ class HeldLifeCessationProjectile : ModProjectile
     {
         AmbientLoop.Update(Projectile.Center, sound =>
         {
-            float idealPitch = LumUtils.InverseLerp(6f, 30f, Projectile.position.Distance(Projectile.oldPosition)) * 0.8f;
+            float idealPitch = InverseLerp(6f, 30f, Projectile.position.Distance(Projectile.oldPosition)) * 0.8f;
             sound.Volume = 0f;
             sound.Pitch = MathHelper.Lerp(sound.Pitch, idealPitch, 0.6f);
         });
@@ -114,25 +113,9 @@ class HeldLifeCessationProjectile : ModProjectile
         ManipulatePlayerVariables();
         
         Player player = Main.player[Projectile.owner];
-        /*
-        
-        Vector2 toMouse = Main.MouseWorld - player.Center;
-        
-        //this code is straight ass.
-        Owner.heldProj = Projectile.whoAmI;
-        Projectile.rotation = toMouse.ToRotation();
-
-        Projectile.velocity = Vector2.Lerp(Projectile.velocity.SafeNormalize(Vector2.Zero), Owner.DirectionTo(Main.MouseWorld).SafeNormalize(Vector2.Zero), 0.1f);// * Owner.HeldItem.shootSpeed;
-        Projectile.Center = Owner.MountedCenter + Projectile.velocity.SafeNormalize(Projectile.velocity).RotatedBy(toMouse.ToRotation());// + new Vector2(0, Owner.gfxOffY); //+ Main.rand.NextVector2Circular(2, 2); //* Projecti
-        Projectile.spriteDirection = Projectile.direction;
-        ManipulatePlayerVariables();
-
-        */
         Owner.heldProj = Projectile.whoAmI;
         Projectile.Center = Owner.MountedCenter + new Vector2(Owner.direction * 20f,13f);// + new Vector2(0, Owner.gfxOffY); //+ Main.rand.NextVector2Circular(2, 2); //* Projecti
         Projectile.rotation = MathHelper.ToRadians(-90);
-        //TODO: make this shit less ass
-
         if (Heat > 0|| player.channel)
         {
             Projectile.timeLeft = 2;
@@ -210,7 +193,7 @@ class HeldLifeCessationProjectile : ModProjectile
         Projectile.NewProjectile(Projectile.GetSource_FromThis(),
                     Projectile.Center,
                     toMouse,
-                    ModContent.ProjectileType<LifeCessationLance>(),
+                    ModContent.ProjectileType<HeatThiefLance>(),
                     Projectile.damage,
                     0f,
                     Owner.whoAmI);
@@ -279,17 +262,12 @@ class HeldLifeCessationProjectile : ModProjectile
     /// <summary>
     /// Creates a single dust particle spawned within a cone in front of the projectile,
     /// respecting its current rotation.
-    ///  TODO: make it move with the player
     /// </summary>
     private Dust CreateConeHeatDust()
     {
-        // Define the half-angle of the cone. Adjust this to widen or narrow the spread.
         float halfConeAngle = MathHelper.Pi / 8f;
         Vector2 toMouse = Main.MouseWorld - Owner.Center;
-        // Choose a random angle within the cone, centered around the projectile rotation.
         float randomAngle = toMouse.ToRotation() + Main.rand.NextFloat(-halfConeAngle, halfConeAngle);
-
-        // Set minimum and maximum distance for the dust's spawn offset relative to the projectile.
         float minDistance = 200f;
         float maxDistance = 400f;
 
@@ -303,11 +281,11 @@ class HeldLifeCessationProjectile : ModProjectile
         // Spawn the dust at the calculated offset.
         Dust dust = Dust.NewDustPerfect(
             Projectile.Center + offset,
-            DustID.Torch,     // Change to your desired dust type.
-            Vector2.Zero,     // Initial velocity will be set in the update loop.
-            100,              // Alpha value (transparency).
-            Color.White,      // Color override.
-            1.5f              // Scale.
+            DustID.Torch,     
+            Vector2.Zero,     
+            100,              
+            Color.White,      
+            1.5f              
         );
         dust.noGravity = true;
         return dust;
@@ -347,7 +325,7 @@ class HeldLifeCessationProjectile : ModProjectile
                 int stealth = Projectile.NewProjectile(Projectile.GetSource_FromThis(), 
                     Projectile.Center,
                     Vector2.Zero,
-                    ModContent.ProjectileType<HeldLifeCessation_StealthStrike>(),
+                    ModContent.ProjectileType<LifeCessationStealthStrike>(),
                     Projectile.damage,
                     0f, 
                     Owner.whoAmI);
@@ -428,7 +406,7 @@ class HeldLifeCessationProjectile : ModProjectile
             float diffusionRate = 0.005f;
             float ambientHeat = 0.0f;
 
-            Heat = MathHelper.Clamp( Heat - (diffusionRate * (Heat - heatIncrement)),minHeat,maxHeat);
+            Heat = MathHelper.Clamp( Heat - diffusionRate * (Heat - heatIncrement),minHeat,maxHeat);
             //Heat = 0;
             if(Heat < 0.1)
             {
@@ -436,8 +414,6 @@ class HeldLifeCessationProjectile : ModProjectile
             }
           //  Heat = (float)Math.Pow(Heat / 10,heatIncrement);
             
-            //Main.NewText($"Heat: {Heat}");
-            // Adjust activation logic for ReleaseLilyStars to every 0.15 heat
             if (Heat > minimumHeatThreshold && Time % 5 == 0)//(Heat % lilyStarActivationInterval < heatIncrement && Heat > 0.4)
             {
                 ReleaseLilyStars(Main.player[Projectile.owner]);
@@ -480,8 +456,6 @@ class HeldLifeCessationProjectile : ModProjectile
 
         Vector2 sparkleScaleX = new Vector2(4.5f, 4.33f);
         Vector2 sparkleScaleY = new Vector2(1.5f, 1.33f);
-        //Main.EntitySpriteDraw(sparkle, sparklePos - Main.screenPosition, sparkle.Frame(), Color.Crimson * 0.3f, 0f, sparkle.Size() * 0.5f, sparkleScaleX, 0, 0);
-        //Main.EntitySpriteDraw(sparkle, sparklePos - Main.screenPosition, sparkle.Frame(), Color.Black * 0.3f, MathHelper.PiOver2, sparkle.Size() * 0.5f, sparkleScaleY, 0, 0);
         
     }
     
@@ -567,76 +541,10 @@ class HeldLifeCessationProjectile : ModProjectile
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 
         Rectangle frame = texture.Frame(1, 1, 0, 0);
-        /*
-        Vector2 sparklePos = Projectile.Center + new Vector2(6, 0).RotatedBy(Projectile.rotation);
-        Texture2D sparkle = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Extra/Sparkle").Value;
-        Color sparkleColor = new Color(255, 20, 0);//new GradientColor(SlimeUtils.GoozColors, 0.2f, 0.2f).ValueAt(Time + 10);
-        sparkleColor.A = 0;
-
-        Vector2 sparkleScaleX = new Vector2(1.5f, 1.33f) * Projectile.ai[2];
-        Vector2 sparkleScaleY = new Vector2(1.5f, 1.33f) * Projectile.ai[2];
-        Main.EntitySpriteDraw(sparkle, sparklePos - Main.screenPosition, sparkle.Frame(), Color.Black * 0.3f, 0f, sparkle.Size() * 0.5f, sparkleScaleX, 0, 0);
-        Main.EntitySpriteDraw(sparkle, sparklePos - Main.screenPosition, sparkle.Frame(), Color.Black * 0.3f, MathHelper.PiOver2, sparkle.Size() * 0.5f, sparkleScaleY, 0, 0);
-
-        Vector2[] positions = new Vector2[500];
-        float[] rotations = new float[500];
-        for (int i = 0; i < 500; i++)
-        {
-            rotations[i] = newRot.AngleLerp(Projectile.rotation, MathF.Sqrt(i / 500f)) + MathF.Sin(Time * 0.2f - i / 50f) * 0.1f * (1f - i / 500f) * Projectile.ai[2];
-            positions[i] = sparklePos + new Vector2(Size * (i / 500f) * Projectile.ai[2], 0).RotatedBy(rotations[i]);
-
-
-        }
-        */
-
-
-
         float rotation = Projectile.rotation+MathHelper.PiOver2;
         SpriteEffects spriteEffects = Projectile.spriteDirection * Owner.gravDir < 0 ? SpriteEffects.FlipVertically : 0;
         Vector2 origin = new Vector2(frame.Width / 2, frame.Height * Owner.gravDir);
-
         Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, frame, lightColor, rotation, origin, Projectile.scale, spriteEffects, 0);
-        // this is making me annoyed just to look at it tbh
-
-        /*
-        Texture2D LillyTexture = GennedAssets.Textures.SecondPhaseForm.SpiderLily;
-        Rectangle Lillyframe = LillyTexture.Frame(1, 3, 0, Projectile.frame);
-
-        
-        Vector2 Lorigin = new Vector2(Lillyframe.Width/2, Lillyframe.Height*1.5f  * Player.gravDir);
-
-
-
-
-
-        /*
-         * 
-   public void Render_Stage1()
-         {
-        Texture2D bulb = GennedAssets.Textures.SeedlingStage1.Bulb;
-        Texture2D bulbGlowmask = GennedAssets.Textures.SeedlingStage1.BulbGlow;
-
-        Vector2 bulbPosition = new Vector2(Main.instance.GraphicsDevice.Viewport.Width * 0.5f, Main.instance.GraphicsDevice.Viewport.Height + 2f);
-
-        // Add a touch of wind to the bulb.
-        float wind = AperiodicSin(Main.GlobalTimeWrappedHourly * 0.56f + Anchor.X + Anchor.Y) * 0.033f + Main.windSpeedCurrent * 0.17f;
-
-        // Draw the bulb. This is done before the upper stem is rendered to ensure that it draws behind it.
-        float LillySquish = Cos(Main.GlobalTimeWrappedHourly * 4.5f + Anchor.X + Anchor.Y) * 0.011f;
-        Vector2 LillyScale = new Vector2(1f - LillySquish, 1f + LillySquish);
-        Color glowmaskColor = new Color(2, 0, 156);
-        ManagedShader shader = ShaderManager.GetShader("NoxusBoss.GenesisGlowmaskShader");
-        shader.SetTexture(bulbGlowmask, 1);
-        shader.Apply();
-        Main.spriteBatch.Draw(bulb, bulbPosition, null, glowmaskColor, wind, bulb.Size() * new Vector2(0.5f, 1f), LillyScale, 0, 0f);
-    }
-        //anchor is point in world questiomark? should be able to just put it to the same place
-        //so the ublb itself is stationary,then the shader is drawn over it, i think? hmm no
-        glow is just the lines on it
-
-
-         */
-
         float wind = AperiodicSin(Main.GlobalTimeWrappedHourly * 0.56f + Projectile.Center.X + Projectile.Center.Y) *
             //clamps rotation kinda
             0.033f
@@ -648,21 +556,14 @@ class HeldLifeCessationProjectile : ModProjectile
         Vector2 Lorigin = new Vector2(Lillyframe.Width / 2, Lillyframe.Height+54  * Owner.gravDir);
         //me sucking the joy from my life:
         float LillySquish = MathF.Cos(Main.GlobalTimeWrappedHourly * 10.5f + Projectile.Center.X + Projectile.Center.Y) * 1f;
-        //im sure there will be no repercussions there
         //Vector2 LillyScale = new Vector2(1f - LillySquish, 1f + LillySquish);
         float LillyScale = 0.1f;
-        // Main.EntitySpriteDraw(LillyTexture, Projectile.Center - Main.screenPosition, Lillyframe, lightColor, rotation, Lorigin, Projectile.scale*0.1f, spriteEffects, 0);
-
-
         Vector2 LillyPos = new Vector2(Projectile.Center.X, Projectile.Center.Y);
-
-        
         if (Heat <= maxHeat && Heat > 0.4)
         {
             HeatFullSparkle();
 
         }
-        
         Color glowmaskColor = new Color(2, 0, 156);
         Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, lightColor, wind, Lorigin, LillyScale, spriteEffects, 0f);
         /*
