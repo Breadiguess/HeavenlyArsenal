@@ -61,6 +61,11 @@ Mods: {
 				DisplayName: Leech Buff
 				Description: Mods.HeavenlyArsenal.Buffs.LeechBuff.Description
 			}
+
+			ClotBuff: {
+				DisplayName: Clot Buff
+				Description: Mods.HeavenlyArsenal.Buffs.ClotBuff.Description
+			}
 		}
 
 		Items: {
@@ -564,6 +569,9 @@ Mods: {
 			VolatileExplosion.DisplayName: Volatile Explosion
 			CombatStim_Held.DisplayName: Combat Stim_ Held
 			LifeCessationLance.DisplayName: Life Cessation Lance
+			BloodTentacle.DisplayName: Blood Tentacle
+			ClotOffense.DisplayName: Clot Offense
+			BloodSplash.DisplayName: Blood Splash
 		}
 
 		NPCs: {
@@ -575,6 +583,9 @@ Mods: {
 			ArtilleryCrab.DisplayName: Artillery Crab
 			BloodMortar.DisplayName: Blood Mortar
 			UmbralLeech2.DisplayName: Umbral Leech2
+			Chum.DisplayName: Chum
+			Goreca.DisplayName: Goreca
+			ShadowHand.DisplayName: Shadow Hand
 		}
 
 		Keybinds: {
