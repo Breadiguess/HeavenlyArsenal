@@ -1,0 +1,17 @@
+
+FusionRifle: {
+				DisplayName: Cold Fusion
+				Tooltip: 
+				''' 
+				Hold <left> to charge the weapon.
+				It will	automatically fire upon reaching max charge.
+				landing consecutive hits grants a stacking charge rate and damage increase 
+				additionally, after a certain amount of hits, shots will apply volatile to enemies.
+				any hit	afterwards will	trigger volatile.
+				'''
+				ShiftTooltip: ''' 
+				Teeth,sharper than your own.
+				"This is my destiny too!" 
+				'''
+			}
+

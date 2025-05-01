@@ -1,8 +1,11 @@
 ﻿using CalamityMod;
+using CalamityMod.Buffs.DamageOverTime;
 using HeavenlyArsenal.ArsenalPlayer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Security.Cryptography.X509Certificates;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -100,13 +103,121 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
         //so why is this here? as in, why use a global npc?
         //i would say this global NPC is here to allow me more freedom to apply any effects i want to happen after an NPC gets hit by life and cessation.
         //
-        public bool IsFreezing;
+        public bool IsFreezingToDeath;
         public bool IsBoilingAlive;
 
         public float HeatAmmount;
+        public int warmupTimer;
+
+        public float GoldilocksMin = 150;
+        public float GoldilocksZone = 200;
+        public float GoldilocksMax = 250;
         public override bool InstancePerEntity => true;
+        public override bool PreAI(NPC npc)
+        {
+            /*
+            //todo: if not within min or max of golidlocks, begin attemping to heat up or cool down.
+
+            //subtract the difference of heat amount - max or min and use that to determine whether heat amount should go up or down
+            //when within the goldilocks zone, heat amount should quickly equal out to the goldilocks zone.
+            // Check if HeatAmmount is outside the Goldilocks range and adjust accordingly.
+            if (HeatAmmount < GoldilocksMin || HeatAmmount > GoldilocksMax)
+            {
+                // Increment or decrement HeatAmmount based on its position relative to the Goldilocks range.
+                if (HeatAmmount < GoldilocksMin)
+                {
+                    if (warmupTimer >= 40)
+                        HeatAmmount += 1; // Heat up if below the minimum.
+                }
+                else if (HeatAmmount > GoldilocksMax)
+                {
+                   if(warmupTimer >= 40)
+                     HeatAmmount -= 1; // Cool down if above the maximum.
+                }
+
+
+                if (HeatAmmount > GoldilocksMin && HeatAmmount < GoldilocksMax)
+                {
+                    IsFreezingToDeath = false;
+                    IsBoilingAlive = false;
+                }
+                    
+
+
+                // Use a timer to control the rate of adjustment.
+                if (warmupTimer >= 40)
+                {
+                    warmupTimer = 0;
+                }
+                
+            }
+            else 
+            {
+                if(warmupTimer >= 0)
+                    HeatAmmount = MathHelper.Lerp(HeatAmmount, GoldilocksZone, 0.1f);
+            }
+            
+            warmupTimer++;
+            if(warmupTimer< -10)
+            {
+                warmupTimer = 0;
+            }
+            if (HeatAmmount < GoldilocksMin)
+            {
+                IsFreezingToDeath = true;
+            }
+            if(HeatAmmount > GoldilocksMax)
+            {               
+                 IsBoilingAlive = true;
+            }
+
+            if(IsBoilingAlive && IsFreezingToDeath)
+            {
+                IsBoilingAlive = false;
+                IsFreezingToDeath = false;
+
+                npc.takenDamageMultiplier = 4f;
+            }
+
+            if (IsBoilingAlive)
+            {
+                npc.AddBuff(ModContent.BuffType<Dragonfire>(), 60);
+                npc.AddBuff(ModContent.BuffType<CalamityMod.Buffs.DamageOverTime.BrimstoneFlames>(), 60);
+            }
+
+            */
+            return base.PreAI(npc);
+        }
+
+
+        public override void UpdateLifeRegen(NPC npc, ref int damage)
+        {
+            if (IsFreezingToDeath)
+            {
+                npc.lifeRegen -= 10;
+                npc.coldDamage = true;
+
+            }
+
+            if (IsBoilingAlive)
+            {
+
+            }
+            base.UpdateLifeRegen(npc, ref damage);
+        }
+        public override void OnSpawn(NPC npc, IEntitySource source)
+        {
+            HeatAmmount = 200;
+            base.OnSpawn(npc, source);
+        }
+
+        
+
+
+
         public override void SetDefaults(NPC npc)
         {
+           
             /*
             if (npc.type == NPCID.TargetDummy)
             {
@@ -119,40 +230,29 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
         }
         public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            Utils.DrawBorderString(Main.spriteBatch, "| Is Freezing " + IsFreezing.ToString(), npc.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(Main.spriteBatch, "| Is Boiling Alive " + IsBoilingAlive.ToString(), npc.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
-
+           /*
 
             if (IsBoilingAlive)
             {
                 Texture2D texture = AssetDirectory.Textures.BigGlowball.Value;
-                spriteBatch.Draw(texture, npc.Center - screenPos, null, Color.Red, 0f, texture.Size() * 0.5f, 1f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(texture, npc.Center - screenPos, null, Color.Red, 0f, texture.Size() * 0.5f, 0.25f, SpriteEffects.None, 0f);
             }
-            if (IsFreezing)
+            if (IsFreezingToDeath)
             {
                 Texture2D texture = AssetDirectory.Textures.BigGlowball.Value;
-                spriteBatch.Draw(texture, npc.Center - screenPos, null, Color.White, 0f, texture.Size() * 0.5f, 1f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(texture, npc.Center - screenPos, null, Color.White, 0f, texture.Size() * 0.5f, 0.25f, SpriteEffects.None, 0f);
             }
+
+            Utils.DrawBorderString(Main.spriteBatch, "| Is Freezing: " + IsFreezingToDeath.ToString(), npc.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "| Is Boiling Alive: " + IsBoilingAlive.ToString(), npc.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "| HeatAmmount: " + HeatAmmount.ToString() + " | Warmup Timer: " + warmupTimer.ToString(), npc.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
+           */
+
             base.PostDraw(npc, spriteBatch, screenPos, drawColor);
         }
 
-        public override bool PreAI(NPC npc)
-        {
-
-
-
-            return base.PreAI(npc);
-        }
-
-        public override void UpdateLifeRegen(NPC npc, ref int damage)
-        {
-            if(IsFreezing)
-            {
-                npc.lifeRegen -= 10;
-                damage = 0;
-            }
-            base.UpdateLifeRegen(npc, ref damage);
-        }
+      
+     
         public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref NPC.HitModifiers modifiers)
         {
             base.ModifyHitByProjectile(npc, projectile, ref modifiers);

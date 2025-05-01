@@ -58,7 +58,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.Haemsong
         {
             Texture2D which = TextureAssets.Item[Type].Value;
             Rectangle sourceRect = which.Frame(1, 2, 0, Main.LocalPlayer.GetModPlayer<BloodPlayer>().offenseMode ? 0 : 1);
-            spriteBatch.Draw(which, position, sourceRect, drawColor, 0, origin, scale * 2, SpriteEffects.None, 0);
+            Vector2 whichOrigin = new Vector2(sourceRect.Width / 2, sourceRect.Height / 2);
+            spriteBatch.Draw(which, position, sourceRect, drawColor, 0, whichOrigin, scale * 1.75f, SpriteEffects.None, 0);
             return false;
         }
     }

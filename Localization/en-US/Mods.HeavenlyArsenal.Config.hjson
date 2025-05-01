@@ -1,0 +1,49 @@
+"": {
+	HeavenlyArsenalConfig: {
+		DisplayName: {
+			$parentVal: Heavenly Arsenal Config
+		}
+
+		ParticleLimit: {
+			Label: Particle Limit
+			Tooltip: ""
+		}
+
+		ScreenshakeMultiplier: {
+			Label: Screenshake Multiplier
+			Tooltip: ""
+		}
+
+		ChromaticAbberationMultiplier: {
+			Label: {
+				$parentVal: Chromatic Abberation Multiplier
+			}
+
+			Tooltip: {
+				$parentVal: ""
+			}
+		}
+
+		BossIntroCardsActivated: {
+			Label: Boss Intro Cards Activated
+			Tooltip: ""
+		}
+
+		VanillaCooldownDisplay: {
+			Label: Vanilla Cooldown Display
+			Tooltip: ""
+		}
+
+		StimVFX: {
+			Label: {
+				$parentVal: Stim V F X
+			}
+
+			Tooltip: {
+				$parentVal: ""
+			}
+		}
+	}
+}
+
+Graphics: Graphics

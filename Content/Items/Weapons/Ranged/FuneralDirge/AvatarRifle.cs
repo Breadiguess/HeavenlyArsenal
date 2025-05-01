@@ -180,7 +180,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
         {
             if (Shredding)
             {
-                Texture2D texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Tiles/ForgottenShrine/PlacedOfuta1").Value;
+                Texture2D texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Tiles/ForgottenShrine/PlacedOfuda1").Value;
                 Vector2 origin = new Vector2(texture.Width / 2, texture.Height / 2);
 
                 Vector2 drawPosition = new Vector2(npc.Center.X, npc.Center.Y - npc.height * 2 + (float)Math.Sin(Main.GlobalTimeWrappedHourly) * 4f) - Main.screenPosition;

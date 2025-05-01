@@ -529,7 +529,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             Rectangle frame = texture.Frame(1, 1, 0, 0);
             float rotation = Projectile.rotation;
             SpriteEffects spriteEffects = Projectile.direction * Owner.gravDir < 0 ? SpriteEffects.FlipVertically : 0;
-            Vector2 origin = new Vector2(frame.Width / 2 - 24 * Projectile.direction, frame.Height / 2 +4 * Owner.gravDir);
+            Vector2 origin = new Vector2(frame.Width / 2 - 24 * Projectile.direction, frame.Height / 2 -6 * Owner.gravDir);
 
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 

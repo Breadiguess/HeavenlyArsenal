@@ -1,0 +1,224 @@
+Mods: {
+	HeavenlyArsenal: {
+		Keybinds: {
+			"Quick Dash.DisplayName": Quick  Dash
+			"Toggle Haemsong Mode.DisplayName": Toggle  Haemsong  Mode
+		}
+
+		Items: {
+			ShintoArmorHelmetAll: {
+				SetBonus: Mods.HeavenlyArsenal.Items.ShintoArmorHelmetAll.SetBonus
+				DisplayName: Shinto Armor Helmet All
+				Tooltip: ""
+			}
+
+			ShintoArmorHelmetRogue: {
+				SetBonus: Mods.HeavenlyArsenal.Items.ShintoArmorHelmetRogue.SetBonus
+				DisplayName: Shinto Armor Helmet Rogue
+				Tooltip: ""
+			}
+
+			AuraCosmetic: {
+				DisplayName: Aura Cosmetic
+				Tooltip: ""
+			}
+
+			DevWing: {
+				DisplayName: Dev Wing
+				Tooltip: ""
+			}
+
+			BloodArmorBody: {
+				DisplayName: Blood Armor Body
+				Tooltip: ""
+			}
+
+			BloodArmorHead: {
+				DisplayName: Blood Armor Head
+				Tooltip: ""
+			}
+
+			BloodArmorLegs: {
+				DisplayName: Blood Armor Legs
+				Tooltip: ""
+			}
+
+			ShintoArmorBreastplate: {
+				DisplayName: Shinto Armor Breastplate
+				Tooltip: ""
+			}
+
+			ShintoArmorLeggings: {
+				DisplayName: Shinto Armor Leggings
+				Tooltip: ""
+			}
+
+			devMask: {
+				DisplayName: dev Mask
+				Tooltip: ""
+			}
+
+			CombatStim: {
+				DisplayName: Combat Stim
+				Tooltip: ""
+			}
+
+			DebugAffrontToGodSummon: {
+				DisplayName: Debug Affront To God Summon
+				Tooltip: ""
+			}
+
+			Auric_Catalyst: {
+				DisplayName: Auric_ Catalyst
+				Tooltip: ""
+			}
+
+			shadowspec_GunParts: {
+				DisplayName: shadowspec_ Gun Parts
+				Tooltip: ""
+			}
+
+			AncientCoin: {
+				DisplayName: Ancient Coin
+				Tooltip: ""
+			}
+
+			ChaliceOfFun: {
+				DisplayName: Chalice Of Fun
+				Tooltip: ""
+			}
+
+			ForgottenShrineTeleporter: {
+				DisplayName: Forgotten Shrine Teleporter
+				Tooltip: ""
+			}
+
+			GoodAppleSling: {
+				DisplayName: Good Apple Sling
+				Tooltip: ""
+			}
+
+			IdolSummoner: {
+				DisplayName: Idol Summoner
+				Tooltip: ""
+			}
+
+			Incomplete_gun: {
+				DisplayName: Incomplete_gun
+				Tooltip: ""
+			}
+
+			TaxidermyBook: {
+				DisplayName: Taxidermy Book
+				Tooltip: ""
+			}
+
+			UncannyDye: {
+				DisplayName: Uncanny Dye
+				Tooltip: ""
+			}
+
+			DebugWeapon: {
+				DisplayName: Debug Weapon
+				Tooltip: ""
+			}
+
+			avatar_FishingRod: {
+				DisplayName: avatar_ Fishing Rod
+				Tooltip: ""
+			}
+
+			BrutalForgiveness: {
+				DisplayName: Brutal Forgiveness
+				Tooltip: ""
+			}
+
+			Goretex: {
+				DisplayName: Goretex
+				Tooltip: ""
+			}
+
+			RocheLimit: {
+				DisplayName: Roche Limit
+				Tooltip: ""
+			}
+
+			AvatarLonginus: {
+				DisplayName: Avatar Longinus
+				Tooltip: ""
+			}
+
+			CircularSaw: {
+				DisplayName: Circular Saw
+				Tooltip: ""
+			}
+
+			Rapture: {
+				DisplayName: Rapture
+				Tooltip: ""
+			}
+
+			StupidFuckYouSword: {
+				DisplayName: Stupid Fuck You Sword
+				Tooltip: ""
+			}
+
+			FusionRifle: {
+				DisplayName: Fusion Rifle
+				Tooltip: ""
+			}
+
+			AvatarRifle: {
+				DisplayName: Avatar Rifle
+				Tooltip: ""
+			}
+
+			Temp: {
+				DisplayName: Temp
+				Tooltip: ""
+			}
+
+			Samsara: {
+				DisplayName: Samsara
+				Tooltip: ""
+			}
+
+			LifeAndCessation: {
+				DisplayName: Life And Cessation
+				Tooltip: ""
+			}
+
+			FlowerShuriken: {
+				DisplayName: Flower Shuriken
+				Tooltip: ""
+			}
+
+			AntishadowBead: {
+				DisplayName: Antishadow Bead
+				Tooltip: ""
+			}
+
+			SolynWhip_Item: {
+				DisplayName: Solyn Whip_ Item
+				Tooltip: ""
+			}
+
+			TheBlackBell: {
+				DisplayName: The Black Bell
+				Tooltip: ""
+			}
+
+			UmbralLeechBanner: {
+				DisplayName: Umbral Leech Banner
+				Tooltip: ""
+			}
+		}
+
+		Biomes: {
+			ForgottenShrineBiome: {
+				DisplayName: Forgotten Shrine Biome
+				TownNPCDialogueName: the Forgotten Shrine Biome
+			}
+		}
+	}
+}

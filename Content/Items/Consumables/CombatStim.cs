@@ -69,8 +69,6 @@ namespace HeavenlyArsenal.Content.Items.Consumables
             }
             if (player.statLife <= 0)
             {
-
-
                 if (player.GetModPlayer<StimPlayer>().Addicted)
                 {
                     string deathMessage = Language.GetTextValue("Mods.HeavenlyArsenal.PlayerDeathMessages.CombatStimAddicted" + Main.rand.Next(1, 5 + 1), player.name);
@@ -86,12 +84,8 @@ namespace HeavenlyArsenal.Content.Items.Consumables
                     string deathMessage = Language.GetTextValue("Mods.HeavenlyArsenal.PlayerDeathMessages.CombatStim" + Main.rand.Next(1, 4 + 1), player.name);
                     player.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromLiteral(deathMessage)), 10000.0, 0, false);
                 }
-
-
-
             }
             player.AddBuff(ModContent.BuffType<CombatStimBuff>(), (int)(Math.Abs(player.GetModPlayer<StimPlayer>().stimsUsed - 160) * 10), true, false);
-
         }
 
         public override void UseAnimation(Player player)

@@ -8,13 +8,21 @@
 	  <OutputType>Library</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <AdditionalFiles Remove="Assets\Textures\Backpacks\**" />
 	  <AdditionalFiles Remove="Content\Projectiles\Weapons\Holdout\**" />
+	  <AdditionalFiles Remove="Core\Autoloaders\**" />
 	  <AdditionalFiles Remove="Sounds\**" />
+	  <Compile Remove="Assets\Textures\Backpacks\**" />
 	  <Compile Remove="Content\Projectiles\Weapons\Holdout\**" />
+	  <Compile Remove="Core\Autoloaders\**" />
 	  <Compile Remove="Sounds\**" />
+	  <EmbeddedResource Remove="Assets\Textures\Backpacks\**" />
 	  <EmbeddedResource Remove="Content\Projectiles\Weapons\Holdout\**" />
+	  <EmbeddedResource Remove="Core\Autoloaders\**" />
 	  <EmbeddedResource Remove="Sounds\**" />
+	  <None Remove="Assets\Textures\Backpacks\**" />
 	  <None Remove="Content\Projectiles\Weapons\Holdout\**" />
+	  <None Remove="Core\Autoloaders\**" />
 	  <None Remove="Sounds\**" />
 	</ItemGroup>
 	<ItemGroup>
@@ -36,6 +44,7 @@
 	  <Compile Remove="Content\Projectiles\Misc\CosmicWatergun_proj.cs" />
 	  <Compile Remove="Content\Projectiles\Weapons\Melee\FileName.cs" />
 	  <Compile Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.cs" />
+	  <Compile Remove="Core\Overrides\CeaselessRiftOverride.cs" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Content\Items\auric_catalyst.png" />
@@ -52,8 +61,8 @@
 	  <None Remove="Shaders\shittyshader.fx" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Assets\Textures\Backpacks\" />
-	  <Folder Include="Core\Autoloaders\SolynBooks\" />
+	  <Folder Include="Common\Scenes\" />
+	  <Folder Include="Core\Overrides\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Reference Include="CalamityMod">

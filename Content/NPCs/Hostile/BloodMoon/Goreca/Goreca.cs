@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Core.World.GameScenes.AvatarAppearances;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
@@ -8,6 +10,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Goreca
 {
@@ -766,6 +769,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Goreca
             Main.npcFrameCount[Type] = 4;*/
             NPCID.Sets.TrailCacheLength[Type] = 15;
             NPCID.Sets.TrailingMode[Type] = 2;
+        }
+
+
+        public override float SpawnChance(NPCSpawnInfo spawnInfo)
+        {
+            if (Main.bloodMoon && PostMLRiftAppearanceSystem.AvatarHasCoveredMoon && !NPC.AnyNPCs(ModContent.NPCType<Goreca>() ))
+                return SpawnCondition.OverworldNightMonster.Chance * 0.01f;
+            return base.SpawnChance(spawnInfo);
         }
     }
     public class Chum : ModNPC

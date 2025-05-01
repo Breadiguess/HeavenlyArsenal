@@ -20,7 +20,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 	{
 		public static readonly int MoveSpeedBonus = 5;
 
-		public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MoveSpeedBonus);
+		//public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MoveSpeedBonus);
         public new string LocalizationCategory => "Items.Armor";
         public override void SetStaticDefaults()
         {
@@ -54,7 +54,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             player.autoJump = true;
             player.jumpSpeedBoost += 1.6f;
             player.noFallDmg = true;
-            //player.blackBelt = true;
             player.GetModPlayer<ShintoArmorPlayer>().VoidBeltEquipped = true;
             //ModContent.GetModPlayer<ShintoArmorPlayer>().ShadowVeil = true;
             if (player.GetModPlayer<ShintoArmorPlayer>().empoweredDash == true)

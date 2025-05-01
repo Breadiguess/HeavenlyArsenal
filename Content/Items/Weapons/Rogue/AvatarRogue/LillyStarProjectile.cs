@@ -295,6 +295,7 @@ public class LillyStarProjectile : ModProjectile, IDrawSubtractive
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         // target.AddBuff(BuffID.OnFire, 300);
+        target.GetGlobalNPC<LifeAndCessationGlobalNPC>().HeatAmmount += 50;
         if (target.life > damageDone)
             Projectile.Kill();
         else

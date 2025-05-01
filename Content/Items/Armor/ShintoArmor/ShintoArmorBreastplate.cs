@@ -31,10 +31,9 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 	[AutoloadEquip(EquipType.Body)]
 	public class ShintoArmorBreastplate : ModItem
 	{
-
+        #region static values
         public static int BarrierCooldown = 20 * 60;
-        public static readonly int MaxManaIncrease = 150;
-		public static readonly int MaxMinionIncrease = 10;
+        
         public static int ShieldDurabilityMax = 200;
         public static int ShieldRechargeDelay = 400;
         public static int ShieldRechargeRate = 25;
@@ -49,10 +48,15 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         public static Texture2D NoiseTex = GennedAssets.Textures.Noise.TurbulentNoise;
         public static Texture2D GFB = GennedAssets.Textures.Extra.Ogscule;
 
-        public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MaxManaIncrease, MaxMinionIncrease);
+        private static readonly int MaxManaIncrease = 200;
+        private static readonly int MaxMinionIncrease = 10;
+        private static readonly int MaxLifeIncrease = 300;
+        #endregion
+        public new string LocalizationCategory => "Items.Armor";
+       // public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MaxManaIncrease, MaxMinionIncrease, MaxLifeIncrease);
 
 
-        public new string LocalizationCategory => "Items.ShintoArmor.Armor";
+        
         public override void SetStaticDefaults()
         {
             var equipSlot = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Body);
@@ -74,8 +78,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             var modPlayer = player.Calamity();
             modPlayer.shadeRegen = true;
             player.thorns += 50f;
-            player.statLifeMax2 += 350;
-            player.statManaMax2 += 350;
+            player.statLifeMax2 += MaxLifeIncrease;
+            player.statManaMax2 += MaxManaIncrease;
             player.GetDamage<GenericDamageClass>() += 0.15f;
             player.GetCritChance<GenericDamageClass>() += 18;
             player.GetAttackSpeed<GenericDamageClass>() += 0.25f;

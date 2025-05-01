@@ -299,42 +299,16 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     SoundEngine.PlaySound(Bash with { Volume = 1.65f });
             }
             // Begin fading out before the exploding sun animation happens.
-            if (DeathAnimationTimer >= 370f)
-                NPC.Opacity *= 0.97f;
+            //if (DeathAnimationTimer >= 370f)
+                //NPC.Opacity *= 0.97f;
 
-            // Create an explosive wave shortly after the death animation begins.
-            // The temporal offset coincides with the point at which the crystal shatter sound happens in the
-            // above defeat scene sound.
             if (DeathAnimationTimer == 92f)
             {
-                SoundEngine.PlaySound(HolyBlast.ImpactSound, NPC.Center);
-                if (Main.netMode != NetmodeID.MultiplayerClient)
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<HolyExplosionBoom>(), 0, 0f);
+               // SoundEngine.PlaySound(HolyBlast.ImpactSound, NPC.Center);
+               // if (Main.netMode != NetmodeID.MultiplayerClient)
+               //     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<HolyExplosionBoom>(), 0, 0f);
             }
 
-            // Explode as an enormous holy star before dying and dropping loot.
-            if (Main.netMode != NetmodeID.MultiplayerClient && DeathAnimationTimer == 310f)
-            {
-                for (int i = 0; i < 80; i++)
-                {
-                    Vector2 sparkleVelocity = Main.rand.NextVector2Circular(23f, 23f);
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, sparkleVelocity, ModContent.ProjectileType<MajesticSparkle>(), 0, 0f);
-                }
-                Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<DyingSun>(), 0, 0f, 255);
-            }
-
-            // Idly release harmless cindiers.
-            int shootRate = (int)MathHelper.Lerp(12f, 5f, Utils.GetLerpValue(0f, 250f, DeathAnimationTimer, true));
-            if (DeathAnimationTimer % shootRate == shootRate - 1f)
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    Vector2 shootVelocity = Main.rand.NextVector2CircularEdge(13f, 13f) * Main.rand.NextFloat(0.7f, 1.3f);
-                    Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, shootVelocity, ModContent.ProjectileType<SwirlingFire>(), 0, 0f, 255);
-                }
-            }
-
-            // Do periodic syncs.
             if (Main.netMode == NetmodeID.Server && DeathAnimationTimer % 45f == 44f)
             {
                 NPC.netUpdate = true;
@@ -345,7 +319,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             }
 
             // Die and create drops after the star is gone.
-            if (DeathAnimationTimer >= 345f)
+            if (DeathAnimationTimer >= 125f)
             {
                 NPC.active = false;
                 NPC.HitEffect();

@@ -1,0 +1,65 @@
+AntimatterAnnihilationAll_Buff: {
+	DisplayName: Antimatter Annihilation All_ Buff
+	Description: Mods.HeavenlyArsenal.Buffs.AntimatterAnnihilationAll_Buff.Description
+}
+
+AntishadowAssassinBuff: {
+	DisplayName: Forgotten Warrior of Madder Crimson
+	Description: As He rises from the shadows, faint whispers echo:
+	NameText: "'Shuuren...'"
+}
+
+BloodArmorFrenzy: {
+	DisplayName: Blood Armor Frenzy
+	Description: Mods.HeavenlyArsenal.Buffs.BloodArmorFrenzy.Description
+}
+
+ColdBurnBuff: {
+	DisplayName: Cold Burn Buff
+	Description: Mods.HeavenlyArsenal.Buffs.ColdBurnBuff.Description
+}
+
+HeatBurnBuff: {
+	DisplayName: Heat Burn Buff
+	Description: Mods.HeavenlyArsenal.Buffs.HeatBurnBuff.Description
+}
+
+SolynWhip_Onhit_Buff: {
+	DisplayName: Solyn Whip_ Onhit_ Buff
+	Description: Mods.HeavenlyArsenal.Buffs.SolynWhip_Onhit_Buff.Description
+}
+
+CombatStimBuff: {
+	DisplayName: Combat Stim Buff
+	Description: you feel like you could break something... in two
+}
+
+StimAddicted_Debuff: {
+	DisplayName: Addiction
+	Description: You reaaaaly just had to try, didnt you
+}
+
+StimWithdrawl_Debuff: {
+	DisplayName: Stim Withdrawl
+	Description: I dont feel so good
+}
+
+TheBlackBell_Buff: {
+	DisplayName: The Black Bell_ Buff
+	Description: Mods.HeavenlyArsenal.Buffs.TheBlackBell_Buff.Description
+}
+
+ThermalShock: {
+	DisplayName: Thermal Shock
+	Description: Mods.HeavenlyArsenal.Buffs.ThermalShock.Description
+}
+
+ClotBuff: {
+	DisplayName: Clot Buff
+	Description: Mods.HeavenlyArsenal.Buffs.ClotBuff.Description
+}
+
+LeechBuff: {
+	DisplayName: Leech Buff
+	Description: Mods.HeavenlyArsenal.Buffs.LeechBuff.Description
+}

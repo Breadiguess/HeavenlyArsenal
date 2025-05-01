@@ -512,6 +512,9 @@ class HeldLifeCessationProjectile : ModProjectile
     {
         if (IsAbsorbingHeat)
         {
+            Heat += 0.005f;
+            target.GetGlobalNPC<LifeAndCessationGlobalNPC>().HeatAmmount -= 5;
+            target.GetGlobalNPC<LifeAndCessationGlobalNPC>().warmupTimer -= 60;
             target.AddBuff(ModContent.BuffType<HeatBurnBuff>(), 600, true);
             
             CombatText.NewText(target.targetRect, Color.AntiqueWhite,1,true,true);
@@ -520,7 +523,7 @@ class HeldLifeCessationProjectile : ModProjectile
             target.AddBuff(ModContent.BuffType<ColdBurnBuff>(), 600, false);
         if (IsAbsorbingHeat)
         {
-            Heat += 0.005f;
+           
         }
 
         base.OnHitNPC(target, hit, damageDone);
@@ -564,8 +567,14 @@ class HeldLifeCessationProjectile : ModProjectile
             HeatFullSparkle();
 
         }
+
+
+
+
         Color glowmaskColor = new Color(2, 0, 156);
         Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, lightColor, wind, Lorigin, LillyScale, spriteEffects, 0f);
+
+        Main.EntitySpriteDraw(LillyTexture, LillyPos - Main.screenPosition, Lillyframe, Color.Black with { A = (byte)Math.Round(Heat * 255,0) , R = (byte)Math.Round(Heat * 255,0), B = (byte)Math.Round(Heat * 255, 0), G = (byte)Math.Round(Heat * 255, 0) }, wind, Lorigin, LillyScale*4, spriteEffects, 0f);
         /*
         ManagedShader psychedelicShader = ShaderManager.GetShader("HeavenlyArsenal.ColdShader");
 

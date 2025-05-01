@@ -1,3 +1,4 @@
+using HeavenlyArsenal.Content.Items.Armor.Haemsong;
 using HeavenlyArsenal.Content.Items.Armor.NewFolder;
 using NoxusBoss.Assets;
 using Terraria;
@@ -9,8 +10,8 @@ namespace HeavenlyArsenal.Common
 {
     public class HeavenlyArsenalKeybinds : ModPlayer
     {
-        private int LearningExampleKeybindHeldTimer;
-        private int LearningExampleKeybindDoubleTapTimer;
+        //private readonly int LearningExampleKeybindHeldTimer;
+        //private int LearningExampleKeybindDoubleTapTimer;
 
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
@@ -21,7 +22,10 @@ namespace HeavenlyArsenal.Common
             }
             */
 
+            
+
             var bloodArmorPlayer = Player.GetModPlayer<BloodArmorPlayer>();
+            var bloodPlayer = Player.GetModPlayer<BloodPlayer>();
             if (KeybindSystem.HaemsongBind.JustPressed && bloodArmorPlayer.BloodArmorEquipped)
             {
                 SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.ArmJutOut with { Volume = 0.2f, Pitch = -1f }, Player.Center, null);
@@ -29,6 +33,17 @@ namespace HeavenlyArsenal.Common
                 bloodArmorPlayer.CurrentForm = bloodArmorPlayer.CurrentForm == BloodArmorForm.Offense
                     ? BloodArmorForm.Defense
                     : BloodArmorForm.Offense;
+
+
+                if (bloodPlayer.offenseMode)
+                {
+                    bloodPlayer.offenseMode = false;
+                   
+                }
+                //bloodPlayer.CurrentForm = bloodPlayer.CurrentForm == BloodArmorForm.Offense
+                //    ? BloodArmorForm.Defense
+                //    : BloodArmorForm.Offense;
+            
             }
 
         }

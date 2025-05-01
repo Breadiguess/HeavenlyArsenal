@@ -29,7 +29,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
     // https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod
     public class FusionRifle : ModItem
     {
-        public new string LocalizationCategory => "Items.Weapons.Ranged.ColdFusion";
+        public new string LocalizationCategory => "Items.Weapons";
+
 
         public Texture2D FusionRifle_Backpack { get; private set; }
 
@@ -42,7 +43,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
 
         public override void SetStaticDefaults()
         { 
-
+            ItemID.Sets.IsRangedSpecialistWeapon[Item.type] = true;
+            ItemID.Sets.IsLavaImmuneRegardlessOfRarity[Item.type] = true;
+            ItemID.Sets.gunProj[Item.type] = true;
         }
 
         public override void SetDefaults()
@@ -50,7 +53,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             
             Item.rare = ModContent.RarityType<NamelessDeityRarity>();
 
-            Item.damage = 6543;
+            Item.damage = 4233;
+            Item.crit = 46;
             Item.DamageType = DamageClass.Ranged;
             Item.shootSpeed = 40f;
             Item.width = Item.height = 40;
@@ -58,18 +62,19 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             Item.reuseDelay = 0;
             Item.useAmmo = AmmoID.Gel;
             Item.useAnimation = 0;
-            Item.noUseGraphic = true;
-            Item.useTurn = true;
-            Item.channel = true;
+            
             Item.useStyle = ItemUseStyleID.Shoot;
             Item.knockBack = 6;
             Item.autoReuse = true;
             Item.shoot = ModContent.ProjectileType<FusionRifleHoldout>();
+            
+           
             Item.ChangePlayerDirectionOnShoot = true;
-            Item.crit = 662;
             Item.noMelee = true;
             Item.Calamity().devItem = true;
-           
+            Item.noUseGraphic = true;
+            Item.useTurn = true;
+            Item.channel = true;
         }
         public bool FusionOut(Player player) => player.ownedProjectileCounts[Item.shoot] > 0;
 

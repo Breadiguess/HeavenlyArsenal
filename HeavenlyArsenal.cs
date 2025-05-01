@@ -2,19 +2,54 @@ global using LumUtils = Luminance.Common.Utilities.Utilities;
 global using WotGUtils = NoxusBoss.Core.Utilities.Utilities;
 using HeavenlyArsenal.Content.Items.Misc;
 using Microsoft.Xna.Framework.Graphics;
+using MonoMod.RuntimeDetour.HookGen;
 using ReLogic.Content;
+using System.Reflection;
+using System;
 using Terraria;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
+using MonoMod.RuntimeDetour;
+using CalamityMod.Particles;
+using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
 
 namespace HeavenlyArsenal
 {
     // Please read https://github.com/tModLoader/tModLoader/wiki/Basic-tModLoader-Modding-Guide#mod-skeleton-contents for more information about the various files in a mod.
     public class HeavenlyArsenal : Mod
     {
+        
+        public static bool forceOpenRift = false;
+
         public override void Load()
         {
+            /*
+            if (ModLoader.GetMod("NoxusBoss") != null)
+            {
+                // Replace the following line:  
+                // Type riftType = ModContent.GetModNPC<CeaselessVoidRift>().Type;  
+
+                // With this corrected line:  
+                Type riftType = ModContent.NPCType<CeaselessVoidRift>();
+                if (riftType != null)
+                {
+                    PropertyInfo prop = riftType.GetProperty("CanEnterRift", BindingFlags.Public | BindingFlags.Static);
+                    MethodInfo getter = prop?.GetGetMethod();
+                    // Type forceRiftOpen = prop.PropertyType;
+                    //MethodInfo detourMethod =  forceOpenRift.get
+                    if (getter != null)
+                    {
+
+                        Hook hook = new Hook(getter, new Func<Func<bool>, bool>(CanEnterRift_Hook));
+                        //HookEndpointManager.Add(getter, hook);
+                    }
+                }
+            
+            */
+
+
+
             if (Main.netMode != NetmodeID.Server)
             {
                 // First, you load in your shader file.
@@ -50,5 +85,20 @@ namespace HeavenlyArsenal
             }
 
         }
+        public override void PostSetupContent()
+        {
+           
+        }
+
+
+        private static bool CanEnterRift_Hook(Func<bool> orig)
+        {
+            if (forceOpenRift)
+            {
+                return true; 
+            }
+            return true;//orig();  
+        }
+       
     }
 }

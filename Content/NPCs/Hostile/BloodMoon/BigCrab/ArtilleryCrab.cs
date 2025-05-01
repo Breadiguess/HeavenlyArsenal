@@ -269,7 +269,16 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             Utils.DrawBorderString(spriteBatch, " | State: " + CurrentState, NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(spriteBatch, " | Ammo: " + AmmoCount, NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(spriteBatch, " | Timer: " + BombardTimer, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
-            return base.PreDraw(spriteBatch, screenPos, drawColor);
+
+            Texture2D texture = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
+
+            Vector2 origin = texture.Size() * 0.5f;
+
+            SpriteEffects Direction = NPC.spriteDirection < 0 ? SpriteEffects.FlipHorizontally : 0;
+
+
+            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition, null, drawColor, 0, origin, NPC.scale, Direction, 0);
+            return false;
         }
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
@@ -298,12 +307,15 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             NPC.width = 50;
             NPC.height = 50;
             NPC.damage = 488;
-            NPC.lifeMax = 1;
+            NPC.lifeMax = 100;
             NPC.defDefense = 4000;
             NPC.noGravity = true;
             NPC.noTileCollide = false;
         }
-
+        public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
+        {
+            base.OnHitPlayer(target, hurtInfo);
+        }
         public override void AI()
         {
             NPC.velocity.Y += Gravity;

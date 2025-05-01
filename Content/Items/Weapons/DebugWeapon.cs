@@ -23,7 +23,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons
             Item.damage = 40939;
             Item.DamageType = DamageClass.Generic;
             
-            Item.shoot = ModContent.ProjectileType<EyeOfTranscendenceProjectile>();
+           // Item.shoot = ModContent.ProjectileType<EyeOfTranscendenceProjectile>();
         }
         public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {

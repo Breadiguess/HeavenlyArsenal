@@ -6,20 +6,45 @@ using HeavenlyArsenal.Common.utils;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
-using HeavenlyArsenal.Common.Scenes;
 using CalamityMod.Particles;
 using NoxusBoss.Core.Utilities;
 using System.Collections.Generic;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
+using HeavenlyArsenal.Core.Systems;
+using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
+using Humanizer;
 
 namespace HeavenlyArsenal.Core.Globals
 {
+
+
+
     public class TradeVFXGlobalItem : GlobalItem
     {
+
+      
+        public override void UpdateInventory(Item item, Player player)
+        {
+            if (VoidTradingSystem.TradeInputRegistry.InputItemTypes.Contains(item.type))
+            {
+                HeavenlyArsenal.forceOpenRift = true;
+                // Check if the Avatar Universe condition is met.
+                if (AvatarUniverseExplorationSystem.InAvatarUniverse)
+                {
+                    // Set the time in the universe variable to 0
+                    player.GetValueRef<int>(AvatarUniverseExplorationSky.TimeInUniverseVariableName).Value = 0;
+                }
+            }
+            else
+            {
+                HeavenlyArsenal.forceOpenRift = false;
+            }
+            base.UpdateInventory(item, player);
+        }
         public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
-
+            
             
             // Check if the item type is one that has a trade registered and if the Avatar Universe condition is met.
             if (!VoidTradingSystem.TradeInputRegistry.InputItemTypes.Contains(item.type)|| !AvatarUniverseExplorationSystem.InAvatarUniverse)
@@ -74,6 +99,8 @@ namespace HeavenlyArsenal.Core.Globals
 
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
+            if (VoidTradingSystem.TradeInputRegistry.InputItemTypes.Contains(item.type))
+                item.SetNameOverride("Trade Item");
             base.ModifyTooltips(item, tooltips);
         }
     }

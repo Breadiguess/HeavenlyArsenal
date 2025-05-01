@@ -690,8 +690,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
                 {
 
                     float glowsize = 1.05f;
-                    Vector2 drawOffset = (MathHelper.TwoPi * i / 6f).ToRotationVector2() * Projectile.scale;    
-                    Main.spriteBatch.Draw(texture, drawPosition + drawOffset, frame, Color.Crimson with { A = 20}, rotation, origin, glowsize, spriteEffects, 0f);
+                    Vector2 drawOffset = (MathHelper.TwoPi * i / 6f).ToRotationVector2() + Vector2.One * (float)Math.Sin(Main.GlobalTimeWrappedHourly) * 4f;
+                Main.spriteBatch.Draw(texture, drawPosition + drawOffset, frame, Color.Crimson with { A = 20}, rotation, origin, glowsize, spriteEffects, 0f);
                 }
             }
 

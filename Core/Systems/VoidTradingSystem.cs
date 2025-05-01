@@ -1,39 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CalamityMod.Items;
+using CalamityMod.Items.Accessories;
+using CalamityMod.Items.Accessories.Wings;
+using CalamityMod.Items.Weapons.Melee;
+using CalamityMod.Items.Weapons.Rogue;
+using HeavenlyArsenal.Content.Items.Accessories.Cosmetic;
+using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
+using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
+using HeavenlyArsenal.Content.Items.Misc;
+using HeavenlyArsenal.Content.Items.Weapons.Magic;
+using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
+using HeavenlyArsenal.Content.Items.Weapons.Melee;
+using HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
+using HeavenlyArsenal.Content.Items.Weapons.Summon;
+using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
+using NoxusBoss.Assets;
+using NoxusBoss.Content.Items.Fishing;
+using NoxusBoss.Core.Autoloaders.SolynBooks;
+using NoxusBoss.Core.World.GameScenes.AvatarUniverseExploration;
+using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.ModLoader;
-using NoxusBoss.Core.World.GameScenes.AvatarUniverseExploration;
-using HeavenlyArsenal.Content.Items.Armor;
-using HeavenlyArsenal.Content.Items.Misc;
-using NoxusBoss.Assets;
-using CalamityMod.Items.Accessories;
-using CalamityMod.Items.Weapons.Melee;
-using HeavenlyArsenal.Content.Items.Weapons.Melee;
-using Luminance.Core.Graphics;
-using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
-using CalamityMod.Items.Accessories.Wings;
-using CalamityMod.Items;
 using Terraria.ID;
-using HeavenlyArsenal.Content.Items.Weapons.Summon;
+using Terraria.ModLoader;
 
-using HeavenlyArsenal.Core.Globals;
-using NoxusBoss.Core.Utilities;
-using CalamityMod.Items.Armor.OmegaBlue;
-using HeavenlyArsenal.Content.Items.Armor.NewFolder;
-using NoxusBoss.Content.Items.Fishing;
-using HeavenlyArsenal.Content.Items.Weapons.Magic;
-
-using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
-using HeavenlyArsenal.Content.Items.Accessories.Cosmetic;
-using NoxusBoss.Core.Autoloaders.SolynBooks;
-using CalamityMod.Items.Weapons.Rogue;
-using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
-using HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
-
-namespace HeavenlyArsenal.Common.Scenes
+namespace HeavenlyArsenal.Core.Systems
 {
     // Define an enum to specify where the output items should appear.
     public enum ItemReturnType
@@ -49,15 +42,19 @@ namespace HeavenlyArsenal.Common.Scenes
         public int InputItemType { get; set; }
         public float MinDistance { get; set; }
         public List<(int itemType, int quantity)> OutputItems { get; set; }
+
+        public List<(bool Condition, bool Condition2)> TradeCondition { get; set; } //TODO: add conditions to the trade, such as if the player has defeated a boss.
         public ItemReturnType ReturnType { get; set; }
 
+
+        //todo: add conditions to the trade, such as if the player has defeated a boss.
         public TradeDefinition(int inputItemType, float minDistance, ItemReturnType returnType, params int[] outputItemPairs)
         {
             InputItemType = inputItemType;
             MinDistance = minDistance;
             ReturnType = returnType;
             OutputItems = new List<(int, int)>();
-
+            TradeCondition = new List<(bool, bool)>();
             if (outputItemPairs.Length % 2 != 0)
             {
                 throw new ArgumentException("Output item pairs must be in itemType, quantity format.");
@@ -81,7 +78,8 @@ namespace HeavenlyArsenal.Common.Scenes
         /// This waits until all items are loaded, as to prevent air from being given instead of items
         /// </summary>
         /// //TODO: Conditions such as bosses defeated
-        public override void PostSetupContent()
+        public override void OnWorldLoad()
+        
         {
             //fun to Blood
             tradeDefinitions.Add(new TradeDefinition(
@@ -160,7 +158,7 @@ namespace HeavenlyArsenal.Common.Scenes
                ModContent.ItemType<ShintoArmorLeggings>(), 1,
                ModContent.ItemType<ShintoArmorBreastplate>(), 1,
                ModContent.ItemType<ShintoArmorHelmetAll>(), 1
-              
+
                ));
            
             //nadir to nadir2
@@ -209,7 +207,7 @@ namespace HeavenlyArsenal.Common.Scenes
             //Book to Taxidermy
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
-               (ItemID.Book),
+               ItemID.Book,
                1000f,
                ItemReturnType.None,
                //Items to get back

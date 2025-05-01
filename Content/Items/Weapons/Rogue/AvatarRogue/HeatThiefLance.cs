@@ -1,6 +1,8 @@
 ﻿using CalamityMod;
 using Luminance.Assets;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -13,6 +15,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
         public bool Stuck;
         public ref float HitX => ref Projectile.localAI[0];
         public ref float HitY => ref Projectile.localAI[1];
+        public ref float HitNPC => ref Projectile.localAI[2];
         public Vector2 HitOffset => new Vector2(HitX, HitY);
 
         public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
@@ -34,6 +37,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false; 
             Projectile.DamageType = ModContent.GetInstance<RogueDamageClass>();
+            Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 1;
            
         }
 
@@ -43,26 +49,41 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
             if (Time< 200 && !Stuck)
             {
                 Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
+                HitNPC = -1;
             }
             
             
             if (Stuck)
             {
                 Projectile.Center= HitOffset;
+                Projectile.timeLeft = 50;
+                Projectile.velocity = Vector2.Zero;
+
+                if (HitNPC != -1 && !Main.npc[(int)HitNPC].active)
+                {
+                    Projectile.Kill();
+                }
+                
+
+
             }
             Time++;
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if(target.life < damageDone && !Stuck)
+            
+            if(!Stuck)
             {
                 HitX = target.position.X + target.width / 2;
                 HitY = target.position.Y + target.height / 2;
                 Projectile.position = HitOffset;
+
+
+                HitNPC = target.type;
                 Stuck = true;
             }
-
+            Main.NewText($"HitNPC:{target.type}, ");
             base.OnHitNPC(target, hit, damageDone);
         }
         public override bool? CanCutTiles()
@@ -81,7 +102,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
         {
 
             Utils.DrawBorderString(Main.spriteBatch, "Stuck: " + Stuck.ToString(), Projectile.Center - Vector2.UnitY * 220 - Main.screenPosition, Color.White);
-            return base.PreDraw(ref lightColor);
+            Texture2D texture = GennedAssets.Textures.Projectiles.FallingMeleeWeapon;
+
+            Main.spriteBatch.Draw(texture, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation-MathHelper.PiOver2, texture.Size() * 0.5f, Projectile.scale/5, SpriteEffects.None, 0f);
+            return false;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
         // Boosted by Cross Necklace.
         internal static readonly int ShadowVeilIFrames = 80;
-        public static LocalizedText SetBonusText { get; private set; }
+        //public static LocalizedText SetBonusText { get; private set; }
 
         public new string LocalizationCategory => "Items.Armor";
 
@@ -35,8 +35,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 			// ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = true; // Draw hair as if a hat was covering the top. Used by Wizards Hat
 			// ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = true; // Draw all hair as normal. Used by Mime Mask, Sunglasses
 			// ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
-
-			SetBonusText = this.GetLocalization("SetBonus").WithFormatArgs(AdditiveGenericDamageBonus);
+           
+			//SetBonusText = this.GetLocalization("SetBonus").WithFormatArgs(AdditiveGenericDamageBonus);
 
 		}
 
@@ -56,7 +56,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         // UpdateArmorSet allows you to give set bonuses to the armor.
         public override void UpdateArmorSet(Player player)
         {
-            player.setBonus = Language.GetOrRegister(Mod.GetLocalizationKey("ShintoArmorHelmetAll.SetBonus")).Value;
+            player.setBonus = Language.GetOrRegister(Mod.GetLocalizationKey("Items.Armor.ShintoArmorHelmetAll.SetBonus")).Value;
             player.jumpSpeedBoost += 2f;
             player.GetModPlayer<ShintoArmorPlayer>().SetActive = true;
             player.GetDamage(DamageClass.Generic) += 0.18f;

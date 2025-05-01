@@ -15,6 +15,7 @@ using Terraria.UI.Chat;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.DataStructures;
+using HeavenlyArsenal.Common;
 
 namespace HeavenlyArsenal.Content.Buffs.Stims
 {
@@ -86,22 +87,27 @@ namespace HeavenlyArsenal.Content.Buffs.Stims
                 Main.NewText($"Addiction chance: {addiction}, stims used: {stimsUsed}", Color.AntiqueWhite);
             }
             */
+
+
+
+            if (HeavenlyArsenalConfig.Instance != null && HeavenlyArsenalConfig.Instance.StimVFX)
+            {
+                if (!GeneralScreenEffectSystem.ChromaticAberration.Active)
+                    GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, HeavenlyArsenalConfig.Instance.ChromaticAbberationMultiplier, 0);
+            }
             
-            // TODO: Make this only apply if config option is turned on
-            /*
-            if (!GeneralScreenEffectSystem.ChromaticAberration.Active)
-                GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, 0.75f, 0);
-            */
+
             player.wellFed = true;
 
 
             if (player.GetModPlayer<StimPlayer>().Addicted)
             {
-                player.statDefense += 2;
-                player.GetAttackSpeed<GenericDamageClass>() += 0.5f;
-                player.GetDamage<GenericDamageClass>() += 0.255f;
-                player.GetCritChance<GenericDamageClass>() += 2f;
-                player.GetKnockback<SummonDamageClass>() += 0.5f;
+                player.statDefense += 3;
+                player.GetAttackSpeed<GenericDamageClass>() += 1f/1.5f;
+                player.GetDamage<GenericDamageClass>() += 0.425f/1.5f;
+                player.GetCritChance<GenericDamageClass>() += 5f/1.5f;
+                player.GetKnockback<SummonDamageClass>() += 1f/1.5f;
+
 
 
                 player.moveSpeed += 0.68f;
