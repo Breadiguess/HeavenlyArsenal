@@ -13,11 +13,18 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 {
+
+    public enum BabyLeechState
+    {
+        disperse,
+
+        Dead
+    }
     class UmbralLeech_Baby : ModNPC
     {
         public override void SetStaticDefaults()
         {
-
+            NPCID.Sets.CantTakeLunchMoney[NPC.type] = true;
 
         }
         public override void SetDefaults()
@@ -41,7 +48,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Texture2D texture = TextureAssets.Npc[Type].Value;
-            Rectangle lech  = new Rectangle(1,5, 0 , (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 3);
+            Rectangle lech  = new Rectangle(1, 5, 0 , (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 3);
 
             Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f);
 

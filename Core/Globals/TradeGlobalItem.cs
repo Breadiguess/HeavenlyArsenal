@@ -100,8 +100,14 @@ namespace HeavenlyArsenal.Core.Globals
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if (VoidTradingSystem.TradeInputRegistry.InputItemTypes.Contains(item.type))
-                item.SetNameOverride("Trade Item");
-            base.ModifyTooltips(item, tooltips);
+            {
+              
+                TooltipLine tooltipLine = new TooltipLine(Mod, "VisitRift", "This item resonates with the Rift. You should visit it.")
+                {
+                    OverrideColor = new Color(200, 50, 50)
+                };
+                tooltips.Add(tooltipLine);
+            }
         }
     }
 

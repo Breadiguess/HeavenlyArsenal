@@ -13,6 +13,7 @@ public class AvatarRifle_MuzzleFlash : BaseParticle
 {
     public static ParticlePool<AvatarRifle_MuzzleFlash> pool = new ParticlePool<AvatarRifle_MuzzleFlash>(500, GetNewParticle<AvatarRifle_MuzzleFlash>);
 
+    public Vector2 Anchor;
     public Vector2 Position;
     public Vector2 Velocity;
     public float Rotation;
@@ -24,8 +25,9 @@ public class AvatarRifle_MuzzleFlash : BaseParticle
     private int Style;
     private int SpriteEffect;
 
-    public void Prepare(Vector2 position, Vector2 velocity, float rotation, int lifeTime, Color color, Color glowColor, float scale)
+    public void Prepare(Vector2 position, Vector2 velocity, float rotation, int lifeTime, Color color, Color glowColor, float scale, Vector2 anchor)
     {
+        Anchor = anchor;
         Position = position;
         Velocity = velocity;
         Rotation = rotation;
@@ -48,10 +50,11 @@ public class AvatarRifle_MuzzleFlash : BaseParticle
 
     public override void Update(ref ParticleRendererSettings settings)
     {
-        Position += Velocity;
-        Velocity += new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), Main.rand.NextFloat(-0.1f, 0.1f));
-        Velocity *= 1.1f;
-
+       
+        //Velocity += new Vector2(Main.rand.NextFloat(-0.1f, 0.1f), Main.rand.NextFloat(-0.1f, 0.1f));
+        //Velocity *= 1.1f;
+        //Position = Anchor;
+       // Rotation = Velocity.ToRotation();
         TimeLeft++;
         if (TimeLeft > MaxTime)
             ShouldBeRemovedFromRenderer = true;
@@ -60,31 +63,23 @@ public class AvatarRifle_MuzzleFlash : BaseParticle
     public override void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch)
     {
         Texture2D texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Particles/MuzzleFlashParticle").Value;
-
-        texture.Frame();
         float progress = (float)TimeLeft / MaxTime;
-        int frameCount = (int)1; // (int)MathF.Floor(MathF.Sqrt(progress) * 7);
-        Rectangle frame = texture.Frame(1, 1, frameCount, Style);
-        // Rectangle glowFrame = texture.Frame(7, 6, frameCount, Style + 3);
+        int frameCount = (int)MathF.Floor(MathF.Sqrt(progress) * 6);
+        Rectangle frame = texture.Frame(1, 6, 0, frameCount);
 
-
-
-
-        
         float alpha = 1f - progress;
-
-        // Apply the alpha value to the draw color
         Color drawColor = Color.Lerp(ColorTint, ColorGlow, Utils.GetLerpValue(0.3f, 0.7f, progress, true)) * Utils.GetLerpValue(1f, 0.9f, progress, true) * alpha;
-
-        // Adjust the scale based on the progress
-        float widthScale = Scale * (1f - progress); // Decrease the width over time
+        float widthScale = Scale;// * (1f - progress); // Decrease the width over time
         float heightScale = Scale; // Keep the height constant
 
-        Vector2 anchorPosition = new Vector2(frame.Width / 2, frame.Height);
+        Vector2 anchorPosition = new Vector2(frame.Width /2, frame.Height/6);
+
+
+        spritebatch.Draw(texture, Position + settings.AnchorPosition, frame, drawColor, Rotation, texture.Size() * 0.5f, new Vector2(widthScale, heightScale), (SpriteEffects)SpriteEffect, 0);
+
 
         // Draw the particle with the adjusted scale
-        spritebatch.Draw(texture, Position + settings.AnchorPosition, texture.Frame(), drawColor, Rotation, texture.Size() * 0.5f, new Vector2(widthScale, heightScale), (SpriteEffects)SpriteEffect, 0);
-        // spritebatch.Draw(texture, Position + settings.AnchorPosition, glowFrame, glowColor, Rotation + MathHelper.PiOver2, glowFrame.Size() * 0.5f, Scale, (SpriteEffects)SpriteEffect, 0);
+       // spritebatch.Draw(texture, Position + settings.AnchorPosition, glowFrame, glowColor, Rotation + MathHelper.PiOver2, glowFrame.Size() * 0.5f, Scale, (SpriteEffects)SpriteEffect, 0);
     }
 
 }

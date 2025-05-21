@@ -1,86 +1,144 @@
 ﻿using CalamityMod;
 using CalamityMod.CalPlayer;
 using CalamityMod.Items;
+using CalamityMod.Items.Armor.Bloodflare;
+using CalamityMod.Items.Armor.OmegaBlue;
 using CalamityMod.Items.Materials;
 using CalamityMod.Rarities;
-using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
-using HeavenlyArsenal.Content.Items.Armor.NewFolder;
+using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Items.Armor.Haemsong;
+using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
-
-[AutoloadEquip(EquipType.Head)]
-
-public class AwakenedBloodHelm : ModItem, ILocalizedModType
+namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
 {
-    public new string LocalizationCategory => "Items.Armor";
 
-    internal static string TentacleEntitySourceContext => "SetBonus_HeavenlyArsenal_BloodArmor";
+    [AutoloadEquip(EquipType.Head)]
 
-
-    public override void Load()
+    public class AwakenedBloodHelm : ModItem, ILocalizedModType
     {
-        if (Main.netMode != NetmodeID.Server)
+        public override string LocalizationCategory => "Items.Armor.AwakenedBloodArmor";
+        internal static string TentacleEntitySourceContext => "SetBonus_HeavenlyArsenal_BloodArmor";
+
+        
+
+        public override void Load()
         {
-            EquipLoader.AddEquipTexture(Mod, "HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/AwakenedBloodHelmDefense_Head", EquipType.Head, name: "AwakenedBloodHelmDefense");
+            if (Main.netMode != NetmodeID.Server)
+            {
+                EquipLoader.AddEquipTexture(Mod, "HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/AwakenedBloodHelmDefense_Head", EquipType.Head, name: "AwakenedBloodHelmDefense");
+                EquipLoader.AddEquipTexture(Mod, "HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/AwakenedBloodHelmOffense_Head", EquipType.Head, name: "AwakenedBloodHelmOffense");
+
+            }
+        }
+        public override void SetStaticDefaults()
+        {
+            if (Main.netMode == NetmodeID.Server)
+                return;
+            var equipSlotHead = EquipLoader.GetEquipSlot(Mod, "AwakenedBloodHelmDefense", EquipType.Head);
+            ArmorIDs.Head.Sets.DrawHead[equipSlotHead] = false;
+        }
+        public override void SetDefaults()
+        {
+            Item.width = 18;
+            Item.height = 18;
+            Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
+            Item.defense = 49; //85
+            Item.rare = ModContent.RarityType<PureGreen>();
+        }
+        public override bool IsArmorSet(Item head, Item body, Item legs) => body.type == ModContent.ItemType<AwakenedBloodplate>() && legs.type == ModContent.ItemType<AwakenedBloodStrides>();
+
+
+        public override void ArmorSetShadows(Player player)
+        {
+            player.armorEffectDrawShadowSubtle = false;
+        }
+        
+        public override void UpdateArmorSet(Player player)
+        {
+            //player.setBonus = this.GetLocalizedValue("SetBonus") + "\n";
+            player.setBonus = Language.GetOrRegister(("Items.Armor.AwakenedBloodArmor.AwakenedBloodHelm.SetBonus")).Value;
+            player.setBonus = this.GetLocalizedValue("SetBonus");
+            var modPlayer = player.Calamity();
+            player.GetAttackSpeed<MeleeDamageClass>() += 0.18f;
+            modPlayer.bloodflareSet = true;
+            modPlayer.bloodflareMelee = true;
+            modPlayer.abyssalDivingSuitPlates = true;
+            modPlayer.abyssalAmulet = true;
+            modPlayer.reaverRegen = true;
+            player.GetModPlayer<BloodArmorPlayer>().BloodArmorEquipped = true;
+
+            player.crimsonRegen = true;
+            player.aggro += 900;
+        }
+
+        private float DamageBoost = 0.1f;
+        private int CritBoost = 5;
+        public override void UpdateEquip(Player player)
+        {
+            player.GetDamage<GenericDamageClass>() += DamageBoost;
+            player.GetCritChance<MeleeDamageClass>() += CritBoost;
+        }
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+
+            // build a single combined tooltip line
+            string text =
+                $"+{DamageBoost * 100:F0}% to all damage\n" +
+                $"+{CritBoost}% crit chance";
+
+            // create and add it
+            TooltipLine line = new TooltipLine(Mod, "AwakenedBloodHelm", text)
+            {
+                OverrideColor = new Color(200, 50, 50)  // optional
+            };
+            tooltips.Add(line);
+        }
+        public override void AddRecipes()
+        {
+            CreateRecipe().
+                     AddIngredient<OmegaBlueHelmet>().
+                     AddRecipeGroup("HeavenlyArsenal:BloodflareHelmets", 1).
+                     AddIngredient<YharonSoulFragment>(15).
+                     AddCondition(conditions: Condition.BloodMoon).
+                     AddTile<CosmicAnvil>().
+                     Register();
+
+            CreateRecipe().
+                    AddIngredient<BloodArmorHead>().
+                    AddTile<CosmicAnvil>().
+                    Register();
         }
     }
-    public override void SetStaticDefaults()
-    {
-        if (Main.netMode == NetmodeID.Server)
-            return;
-        var equipSlotHead = EquipLoader.GetEquipSlot(Mod, "AwakenedBloodHelmDefense", EquipType.Head);
-        ArmorIDs.Head.Sets.DrawHead[equipSlotHead] = false;
-    }
-    public override void SetDefaults()
-    {
-        Item.width = 18;
-        Item.height = 18;
-        Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
-        Item.defense = 49; //85
-        Item.rare = ModContent.RarityType<PureGreen>();
-    }
-    public override bool IsArmorSet(Item head, Item body, Item legs) => body.type == ModContent.ItemType<AwakenedBloodplate>() && legs.type == ModContent.ItemType<AwakenedBloodStrides>();
-    
 
-    public override void ArmorSetShadows(Player player)
-    {
-        player.armorEffectDrawShadowSubtle = false;
-    }
 
-    public override void UpdateArmorSet(Player player)
+    public class bloodRecipeGroup : ModSystem
     {
-        //player.setBonus = this.GetLocalizedValue("SetBonus") + "\n";
-        player.setBonus = Language.GetOrRegister(Mod.GetLocalizationKey("Items.Armor.AwakenedBloodHelm.SetBonus")).Value;
-        
-        var modPlayer = player.Calamity();
-        player.GetAttackSpeed<MeleeDamageClass>() += 0.18f;
-        modPlayer.bloodflareSet = true;
-        modPlayer.bloodflareMelee = true;
-        modPlayer.abyssalDivingSuitPlates = true;
-        modPlayer.abyssalAmulet = true;
-        modPlayer.reaverRegen = true;
-        player.GetModPlayer<BloodArmorPlayer>().BloodArmorEquipped = true;
-        
-        player.crimsonRegen = true;
-        player.aggro += 900;
+        public static LocalizedText BloodflareHelmetGroupText;
+
+        public override void Load()
+        {
+            BloodflareHelmetGroupText = Language.GetOrRegister(Mod.GetLocalizationKey("Items.Armor.BloodflareHelmetGroup"));
+        }
+
+        public override void AddRecipeGroups()
+        {
+            RecipeGroup group = new RecipeGroup(() => $"{Language.GetTextValue("LegacyMisc.37")} {BloodflareHelmetGroupText.Value}",
+                ModContent.ItemType<BloodflareHeadMagic>(),
+                ModContent.ItemType<BloodflareHeadMelee>(),
+                ModContent.ItemType<BloodflareHeadRanged>(),
+                ModContent.ItemType<BloodflareHeadRogue>(),
+                ModContent.ItemType<BloodflareHeadSummon>());
+            RecipeGroup.RegisterGroup("HeavenlyArsenal:BloodflareHelmets", group);
+        }
     }
 
-    public override void UpdateEquip(Player player)
-    {
-        player.GetDamage<MeleeDamageClass>() += 0.1f;
-        player.GetCritChance<MeleeDamageClass>() += 5;
-    }
-
-    public override void AddRecipes()
-    {
-        CreateRecipe().
-            AddIngredient<BloodstoneCore>(11).
-            AddIngredient<RuinousSoul>(2).
-            AddTile(TileID.LunarCraftingStation).
-            Register();
-    }
 }
+
+
+   
+

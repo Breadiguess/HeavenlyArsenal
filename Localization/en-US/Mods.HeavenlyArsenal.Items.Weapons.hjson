@@ -1,17 +1,100 @@
+Ranged: {
+	ClaretCannon: {
+		DisplayName: Claret Cannon
+		Tooltip: ""
+	}
 
-FusionRifle: {
-				DisplayName: Cold Fusion
-				Tooltip: 
-				''' 
-				Hold <left> to charge the weapon.
-				It will	automatically fire upon reaching max charge.
-				landing consecutive hits grants a stacking charge rate and damage increase 
-				additionally, after a certain amount of hits, shots will apply volatile to enemies.
-				any hit	afterwards will	trigger volatile.
-				'''
-				ShiftTooltip: ''' 
-				Teeth,sharper than your own.
-				"This is my destiny too!" 
-				'''
-			}
+	FusionRifle: {
+		ShiftTooltip:
+			'''
+			Teeth,sharper than your own.
+			"This is my destiny too!" 
+			'''
+		DisplayName: Cold Fusion
+		Tooltip:
+			'''
+			Hold <left> to charge the weapon.
+			It will automatically fire upon reaching max charge.
+			landing consecutive hits grants a stacking charge rate and damage increase 
+			additionally, after a certain amount of hits, shots will apply volatile to enemies.
+			any hit afterwards will trigger volatile.
+			'''
+	}
 
+	AvatarRifle: {
+		DisplayName: Funeral Dirge of a dead world
+		Tooltip:
+			'''
+			every 7 shots will empower the rifle
+			every 4th bullet landed on an enemy will shred them, reducing their defense and causing nearby enemies to suffer
+			'''
+	}
+
+	Samsara: {
+		DisplayName: Samsara
+		Tooltip: Fires Seeds of possibilty that bloom into devastating lasers.
+	}
+
+	GoodAppleSling: {
+		DisplayName: Good Apple Sling
+		Tooltip: ""
+	}
+}
+
+Magic: {
+	avatar_FishingRod: {
+		DisplayName: FlyRift
+		Tooltip:
+			'''
+			ring the bell to call forth a rather large fish
+
+			'''
+	}
+
+	BrutalForgiveness: {
+		DisplayName: Brutal Forgiveness
+		Tooltip: ""
+	}
+
+	Goretex: {
+		DisplayName: Goretex
+		Tooltip: in development
+	}
+
+	RocheLimit: {
+		DisplayName: Roche Limit
+		Tooltip:
+			'''
+			Conjures a localized star in front of you
+			Over time its energy is increased, until eventually it transforms into a blazing kugelblitz which consumes everything
+			'Rage, rage against the dying of the light'
+			'''
+	}
+}
+
+Melee: {
+	AvatarLonginus: {
+		DisplayName: Dormant Splinter
+		Tooltip:
+			'''
+			<left> Cycles through several extremely fast attacks. 
+			as you attack, you build up (insert resource that isnt heat here) At max (Resource), The Spear awakens and gains a new set of attacks.
+			<right> at any point will throw the spear 
+			The spear can pass through blocks, and will attempt to drag you to its location
+			If thrown with over (insert percentage ) (resource), you will create a small glowing orb that rapidly racks into the hit target 
+			Once the orb collides, You teleport inside of the target, dealing massive damage.\
+			'''
+	}
+}
+
+Summon: {
+	AntishadowBead: {
+		DisplayName: Scroll of Brightest Shadow
+		Tooltip:
+			'''
+			bound by blood and seal, it shall always be by your side
+
+			There can be only one.
+			'''
+	}
+}

@@ -21,15 +21,11 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 		public static readonly int AdditiveGenericDamageBonus = 20;
         public const float TeleportRange = 2000f;
 
-        // Boosted by Cross Necklace.
         internal static readonly int ShadowVeilIFrames = 80;
         public static LocalizedText SetBonusText { get; private set; }
-        public new string LocalizationCategory => "Items.Armor";
+        public override string LocalizationCategory => "Items.Armor.ShintoArmor";
         public override void SetStaticDefaults() {
-			// If your head equipment should draw hair while drawn, use one of the following:
-			//ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
 			ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = true; // Draw hair as if a hat was covering the top. Used by Wizards Hat
-			// ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = true; // Draw all hair as normal. Used by Mime Mask, Sunglasses
 			// ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
 
 			SetBonusText = this.GetLocalization("SetBonus").WithFormatArgs(AdditiveGenericDamageBonus);
@@ -37,8 +33,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 		}
 
 		public override void SetDefaults() {
-			Item.width = 18; // Width of the item
-			Item.height = 18; // Height of the item
+            Item.width = 32;
+			Item.height = 32; 
 			Item.value = Item.sellPrice(gold: 999); // How many coins the item is worth
             Item.rare = ModContent.RarityType<AvatarRarity>();  // The rarity of the item
             Item.defense = 60; // The amount of defense the item will give when equipped

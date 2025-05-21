@@ -1,11 +1,9 @@
 ﻿using CalamityMod;
-using CalamityMod.Balancing;
 using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.ArsenalPlayer;
-using HeavenlyArsenal.Content.Items.Armor.NewFolder;
 using NoxusBoss.Content.Rarities;
 using System.Collections.Generic;
 using Terraria;
@@ -27,7 +25,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         internal static readonly int ShadowVeilIFrames = 80;
         //public static LocalizedText SetBonusText { get; private set; }
 
-        public new string LocalizationCategory => "Items.Armor";
+        public override string LocalizationCategory => "Items.Armor.ShintoArmor";
 
         public override void SetStaticDefaults() {
 			// If your head equipment should draw hair while drawn, use one of the following:

@@ -18,6 +18,7 @@ namespace HeavenlyArsenal.Content.Items.Misc
 {
     class GoodAppleSling : ModItem
     {
+        public override string LocalizationCategory => "Items.Weapons.Ranged";
         public override void SetDefaults()
         {
             Item.useAmmo = AmmoID.Dart;

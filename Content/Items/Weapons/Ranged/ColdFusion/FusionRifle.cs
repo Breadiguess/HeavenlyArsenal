@@ -18,6 +18,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using static NoxusBoss.Assets.GennedAssets.Sounds;
 using Player = Terraria.Player;
@@ -29,8 +30,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
     // https://github.com/tModLoader/tModLoader/tree/stable/ExampleMod
     public class FusionRifle : ModItem
     {
-        public new string LocalizationCategory => "Items.Weapons";
-
+        //public new string LocalizationCategory => "Items.Weapons.Ranged";
+        public override string LocalizationCategory => "Items.Weapons.Ranged";
 
         public Texture2D FusionRifle_Backpack { get; private set; }
 
@@ -40,12 +41,18 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
 
         public static int MaxChargeTime = 110;
  
-
+        public static LocalizedText infoTooltip
+        {
+            get;
+            private set;
+        }
         public override void SetStaticDefaults()
         { 
             ItemID.Sets.IsRangedSpecialistWeapon[Item.type] = true;
             ItemID.Sets.IsLavaImmuneRegardlessOfRarity[Item.type] = true;
             ItemID.Sets.gunProj[Item.type] = true;
+
+            infoTooltip = this.GetLocalization("ShiftTooltip").WithFormatArgs(BoltsPerBurst, ShootDelay, MaxChargeTime);
         }
 
         public override void SetDefaults()

@@ -2,6 +2,7 @@
 using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Common.Ui;
 using HeavenlyArsenal.Content.Buffs.LifeAndCessation;
+using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using Luminance.Core.Sounds;
 using Microsoft.Xna.Framework;
@@ -112,8 +113,11 @@ class HeldLifeCessationProjectile : ModProjectile
 
         ManipulatePlayerVariables();
         
+        Owner.ChangeDir(Owner.DirectionTo(Main.MouseWorld).X > 0 ? 1 : -1);
+        
         Player player = Main.player[Projectile.owner];
         Owner.heldProj = Projectile.whoAmI;
+
         Projectile.Center = Owner.MountedCenter + new Vector2(Owner.direction * 20f,13f);// + new Vector2(0, Owner.gfxOffY); //+ Main.rand.NextVector2Circular(2, 2); //* Projecti
         Projectile.rotation = MathHelper.ToRadians(-90);
         if (Heat > 0|| player.channel)
@@ -187,16 +191,26 @@ class HeldLifeCessationProjectile : ModProjectile
     //todo: make it update properly with the Player's velocity
     public void AbsorbHeat()
     {
+
         Vector2 toMouse = Main.MouseWorld - Owner.Center;
+
+
+        Vector2 heatlance = Vector2.Zero.SafeDirectionTo(toMouse);
+
+        Vector2 spawnPos = new Vector2(Owner.Center.X - Main.rand.NextFloat(60,200) * Owner.direction, Owner.Center.Y - Main.rand.NextFloat(-40, 120) * Owner.gravDir);
         // Increase and clamp heat.
         Heat = MathHelper.Clamp(Heat + heatIncrement / 10, minHeat, maxHeat);
-        Projectile.NewProjectile(Projectile.GetSource_FromThis(),
-                    Projectile.Center,
-                    toMouse,
-                    ModContent.ProjectileType<HeatThiefLance>(),
-                    Projectile.damage,
-                    0f,
-                    Owner.whoAmI);
+        if (Time % 10 == 0)
+        {
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(),
+                   spawnPos,
+                   heatlance,
+                   ModContent.ProjectileType<HeatThiefLance>(),
+                   Projectile.damage,
+                   0f,
+                   Owner.whoAmI);
+        }
+       
         // Ensure our dust array is initialized.
         if (heatDusts == null || heatDusts.Length == 0)
         {
@@ -329,7 +343,7 @@ class HeldLifeCessationProjectile : ModProjectile
                     Projectile.damage,
                     0f, 
                     Owner.whoAmI);
-                Main.NewText($"Stealth strike created: {stealth}");
+                //Main.NewText($"Stealth strike created: {stealth}");
                 if (stealth.WithinBounds(Main.maxProjectiles))
                 {
                     Main.projectile[stealth].Calamity().stealthStrike = true;
@@ -553,7 +567,7 @@ class HeldLifeCessationProjectile : ModProjectile
             0.033f
             + Main.windSpeedCurrent * 0.17f ;
 
-        Texture2D LillyTexture = GennedAssets.Textures.SecondPhaseForm.SpiderLily;
+        Texture2D LillyTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Rogue/AvatarRogue/SpiderLilly_LifeandCessation").Value;
         Rectangle Lillyframe = LillyTexture.Frame(1, 3, 0, (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 3);
 
         Vector2 Lorigin = new Vector2(Lillyframe.Width / 2, Lillyframe.Height+54  * Owner.gravDir);

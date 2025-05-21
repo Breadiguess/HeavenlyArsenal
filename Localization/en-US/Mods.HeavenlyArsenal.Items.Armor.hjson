@@ -1,14 +1,86 @@
-AwakenedBloodHelm: {
-	DisplayName: Awakened Blood Helm
-	Tooltip: ""
+ShintoArmor: {
+	ShintoArmorHelmetRogue: {
+		SetBonus: Mods.HeavenlyArsenal.Items.Armor.ShintoArmor.ShintoArmorHelmetRogue.SetBonus
+		DisplayName: Shinto Armor Helmet Rogue
+		Tooltip: ""
+	}
+
+	ShintoArmorHelmetAll: {
+		DisplayName: Shinto Armor Helmet All
+		Tooltip: ""
+	}
+
+	ShintoArmorBreastplate: {
+		DisplayName: Mantle of Dimming Radiance
+		Tooltip:
+			'''
+			20% increased damage
+			Reduces damage taken by 9% and greatly increases life regeneration
+			Increases max life by {0} and Mana by {1}
+			'''
+	}
+
+	ShintoArmorLeggings: {
+		DisplayName: Steps of the darkened passage
+		Tooltip:
+			'''
+			20% increased damage
+			50% increased movement speed
+			Shadow Speed
+			Greatly improved acceleration and maneuverability
+			'''
+	}
 }
 
-AwakenedBloodplate: {
-	DisplayName: Awakened Bloodplate
-	Tooltip: ""
+AwakenedBloodArmor: {
+	AwakenedBloodHelm: {
+		DisplayName: Sentient Helm
+		SetBonus:
+			'''
+			covers you in a sentient amalgam of flesh and bone
+			Press <f> to toggle between two distinct variants
+			while in offense form, gain two needles that constantly lash out at nearby enemies
+			while in defense form, activating your set bonus will launch a harpoon to impale and drain enemies, as well as providing a massive defense boost.
+			 
+			both of these actions grant blood.
+			blood will eventually decay into clot- while in offense form, reaching max blood will send you into a frenzy where you deal increased damage.
+			while in defense form, clot will be consumed to grant healing.
+			'''
+		Tooltip:
+			'''
+			"i found myself in the middle of a crowd, a sea of multicolored fabric in all directions."
+			"the crowd parted, and i saw a tall, pale figure. i heard a name whispered... 'Nyarlathotep'."
+			'''
+	}
+
+	AwakenedBloodplate: {
+		DisplayName: Sentient Carapice
+		Tooltip: an alien heartbeat pulsates alongside your own
+	}
+
+	AwakenedBloodStrides: {
+		DisplayName: Sentient Sabatons
+		Tooltip: '''"i awoke from my slumber, gasping for air. "'''
+	}
 }
 
-AwakenedBloodStrides: {
-	DisplayName: Awakened Blood Strides
-	Tooltip: ""
+BloodflareHelmetGroup: Any Bloodflare Helmet
+
+Vanity: {
+	LightCultist: {
+		LightCultist_Helmet: {
+			DisplayName: Blinding vision of the firmament
+			Tooltip: ""
+		}
+
+		LightCultist_Pants: {
+			DisplayName: Light Cultist_ Pants
+			Tooltip: ""
+		}
+
+		LightCultist_Robe: {
+			DisplayName: Light Cultist_ Robe
+			Tooltip: ""
+		}
+	}
 }

@@ -20,8 +20,9 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 	{
 		public static readonly int MoveSpeedBonus = 5;
 
-		//public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MoveSpeedBonus);
-        public new string LocalizationCategory => "Items.Armor";
+        //public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MoveSpeedBonus);
+
+        public override string LocalizationCategory => "Items.Armor.ShintoArmor";
         public override void SetStaticDefaults()
         {
 

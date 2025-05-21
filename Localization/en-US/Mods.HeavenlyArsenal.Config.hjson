@@ -1,13 +1,6 @@
 "": {
 	HeavenlyArsenalConfig: {
-		DisplayName: {
-			$parentVal: Heavenly Arsenal Config
-		}
-
-		ParticleLimit: {
-			Label: Particle Limit
-			Tooltip: ""
-		}
+		DisplayName: Heavenly Arsenal Config
 
 		ScreenshakeMultiplier: {
 			Label: Screenshake Multiplier
@@ -15,13 +8,8 @@
 		}
 
 		ChromaticAbberationMultiplier: {
-			Label: {
-				$parentVal: Chromatic Abberation Multiplier
-			}
-
-			Tooltip: {
-				$parentVal: ""
-			}
+			Label: Chromatic Abberation Multiplier
+			Tooltip: ""
 		}
 
 		BossIntroCardsActivated: {
@@ -35,13 +23,50 @@
 		}
 
 		StimVFX: {
-			Label: {
-				$parentVal: Stim V F X
-			}
+			Label: Disable Stim Visual effects on use/while the effect is active.
+			Tooltip: mostly here in case you want to use fargos, but dont want to have the slight visual effect.
+		}
+	}
 
+	HeavenlyArsenalServerConfig: {
+		EnableSpecialItems: {
 			Tooltip: {
 				$parentVal: ""
 			}
+
+			Label: {
+				$parentVal: Enable Special Items
+			}
+		}
+
+		DisplayName: {
+			$parentVal: Heavenly Arsenal Server Config
+		}
+	}
+
+	HeavenlyArsenalClientConfig: {
+		ChromaticAbberationMultiplier: {
+			Tooltip: {
+				$parentVal: ""
+			}
+
+			Label: {
+				$parentVal: Chromatic Abberation Multiplier
+			}
+		}
+
+		StimVFX: {
+			Tooltip: {
+				$parentVal: ""
+			}
+
+			Label: {
+				$parentVal: Stim V F X
+			}
+		}
+
+		DisplayName: {
+			$parentVal: Heavenly Arsenal Client Config
 		}
 	}
 }

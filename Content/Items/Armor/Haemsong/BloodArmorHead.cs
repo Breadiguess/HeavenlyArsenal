@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -61,6 +63,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.Haemsong
             Vector2 whichOrigin = new Vector2(sourceRect.Width / 2, sourceRect.Height / 2);
             spriteBatch.Draw(which, position, sourceRect, drawColor, 0, whichOrigin, scale * 1.75f, SpriteEffects.None, 0);
             return false;
+        }
+        public override void AddRecipes()
+        {
+            CreateRecipe().
+                    AddIngredient<AwakenedBloodHelm>().
+                    AddTile<CosmicAnvil>().
+                    Register();
         }
     }
 	public class BloodPlayer : ModPlayer

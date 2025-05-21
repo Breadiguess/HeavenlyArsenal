@@ -2,7 +2,7 @@ VambraceDash.DisplayName: Vambrace Dash
 VambraceDischarge.DisplayName: Vambrace Discharge
 VambraceLightning.DisplayName: Vambrace Lightning
 BloodHarpoon.DisplayName: Blood Harpoon
-BloodNeedle.DisplayName: Blood Needle
+BloodNeedle.DisplayName: Famine Needle
 BloodTentacle.DisplayName: Blood Tentacle
 ClotOffense.DisplayName: Clot Offense
 BrutalForgivenessProjectile.DisplayName: Brutal Forgiveness Projectile
@@ -13,7 +13,7 @@ RocheLimitBlackHole.DisplayName: Roche Limit Black Hole
 ColdBurst.DisplayName: Cold Burst
 FusionRifleHoldout.DisplayName: Fusion Rifle Holdout
 VolatileExplosion.DisplayName: Volatile Explosion
-AvatarRifle_Holdout.DisplayName: Avatar Rifle_ Holdout
+AvatarRifle_Holdout.DisplayName: Funeral Dirge
 HeatThiefLance.DisplayName: Heat Thief Lance
 HeldLifeCessationProjectile.DisplayName: Held Life Cessation Projectile
 LifeCessationStealthStrike.DisplayName: Life Cessation Stealth Strike
@@ -49,3 +49,8 @@ Thistle_Proj.DisplayName: Thistle_ Proj
 SolynWhip_BattleSolyn.DisplayName: Solyn
 SolynWhip_Projectile.DisplayName: Solynel
 TheBlackBell_Projectile.DisplayName: The Black Bell_ Projectile
+TerraHawk.DisplayName: Terra Hawk
+BloodFallTelegraph.DisplayName: Blood Fall Telegraph
+NoxusWeaponProjectile.DisplayName: Noxus Weapon Projectile
+DefenseTendril.DisplayName: Defense Tendril
+Bloodproj.DisplayName: Bloodproj

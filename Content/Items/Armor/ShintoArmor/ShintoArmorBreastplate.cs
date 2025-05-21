@@ -52,11 +52,11 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         private static readonly int MaxMinionIncrease = 10;
         private static readonly int MaxLifeIncrease = 300;
         #endregion
-        public new string LocalizationCategory => "Items.Armor";
-       // public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MaxManaIncrease, MaxMinionIncrease, MaxLifeIncrease);
+        // public new string LocalizationCategory => "Items.Armor";
+        // public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MaxManaIncrease, MaxMinionIncrease, MaxLifeIncrease);
 
 
-        
+        public override string LocalizationCategory => "Items.Armor.ShintoArmor";
         public override void SetStaticDefaults()
         {
             var equipSlot = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Body);

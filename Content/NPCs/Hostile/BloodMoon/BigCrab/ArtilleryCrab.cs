@@ -7,6 +7,7 @@ using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Utilities;
@@ -44,14 +45,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         public override void SetDefaults()
         {
             NPC.width = 100;
-            NPC.height = 60;
+            NPC.height =95;
             NPC.damage = 200;
-            NPC.defense = 130;
-            NPC.lifeMax = 48370;
+            NPC.defense = 130/2;
+            NPC.lifeMax = 38470;
             NPC.value = 10000;
             NPC.aiStyle = -1;
             NPC.npcSlots = 3f;
-            NPC.knockBackResist = 0.2f;
+            NPC.knockBackResist = 0f;
         }
 
         public override void AI()
@@ -65,6 +66,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 
             switch (CurrentState)
             {
+                
                 case HemocrabAI.Idle:
                     NPC.TargetClosest();
                     CurrentState = HemocrabAI.MoveToRange;
@@ -72,9 +74,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 
                 case HemocrabAI.MoveToRange:
                     if (distance > BombardRange)
-                        MoveTowards(target.Center, WalkSpeed);
+                        MoveTowards(target.Center, WalkSpeed*3);
                     else if (distance < BombardRange * 0.7f)
-                        MoveAway(target.Center, WalkSpeed);
+                        MoveAway(target.Center, WalkSpeed*3);
                     else
                     {
                         if (NPC.collideY)
@@ -127,11 +129,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 
                 case HemocrabAI.Evicerate:
                     if(BombardTimer ==0)
-                        NPC.velocity = Vector2.Zero;
-
-                    if (BombardTimer <= 60)
+                        NPC.velocity *= 0.5f;
+                    Vector2 dist = target.Center - NPC.Center;
+                    if (BombardTimer <= 120 && dist.Length() > 10)
                     {
-                        ChargeAt(target.Center, ChargeSpeed * 2f);
+                        ChargeAt(target.Center, ChargeSpeed * 1.2f);
                         
                     
                     }
@@ -148,30 +150,32 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
                     // Fire 3 chaos balls, then charge back
 
 
-                    NPC.velocity = Vector2.Zero;
-                    
+                    float ChargeDistance = NPC.Center.X - target.Center.X;
+                    if(ChargeDistance !> 100)
+                        NPC.velocity.X = 0;
                     // Shoot a chaos ball every 30 ticks, up to 3
-                    if (BombardTimer == 60  && BombardTimer % 30 == 0)
+                    if (BombardTimer <=20  && BombardTimer % 6 == 0)
                     {
                         for(int i = 0; i < 2; i++)
                         {
                             //when i = 0, the angle should be offset by -15 degrees
                             //when i = 1, the angle should be offset by 0
                             //when i = 2, the angle should be offset by 15 degrees
-                            Vector2 dir = (target.Center - NPC.Center).SafeNormalize(Vector2.Zero) * 10f;
-                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, dir,
-                                ProjectileID.AncientDoomProjectile, NPC.damage / 10, 0f, Main.myPlayer);
+                            Vector2 dir = (target.Center - NPC.Center).SafeNormalize(new Vector2(0,i*15 - 15)) * 10f;
+                            Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, dir, ModContent.ProjectileType<Bloodproj>(), NPC.damage / 10, 0f, Main.myPlayer);
                         }
                         
                     }
+                    
                     // After 3 shots, charge and transition
-                    if (BombardTimer > 90)
+                    if (BombardTimer > 60 && ChargeDistance < 400)
                     {
-                        ChargeAt(target.Center, ChargeSpeed * 2f);
+                        
+                        ChargeAt(NPC.Center + Vector2.UnitX*NPC.direction, ChargeSpeed * 2f);
 
                     }
 
-                    if(BombardTimer >=120)
+                    if(BombardTimer >=180)
                     { 
                         CurrentState = HemocrabAI.Disengage;
                         BombardTimer = 0;
@@ -182,7 +186,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
                 case HemocrabAI.Disengage:
                     MoveAway(target.Center, 5 *WalkSpeed);
                     BombardTimer++;
-                    if (BombardTimer > 120 || distance > 100)
+                    if (BombardTimer > 120 || distance > 200)
                     {
                         CurrentState = HemocrabAI.MoveToRange;
                         BombardTimer = 0;
@@ -197,11 +201,36 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             }
         }
 
-
+        public const int totalFrameCount = 13;
+        public const int WalkFrameCount = 6;
+        public const int BombardFrameCount = 7;
+        public int BodyFrame;
+        public override void PostAI()
+        {
+            if(NPC.velocity.X != 0)
+            {
+                NPC.direction = Math.Sign(NPC.velocity.X);
+            }
+            if (CurrentState == HemocrabAI.MoveToRange || CurrentState == HemocrabAI.Disembowl)
+            {
+                // If the crab is moving, play the walking animation (frames 0-5)
+                if (NPC.velocity.X != 0)
+                {
+                    BodyFrame = (int)((Main.GameUpdateCount / 10) % WalkFrameCount);
+                }
+                else
+                    BodyFrame = 0;
+            }
+            if (CurrentState == HemocrabAI.BombardTarget)
+            {
+                // If the crab is bombarding, play the bombard animation (frames 6-12)
+                BodyFrame = WalkFrameCount + (int)((BombardTimer / 10) % BombardFrameCount);
+            }
+        }
 
         private void FireMortarAt(Vector2 targetPos)
         {
-            // Simplified fixed-angle mortar logic for consistent arcs
+            
             float angle = MathHelper.ToRadians(75f); // steep 75° arc
             const float v0 = LaunchSpeed;
 
@@ -219,7 +248,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             );
 
             int idx = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y,
-                                 ModContent.NPCType<BloodMortar>());
+            ModContent.NPCType<BloodMortar>());
             NPC mortar = Main.npc[idx];
             mortar.velocity = launchV;
             mortar.localAI[0] = targetPos.X;
@@ -232,52 +261,77 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         {
             int dir = Math.Sign(pos.X - NPC.Center.X);
             NPC.velocity.X = dir * speed;
-            HandleJump(dir);
+            if(NPC.velocity.Y == 0)
+                HandleJump(dir);
         }
 
         private void MoveAway(Vector2 pos, float speed)
         {
             int dir = Math.Sign(NPC.Center.X - pos.X);
             NPC.velocity.X = dir * speed;
-            HandleJump(dir);
+            if (NPC.velocity.Y == 0)
+                HandleJump(dir);
         }
+
 
         private void HandleJump(int xDirection)
         {
             Vector2 origin = NPC.Bottom + new Vector2(xDirection * (NPC.width / 2 + 2), 0);
             Vector2 stepTarget = origin + new Vector2(xDirection * 16, -16);
             Point pFeet = origin.ToTileCoordinates();
+
+            
             if (WorldGen.SolidTile(pFeet.X + xDirection, pFeet.Y))
             {
                 Point pStep = stepTarget.ToTileCoordinates();
+                // …but space to step up…
                 if (!WorldGen.SolidTile(pStep.X, pStep.Y))
                 {
-                    NPC.velocity.Y = -10f;
+                  
+                    NPC.velocity.Y = -4f;
+
                 }
             }
         }
 
+        public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
+        {
+            //todo: if 
+            if(CurrentState == HemocrabAI.BombardTarget && (damageDone-NPC.life)/NPC.lifeMax > NPC.life/NPC.lifeMax * 1.1)
+            {
+                CurrentState = HemocrabAI.EnragedMelee;
+                BombardTimer = 0;
+            }
+            base.OnHitByProjectile(projectile, hit, damageDone);
+        }
         private void ChargeAt(Vector2 pos, float speed)
         {
-            // Only affect horizontal motion, keep existing Y velocity
+            
             int dirX = Math.Sign(pos.X - NPC.Center.X);
             NPC.velocity.X = dirX * speed;
+            HandleJump(dirX);
         }
-
+        
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            Utils.DrawBorderString(spriteBatch, " | State: " + CurrentState, NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(spriteBatch, " | Ammo: " + AmmoCount, NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(spriteBatch, " | Timer: " + BombardTimer, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
+            if (!NPC.IsABestiaryIconDummy)
+            {
+                Utils.DrawBorderString(spriteBatch, " | State: " + CurrentState, NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+                Utils.DrawBorderString(spriteBatch, " | Ammo: " + AmmoCount, NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
+                Utils.DrawBorderString(spriteBatch, " | Timer: " + BombardTimer, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
 
-            Texture2D texture = Terraria.GameContent.TextureAssets.Npc[NPC.type].Value;
+            }
 
-            Vector2 origin = texture.Size() * 0.5f;
+            Texture2D texture = TextureAssets.Npc[NPC.type].Value;
 
-            SpriteEffects Direction = NPC.spriteDirection < 0 ? SpriteEffects.FlipHorizontally : 0;
+            int frameHeight = texture.Height / totalFrameCount;
+            Vector2 origin = new Vector2(texture.Width / 2f,  frameHeight/2);
+            
+            SpriteEffects Direction = NPC.direction < 0 ? SpriteEffects.FlipHorizontally : 0;
 
+            Rectangle CrabFrame = new Rectangle(0, BodyFrame * frameHeight, texture.Width, frameHeight);
 
-            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition, null, drawColor, 0, origin, NPC.scale, Direction, 0);
+            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition, CrabFrame, drawColor, 0, origin, NPC.scale, Direction, 0);
             return false;
         }
 
@@ -291,15 +345,17 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 
     class BloodMortar : ModNPC
     {
-        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech";
+        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/BigCrab/Bloodproj";
         public ref float Xcoord => ref NPC.localAI[0];
         public ref float Ycoord => ref NPC.localAI[1];
         private const float Gravity = 0.2f;
         private bool exploded = false;
 
+        public ref float Owner => ref NPC.ai[0];
         public override void SetStaticDefaults()
         {
             NPCID.Sets.ProjectileNPC[NPC.type] = true;
+           // NPCID.Sets
         }
 
         public override void SetDefaults()
@@ -312,6 +368,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             NPC.noGravity = true;
             NPC.noTileCollide = false;
         }
+       
         public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
         {
             base.OnHitPlayer(target, hurtInfo);
@@ -327,17 +384,17 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             }
         }
 
-        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color lightColor)
         {
-            Texture2D Glowball = GreyscaleTextures.BloomFlare;
+            Texture2D texture = TextureAssets.Projectile[Type].Value;
             float GlowScale = 0.1f;
-            Vector2 glowScale = new Vector2(0.4f, 0.2f);
-            Vector2 Gorigin = new Vector2(Glowball.Size().X / 2, Glowball.Size().Y / 2);
-
+            Vector2 glowScale = new Vector2(1f, 1f);
+            Vector2 Gorigin = new Vector2(texture.Size().X / 2, texture.Size().Y / 2);
+            
 
             
-            Main.spriteBatch.Draw(Glowball, NPC.Center + NPC.velocity / 2 - Main.screenPosition, null,
-                     (Color.Violet with { A = 0 }) * 0.2f, NPC.velocity.ToRotation(), Gorigin, glowScale, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(texture, NPC.Center + NPC.velocity / 2 - Main.screenPosition, null,
+                     lightColor, NPC.velocity.ToRotation(), Gorigin, glowScale, SpriteEffects.None, 0f);
 
 
             return false;// base.PreDraw(spriteBatch, screenPos, drawColor);
@@ -346,11 +403,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         {
             SoundEngine.PlaySound(SoundID.Item14, NPC.Center);
             Projectile.NewProjectile(NPC.GetSource_Death(), NPC.Center, Vector2.Zero,
-                ProjectileID.DD2ExplosiveTrapT3Explosion, NPC.damage, 0f, Main.myPlayer);
+                ProjectileID.DD2ExplosiveTrapT3Explosion, NPC.damage, 0f, NPC.whoAmI);
             for (int i = 0; i < 20; i++)
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Blood,
                     Main.rand.NextFloat(-3, 3), Main.rand.NextFloat(-3, 3));
-            NPC.active = false;
+            NPC.StrikeInstantKill();
         }
     }
 }

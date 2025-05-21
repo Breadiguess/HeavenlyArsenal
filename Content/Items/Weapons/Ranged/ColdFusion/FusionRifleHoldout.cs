@@ -609,7 +609,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
                     rotation, Gorigin, GlowScale, direction, 0f);
             }
 
-            
+            /*
             Utils.DrawBorderString(Main.spriteBatch, "|State: " + CurrentState.ToString() + " | State Timer: " + StateTimer.ToString(), Projectile.Center - Vector2.UnitY * 90 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|Charge: " + ChargeTimer.ToString() + " | Charge iter: " + (1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7).ToString() + " | 120/chargeiter " + (120 / (1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7)).ToString(), Projectile.Center - Vector2.UnitY * 110 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|MaxCharge: " + FusionRifle.MaxChargeTime.ToString(), Projectile.Center - Vector2.UnitY * 130 - Main.screenPosition, Color.White);
@@ -620,7 +620,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
 
             Utils.DrawBorderString(Main.spriteBatch, "|VolatileRound Chance " + Owner.GetModPlayer<FusionRiflePlayer>().VolCount.ToString() + " | Volatile Rounds: " + Owner.GetModPlayer<FusionRiflePlayer>().VolatileRounds.ToString(), Projectile.Center - Vector2.UnitY * 230 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|VolatileTimer " + Owner.GetModPlayer<FusionRiflePlayer>().VolatileRoundTimer.ToString(), Projectile.Center - Vector2.UnitY * 250 - Main.screenPosition, Color.White);
-            
+            */
             return false;
         }
         public override bool? CanDamage() => false;

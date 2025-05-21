@@ -1,5 +1,4 @@
 ﻿using HeavenlyArsenal.Common.utils;
-using HeavenlyArsenal.Content.Items.Armor.NewFolder;
 using Luminance.Assets;
 using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
@@ -58,7 +57,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             HarpoonedNPC = -1;
             HarpoonState = 0;
             Time = 0;
-            SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.ArmJutOut with { MaxInstances = 0, PitchVariance = 15f, Volume = 0.4f });
+            SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.DisgustingStarSever with { MaxInstances = 0, PitchVariance = 1f, Volume = 0.4f });
         }
 
         public override void AI()
@@ -83,7 +82,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             }
             for (int i = 0; i < HarpoonTendril.segments.Length - 1; i++)
             {
-                if (Main.rand.NextBool(1))
+                if (Main.rand.NextBool(100))
                 {
                     Dust blood = Dust.NewDustPerfect(HarpoonTendril.segments[i].position, DustID.CrimtaneWeapons, new Vector2(0, 0f), 10, Color.Crimson, 1);
                     blood.noGravity = true;
@@ -170,7 +169,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         {
             
             Texture2D head = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/BloodHarpoon").Value;
-            Texture2D body = GennedAssets.Textures.GreyscaleTextures.WhitePixel.Value;
+            
+            Texture2D body = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/RegSeg").Value;
 
             List<Vector2> points = new List<Vector2>();
             points.AddRange(HarpoonTendril.GetPoints());
@@ -179,6 +179,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
 
             for (int i = points.Count - 1; i > 0; i--)
             {
+
                 float rot = points[i].AngleTo(points[i - 1]); // MathHelper.PiOver2;
                 Vector2 stretch = new Vector2((1.1f - (float)i / points.Count ) * Projectile.scale, 
                     i > points.Count - 2 ? points[i].Distance(points[i - 1]) 
@@ -190,7 +191,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                 //   Otherwise, it uses a default stretch value of 1.1f.
                 // This ensures the HarpoonTendril looks smooth and natural as it connects between points.
                 Vector2 drawPos = points[i] - Main.screenPosition;
-                Main.EntitySpriteDraw(body, drawPos, body.Frame(), Color.White, Projectile.rotation, body.Size() * 0.5f, new Vector2(0.5f, 0.5f), 0, 0);
+                Main.EntitySpriteDraw(body, drawPos, body.Frame(), Color.White, rot, body.Size() * 0.5f, new Vector2(0.5f, 0.5f), 0, 0);
                 
             }
             Main.EntitySpriteDraw(head, Projectile.Center - Main.screenPosition, head.Frame(), lightColor, Projectile.rotation, head.Size()*0.5f, Projectile.scale, SpriteEffects.None, 0);

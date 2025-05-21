@@ -23,6 +23,7 @@ namespace HeavenlyArsenal.Content.Items.Materials
 {
     internal class shadowspec_GunParts : ModItem
     {
+        public override string LocalizationCategory => "Items.Misc.Materials";
         public override void SetStaticDefaults()
         {
             //DisplayName.SetDefault("ITEM NAME");

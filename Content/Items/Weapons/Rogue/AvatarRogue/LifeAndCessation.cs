@@ -3,6 +3,7 @@ using CalamityMod.Buffs.DamageOverTime;
 using HeavenlyArsenal.ArsenalPlayer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Security.Cryptography.X509Certificates;
 using Terraria;
 using Terraria.DataStructures;
@@ -17,7 +18,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
 
         public override void SetStaticDefaults()
         {
-
+            ItemID.Sets.gunProj[Item.type] = true;
         }
 
         public override void SetDefaults()
@@ -40,10 +41,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
             Item.useStyle = ItemUseStyleID.Shoot;
             Item.noUseGraphic = true;
             Item.shoot = ModContent.ProjectileType<HeldLifeCessationProjectile>();
-            Item.shootSpeed = 0.1f; // The “held projectile” doesn’t really move. lmao.
+            Item.shootSpeed = 1;
             Item.autoReuse = true;
 
-            // Sound/consumable details
+            
             Item.UseSound = SoundID.Item1;
             Item.consumable = false;
 
@@ -59,11 +60,23 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
                 if (!HoldingBowl(player))
                 {
                     Projectile.NewProjectileDirect(player.GetSource_ItemUse(Item), player.Center, Vector2.Zero, Item.shoot, Item.damage, Item.knockBack, player.whoAmI);
-                    //spear.rotation = -MathHelper.PiOver2 + 1f * player.direction;
+                
                 }
             }
         }
         public override bool CanUseItem(Player player) => player.ownedProjectileCounts[ModContent.ProjectileType<HeldLifeCessationProjectile>()] <= 0;
+
+        public override void UseItemFrame(Player player)
+        {
+            player.ChangeDir(Math.Sign((player.Calamity().mouseWorld - player.Center).X));
+
+            //float animProgress = Math.Abs(player.itemTime / (float)player.itemTimeMax);
+            //float rotation = (player.Center - player.Calamity().mouseWorld).ToRotation() * player.gravDir + MathHelper.PiOver2;
+            //if (animProgress < 0.7f)
+            //    rotation += -0.45f * (float)Math.Pow((0.4f - animProgress) / 0.4f, 2) * player.direction;
+            //Main.NewText($"AnimProg: {animProgress}, rotation: {rotation}");
+            //player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, rotation);
+        }
 
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
@@ -115,6 +128,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
         public override bool InstancePerEntity => true;
         public override bool PreAI(NPC npc)
         {
+            //todo: rewrite all of this so that its not shit
             /*
             //todo: if not within min or max of golidlocks, begin attemping to heat up or cool down.
 

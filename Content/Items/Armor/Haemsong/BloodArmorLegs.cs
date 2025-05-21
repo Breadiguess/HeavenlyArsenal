@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -25,6 +27,14 @@ namespace HeavenlyArsenal.Content.Items.Armor.Haemsong
             Item.rare = ItemRarityID.Red;
             Item.value = 200000;
 			Item.width = 22;
+        }
+
+        public override void AddRecipes()
+        {
+            CreateRecipe().
+                    AddIngredient<AwakenedBloodStrides>().
+                    AddTile<CosmicAnvil>().
+                    Register();
         }
     }
 }

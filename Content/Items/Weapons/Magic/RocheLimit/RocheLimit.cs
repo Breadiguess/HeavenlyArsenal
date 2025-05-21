@@ -22,7 +22,7 @@ public class RocheLimit : ModItem
     /// The rate at which this weapon consumes mana.
     /// </summary>
     internal static int ManaConsumptionRate => LumUtils.SecondsToFrames(0.08f);
-
+    public override string LocalizationCategory => "Items.Weapons.Magic";
     public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
 
     public override void SetStaticDefaults()

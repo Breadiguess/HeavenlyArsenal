@@ -147,12 +147,12 @@ public class ForgottenShrineSystem : ModSystem
 
         // TODO -- Remove later.
 
-        bool summonTheHorde = Main.LocalPlayer.name != "ModTester2" && Main.LocalPlayer.name != "Lucille";
-        if (summonTheHorde)
-        {
-            EmptinessSprayPlayerDeletionSystem.PlayerWasDeletedByNamelessDeity = true;
-            EmptinessSprayPlayerDeletionSystem.PlayerWasDeleted = true;
-        }
+       // bool summonTheHorde = Main.LocalPlayer.name != "ModTester2" && Main.LocalPlayer.name != "Lucille";
+        //if (summonTheHorde)
+        //{
+        //    EmptinessSprayPlayerDeletionSystem.PlayerWasDeletedByNamelessDeity = true;
+         //   EmptinessSprayPlayerDeletionSystem.PlayerWasDeleted = true;
+        //}
         /*
         if (summonTheHorde && Main.rand.NextBool(60))
             if (Main.rand.NextBool(2))

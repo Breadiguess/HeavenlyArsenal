@@ -1,6 +1,12 @@
 ElectricVambrace: {
-	DisplayName: Electric Vambrace
-	Tooltip: ""
+	DisplayName: Vambrace of Otonilou
+	Tooltip:
+		'''
+		your dashes are empowered by the storm
+		20% reduced dash cooldown
+
+
+		'''
 }
 
 VoidCrestOath: {

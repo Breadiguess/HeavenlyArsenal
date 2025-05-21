@@ -17,41 +17,19 @@ public static class AssetDirectory
     {
         //public static readonly Asset<Texture2D> Sparkle = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/Sparkle");
         //public static readonly Asset<Texture2D> ShockRing = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/ShockRing");
+        #region blockaroz stuff
         public static readonly Asset<Texture2D> BigGlowball = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/BigGlowball");
         public static readonly Asset<Texture2D> VoidLake = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/VoidLake");
         public static readonly Asset<Texture2D> VoidLakeShadowArm = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/VoidLakeShadowArm");
         public static readonly Asset<Texture2D> VoidLakeShadowHand = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/VoidLakeShadowHand");
         public static readonly Asset<Texture2D> HeatLightning = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Particles/HeatLightning");
-        //public static readonly Asset<Texture2D> Empty = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/Empty");
-        //public static readonly Asset<Texture2D> Template = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/Template");
-
-
-        //my first custom assetDirectory
-
-        //public static readonly Asset<Texture2D> PerlinNoise = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/PerlinNoise");
-
-
-
-
-
-        
-
-        //public static Dictionary<int, Asset<Texture2D>> Particle = new Dictionary<int, Asset<Texture2D>>();
-        //public static Dictionary<int, Asset<Texture2D>> Relic = new Dictionary<int, Asset<Texture2D>>();
-        //public static Dictionary<int, Asset<Texture2D>> FlyingSlime = new Dictionary<int, Asset<Texture2D>>();
-
-        //Jokes and Seasons
-        //internal static readonly Asset<Texture2D> FrogParticle = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/FrogParticle");
-       // internal static readonly Asset<Texture2D> WideMoto = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/WideMoto");
-       // internal static readonly Asset<Texture2D> SantaHat = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/SantaHat");
-       // internal static readonly Asset<Texture2D> ElfHat = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/ElfHat");
-
-       
+        #endregion
+        #region UmbralLeech
+        public static readonly Asset<Texture2D> UmbralLeechWhisker = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/NPCs/Hostile/BloodMoon/UmbralLeech/UmbralLeech_Whisker");
+        #endregion
         public static class Inventors
         {
-           // public static readonly string InventorsPrefix = AssetPath + "Textures/NPCs/Bosses/Inventors/";
-
-            //lol
+           
         }
 
         public static class Buffs
@@ -64,21 +42,28 @@ public static class AssetDirectory
          public static readonly Asset<Texture2D>[] Bar = AssetUtilities.RequestArrayTotalImmediate<Texture2D>(AssetPath + "Textures/UI/Bars/BarBase_");
          public static readonly Asset<Texture2D>[] BarFill = AssetUtilities.RequestArrayTotalImmediate<Texture2D>(AssetPath + "Textures/UI/Bars/BarFill_");
 
-         //   public static readonly Asset<Texture2D> Stress = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/UI/StressBar");
-         //  public static readonly Asset<Texture2D> StressCharge = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/UI/StressBarFill");
-         //   public static readonly Asset<Texture2D> StressTopped = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/UI/StressBarTopped");
         }
 
 
-        //leftover code because i just copied it from blockaroz lmao
-       // public static class SlimeMonsoon
-       // {
-       //     public static readonly Asset<Texture2D> MapBG = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/SlimeMonsoonBG");
-       //     public static readonly Asset<Texture2D> Lightning = AssetUtilities.RequestImmediate<Texture2D>($"{nameof(HeavenlyArsenal)}/Common/Graphics/SlimeMonsoon/Lightning");
-       //     public static readonly Asset<Texture2D> LightningGlow = AssetUtilities.RequestImmediate<Texture2D>($"{nameof(HeavenlyArsenal)}/Common/Graphics/SlimeMonsoon/LightningGlow");
-       // }
     }
+    public static class PrimShaders 
+    {
+        /// <summary>
+        /// Samples the provided 'sampleTexture' along the primitive (Texture must be horizontal)<br/>
+        /// Sampling coordinates can be tiled or stretched using 'repeats', and scrolled with 'scroll' <br/>
+        /// Sampled color is multiplied by the primitive's vertex colors
+        /// thank you ibabbleplays
+        /// <code>
+        /// float4 scroll;
+        /// float2 repeats;
+        /// texture sampleTexture;
+        /// </code>
+        /// 
+        /// Used by <see cref="VerletNet"/> when rendering non-framed verlet links, notably <see cref="Crabulon"/>'s numerous vines
+        /// </summary>
+        //public static Effect TextureMap => Scene["Primitive_TextureMap"].GetShader().Shader;
 
+    }
     public static class Music
     {
       //  public static readonly int GoozmaPhase1 = MusicLoader.GetMusicSlot(AssetPath + "Music/GlutinousArbitration");
@@ -91,13 +76,6 @@ public static class AssetDirectory
 
     public static class Sounds
     {
-       
-        public static class GoozmaMinions
-        {
-            //public static readonly SoundStyle SlimeSlam = new(AssetPath + "Sounds/Goozma/Slimes/GoozmaSlimeSlam", 1, 3) { MaxInstances = 0 };
-
-        }
-
     }
 
     public static class Effects
@@ -106,22 +84,6 @@ public static class AssetDirectory
         //public static readonly Asset<Effect> BasicTrail = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/BasicTrail");
         //public static readonly Asset<Effect> LightningBeam = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/LightningBeam");
         public static readonly Asset<Effect> FlameDissolve = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/FlameDissolve");
-
-        //Goozma related
-        //public static readonly Asset<Effect> SlimeMonsoonOldCloudLayer = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/SlimeMonsoonOldCloudLayer");
-        //public static readonly Asset<Effect> SlimeMonsoonSkyLayer = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/SlimeMonsoonSkyLayer");
-        //public static readonly Asset<Effect> SlimeMonsoonDistortion = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/SlimeMonsoonDistortion");
-        //public static readonly Asset<Effect> PluripotentDistortion = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/PluripotentDistortion");
-
-        //public static readonly Asset<Effect> GoozmaCordMap = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/GoozmaCordMap");
-        //public static readonly Asset<Effect> GooLightning = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/GooLightningEffect");
-        //public static readonly Asset<Effect> Cosmos = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/CosmosEffect");
-        //public static readonly Asset<Effect> StellarRing = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/StellarRing");
-        //public static readonly Asset<Effect> RainbowGel = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/RainbowGel");
-        //public static readonly Asset<Effect> HolographicGel = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/HolographEffect");
-        //public static readonly Asset<Effect> BlackHole = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/SpaceHole");
-
-        
         public static readonly Asset<Effect> GoomoireWindR = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/GoomoireSuckEffect");
         public static readonly Asset<Effect> GoomoireWindL = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/GoomoireSuckEffect2");
         public static readonly Asset<Effect> bloodShader = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/BloodBlobShader");

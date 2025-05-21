@@ -11,6 +11,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Magic.BrutalForgiveness;
 
 public class BrutalForgiveness : ModItem
 {
+    public override string LocalizationCategory => "Items.Weapons.Magic";
     public override void SetStaticDefaults()
     {
         GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>

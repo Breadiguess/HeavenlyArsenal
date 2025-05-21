@@ -18,6 +18,7 @@ namespace HeavenlyArsenal.Content.Items.Misc
 {
     class AncientCoin : ModItem
     {
+        public override string LocalizationCategory => "Items.Misc";
         public override void SetDefaults()
         {
             Item.rare = ItemRarityID.Quest;

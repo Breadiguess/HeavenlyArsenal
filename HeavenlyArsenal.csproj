@@ -32,16 +32,29 @@
 	  <Compile Remove="Common\utils\Debug.cs" />
 	  <Compile Remove="Common\utils\MusicKiller.cs" />
 	  <Compile Remove="Content\Buffs\ShintoArmorEnrage.cs" />
+	  <Compile Remove="Content\Items\Accessories\Cosmetic\AuraCosmetic.cs" />
 	  <Compile Remove="Content\Items\Accessories\NDWings.cs" />
 	  <Compile Remove="Content\Items\Accessories\Vambrace\ElectricVambraceDash.cs" />
+	  <Compile Remove="Content\Items\Armor\Vanity\LightCultist_Helmet.cs" />
+	  <Compile Remove="Content\Items\Armor\Vanity\LightCultist_Pants.cs" />
+	  <Compile Remove="Content\Items\Armor\Vanity\LightCultist_Robe.cs" />
+	  <Compile Remove="Content\Items\Consumables\spinel_tonic.cs" />
+	  <Compile Remove="Content\Items\Misc\GoodAppleSling.cs" />
+	  <Compile Remove="Content\Items\Weapons\Melee\StupidFuckYouSword.cs" />
 	  <Compile Remove="Content\Items\Weapons\Ranged\AvatarBow.cs" />
+	  <Compile Remove="Content\Items\Weapons\Ranged\BloodFall.cs" />
+	  <Compile Remove="Content\Items\Weapons\Ranged\FileName.cs" />
+	  <Compile Remove="Content\Items\Weapons\Ranged\HotFusion\Temp.cs" />
 	  <Compile Remove="Content\Items\Weapons\Rogue\LifeAndCessationGlobalNPC.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\NobleWorm.cs" />
+	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\siphonophore\Cryonophore_Basic.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\wormEnemy.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\ZombeReskin.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\CombatStim_Held.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\CosmicWatergun_proj.cs" />
+	  <Compile Remove="Content\Projectiles\Misc\GoodAppleSlingFolder\GoodAppleProj.cs" />
+	  <Compile Remove="Content\Projectiles\Misc\GoodAppleSlingFolder\GoodAppleSlingHeld.cs" />
 	  <Compile Remove="Content\Projectiles\Weapons\Melee\FileName.cs" />
 	  <Compile Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.cs" />
 	  <Compile Remove="Core\Overrides\CeaselessRiftOverride.cs" />
@@ -62,6 +75,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Common\Scenes\" />
+	  <Folder Include="Content\Items\Weapons\Ranged\HotFusion\" />
 	  <Folder Include="Core\Overrides\" />
 	</ItemGroup>
 	<ItemGroup>

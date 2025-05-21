@@ -12,6 +12,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Magic
 {
     public class Goretex : ModItem
     {
+        public override string LocalizationCategory => "Items.Weapons.Magic";
         public override void SetDefaults()
         {
             Item.width = 40;

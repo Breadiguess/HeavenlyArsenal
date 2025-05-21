@@ -61,6 +61,7 @@ Mods: {
 			CombatStim: {
 				DisplayName: Combat Stim
 				Tooltip: ""
+				StimDuration: Mods.HeavenlyArsenal.Items.CombatStim.StimDuration
 			}
 
 			DebugAffrontToGodSummon: {
@@ -166,6 +167,7 @@ Mods: {
 			FusionRifle: {
 				DisplayName: Fusion Rifle
 				Tooltip: ""
+				ShiftTooltip: Mods.HeavenlyArsenal.Items.FusionRifle.ShiftTooltip
 			}
 
 			AvatarRifle: {
@@ -212,12 +214,73 @@ Mods: {
 				DisplayName: Umbral Leech Banner
 				Tooltip: ""
 			}
+
+			LightCultist_Helmet: {
+				DisplayName: Light Cultist_ Helmet
+				Tooltip: ""
+			}
+
+			LightCultist_Robe: {
+				DisplayName: Light Cultist_ Robe
+				Tooltip: ""
+			}
+
+			spinel_tonic: {
+				DisplayName: spinel_tonic
+				Tooltip: ""
+			}
+
+			LightCultist_Pants: {
+				DisplayName: Light Cultist_ Pants
+				Tooltip: ""
+			}
+
+			Ranged: {
+				BloodFall: {
+					DisplayName: Blood Fall
+					Tooltip: ""
+				}
+			}
+
+			NoxusWeapon: {
+				DisplayName: Noxus Weapon
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {
 			ForgottenShrineBiome: {
 				DisplayName: Forgotten Shrine Biome
 				TownNPCDialogueName: the Forgotten Shrine Biome
+			}
+		}
+
+		Mods: {
+			HeavenlyArsenal: {
+				Items: {
+					Consumables: {
+						CombatStim: {
+							StimDuration: Mods.HeavenlyArsenal.Mods.HeavenlyArsenal.Items.Consumables.CombatStim.StimDuration
+							DisplayName: Combat Stim
+							Tooltip: ""
+						}
+
+						spinel_tonic: {
+							DisplayName: spinel_tonic
+							Tooltip: ""
+						}
+					}
+
+					Weapons: {
+						FusionRifle: {
+							FusionRifle: {
+								ShiftTooltip: Mods.HeavenlyArsenal.Mods.HeavenlyArsenal.Items.Weapons.FusionRifle.FusionRifle.ShiftTooltip
+								DisplayName: Fusion Rifle
+								Tooltip: ""
+							}
+						}
+					}
+				}
 			}
 		}
 	}

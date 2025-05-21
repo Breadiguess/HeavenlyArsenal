@@ -52,7 +52,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
             }
             else if(Addicted)
             {
-                // Handle addiction effects here if needed
+              
                 //Player.AddBuff(ModContent.BuffType<StimAddicted_Debuff>(), 100, true, false);
                 timeSinceLastStim++;
                 if (!Player.HasBuff(ModContent.BuffType<StimAddicted_Debuff>()))

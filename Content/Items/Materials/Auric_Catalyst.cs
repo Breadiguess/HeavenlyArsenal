@@ -15,6 +15,7 @@ namespace HeavenlyArsenal.Content.Items.Materials
 {
     public class Auric_Catalyst : ModItem
     {
+        public override string LocalizationCategory => "Items.Misc.Materials";
         public override void SetStaticDefaults()
         {
             //DisplayName.SetDefault("ITEM NAME");

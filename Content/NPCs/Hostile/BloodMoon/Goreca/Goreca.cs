@@ -14,6 +14,7 @@ using Terraria.ModLoader.Utilities;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Goreca
 {
+    //todo: delete this all after getting everything i can 
     public enum Behaviours
     {
         goUp,
@@ -744,7 +745,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Goreca
             NPC.damage = damage;
             NPC.aiStyle = -1;
             NPC.DeathSound = SoundID.NPCHit57;
-            NPC.defense = 150;
+            NPC.defense = 150/3;
             NPC.friendly = false;
             NPC.height = 98;
             NPC.lavaImmune = true;
@@ -753,7 +754,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Goreca
             NPC.lifeMax = 320000;
             NPC.noGravity = true;
             NPC.noTileCollide = true;
-            NPC.takenDamageMultiplier = 0.6f;
+            NPC.takenDamageMultiplier = 0.85f;
             NPC.value = 250000;
             NPC.width = 126;
         }

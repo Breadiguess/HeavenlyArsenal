@@ -22,6 +22,9 @@ using Terraria.DataStructures;
 using System;
 using HeavenlyArsenal.Content.Particles.Metaballs;
 using NoxusBoss.Content.Particles.Metaballs;
+using Luminance.Common.Utilities;
+using Luminance.Core.Graphics;
+using NoxusBoss.Assets;
 
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
@@ -38,11 +41,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
         public const int CycleTime = 120;
 
         public const int ReloadTime = 360;
-        
 
-        public static readonly SoundStyle FireSound = new("CalamityMod/Sounds/Item/HeavenlyGaleFire");
-
-        public static readonly SoundStyle LightningStrikeSound = new("CalamityMod/Sounds/Custom/HeavenlyGaleLightningStrike");
+        public override string LocalizationCategory => "Items.Weapons.Ranged";
 
         //public static int AmmoType = 
         public override void SetDefaults()
@@ -185,12 +185,29 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
 
                 Vector2 drawPosition = new Vector2(npc.Center.X, npc.Center.Y - npc.height * 2 + (float)Math.Sin(Main.GlobalTimeWrappedHourly) * 4f) - Main.screenPosition;
                 spriteBatch.Draw(texture, drawPosition, null, Color.White, MathHelper.ToRadians(90), origin, 1f, SpriteEffects.None, 0f);
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+
+                Main.spriteBatch.PrepareForShaders();
+                //new Texture Placeholder = GennedAssets.Textures.Extra.Code;
+                ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.FusionRifleClothPostProcessingShader");
+                postProcessingShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly);
+                postProcessingShader.TrySetParameter("FlameColor", new Color(208, 37, 40).ToVector4());
+                postProcessingShader.SetTexture(GennedAssets.Textures.GreyscaleTextures.WhitePixel, 0, SamplerState.LinearWrap);
+                postProcessingShader.Apply();
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+
+
             }
 
-            /*
-            Utils.DrawBorderString(spriteBatch, "| ShotCount: " + shotcount.ToString(), npc.Center - Vector2.UnitY * 150 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(spriteBatch, "| Defense: " + npc.defense.ToString() + " | DefDefense: "+ npc.defDefense.ToString(), npc.Center - Vector2.UnitY * 130 - Main.screenPosition, Color.White);
-            */
+
+            //Utils.DrawBorderString(spriteBatch, "| ShotCount: " + shotcount.ToString(), npc.Center - Vector2.UnitY * 150 - Main.screenPosition, Color.White);
+            //Utils.DrawBorderString(spriteBatch, "| Defense: " + npc.defense.ToString() + " | DefDefense: "+ npc.defDefense.ToString(), npc.Center - Vector2.UnitY * 130 - Main.screenPosition, Color.White);
+            //Utils.DrawBorderString(spriteBatch, "| Shredding: " + Shredding.ToString(), npc.Center - Vector2.UnitY * 110 - Main.screenPosition, Color.White);
+
+
             base.PostDraw(npc, spriteBatch, screenPos, drawColor);
         }
         public override void PostAI(NPC npc)
@@ -234,7 +251,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
                             {
                                 if (Vector2.Distance(npc.Center, target.Center) <= radius)
                                 {
-                                    target.SimpleStrikeNPC((int)damage, 0, true, 0, DamageClass.Generic, true, 50, false); // apply damage with no knockback
+                                    target.SimpleStrikeNPC((int)damage, 0, true, 0, DamageClass.Generic, true, 50, false); 
                                 }
                             }
                         }
@@ -267,10 +284,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
 
                 foreach (NPC target in Main.npc)
                 {
-                    if (target.active && !target.friendly && !target.dontTakeDamage && target.whoAmI != npc.whoAmI)
+                    if (target.active && !target.friendly && !target.dontTakeDamage) //&& target.whoAmI != npc.whoAmI)
                     {
                         if (Vector2.Distance(npc.Center, target.Center) <= radius)
                         {
+                            
                             target.SimpleStrikeNPC((int)damage, 0, true, 0, DamageClass.Generic, true, 50, false); // apply damage with no knockback
                         }
                     }

@@ -5,12 +5,14 @@ using HeavenlyArsenal.Common.Ui;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Gores;
 using HeavenlyArsenal.Content.Particles;
+using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
 using System;
+using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -67,6 +69,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
 
         private enum AvatarRifleState
         {
+            Idle, // Idle state           
             Firing,  // Firing a shot
             PostFire, //handle recoil for a better visual experience
             Cycle,   // Cycle before cycling the bolt
@@ -113,8 +116,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
         {
             WeaponBar.DisplayBar(Color.SlateBlue, Color.Lerp(Color.DeepSkyBlue, Color.Crimson, Utils.GetLerpValue(0.3f, 0.8f, (float)Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().AvatarRifleCounter/7, true)), (float)Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().AvatarRifleCounter/7, 10, 1,new Vector2(0,-40));
             RibbonPhysics();
-            Vector2 RopeStart = Projectile.Center + new Vector2(-40, Projectile.direction * 10).RotatedBy(Projectile.rotation);
-            Vector2 endPoint = Projectile.Center + new Vector2(83, Projectile.direction * 2).RotatedBy(Projectile.rotation);
+            Vector2 RopeStart = Projectile.Center + new Vector2(-16, Projectile.direction * 7).RotatedBy(Projectile.rotation);
+            Vector2 endPoint = Projectile.Center + new Vector2(95, Projectile.direction * -10).RotatedBy(Projectile.rotation);
 
             rope.segments[0].position = RopeStart;
             rope.segments[^1].position = endPoint;
@@ -129,6 +132,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
             {
                 switch (CurrentState)
                 {
+                    case AvatarRifleState.Idle:
+                        if (Owner.controlUseItem)
+                        {
+                            CurrentState = AvatarRifleState.Firing;
+                        }
+                        break;
                     case AvatarRifleState.Firing:
                         HandleFiring();
                         break;
@@ -145,7 +154,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
             }
             else
             {
-                CurrentState = AvatarRifleState.Firing;
+                CurrentState = AvatarRifleState.Idle;
                 StateTimer = 0;
                 Projectile.Kill();
             }
@@ -184,34 +193,26 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
         }
         private void FireProjectile()
         {
-
             int bulletAMMO = ProjectileID.Bullet;
             Owner.PickAmmo(Owner.ActiveItem(), out bulletAMMO, out float SpeedNoUse, out int bulletDamage, out float kBackNoUse, out int _);
-
             Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
-
-
-
             Vector2 tipPosition = armPosition + Projectile.velocity * Projectile.width * 1.55f + new Vector2(3, -3);
-            CreateMuzzleFlash(tipPosition, Projectile.velocity);
+            Vector2 MuzzleFlash = armPosition + Projectile.velocity * Projectile.width * 2f + new Vector2(3, -6);
+            CreateMuzzleFlash(MuzzleFlash, Projectile.velocity);
 
             //float AmmoDifference = MaxAmmo - AmmoCount;
             RecoilRotation += Projectile.spriteDirection * MathHelper.ToRadians(34f); // Spread angle for the muzzle flash particles
             Projectile shot = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity * 12, bulletAMMO, Projectile.damage, Projectile.knockBack, Projectile.owner);
             shot.GetGlobalProjectile<AvatarRifleSuperBullet>().hasEmpowerment = true;
             shot.GetGlobalProjectile<AvatarRifleSuperBullet>().empowerment = 7;//(int)MathHelper.Lerp((int)MathF.Pow(MaxAmmo - AmmoCount, 2), 2, (7 - AmmoCount) / MaxAmmo);
+            
             AvatarRifle_MuzzleFlash darkParticle = AvatarRifle_MuzzleFlash.pool.RequestParticle();
             darkParticle.Prepare(tipPosition, Projectile.velocity, Projectile.velocity.ToRotation() 
-                + MathHelper.PiOver2, 30, Color.Crimson, Color.AntiqueWhite, 3f);
+                + MathHelper.PiOver2, 20, Color.AntiqueWhite, Color.AntiqueWhite, 1f, MuzzleFlash);
 
 
             ParticleEngine.Particles.Add(darkParticle);
-
             recoilIntensity = maxRecoil;
-            if (AmmoCount > 0)
-            {
-
-            }
         }
         private void HandlePostFire()
         {
@@ -269,7 +270,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
             if (!Cycled)
             {
                 StateTimer = MathHelper.Clamp(AvatarRifle.CycleTime * SpeedMulti,30,1999);
-                Main.NewText($"StateTimer: {StateTimer}");
+                //Main.NewText($"StateTimer: {StateTimer}");
                 SoundEngine.PlaySound(CycleSound.WithVolumeScale(1.5f).WithPitchOffset(Main.rand.NextFloat(-0.1f,0.1f)), Projectile.position);
                 Cycled = true;
                 Projectile.frame = 0; // Start animation from the first frame
@@ -278,13 +279,17 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
 
             if (StateTimer > holdCyclePosition)
             {
-               CycleOffset = Projectile.spriteDirection*MathHelper.ToRadians(15f);
+                CycleOffset = Projectile.spriteDirection * MathHelper.ToRadians(15f);
+
+                Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full ,Projectile.Center.ToRotation()+MathHelper.ToRadians(Projectile.frameCounter)*5 + MathHelper.PiOver2);
+
+               
                if (Projectile.frameCounter == 4)
                 {
                     if (HasShellToEject)
                     {
                         HasShellToEject = false;
-                        EjectShell(2039, origin, -20, 20);
+                        EjectShell(203, origin, -20, 20);
                     }
                 }
                 if (++Projectile.frameCounter > frameDuration * SpeedMulti) 
@@ -311,7 +316,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
                 Owner.SetDummyItemTime(0);
                 // End of cycling state
                 CycleOffset = 0f;
-                CurrentState = AvatarRifleState.Firing;
+                if(Owner.controlUseItem)
+                    CurrentState = AvatarRifleState.Firing;
+                else
+                   CurrentState = AvatarRifleState.Idle;
                 Cycled = false;
                 Projectile.frame = 0; // Reset frame to the starting frame
 
@@ -382,11 +390,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
         private void EjectShell(int SparkCount, Vector2 ShellPosition, float ShellVelocityMin, float ShellVelocityMax)
         {
             int BulletVariation = (int)Main.rand.NextFloat(ShellVelocityMin, ShellVelocityMax);
-            Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Left, new Vector2(Projectile.direction * -5f, -10f), ModContent.GoreType<BulletGore>(), 1);
-            for (int i = 0; i <= SparkCount; i++)
+            Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Left, new Vector2(Projectile.direction * -5f, -7f), ModContent.GoreType<BulletGore>(), 1);
+            for (int i = 0; i < SparkCount; i++)
             {
                 float CasingVariation = Main.rand.NextFloat(ShellVelocityMin, ShellVelocityMax);
-                Dust.NewDust(ShellPosition, 1, 1, DustID.GoldFlame, Projectile.velocity.X + CasingVariation, Projectile.velocity.Y + CasingVariation, 150, default, 1);
+                int jelly = Dust.NewDust(ShellPosition, 1, 1, DustID.Torch, Projectile.velocity.X + CasingVariation, Projectile.velocity.Y + CasingVariation, 150, default, 1);
             }
         }
 
@@ -490,16 +498,13 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
 
         private void DrawRibbon(Color lightColor)
         {
-            // Define the textures
             Texture2D stringRopeTexture = GennedAssets.Textures.GreyscaleTextures.WhitePixel; // Rope texture
             Texture2D beadRopeTexture = GennedAssets.Textures.SecondPhaseForm.Beads3;        // Object at the end
 
             if (ribbonPoints != null)
             {
-                // Draw the rope segments
                 for (int i = 0; i < ribbonPoints.Length - 1; i++)
                 {
-                    // Get the direction and rotation for this segment
                     Vector2 direction = ribbonPoints[i + 1] - ribbonPoints[i];
                     float rotation = direction.ToRotation(); // Rotate to align texture with segment direction
                     float segmentLength = direction.Length(); // Distance between points determines stretch
@@ -546,7 +551,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
         private Vector2 AnchorPosition()
         {
           
-            return Projectile.Center + new Vector2(80, -5 * Projectile.spriteDirection).RotatedBy(Projectile.rotation) * Projectile.scale;
+            return Projectile.Center + new Vector2(95, -5 * Projectile.spriteDirection).RotatedBy(Projectile.rotation) * Projectile.scale;
         }
 
         public void RibbonPhysics()
@@ -654,11 +659,25 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
         }
         public override bool PreDraw(ref Color lightColor)
         {
+            /*
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+
+            Main.spriteBatch.PrepareForShaders();
+            //new Texture Placeholder = GennedAssets.Textures.Extra.Code;
+            ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.FusionRifleClothPostProcessingShader");
+            postProcessingShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly);
+            postProcessingShader.TrySetParameter("FlameColor", new Color(208, 37, 40).ToVector4());
+            postProcessingShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 0, SamplerState.LinearWrap);
+            postProcessingShader.Apply();
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+            */
 
             drawRope(lightColor);
             DrawRibbon(lightColor);
 
-
+           
             Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;//ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Projectiles/Weapons/Ranged/AvatarRifleProj/AvatarRifle_HoldoutN").Value;//
             //Texture2D Roots = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Ranged/FuneralDirge/AvatarRifle_Holdout_Roots").Value;
 
@@ -680,161 +699,42 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
 
             
             //Rectangle Lillyframe = Roots.Frame(1, 1, 0, 0);
-            float LillyScale = 1f;
             Vector2 LillyPos = new Vector2(Projectile.Center.X, Projectile.Center.Y);
             //Main.EntitySpriteDraw(Roots, LillyPos - Main.screenPosition, Lillyframe, lightColor, wind,new Vector2(origin.X, origin.Y - 15 * Projectile.spriteDirection), LillyScale, spriteEffects, 0f);
             Vector2 Bulletorigin = new Vector2(frame.Width / 2 - 24, frame.Height / 2 - 7 * Projectile.direction * Owner.gravDir);
             if (Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpowered)
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 6; i++)
                 {
 
-                    float glowsize = 1.05f;
-                    Vector2 drawOffset = (MathHelper.TwoPi * i / 6f).ToRotationVector2() + Vector2.One * (float)Math.Sin(Main.GlobalTimeWrappedHourly) * 4f;
-                Main.spriteBatch.Draw(texture, drawPosition + drawOffset, frame, Color.Crimson with { A = 20}, rotation, origin, glowsize, spriteEffects, 0f);
+                    float glowsize = 1.01f;
+
+                    Vector2 drawOffset = (MathHelper.Pi * i / 6f).ToRotationVector2() + Vector2.One * (float)Math.Sin(Main.GlobalTimeWrappedHourly+ i*6) * 4f;
+                    Main.spriteBatch.Draw(texture, drawPosition + drawOffset, frame, Color.Crimson with { A = 1}, rotation, origin, glowsize, spriteEffects, 0f);
                 }
             }
+
 
             
 
 
             Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation, origin, Projectile.scale, spriteEffects, 0);
+           
 
-
-
+            /*
             Utils.DrawBorderString(Main.spriteBatch, "| Is empowered: " + Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpowered.ToString(), Projectile.Center - Vector2.UnitY * 60 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "| Rifle Charge : " + Owner.GetModPlayer<AvatarRiflePlayer>().RifleCharge.ToString() + " | RifleCharge Decay: " + Owner.GetModPlayer<AvatarRiflePlayer>().RifleChargeDecay, Projectile.Center - Vector2.UnitY * 80 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "| Empowerment Timer: " + Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpoweredTimer.ToString(), Projectile.Center - Vector2.UnitY * 100 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "| State: " + CurrentState.ToString() + " | StateTimer: " + StateTimer, Projectile.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "| AttackSpeed: " + Owner.GetTotalAttackSpeed<RangedDamageClass>().ToString(), Projectile.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(Main.spriteBatch, "| AmmoType: " + Owner.coinLuck.ToString(), Projectile.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-
+            //Utils.DrawBorderString(Main.spriteBatch, "| AmmoType: " + Owner.coinLuck.ToString(), Projectile.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+            */
 
 
             return false;
         }
 
-        // Property to hold the cloth simulation object
-       // public ClothSimulation Cloth
-       // {
-      //      get;
-      //      private set; // Only accessible within the class
-      //  }
-
-        /// <summary>
-        /// The render target responsible for rendering the cloth.
-        /// </summary>
-     ///   public static InstancedRequestableTarget ClothTarget
-     //   {
-    //        get;
-    //        private set;
-    //    }
-
-        /// <summary>
-        /// Constrains a cloth particle to a specific anchor point with an optional angle offset.
-        /// </summary>
-        /*
-        private void ConstrainParticle(Vector2 anchor, ClothPoint point, float angleOffset)
-        {
-            // Check if the particle (point) is null before proceeding
-            if (point is null)
-                return;
-
-            // Calculate the horizontal interpolation factor for the particle's X position within the cloth width
-            float xInterpolant = point.X*5 / (float)Cloth.Width;
-
-            // Determine the angle for the particle's position based on the interpolation factor
-            float angle = MathHelper.Lerp(MathHelper.PiOver2, MathHelper.TwoPi - MathHelper.PiOver2, xInterpolant);
-
-            // Calculate the offset for the particle's position based on its angle and projectile rotation
-            Vector2 offset = new Vector2(MathF.Cos(angle + angleOffset) * 60f, 0f).RotatedBy(Projectile.rotation);
-
-            // Compute a 3D ring position for the particle, adding depth based on the sine of the angle
-            Vector3 ring = new Vector3(offset.X, offset.Y, MathF.Sin(angle - MathHelper.PiOver2) * 6f);
-
-            // Adjust the Y-component of the ring based on the particle's Y position
-            ring.Y += point.Y * 24f;
-
-            // Set the particle's final position relative to the anchor and mark it as fixed
-            point.position = new Vector3(anchor, 0f) + ring;
-            point.IsFixed = true;
-        }
-
-        /// <summary>
-        /// Updates the cloth simulation with wind and rotational forces.
-        /// </summary>
-        private void UpdateCloth()
-        {
-            // Number of simulation steps to perform in one update
-            int steps = 24;
-
-            // Calculate wind speed, clamping it between -1.3 and 1.3
-            float windSpeed = Math.Clamp(Main.WindForVisuals * Projectile.spriteDirection * 8f, -1.3f, 1.3f);
-
-            // Determine cloth position based on projectile properties (center, rotation, scale)
-            Vector2 clothPosition = Projectile.Center + new Vector2(90f, Projectile.velocity.X.NonZeroSign() * -3f).RotatedBy(Projectile.rotation) * Projectile.scale;
-
-            // Calculate previous and current barrel end positions for rotational force computation
-            Vector2 previousBarrelEnd = Projectile.Center + Projectile.oldRot[1].ToRotationVector2() * Projectile.scale * 30f;
-            Vector2 barrelEnd = Projectile.Center + Projectile.oldRot[0].ToRotationVector2() * Projectile.scale * 30f;
-
-            // Compute rotational force based on the difference in barrel end positions
-            Vector3 rotationalForce = new Vector3(barrelEnd - previousBarrelEnd, 0f) * 4f;
-
-            // Run the simulation for a predefined number of steps
-            for (int i = 0; i < steps; i++)
-            {
-                // Loop through the cloth grid's width with a step of 2 particles
-                for (int x = 0; x < Cloth.Width; x += 2)
-                {
-                    // Constrain particles in the first two rows of the cloth grid
-                    for (int y = 0; y < 2; y++)
-                        ConstrainParticle(clothPosition, Cloth.particleGrid[x, y], 0f);
-
-                    // Apply wind and rotational forces to all particles in the cloth grid
-                    for (int y = 0; y < Cloth.Height; y++)
-                    {
-                        // Calculate local wind force with turbulence and scaling
-                        Vector3 localWind = Vector3.UnitX * (AperiodicSin(Time * 0.01f + y * 0.05f) * windSpeed) * 1.2f;
-
-                        // Apply forces to the cloth particle at position (x, y)
-                        Cloth.particleGrid[x, y].AddForce(localWind + rotationalForce);
-                    }
-                }
-
-                // Simulate cloth behavior with gravity and a small time step
-                Cloth.Simulate(0.051f, false, Vector3.UnitY * 4f);
-            }
-        }
-
-        /// <summary>
-        /// Draws the cloth using a specific shader and transformation matrix.
-        /// </summary>
-        private void DrawCloth()
-        {
-            // Create a world matrix to center the viewport around the projectile
-            Matrix world = Matrix.CreateTranslation(-Projectile.Center.X + WotGUtils.ViewportSize.X * 0.5f, -Projectile.Center.Y + WotGUtils.ViewportSize.Y * 0.5f, 0f);
-
-            // Create an orthographic projection matrix for rendering
-            Matrix projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -1000f, 1000f);
-
-            // Combine the world and projection matrices for the final transformation
-            Matrix matrix = world * projection;
-
-            // Get the shader used for rendering the cloth
-            ManagedShader clothShader = ShaderManager.GetShader("HeavenlyArsenal.AvatarRifleClothShader");
-
-            // Set shader parameters for opacity and transformation
-            clothShader.TrySetParameter("opacity", Projectile.Opacity);
-            clothShader.TrySetParameter("transform", matrix);
-
-            // Apply the shader
-            clothShader.Apply();
-
-            // Render the cloth
-            Cloth.Render();
-        }
-        */
+       
         public override bool? CanDamage() => false;
     }
 

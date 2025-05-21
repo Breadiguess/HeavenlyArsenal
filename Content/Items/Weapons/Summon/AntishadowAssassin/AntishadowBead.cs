@@ -24,7 +24,7 @@ public class AntishadowBead : ModItem
         $"HeavenlyArsenal/{prefix}/{name}";
 
     public override string Texture => GetAssetPath("Content/Items/Weapons/Summon/AntishadowAssassin", Name);
-
+    public override string LocalizationCategory => "Items.Weapons.Summon";
     public override void SetStaticDefaults()
     {
         GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>

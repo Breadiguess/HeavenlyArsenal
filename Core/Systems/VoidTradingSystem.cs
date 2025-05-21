@@ -78,6 +78,7 @@ namespace HeavenlyArsenal.Core.Systems
         /// This waits until all items are loaded, as to prevent air from being given instead of items
         /// </summary>
         /// //TODO: Conditions such as bosses defeated
+       
         public override void OnWorldLoad()
         
         {

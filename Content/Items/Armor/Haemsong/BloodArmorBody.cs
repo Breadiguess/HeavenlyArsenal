@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -31,7 +33,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.Haemsong
 
         public override void AddRecipes()
         {
-            base.AddRecipes();
+            CreateRecipe().
+                   AddIngredient<AwakenedBloodplate>().
+                   AddTile<CosmicAnvil>().
+                   Register();
         }
     }
 }

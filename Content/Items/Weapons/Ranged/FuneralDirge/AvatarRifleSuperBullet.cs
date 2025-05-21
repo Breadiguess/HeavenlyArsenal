@@ -26,6 +26,10 @@ public class AvatarRifleSuperBullet : GlobalProjectile
     {
         // TODO -- Applying penetrate = -1 to every projectile ever seems a bit funny? I'm guessing this is just code that's unfinished.
         // entity.penetrate = -1;
+        if (hasEmpowerment)
+        {
+            entity.damage = (int)(entity.damage * 1+empowerment/7);
+        }
     }
     public override bool PreAI(Projectile projectile)
     {
@@ -61,8 +65,8 @@ public class AvatarRifleSuperBullet : GlobalProjectile
             trailShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 2, SamplerState.LinearWrap);
 
             PrimitiveRenderer.RenderTrail(oldPos, new PrimitiveSettings(WidthFunction, ColorFunction, _ => Vector2.Zero, Shader: trailShader, Smoothen: false), oldPos.Length);
-            Utils.DrawBorderString(Main.spriteBatch, "Empowerment: " + empowerment.ToString(), projectile.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(Main.spriteBatch, "Empowerment: " + hasEmpowerment.ToString(), projectile.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
+            //Utils.DrawBorderString(Main.spriteBatch, "Empowerment: " + empowerment.ToString(), projectile.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+            //Utils.DrawBorderString(Main.spriteBatch, "Empowerment: " + hasEmpowerment.ToString(), projectile.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
 
         }
     }

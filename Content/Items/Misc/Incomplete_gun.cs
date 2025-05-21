@@ -26,7 +26,7 @@ namespace HeavenlyArsenal.Content.Items.Misc
 {
     internal class Incomplete_gun : ModItem
     {
-
+        public override string LocalizationCategory => "Items.Misc";
         public override void SetDefaults()
         {
 

@@ -12,14 +12,17 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static NoxusBoss.Assets.GennedAssets.Sounds;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Melee;
 
 public class AvatarLonginus : ModItem
 {
+    public override string LocalizationCategory => "Items.Weapons.Melee";
     public override void SetStaticDefaults()
     {
         ItemID.Sets.Spears[Type] = true;
+        ItemID.Sets.gunProj[Type] = true;
     }
 
     public override void SetDefaults()
@@ -48,8 +51,33 @@ public class AvatarLonginus : ModItem
     }
 
 
-    //public override void ModifyTooltips(List<TooltipLine> list) => list.IntegrateHotkey();
-
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        Player player = Main.LocalPlayer;
+        // Access the projectile AvatarLonginusHeld and check the public bool IsEmpowered
+        if (player.ownedProjectileCounts[Item.shoot] > 0)
+        {
+            foreach (Projectile projectile in Main.projectile)
+            {
+                if (projectile.active && projectile.type == Item.shoot && projectile.owner == player.whoAmI)
+                {
+                    AvatarLonginusHeld avatarSpear = projectile.ModProjectile as AvatarLonginusHeld;
+                    if (avatarSpear != null && avatarSpear.IsEmpowered)
+                    {
+                        foreach (var tooltip in tooltips)
+                        {
+                            if (tooltip.Mod == "Terraria" && tooltip.Name == "ItemName")
+                            {
+                                tooltip.Text = "UNENDING CYCLE OF RETRIBUTION"; // Change the item name
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
     private bool SpearOut(Player player) => player.ownedProjectileCounts[Item.shoot] > 0;
 
     public override void HoldItem(Player player)
@@ -63,9 +91,7 @@ public class AvatarLonginus : ModItem
             }
         }
     }
-
     public override bool AltFunctionUse(Player player) => true;
-
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
 
     

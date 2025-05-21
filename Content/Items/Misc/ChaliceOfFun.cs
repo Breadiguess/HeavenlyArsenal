@@ -16,6 +16,7 @@ namespace HeavenlyArsenal.Content.Items.Misc
 {
     class ChaliceOfFun : ModItem
     {
+        public override string LocalizationCategory => "Items.Misc";
         public override void SetDefaults()
         {
             Item.rare = ModContent.RarityType<HotPink>();

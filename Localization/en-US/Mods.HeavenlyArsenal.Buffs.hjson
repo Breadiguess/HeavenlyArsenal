@@ -10,8 +10,8 @@ AntishadowAssassinBuff: {
 }
 
 BloodArmorFrenzy: {
-	DisplayName: Blood Armor Frenzy
-	Description: Mods.HeavenlyArsenal.Buffs.BloodArmorFrenzy.Description
+	DisplayName: Frenzy
+	Description: your enemies had better run, and not scrape their ankles...
 }
 
 ColdBurnBuff: {
@@ -62,4 +62,9 @@ ClotBuff: {
 LeechBuff: {
 	DisplayName: Leech Buff
 	Description: Mods.HeavenlyArsenal.Buffs.LeechBuff.Description
+}
+
+LacerationBuff: {
+	DisplayName: Laceration Buff
+	Description: Mods.HeavenlyArsenal.Buffs.LacerationBuff.Description
 }
