@@ -112,7 +112,7 @@ public class avatar_FishingRodVoid : ModProjectile
 
         if (Time % Projectile.localNPCHitCooldown == 0 && Time < Projectile.localNPCHitCooldown * 3)
         {
-            SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.IntroScreenSlice with { Volume = 0.5f, MaxInstances = 0 }, Projectile.Center);
+            SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.IntroScreenSlice with { PitchVariance = 0.3f ,Volume = 0.5f, MaxInstances = 0 }, Projectile.Center);
         }
 
         Time++;

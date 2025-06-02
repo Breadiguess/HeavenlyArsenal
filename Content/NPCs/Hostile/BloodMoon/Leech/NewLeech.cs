@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using CalamityMod;
 using CalamityMod.Items.Accessories;
+using CalamityMod.Items.Potions.Alcohol;
+using CalamityMod.Projectiles.Ranged;
 using HeavenlyArsenal.Common.utils;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Content.Particles.Metaballs;
 using NoxusBoss.Core.World.GameScenes.AvatarAppearances;
 using ReLogic.Content;
 using Terraria;
@@ -121,6 +126,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         /// </summary>
         public Vector2[] headPositions;
 
+        private List<Vector2> WhiskerAnchors;
 
         // This boolean toggles “feeding mode” so bodies know to lash harder.
         private bool isFeeding = false;
@@ -170,18 +176,16 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         }
         #endregion
         public float feedtime = 0;
-        /// <summary>
-        /// When the head (SegmentNum == 0) spawns, choose a random segment count,
-        /// store that in localAI[0], then spawn each segment with AI parameters:
-        /// - ai[0] = head NPC ID
-        /// - ai[1] = this segment’s index (1..count)
-        /// Also copy SegmentCount into each child’s localAI[0].
+      
         public override void OnSpawn(IEntitySource source)
         {
-            // Ensure that each segment spawned shares the same segment count, for placement of things later on.
+           
             int count;
             if (SegmentNum == 0)
             {
+                //set up whisker locations
+                
+                //WhiskerAnchors.Add(new Vector2(NPC.Center.X, NPC.Center.Y));
                 // Head segment: choose random segment count and store in localAI[0]
                 count = Main.rand.Next(6, 16);
                 SegmentCount = count;
@@ -189,11 +193,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 
                 HeadID = NPC.whoAmI;
 
-                // Only the head is running OnSpawn with SegmentNum == 0, so it can allocate:
+
+              
+                
                 headPositions = new Vector2[count + 1]; 
 
-                // Immediately set up our SegmentPositions list to size (count + 1),
-                // where index 0 is head’s position, and 1..count are segment positions.
+               
                 SegmentPositions = new List<Vector2>(new Vector2[count + 1]);
                 Segments = new List<NPC>(new NPC[count + 1]);
                 // For each index i = 1..count, spawn a body segment.
@@ -236,6 +241,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 
         public void RibbonPhysics()
         {
+           //todo: make the tendrils more floaty and 
             int length = SegmentCount;
             if (ribbonVels != null)
             {
@@ -250,16 +256,46 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             }
 
             if (ribbonPoints != null)
-            {
+            {// Improved tail simulation using Verlet integration and spring-damper physics
                 float drawScale = NPC.scale;
-                // Incorporate wiggle timer so while it's near 0 or 80, flare outwards, but draw inwards as it approaches 40.
-                // We'll use a sine curve to modulate the flare amount based on WiggleTime.
-                float maxCycle = 80f;
+                float maxCycle = 800f;
                 float t = WiggleTime % maxCycle;
-                // Flare factor: 1 at t=0 or t=80, 0 at t=40
                 float flare = (float)Math.Sin(Math.PI * t / maxCycle);
-                float flareAmount = MathHelper.Lerp(0.8f, 1.3f, Math.Abs(flare)); // 0.8 (inward) to 1.3 (outward)
+                float flareAmount = MathHelper.Lerp(0.8f, 1.3f, Math.Abs(flare));
 
+                // Anchor the first point to the NPC's base
+                ribbonPoints[0] = NPC.Center + new Vector2(40 * flareAmount, -50 * NPC.spriteDirection).RotatedBy(NPC.rotation);
+
+                // Tail simulation parameters
+                float segmentLength = 10f * flareAmount;
+                float springiness = 0.18f; // how strongly each segment follows the previous
+                float damping = 1f;     // how much velocity is preserved (lower = more floppy)
+
+                for (int i = 1; i < ribbonPoints.Length; i++)
+                {
+                    // Verlet integration: update position based on velocity
+                    ribbonVels[i] *= damping;
+                    ribbonPoints[i] += ribbonVels[i];
+
+                    // Calculate the vector from this point to the previous
+                    Vector2 toPrev = ribbonPoints[i - 1] - ribbonPoints[i];
+                    float dist = toPrev.Length();
+                    if (dist > 0.0001f)
+                    {
+                        Vector2 dir = toPrev / dist;
+                        float diff = dist - segmentLength;
+                        // Spring force: move this point toward/away from the previous to maintain segmentLength
+                        ribbonPoints[i] += dir * diff * springiness;
+                        // Add a bit of the spring force to velocity for more natural motion
+                        ribbonVels[i] += dir * diff * springiness * 0.5f;
+                    }
+
+                    // Optional: add a small sine-based wiggle for organic movement
+                    float wigglePhase = WiggleTime * 0.12f + i * 0.5f;
+                    float wiggleMag = MathHelper.Lerp(0.5f, 2.5f, (float)i / ribbonPoints.Length);
+                    Vector2 wiggle = new Vector2(0, (float)Math.Sin(wigglePhase) * wiggleMag);
+                    ribbonPoints[i] += wiggle.RotatedBy(NPC.rotation);
+                }
                 ribbonPoints[0] = NPC.Center + new Vector2(4, -5 * NPC.spriteDirection).RotatedBy(NPC.rotation) * drawScale * flareAmount;
 
                 for (int i = 1; i < ribbonPoints.Length; i++)
@@ -273,6 +309,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                             0.8f
                         );
                     }
+                    
                 }
             }
             else
@@ -289,8 +326,34 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 
         public override void AI()
         {
-            if(ribbonPoints != null)
-                RibbonPhysics();
+            if (SegmentNum == 0)
+            {
+                
+                    // Calculate whisker anchor points based on the NPC's rotation and direction
+                    // Define local offsets for whiskers relative to the head's center
+                    Vector2[] localOffsets = new Vector2[]
+                    {
+                        new Vector2(14, NPC.directionY*-4),   // left, close
+                        new Vector2(14, NPC.directionY*-15),  // left, far
+                        new Vector2(28, NPC.directionY*-4),  // right, close
+                        new Vector2(27, NPC.directionY * -15)  // right, far
+                    };
+
+                    WhiskerAnchors = new List<Vector2>();
+                    for (int i = 0; i < localOffsets.Length; i++)
+                    {
+                        // Flip Y offset based on direction (spriteDirection)
+                        Vector2 offset = localOffsets[i];
+                        offset.Y *= NPC.direction;
+                        // Rotate the offset by the NPC's rotation
+                        Vector2 rotatedOffset = offset.RotatedBy(NPC.rotation);
+                        // Add to the head's center
+                        Vector2 anchor = Main.npc[(int)HeadID].Center + rotatedOffset;
+                        WhiskerAnchors.Add(anchor);
+                    }
+                
+            }
+          
             if (currentTarget != null)
             {
                 NPC.direction = Math.Sign(NPC.Center.X - currentTarget.Center.X);
@@ -306,33 +369,30 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                 
                 headPositions[0] = NPC.Center;
 
-                // Compute head’s base velocity direction
+                
                 Vector2 headVelDir = Vector2.Zero;
                 if (NPC.velocity.LengthSquared() > 0.001f)
                     headVelDir = Vector2.Normalize(NPC.velocity);
                 NPC.rotation = NPC.velocity.ToRotation();
 
                 
-                // If we just entered FeedOnTarget, reset Time so sine wave restarts
                 if (CurrentState == UmbralLeechAI.FeedOnTarget && !isFeeding)
                 {
-                    
                     isFeeding = true;
                 }
                 else if (CurrentState != UmbralLeechAI.FeedOnTarget && isFeeding)
                 {
-                    // We’ve left feeding state → reset flag
                     isFeeding = false;
                 }
 
                 
 
-                // Keep Time within a cycle—say a max of 40 ticks in feed, 80 in normal
+                
                 float maxCycle = isFeeding ? 60f : 80f;
                 if (WiggleTime > maxCycle)
                     WiggleTime -= maxCycle;
 
-                // Now build the chain of positions:
+              
                 for (int i = 1; i <= total; i++)
                 {
                     Vector2 basePoint = headPositions[i - 1] - headVelDir * 40f;
@@ -345,7 +405,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     else {sineValue = (float)Math.Sin(Math.PI * (WiggleTime + phaseShift) / 10f); headPositions[i] = basePoint + perp * (sineValue * 18f);}
                 }
             }
-
+            if(ribbonPoints != null) 
+                RibbonPhysics();
             WiggleTime++;
             //body
             if (SegmentNum >= 1f)
@@ -409,7 +470,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                 float phaseShift = SegmentNum * (isFeeding ? 2.5f : 2.5f);
                 float sineVal = (float)Math.Sin(Math.PI * (WiggleTime + phaseShift) / (isFeeding ? 5f : 10f));
 
-                // Amplitude tapers at the start and end of the segment chain
+              
                 float baseAmplitude = isFeeding ? 5f : (SegmentCount)/5;
                 float t = (float)idx / (float)total;
                 // Use a smoothstep curve for tapering: 0 at ends, 1 in the middle
@@ -418,17 +479,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 
                 Vector2 wiggleOffset = perp * (sineVal * amplitude);
 
-                // 4) Final desired position
                 Vector2 desired = basePoint + wiggleOffset;
 
-                // 5) Lerp toward desired
                 float lerpFactor = isFeeding ? 0.35f : 1f;
                 NPC.Center = Vector2.Lerp(NPC.Center, desired, lerpFactor);
-
-                // 6) Rotate to face preceding NPC
                 NPC.rotation = (precedingNPC.Center - NPC.Center).ToRotation();
-
-                // 7) Sync life
                 NPC.life = Main.npc[headIndex].life;
 
                
@@ -436,12 +491,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             }
           
             //Actual AI
-            if (SegmentNum == 0f)
-            {
-                if (NPC.life > 0)
+            if (NPC.life > 0)
                 {
-                    
-                    
                     switch (CurrentState)
                     {
                         case UmbralLeechAI.Idle:
@@ -464,7 +515,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                                 if (Vector2.Distance(NPC.Center, currentTarget.Center) < 40f)
                                 {
                                     CurrentState = UmbralLeechAI.FeedOnTarget;
-                                    Time = 0f;       // reset Time right when feeding starts
+                                    Time = 0f;      
                                     feedtime = 0;
                                 }
                             }
@@ -478,23 +529,22 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                             
                             if (currentTarget != null && currentTarget.active)
                             {
-                                feedtime++;
-                                // (1) Snap head to player center + small jitter
+                                NPC.dontTakeDamage = true;
+                                
+                                
                                 Vector2 toPlayer = currentTarget.Center - NPC.Center;
                                 NPC.Center = Vector2.Lerp(NPC.Center, currentTarget.Center, 0.5f);
-
-                                // (2) Shake the head itself: small perpendicular wiggle
                                 Vector2 dir = Vector2.Normalize(toPlayer);
                                 Vector2 perp = dir.RotatedBy(MathHelper.PiOver2);
-                                float shake = (float)Math.Sin(Math.PI * Time / 4f) * 4f;
+                                float shake = (float)Math.Sin(Math.PI * Time / 4f) * 1f;
                                 NPC.Center += perp * shake;
-
-                                // After a short feed duration, transition to FlyAway
                                 if (feedtime > 60f)
                                 {
+                                    NPC.dontTakeDamage = false; 
                                     Time = 0f;
                                     CurrentState = UmbralLeechAI.FlyAway;
                                 }
+                                feedtime++;
                             }
                             else
                             {
@@ -520,12 +570,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                             DoDeathAnimation();
                             break;
                     }
-                }
-                else
-                {
-                    CurrentState = UmbralLeechAI.DeathAnim;
-                    DoDeathAnimation();
-                }
+                
+                
+                
             }
             if (SegmentNum < 1f)
             {
@@ -536,6 +583,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     DoDeathAnimation();
                 }
             }
+            if(WhiskerAnchors != null)
+                ManageWhisker();
+
+
             Time++;
         }
 
@@ -570,32 +621,20 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         }
 
 
-        /// <summary>
-        /// Prevent the NPC from fully dying immediately. Instead, set life = 1, switch to DeathAnim,
-        /// and keep it active so that DoDeathAnimation can play out for all segments.
-        /// </summary>
+
         public override bool CheckDead()
         {
-            if (SegmentNum == 0f)
-            {
-                // Head should go into DeathAnim.
-                NPC.life = 1;
-                CurrentState = UmbralLeechAI.DeathAnim;
-                NPC.active = true;
-                NPC.dontTakeDamage = true;
-                NPC.netUpdate = true;
+            // Head should go into DeathAnim.
+            NPC.life = 1;
+            CurrentState = UmbralLeechAI.DeathAnim;
+            NPC.active = true;
+            NPC.dontTakeDamage = true;
+            NPC.netUpdate = true;
 
-                
-                if (NPC.netSpam >= 10)
-                    NPC.netSpam = 9;
+            if (NPC.netSpam >= 10)
+                NPC.netSpam = 9;
 
-                return false; // Return false so tModLoader does not actually remove the NPC yet.
-            }
-            else
-            {
-                // Segments themselves never “die”—they mirror head’s life (set in AI).
-                return false;
-            }
+            return false;
         }
 
         private float DeathAnimationTimer;
@@ -637,6 +676,16 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             if (DeathAnimationTimer >= 125f)
             {
                 // Only the head needs to call HitEffect() and NPCLoot(); segments will vanish automatically.
+
+                BloodMetaball metaball = ModContent.GetInstance<BloodMetaball>();
+                for (int i = 0; i < 120; i++)
+                {
+                    Vector2 bloodSpawnPosition = NPC.Center + new Vector2(NPC.scale).RotatedBy(NPC.rotation);
+                    Vector2 bloodVelocity = (Main.rand.NextVector2Circular(8f, 8f) - NPC.velocity) * Main.rand.NextFloat(0.2f, 1.2f);
+                    metaball.CreateParticle(bloodSpawnPosition, bloodVelocity, Main.rand.NextFloat(10f, 40f), Main.rand.NextFloat(2f));
+                }
+                SoundEngine.PlaySound(Explode with { MaxInstances = 0}, NPC.Center);
+
                 NPC.active = false;
                 NPC.HitEffect();
                 NPC.NPCLoot();
@@ -648,31 +697,39 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 
             DeathAnimationTimer++;
         }
-
+        public override bool PreKill()
+        {
+            return false;
+        }
+        public override void OnKill()
+        {
+            
+            Main.NewText($"you shouldn't be seeing this");
+        }
         #endregion
-   
+
         public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone)
         {
-            if (SegmentNum <= 1f)
+            if (SegmentNum == 0f)
             {
                 // Near head: apply small knockback.
-                NPC.velocity -= NPC.DirectionTo(item.Center) * item.knockBack * 0.2f;
+                NPC.velocity -= NPC.DirectionTo(item.Center) * item.knockBack * 0.1f;
             }
             else
             {
-                // Body/tail: redirect damage to head.
+                
                 int headIndex = (int)HeadID;
                 if (headIndex >= 0 && headIndex < Main.maxNPCs)
                 {
                     Main.npc[headIndex].life -= damageDone;
-                    // Make sure our health matches the head’s after redirecting.
+                    
                     NPC.life = Main.npc[headIndex].life;
                 }
             }
         }
         public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
         {
-            if (SegmentNum <= 1f)
+            if (SegmentNum == 0f)
             {
                 NPC.velocity -= NPC.SafeDirectionTo(projectile.Center, Vector2.Zero) * projectile.knockBack * 0.2f;//NPC.DirectionTo(projectile.Center) * projectile.knockBack * 0.2f;
             }
@@ -687,6 +744,87 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             }
         }
 
+        private List<Vector2> WhiskerEnds;
+        private List<float> WhiskerRot;
+        
+        /// <summary>
+        /// Controls the whiskers.
+        /// if the whisker rot list is empty (such as when the leech first initializes), then it populates it.
+        /// </summary>
+        private void ManageWhisker()
+        {
+            
+            if (WhiskerRot == null)
+            {
+                WhiskerRot = new List<float>();
+                for (int i = 0; i< WhiskerAnchors.Count; i++)
+                {
+                    WhiskerRot.Add(0);
+                }
+            }
+            else
+            {
+                
+                for (int i = 0; i < WhiskerRot.Count; i++)
+                {
+                    //todo: ensure that rotations do not get weird as the head rotates.
+
+
+                    // Calculate the center point of all whisker anchors
+                    Vector2 center = Vector2.Zero;
+                    for (int j = 0; j < WhiskerAnchors.Count; j++)
+                        center += WhiskerAnchors[j];
+                    center /= WhiskerAnchors.Count;
+
+                    // Find the closest player and their distance
+                    float playerDist = float.MaxValue;
+                    Player closest = null;
+                    foreach (var p in Main.player)
+                    {
+                        if (!p.active || p.dead) continue;
+                        float d = Vector2.Distance(p.Center, NPC.Center);
+                        if (d < playerDist)
+                        {
+                            playerDist = d;
+                            closest = p;
+                        }
+                    }
+
+                    Dust.NewDustPerfect(center, DustID.Cloud, Vector2.Zero, 0, default, 0.25f);
+
+                    float phaseShift = (WiggleTime * 0.08f) + ((i % 2 == 0 ? 1 : 0) * MathHelper.PiOver2);
+                    float amplitude = 0.5f; 
+                    float baseAngle = Main.npc[(int)HeadID].velocity.ToRotation();
+                    float wiggle = (float)Math.Sin(phaseShift) * amplitude + Main.rand.NextFloat(0,0.1f);
+
+                    // Calculate the angle away from the center
+                    Vector2 away = Vector2.Normalize(WhiskerAnchors[i] - center);
+                    float awayAngle = away.ToRotation();
+
+                    // t = 0 (player close) => fully open, t = 1 (player far) => normal ish behavior
+                    float t = Utils.GetLerpValue(0f, 400f, playerDist, true);
+
+                    // allow for smooth transitions between open and close
+                    float targetAngle;
+                    if (closest != null && playerDist < 400f)
+                    {
+                        // Open whiskers away from center, but still wiggle a bit
+                        targetAngle = MathHelper.Lerp(baseAngle + (i % 2 == 0 ? -0.5f : 0.5f), awayAngle + wiggle, 1f - t);
+                    }
+                    else
+                    {
+                        
+                        targetAngle = baseAngle + (i % 2 == 0 ? -0.5f : 0.5f) + wiggle;
+                    }
+
+                   
+                    WhiskerRot[i] = MathHelper.Lerp(WhiskerRot[i], targetAngle, 0.15f);
+
+                    //Main.NewText($"{playerDist}, t:{t}");
+                    //Dust.NewDustPerfect(WhiskerAnchors[i], DustID.Cloud, Vector2.Zero, 0, Color.AntiqueWhite, 0.25f);
+                }
+            }
+        }
         #region drawcode
         public static Asset<Texture2D> ribbonTexture;
         private void DrawRibbon(Color lightColor, Vector2 Offset)
@@ -728,8 +866,20 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                 }
             }
         }
-        private void DrawWhisker()
+        private void DrawWhisker(Color lightColor)
         {
+            Texture2D whisker = AssetDirectory.Textures.UmbralLeechWhisker.Value;
+            Vector2 origin = new Vector2(0,whisker.Height/2);
+
+            for (int i = 0; i < WhiskerAnchors.Count; i++)
+            {
+                Vector2 drawpos = WhiskerAnchors[i].ToPoint().ToVector2() - Main.screenPosition;
+
+                Main.EntitySpriteDraw(whisker, drawpos, null, lightColor, WhiskerRot[i], origin, 1, SpriteEffects.None);
+                Utils.DrawBorderString(Main.spriteBatch, "|" + i.ToString()+"", drawpos + Vector2.UnitY * ( (i % 4 == 0 ? 1: 2)* 40), lightColor, 1);
+                //Main.EntitySpriteDraw(whisker, WhiskerAnchors[i].ToPoint() - Main.screenPosition, null, lightColor,0,origin, 100, SpriteEffects.None);
+                //Main.NewText($"Drawn whisker at {WhiskerAnchors[i] - Main.screenPosition}");
+            }
 
         }
 
@@ -737,9 +887,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         /// Draw the leech’s body (head/body/tail) using a 3×8 sprite sheet.
         /// We pick the correct frame based on ai[1] (SegmentNum) and animation timer.
         /// </summary>
-        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color lightColor)
         {
-            // Load our 3 (horizontal) × 8 (vertical) sprite sheet. Each row is a different segment‐type frame.
+            
             Texture2D texture = 
                 ModContent.Request<Texture2D>(
                 "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/NewLeech"
@@ -747,12 +897,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 
             //Texture2D outline = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech2").Value;
             SpriteEffects Leech = NPC.direction == 1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
-            int row = (SegmentNum < 1f) ? 2 : 1;
+            int row = (SegmentNum < 1f) ? 2 : 3;
            
 
-            if (!NPC.IsABestiaryIconDummy & SegmentNum == 0)
+            if (!NPC.IsABestiaryIconDummy & SegmentNum % 2 == 0)
             {
-                Utils.DrawBorderString(Main.spriteBatch, "|FeedTime: " + feedtime.ToString()+"|", NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(Main.spriteBatch, "|FeedTime: " + feedtime.ToString()+"|", NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
                 Utils.DrawBorderString(Main.spriteBatch, "| " + CurrentState +"| Time: "+ Time.ToString() + " | wiggletime: " + WiggleTime.ToString(), NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
             }
             if (SegmentNum % 2 == 0)
@@ -776,8 +926,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                         ribbonPoints[i] = NPC.Center;
                 }
                 //Utils.DrawBorderString(Main.spriteBatch, "|Test " , NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-                DrawRibbon(drawColor, new Vector2(0, -1*NPC.direction*-15));
-                DrawRibbon(drawColor, new Vector2(0, -1*NPC.direction*5));
+                DrawRibbon(lightColor, Vector2.Zero);
+                DrawRibbon(lightColor, Vector2.Zero);
             }
             else if (SegmentNum == SegmentCount -1)
             {
@@ -793,19 +943,24 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             
             Vector2 origin = sourceRect.Size() / 2f;
           
-            // Draw with rotation and chosen frame. Lighting.GetColor for proper lighting.
+           
             Main.EntitySpriteDraw(
                 texture,
                 NPC.Center - Main.screenPosition,
                 sourceRect,
-                Lighting.GetColor(NPC.Center.ToTileCoordinates()),
+                lightColor,
                 NPC.rotation,
                 origin,
                 1f,
                 Leech
             );
 
-            return false; // Skip default draw
+            if (!NPC.IsABestiaryIconDummy && WhiskerAnchors != null)
+            {
+                DrawWhisker(lightColor);
+            }
+                
+            return false;
         }
 
         #endregion

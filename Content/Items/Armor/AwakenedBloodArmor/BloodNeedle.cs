@@ -414,8 +414,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                 AttackCooldown += 10;
             if (target.type == ModContent.NPCType<FAP>())
             {
-                // Instantly kill the npc if its of the type "FAP"
-               // target.StrikeNPCNoInteraction(target.life + 9999, 0f, 0, false, false, false);
                 target.StrikeInstantKill();
                 target.checkDead();
                 target.active = false;
