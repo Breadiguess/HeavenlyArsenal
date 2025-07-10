@@ -1,12 +1,12 @@
 ShintoArmor: {
 	ShintoArmorHelmetRogue: {
 		SetBonus: Mods.HeavenlyArsenal.Items.Armor.ShintoArmor.ShintoArmorHelmetRogue.SetBonus
-		DisplayName: Shinto Armor Helmet Rogue
-		Tooltip: ""
+		DisplayName: Darkened Cap
+		Tooltip: Might've belonged to an assassin at one point or another...
 	}
 
 	ShintoArmorHelmetAll: {
-		DisplayName: Shinto Armor Helmet All
+		DisplayName: Helm of Forlorn Stars
 		Tooltip: ""
 	}
 
@@ -69,17 +69,17 @@ BloodflareHelmetGroup: Any Bloodflare Helmet
 Vanity: {
 	LightCultist: {
 		LightCultist_Helmet: {
-			DisplayName: Blinding vision of the firmament
+			DisplayName: Blinding vision of the Firmament
 			Tooltip: ""
 		}
 
 		LightCultist_Pants: {
-			DisplayName: Light Cultist_ Pants
+			DisplayName: Blinding Pantaloons of the Firmament
 			Tooltip: ""
 		}
 
 		LightCultist_Robe: {
-			DisplayName: Light Cultist_ Robe
+			DisplayName: Classy Attire of the Firmament
 			Tooltip: ""
 		}
 	}

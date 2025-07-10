@@ -7,6 +7,7 @@ using CalamityMod.Items.Materials;
 using CalamityMod.Items.Placeables;
 using CalamityMod.Rarities;
 using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Rarities;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
@@ -47,9 +48,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         {
             Item.width = 18;
             Item.height = 18;
+            Item.rare = ModContent.RarityType<BloodMoonRarity>();
             Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
             Item.defense = 48;
-            Item.rare = ModContent.RarityType<PureGreen>();
+           
         }
         private float DamageBoost = 0.12f;
         private int CritBoost = 8;

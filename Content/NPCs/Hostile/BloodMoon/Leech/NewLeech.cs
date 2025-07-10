@@ -1,8 +1,10 @@
 ﻿using CalamityMod;
+using CalamityMod.NPCs.Providence;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Content.Particles.Metaballs;
+using NoxusBoss.Core.World.WorldSaving;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
@@ -141,7 +143,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             "HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/UmbralLeech/GORE - Giblet_Drop_3"
         );
 
-       
+        public static readonly SoundStyle DeathNoise = new SoundStyle("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/UmbralLeech/Death", 3);
+        public static readonly SoundStyle DyingNoise = new SoundStyle("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/UmbralLeech/Dying1");
+
         public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech";
 
         public override void SetStaticDefaults()
@@ -150,6 +154,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             NPCID.Sets.CantTakeLunchMoney[Type] = true;
             NPCID.Sets.CannotDropSouls[Type] = true;
             NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
+            
         }
 
         public override void SetDefaults()
@@ -171,6 +176,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         public override void Load()
         {
             TailTexture = AssetDirectory.Textures.UmbralLeechTendril;
+            //WhiskerTexture = AssetDirectory.Textures.UmbralLeechWhisker;
         }
        
         public float feedtime = 0;
@@ -322,9 +328,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         #region AI
         private const float PlayerDetectionRange = 4000f;
 
+        public override bool? CanFallThroughPlatforms()
+        {
+            return true;
+        }
         public override void AI()
         {
             //Actual AI
+
             if (NPC.life > 1)
             {
                 switch (CurrentState)
@@ -739,6 +750,18 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         }
        
 
+        private void HandleIdle()
+        {
+
+        }
+        private void HandleSeekTarget()
+        {
+
+        }
+        private void HandleFeedOnTarget() 
+        {
+        
+        }
         /// <summary>
         /// Return the closest active, alive player within maxDist, or null if none.
         /// </summary>
@@ -794,12 +817,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                 NPC.velocity *= 0.1f;
                 SegmentPositions[i] += new Vector2();
             }
-            for(int i = 0; i< SegmentPositions.Count; i++)
-            {
-                SegmentPositions[i] += new Vector2(Main.rand.NextFloat(-10,10),Main.rand.NextFloat(-10,10));
-            }
+            //for(int i = 0; i< SegmentPositions.Count; i++)
+            //{
+                //SegmentPositions[i] += new Vector2(Main.rand.NextFloat(-10,10),Main.rand.NextFloat(-10,10));
+            //}
 
-            if (DeathAnimationTimer % 6 == 0 && Main.netMode != NetmodeID.Server)
+            if (DeathAnimationTimer % 6 == 0)
             {
                 BloodMetaball metaball = ModContent.GetInstance<BloodMetaball>();
                 for(int u = 0; u < SegmentPositions.Count; u++)
@@ -813,16 +836,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                 }
                
             }
-            if (DeathAnimationTimer % 60 == 0 && Main.netMode != NetmodeID.Server && NPC.whoAmI == Main.npc[(int)HeadID].whoAmI)
+            if (DeathAnimationTimer == 1 && Main.netMode != NetmodeID.Server && NPC.whoAmI == Main.npc[(int)HeadID].whoAmI)
             {
-                Player local = Main.LocalPlayer;
-                if (local.WithinRange(NPC.Center, 4800f))
-                    if(Main.rand.NextBool(4))
-                    SoundEngine.PlaySound(GibletDrop with { Volume = 1.65f , MaxInstances = 0 });
-                    else
-                    {
-                        SoundEngine.PlaySound(Bash);
-                    }
+                    SoundEngine.PlaySound(DyingNoise with { MaxInstances = 1 });
+                    
                
             }
 
@@ -837,7 +854,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     NPC.netSpam = 9;
             }
 
-            if (DeathAnimationTimer >= 250f)
+            if (DeathAnimationTimer >= 220f)
             {
                 
                 BloodMetaball metaball = ModContent.GetInstance<BloodMetaball>();
@@ -847,13 +864,13 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     Vector2 bloodVelocity = (Main.rand.NextVector2Circular(8f, 8f) - NPC.velocity) * Main.rand.NextFloat(0.2f, 1.2f);
                     metaball.CreateParticle(bloodSpawnPosition, bloodVelocity, Main.rand.NextFloat(10f, 40f), Main.rand.NextFloat(2f));
                 }
-                SoundEngine.PlaySound(Explode with { MaxInstances = 0}, NPC.Center);
+                SoundEngine.PlaySound(DeathNoise with { MaxInstances = 0}, NPC.Center);
 
-                createGore();
-                NPC.StrikeInstantKill();
+                //createGore();
+                
                 NPC.HitEffect();
                 NPC.NPCLoot();
-
+                NPC.active = false;
                
                 NPC.netUpdate = true;
 
@@ -865,6 +882,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             //Main.NewText($"DeathTimer: {DeathAnimationTimer}");
         }
 
+        
         public static Asset<Texture2D>[] UmbralLeechGores
         {
             get;
@@ -877,7 +895,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             if (Main.netMode != NetmodeID.Server)
             {
                 int variant = 0;
-                // segment 0 = head, last = tail, others = random body variant
+               
                 if (SegmentNum == 0)
                 {
                     // Head segment
@@ -937,7 +955,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         }
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (Main.bloodMoon)
+            if (Main.bloodMoon && BossDownedSaveSystem.HasDefeated<Providence>())
                 return SpawnCondition.OverworldNightMonster.Chance * 0.1f;
             return 0f;
 
@@ -947,10 +965,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
 
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            // This is where we add item drop rules, here is a simple example:
+           
             if(NPC.whoAmI == Main.npc[(int)HeadID].whoAmI)
             {
-                // If this is the head, drop a special item.
+                
                 npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<UmbralLeechDrop>(), 10,default,2));
             }
             
@@ -1149,7 +1167,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             if (!NPC.IsABestiaryIconDummy & SegmentNum == 0)
             {
                 //Utils.DrawBorderString(Main.spriteBatch, "|FeedTime: " + feedtime.ToString()+"|", NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
-                Utils.DrawBorderString(Main.spriteBatch, "| " + CurrentState +"| Time: "+ Time.ToString() + " | wiggletime: " + WiggleTime.ToString(), NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(Main.spriteBatch, "| " + CurrentState +"| Time: "+ Time.ToString() + " | wiggletime: " + WiggleTime.ToString(), NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
             }
             if (SegmentNum % 2 == 0)
             {

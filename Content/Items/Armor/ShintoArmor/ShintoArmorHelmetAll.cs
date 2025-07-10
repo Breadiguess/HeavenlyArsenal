@@ -4,9 +4,13 @@ using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.ArsenalPlayer;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
 using NoxusBoss.Content.Rarities;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -29,7 +33,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
         public override void SetStaticDefaults() {
 			// If your head equipment should draw hair while drawn, use one of the following:
-			ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
+			ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = true; // Don't draw the head at all. Used by Space Creature Mask
 			// ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = true; // Draw hair as if a hat was covering the top. Used by Wizards Hat
 			// ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = true; // Draw all hair as normal. Used by Mime Mask, Sunglasses
 			// ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
@@ -51,7 +55,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 			return body.type == ModContent.ItemType<ShintoArmorBreastplate>() && legs.type == ModContent.ItemType<ShintoArmorLeggings>();
 		}
 
-        // UpdateArmorSet allows you to give set bonuses to the armor.
+        
         public override void UpdateArmorSet(Player player)
         {
             player.setBonus = Language.GetOrRegister(Mod.GetLocalizationKey("Items.Armor.ShintoArmorHelmetAll.SetBonus")).Value;
@@ -111,4 +115,23 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             
 		}
 	}
+    
+    public class HelmetFauld : PlayerDrawLayer
+    {
+        public override Position GetDefaultPosition() => new BeforeParent(PlayerDrawLayers.FrontAccFront);
+
+        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.head == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorHelmetAll), EquipType.Head);
+
+        public override bool IsHeadLayer => false;
+
+
+
+        protected override void Draw(ref PlayerDrawSet drawInfo)
+        {
+            Texture2D texture = GennedAssets.Textures.GreyscaleTextures.WhitePixel;//ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/ShintoArmor/ShintoArmorHelmetFauld").Value;
+
+            Vector2 Pos = drawInfo.drawPlayer.Center - Main.screenPosition;
+            
+        }
+    }
 }

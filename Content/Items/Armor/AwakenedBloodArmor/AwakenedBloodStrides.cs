@@ -4,6 +4,7 @@ using CalamityMod.Items.Armor.OmegaBlue;
 using CalamityMod.Items.Materials;
 using CalamityMod.Rarities;
 using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Rarities;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
@@ -24,7 +25,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             Item.height = 18;
             Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
             Item.defense = 43;
-            Item.rare = ModContent.RarityType<PureGreen>();
+            Item.rare = ModContent.RarityType<BloodMoonRarity>();
         }
         public override void SetStaticDefaults()
         {

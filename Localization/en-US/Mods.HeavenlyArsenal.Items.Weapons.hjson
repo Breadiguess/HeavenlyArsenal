@@ -39,6 +39,11 @@ Ranged: {
 		DisplayName: Good Apple Sling
 		Tooltip: ""
 	}
+
+	NoxusWeapon: {
+		DisplayName: Noxious Fumes
+		Tooltip: ""
+	}
 }
 
 Magic: {

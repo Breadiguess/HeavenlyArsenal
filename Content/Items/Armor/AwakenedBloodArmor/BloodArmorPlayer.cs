@@ -655,6 +655,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
             var modPlayer = drawInfo.drawPlayer.GetModPlayer<BloodArmorPlayer>();
+            /*
             string BloodClotString = (" | Blood = " + modPlayer.CurrentBlood + " | Clot = " + modPlayer.Clot + " | Total = " + modPlayer.TotalResource.ToString());
             Utils.DrawBorderString(Main.spriteBatch, BloodClotString, (Vector2.UnitX* -230)+drawInfo.drawPlayer.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
 
@@ -678,7 +679,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                 }
 
             }
-
+            */
             Asset<Texture2D> coronaTexture = GennedAssets.Textures.GreyscaleTextures.Corona.Asset;
             if (modPlayer.frenzyTimer > 0f)
             {

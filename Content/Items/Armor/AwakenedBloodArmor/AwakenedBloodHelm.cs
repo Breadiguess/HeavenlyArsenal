@@ -1,13 +1,11 @@
 ﻿using CalamityMod;
-using CalamityMod.CalPlayer;
 using CalamityMod.Items;
 using CalamityMod.Items.Armor.Bloodflare;
 using CalamityMod.Items.Armor.OmegaBlue;
 using CalamityMod.Items.Materials;
-using CalamityMod.Rarities;
 using CalamityMod.Tiles.Furniture.CraftingStations;
-using HeavenlyArsenal.Content.Items.Armor.Haemsong;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
+using HeavenlyArsenal.Content.Rarities;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
@@ -47,9 +45,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         {
             Item.width = 18;
             Item.height = 18;
+            Item.rare = ModContent.RarityType<BloodMoonRarity>();
             Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
             Item.defense = 49; //85
-            Item.rare = ModContent.RarityType<PureGreen>();
+            
         }
         public override bool IsArmorSet(Item head, Item body, Item legs) => body.type == ModContent.ItemType<AwakenedBloodplate>() && legs.type == ModContent.ItemType<AwakenedBloodStrides>();
 
@@ -105,15 +104,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                      AddIngredient<OmegaBlueHelmet>().
                      AddRecipeGroup("HeavenlyArsenal:BloodflareHelmets", 1).
                      AddIngredient<YharonSoulFragment>(15).
-                     AddIngredient<UmbralLeechDrop>(3).
+                     //AddIngredient<UmbralLeechDrop>(3).
                      AddCondition(conditions: Condition.BloodMoon).
                      AddTile<CosmicAnvil>().
                      Register();
 
-            CreateRecipe().
-                    AddIngredient<BloodArmorHead>().
-                    AddTile<CosmicAnvil>().
-                    Register();
+          
         }
     }
 

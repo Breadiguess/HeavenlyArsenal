@@ -48,6 +48,38 @@ namespace HeavenlyArsenal.ArsenalPlayer
         public bool empoweredDash;
 
 
+        public bool Enraged;
+        #region s
+        /*
+            +++++++++++++++++++++++++++++++++++++*+*
+            ++++++++++++++++++++++++++++++++++++++++
+            ++++++++++++++++++++++++++++++++++++++++
+            ++++++++++++++++++++++++++++++++++++++++
+            +++++++++++++++++%@%+-...:=%@%++++++++++
+            +++++++++++++*%*:.:::.:.-+=.:-=%#+++++++
+            +++++++++%@@%-...:+-=-:*++-.:==.:##+++++
+            ++++++#@%%@-..:=*+=%=..:=#..:==...+%++++
+            ++++#@%#%%....##%@@@=..:=*:..==..*@@*+++
+            +++%%##%%.......::*@*@*-=*:..===@+:+%+++
+            ++@%###@:.....:=%@+-%::-+++.*%@+-..+%+++
+            +@%###%#...:-=*%:+%=+#+:++...=++:.:*#+++
+            #@####%*.....-::%=#+..::++:-===-...@%++*
+            @#####%*.......::#-:..::++...===...@@+++
+            @#####%#.....:+**#:...::=+. .--=.=@@@*++
+            @#####%@...::..+-+=...::=+...--=:..#@#++
+            %%#####@*.......-*=...::=+. .:==-...%*++
+            +@%#####@-.......:::=*=::-...:=-=*.+@*++
+            ++%@####%@-.......+#-..::++=+++==..%#+++
+            +++*@%####@*........:..::-+::---===*++++
+            +++++*%%###%@*..........:-+-.::-:*%+++++
+            ++++++++*####%%@#=............:#@#++++++
+            +++++*%###########%@@*-@%+++#@@@@%++++++
+            +++#%#########################*+*%@@%+++
+            +#@%##################*#*+++++++++*****#
+            @%#####**++++++**++++*##################
+            ++++++++++++*###########################
+         */
+        #endregion
         public Dictionary<string, CooldownInstance> cooldowns;
 
         public int ShadowVeilImmunity = 0;
@@ -70,6 +102,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
             IsDashing = false;
             empoweredDash = false;
             VoidBeltEquipped = false;
+            Enraged = false;
 
         }
         public override void Load()
@@ -79,7 +112,10 @@ namespace HeavenlyArsenal.ArsenalPlayer
             PlayerDashManager.TryAddDash(new AbyssDash());
 
         }
-
+        public override void ArmorSetBonusActivated()
+        {
+            Enraged = Enraged == true ? false : true;
+        }
         public override void PostUpdateMiscEffects()
         {
             if (SetActive)
@@ -272,7 +308,11 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
 
 
-            
+            if (Enraged)
+            {
+                Player.GetDamage<GenericDamageClass>() *= 3;
+                
+            }
         }
 
 
@@ -293,14 +333,21 @@ namespace HeavenlyArsenal.ArsenalPlayer
                         BarrierCrack(Player);
                         SoundEngine.PlaySound(ShintoArmorBreastplate.BreakSound, Player.Center);
                         barrier = 0;
+
                     }
 
 
+                }
+
+                if(barrier <=0 && Enraged)
+                {
+                    modifiers.FinalDamage *= 3;
                 }
             }
            
         }
 
+        
 
         public void BarrierTakeDamageVFX()
         {

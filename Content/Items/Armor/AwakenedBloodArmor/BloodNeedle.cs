@@ -2,6 +2,7 @@
 using CalamityMod.NPCs.TownNPCs;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.utils;
+using HeavenlyArsenal.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
@@ -59,6 +60,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         public ref Player Player => ref Main.player[Projectile.owner];
         public Rope tentacle;
 
+        public BezierCurve Tendril;
         /// <summary>
         /// stores the target chosen, mainly used for debug
         /// </summary>
@@ -265,10 +267,14 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                 }
             }
             #endregion
-            
+
 
             // Tentacle rope logic
             #region cool tentacle stuff
+            if (Tendril == null)
+                Tendril = new BezierCurve(Projectile.Center);
+
+
             if (tentacle == null)
             {
                 tentacle = new Rope(Projectile.Center, Player.MountedCenter, 15, 10f, Vector2.Zero);
@@ -412,12 +418,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                 AttackCooldown += MaxAttackCooldown - 2 + Main.rand.Next(0, 2);
             else
                 AttackCooldown += 10;
-            if (target.type == ModContent.NPCType<FAP>())
-            {
-                target.StrikeInstantKill();
-                target.checkDead();
-                target.active = false;
-            }
+           
             BloodMetaball metaball = ModContent.GetInstance<BloodMetaball>();
             for (int i = 0; i < 5; i++)
             {
@@ -584,7 +585,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         {
             Texture2D head = ModContent.Request<Texture2D>(Texture).Value;
             Texture2D body = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/RegSeg").Value;
-            Texture2D Clot = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/Scab").Value;
+            Texture2D Clot = GennedAssets.Textures.GreyscaleTextures.WhitePixel;//ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/Scab").Value;
             //todo: create frame and make sure that it looks decent.x
 
            

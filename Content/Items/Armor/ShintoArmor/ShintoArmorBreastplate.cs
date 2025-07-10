@@ -6,6 +6,7 @@ using CalamityMod.DataStructures;
 using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
+using CalamityMod.Projectiles.Rogue;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.ArsenalPlayer;
 using Luminance.Core.Graphics;
@@ -77,7 +78,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         {
             var modPlayer = player.Calamity();
             modPlayer.shadeRegen = true;
-            player.thorns += 50f;
+            player.thorns += 10f;
             player.statLifeMax2 += MaxLifeIncrease;
             player.statManaMax2 += MaxManaIncrease;
             player.GetDamage<GenericDamageClass>() += 0.15f;
@@ -123,16 +124,17 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                 // The "i" parameter is to desync each player's shield animation.
                 int i = player.whoAmI;
                 float baseScale = 1f;
-                float maxExtraScale = 0.025f;
+                float maxExtraScale = 0.055f;
                 float extraScalePulseInterpolant = MathF.Pow(4f, MathF.Sin(Main.GlobalTimeWrappedHourly * 0.791f + i) - 1);
                 float scale = baseScale + maxExtraScale * extraScalePulseInterpolant;
+                float ShieldHealthInterpolant = (float)player.GetModPlayer<ShintoArmorPlayer>().barrier / ShieldDurabilityMax;
 
                 if (!alreadyDrawnShieldForPlayer)
                 {
-                    float visualShieldStrength = 1f;
+                    float visualShieldStrength = ShieldHealthInterpolant;
 
                     // The scale used for the noise overlay also grows and shrinks
-                    float noiseScale = MathHelper.Lerp(0.28f, 0.38f, 0.5f + 0.5f * MathF.Sin(Main.GlobalTimeWrappedHourly * 0.347f + i));
+                    float noiseScale = MathHelper.Lerp(0.28f, 0.38f, 5f + 0.5f * MathF.Sin(Main.GlobalTimeWrappedHourly * 0.347f + i));
 
 
                     
@@ -142,18 +144,21 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                     shieldEffect.Parameters["blowUpSize"].SetValue(0.56f);
                     shieldEffect.Parameters["noiseScale"].SetValue(noiseScale);
 
-                    float baseShieldOpacity = 0.6f + 0.1f * MathF.Sin(Main.GlobalTimeWrappedHourly * 0.95f);
+                    float baseShieldOpacity = 1.2f *Utils.SmoothStep(-15f, 15f, (float)Math.Sin(Main.GlobalTimeWrappedHourly * 2f)) - 0.2f;
+                                              //(float)Utils.SmoothStep(0,0.5f,Math.Sin(Main.GlobalTimeWrappedHourly * 0.45f));
+                                              //(float)Utils.Lerp(0, 1, Math.Clamp((MathF.Sin(Main.GlobalTimeWrappedHourly * 0.95f)),0,1));//(0.2f) + 0.2f * (player.statLife / player.statLifeMax) * MathF.Sin(Main.GlobalTimeWrappedHourly * 0.76f);
 
-                    float minShieldStrengthOpacityMultiplier = 0.25f;
+                    
+                    float minShieldStrengthOpacityMultiplier = 1f;
                     float finalShieldOpacity = baseShieldOpacity * MathHelper.Lerp(minShieldStrengthOpacityMultiplier, 1f, visualShieldStrength);
                     shieldEffect.Parameters["shieldOpacity"].SetValue(finalShieldOpacity);
                     shieldEffect.Parameters["shieldEdgeBlendStrenght"].SetValue(1f);
 
                     Color shieldColor = new Color(163, 0, 41); // #189CCC
                     Color primaryEdgeColor = shieldColor;
-                    Color secondaryEdgeColor = new Color(163,0,41); // #22E0E3                   
+                    Color secondaryEdgeColor = new Color(220,20,71); // #22E0E3                   
                    // Main.NewText($"Shield Opacity: {baseShieldOpacity}", Color.AliceBlue);
-                    Color edgeColor = CalamityUtils.MulticolorLerp(Main.GlobalTimeWrappedHourly * 0.2f, primaryEdgeColor, secondaryEdgeColor);
+                    Color edgeColor = CalamityUtils.MulticolorLerp(Main.GlobalTimeWrappedHourly * ShieldHealthInterpolant, primaryEdgeColor, secondaryEdgeColor);
 
                     shieldEffect.Parameters["shieldColor"].SetValue(shieldColor.ToVector3());
                     shieldEffect.Parameters["shieldEdgeColor"].SetValue(edgeColor.ToVector3());
@@ -164,9 +169,9 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                     Main.pixelShader.CurrentTechnique.Passes[0].Apply();
 
 
-                    float rotation = 0f;
+                    float rotation = Utils.AngleLerp(0, (float)Math.Sin(Main.GlobalTimeWrappedHourly * 0.02f),0.4f);
                     //Texture2D ShieldNoise = AssetDirectory.Textures.VoidLake.Value;
-                    Texture2D glow = GennedAssets.Textures.Noise.MoltenNoise.Value;
+                    Texture2D glow = GennedAssets.Textures.Noise.MoltenNoise;
                     Texture2D ogg = GennedAssets.Textures.Extra.Ogscule;
                     Main.spriteBatch.End();
 
@@ -180,11 +185,15 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                         Main.EntitySpriteDraw(ogg, pos, null, Color.AntiqueWhite, rotation, ogg.Size() / 2f, 0.05f, 0, 0);
                     }
                     else 
-                        Main.EntitySpriteDraw(glow, pos, null, Color.AntiqueWhite, rotation, glow.Size() / 2f, 0.1f, 0, 0);
+                        Main.EntitySpriteDraw(glow, pos, null, Color.AntiqueWhite, rotation, glow.Size() / 2f, (baseShieldOpacity/20)+0.1f, 0);
                     
                     
                     Main.spriteBatch.End();
                     Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+
+                    //Utils.DrawBorderString(Main.spriteBatch, "Opacity: " + baseShieldOpacity.ToString(), -Vector2.UnitX *150 +pos - Vector2.UnitY*40, Color.AntiqueWhite);
+                    Utils.DrawBorderString(Main.spriteBatch, "Barrier: "+player.GetModPlayer<ShintoArmorPlayer>().barrier, -Vector2.UnitX * 150 + pos - Vector2.UnitY * 60, Color.AntiqueWhite);
+                    Utils.DrawBorderString(Main.spriteBatch, "ShieldHealth Interp: " + ShieldHealthInterpolant.ToString(), - Vector2.UnitX * 150 + pos - Vector2.UnitY * 80, Color.AntiqueWhite);
 
                     Vector2 drawPosition = player.Center - Main.screenPosition;
 
@@ -216,8 +225,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             if (Main.netMode != NetmodeID.Server)
             {
                 //register the faulds texture. This appears either when the leggings  or the chestplate is equipped (both works)
-                EquipLoader.AddEquipTexture(Mod, Texture + "_Bulk", EquipType.Front, this);
-                EquipLoader.AddEquipTexture(Mod, Texture + "_Waist", EquipType.Waist, this);
+                //EquipLoader.AddEquipTexture(Mod, Texture + "_Bulk", EquipType.Front, this);
+                //EquipLoader.AddEquipTexture(Mod, Texture + "_Waist", EquipType.Waist, this);
                 //EquipLoader.AddEquipTexture(Mod, "HeavenlyArsenal/Content/Items/Armor/ShintoArmorFaulds_Waist", EquipType.Waist, name: "ShintoArmorFaulds");
             }
              On_Main.DrawInfernoRings += On_Main_DrawInfernoRings;

@@ -15,6 +15,7 @@ using HeavenlyArsenal.Content.Items.Weapons.Summon;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.Items.Accessories.Wings;
 using NoxusBoss.Content.Items.Fishing;
 using NoxusBoss.Core.Autoloaders.SolynBooks;
 using NoxusBoss.Core.World.GameScenes.AvatarUniverseExploration;
@@ -107,7 +108,7 @@ namespace HeavenlyArsenal.Core.Systems
             //drew wings to dev wings
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
-            ModContent.ItemType<DrewsWings>(),
+            ModContent.ItemType<DivineWings>(),
             1000f,
             ItemReturnType.None,
                //Items to get back

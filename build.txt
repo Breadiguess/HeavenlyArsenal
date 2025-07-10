@@ -1,4 +1,4 @@
 displayName = Heavenly Arsenal
 author = Bread, Lucille Karma, Blockaroz
-version = 0.5
+version = 0.602
 modReferences = NoxusBoss, SubworldLibrary

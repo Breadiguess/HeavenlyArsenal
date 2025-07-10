@@ -316,9 +316,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         {
             if (!NPC.IsABestiaryIconDummy)
             {
-                Utils.DrawBorderString(spriteBatch, " | State: " + CurrentState, NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-                Utils.DrawBorderString(spriteBatch, " | Ammo: " + AmmoCount, NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
-                Utils.DrawBorderString(spriteBatch, " | Timer: " + BombardTimer, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(spriteBatch, " | State: " + CurrentState, NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(spriteBatch, " | Ammo: " + AmmoCount, NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(spriteBatch, " | Timer: " + BombardTimer, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
 
             }
 
@@ -337,7 +337,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (Main.bloodMoon && DownedBossSystem.downedYharon)
+            if (Main.bloodMoon && DownedBossSystem.downedProvidence)
                 return SpawnCondition.OverworldNightMonster.Chance * 0.01f;
             return 0f;
         }

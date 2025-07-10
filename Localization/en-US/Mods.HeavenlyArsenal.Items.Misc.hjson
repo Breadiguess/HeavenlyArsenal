@@ -8,7 +8,8 @@ Materials: {
 		DisplayName: Shadowspec Gun Parts
 		Tooltip:
 			'''
-			the ultimate culmination of gunsmithing. Years of the craft have gone into this, and the end result lies before you
+			the ultimate culmination of gunsmithing.
+			Years of the craft have gone into this, and the end result lies before you
 			these parts are capable of creating a weapon of unimaginable power...
 			 
 			I F  O N L Y  Y O U  W I L L  B R I N G  A B O U T  T H E  E N D
@@ -27,6 +28,7 @@ ChaliceOfFun: {
 }
 
 Incomplete_gun: {
-	DisplayName: Incomplete_gun
-	Tooltip: ""
+	DisplayName: Incomplete Reactor
+	Tooltip: bottom text
+	TooltipPostNamelessDiety: Go on. Claim Your Destiny.
 }

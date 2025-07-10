@@ -9,18 +9,22 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <AdditionalFiles Remove="Assets\Textures\Backpacks\**" />
+	  <AdditionalFiles Remove="Content\Items\Armor\Haemsong\**" />
 	  <AdditionalFiles Remove="Content\Projectiles\Weapons\Holdout\**" />
 	  <AdditionalFiles Remove="Core\Autoloaders\**" />
 	  <AdditionalFiles Remove="Sounds\**" />
 	  <Compile Remove="Assets\Textures\Backpacks\**" />
+	  <Compile Remove="Content\Items\Armor\Haemsong\**" />
 	  <Compile Remove="Content\Projectiles\Weapons\Holdout\**" />
 	  <Compile Remove="Core\Autoloaders\**" />
 	  <Compile Remove="Sounds\**" />
 	  <EmbeddedResource Remove="Assets\Textures\Backpacks\**" />
+	  <EmbeddedResource Remove="Content\Items\Armor\Haemsong\**" />
 	  <EmbeddedResource Remove="Content\Projectiles\Weapons\Holdout\**" />
 	  <EmbeddedResource Remove="Core\Autoloaders\**" />
 	  <EmbeddedResource Remove="Sounds\**" />
 	  <None Remove="Assets\Textures\Backpacks\**" />
+	  <None Remove="Content\Items\Armor\Haemsong\**" />
 	  <None Remove="Content\Projectiles\Weapons\Holdout\**" />
 	  <None Remove="Core\Autoloaders\**" />
 	  <None Remove="Sounds\**" />

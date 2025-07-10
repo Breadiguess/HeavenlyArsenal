@@ -52,9 +52,11 @@ namespace CalRemix.Core.Graphics
             get
             {
                 // Only draw if there is at least one active EntropicBlast projectile
-                int entropicBlastType = ModContent.ProjectileType<EntropicComet>();
-                return Main.projectile.Any(p => p.active && p.type == entropicBlastType);
+                int entropicBlastType = ModContent.ProjectileType<EntropicBlast>();
+                int entropicCrystalType = ModContent.ProjectileType<EntropicBlast>();
+                return true;//Main.projectile.Any(p => p.active && (p.type == entropicBlastType)|| p.type == entropicCrystalType);
             }
+            
         }
 
         
@@ -93,7 +95,7 @@ namespace CalRemix.Core.Graphics
             foreach (Projectile p in Main.projectile.Where(p => p.active))
             {
                 Color c = Color.Purple;
-                if (p.type == ModContent.ProjectileType<EntropicComet>())
+                if (p.type == ModContent.ProjectileType<EntropicBlast>() && p.hide != true)
                 {
                     c.A = 0;
                     p.ModProjectile.PreDraw(ref c);

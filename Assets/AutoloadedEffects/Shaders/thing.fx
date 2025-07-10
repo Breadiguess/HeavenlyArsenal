@@ -3,7 +3,7 @@ float2 Resolution;
 
 // This is the “time” uniform (in seconds). tModLoader will update this each frame.
 // You can adjust the speed by multiplying/divider if you want.
-float Time;
+float uTime;
 
 // The input texture (the current back buffer). If you want to blend your tunnel
 // on top of an existing screen, you sample from this. If you only want the tunnel,
@@ -44,7 +44,7 @@ float4 MainPS(PS_INPUT input) : SV_TARGET
     float i = 0.0;
     float s = 0.0;
     float n = 0.0;
-    float t = Time * 0.05;
+    float t = uTime * 0.05;
 
     // 3) The main raymarch loop: “for(o *= i; i++ < 1e2; ) { … }”
     //    We will do exactly 100 iterations (i goes from 0 -> 100).

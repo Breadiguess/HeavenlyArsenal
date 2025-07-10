@@ -1,5 +1,4 @@
 using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
-using HeavenlyArsenal.Content.Items.Armor.Haemsong;
 using NoxusBoss.Assets;
 using Terraria;
 using Terraria.Audio;
@@ -14,20 +13,14 @@ namespace HeavenlyArsenal.Common
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
             var bloodArmorPlayer = Player.GetModPlayer<BloodArmorPlayer>();
-            var bloodPlayer = Player.GetModPlayer<BloodPlayer>();
-            if (KeybindSystem.HaemsongBind.JustPressed && (bloodArmorPlayer.BloodArmorEquipped || bloodPlayer.fullBloodArmor))
+           
+            if (KeybindSystem.HaemsongBind.JustPressed && (bloodArmorPlayer.BloodArmorEquipped))
             {
                 SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.ArmJutOut with { Volume = 0.2f, Pitch = -1f }, Player.Center, null);
                 bloodArmorPlayer.CurrentForm = bloodArmorPlayer.CurrentForm == BloodArmorForm.Offense
                     ? BloodArmorForm.Defense
                     : BloodArmorForm.Offense;
-                if (bloodPlayer.offenseMode == true)
-                {
-                    
-                    bloodPlayer.offenseMode = false;
-                }
-                else
-                    bloodPlayer.offenseMode = true;
+               
             }
 
         }

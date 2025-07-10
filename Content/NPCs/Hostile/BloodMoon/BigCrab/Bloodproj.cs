@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
+using Terraria.GameContent;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 {
@@ -20,6 +22,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             Projectile.hostile = true;
             Projectile.friendly = false;
             Projectile.timeLeft = 400;
+            Projectile.ignoreWater = true;
+            Projectile.tileCollide = false;
+            Projectile.damage = 300;
         }
         public override void SetStaticDefaults()
         {
@@ -31,12 +36,24 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             Projectile.velocity *= 0.9999f;
             Projectile.velocity.Y += 100 * (float)Math.Sin(Time);
 
+            Projectile.rotation = MathHelper.PiOver2+Projectile.velocity.ToRotation();
             if(Projectile.velocity.Length() <= Vector2.One.Length())
             {
                 Projectile.velocity = Vector2.Zero;
 
             }
             
+        }
+        public override bool PreDraw(ref Color lightColor)
+        {
+
+            Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
+
+            Vector2 origin = texture.Size() / 2;
+
+
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, lightColor, Projectile.rotation, origin, 1, SpriteEffects.None); 
+            return false;
         }
     }
 }
