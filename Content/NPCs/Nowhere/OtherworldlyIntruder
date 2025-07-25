@@ -1,0 +1,456 @@
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using HeavenlyArsenal.Core;
+using Luminance.Core.Graphics;
+using NoxusBoss.Assets;
+//ignore that the usings are fucked up, I literally am writing this blind :sob:
+//no, ignore that EVERYTHING is fucked up. AAAAAAAAAAAAAAAAAAA
+namespace HeavenlyArsenal.Content.NPCs.Nowhere {
+
+  public class OtherworldlyIntruder: ModNPC {
+    #region Setup
+    public enum IntruderState {
+      EmergeFromPortal,
+      Idle,
+      LookAtInterest, //go, my abstract autistic son, pursue your fixation!
+      ScareOff,
+      Leave
+    }
+
+    public IntruderState CurrentState {
+      get;
+      set;
+    }
+    
+    public float LeaveTime {
+      get;
+      private set;
+    }
+    public enum InterestType {
+      None,
+      Player,
+      NPC,
+      Projectile,
+      Tile
+    }
+
+    public struct InterestData
+    n {
+      public InterestType Type;
+      public int Index; // index in corresponding array or tile ID in list
+      public Point TilePos;
+      public Vector2 Position =>
+        Type == InterestType.Tile ? new Vector2(TilePos.X * 16, TilePos.Y * 16) :
+        Type == InterestType.Player ? Main.player[Index].Center :
+        Type == InterestType.NPC ? Main.npc[Index].Center :
+        Type == InterestType.Projectile ? Main.projectile[Index].Center :
+        Vector2.Zero;
+    }
+
+    public IntruderState CurrentState {
+      get;
+      set;
+    }
+    public ref float Time => ref NPC.ai[0];
+    public float LeaveTime {
+      get;
+      private set;
+    }
+    public float Cowardice {
+      get;
+      private set;
+    }
+
+    public InterestData Interest;
+    private static readonly List < ushort > ValidTileTypes = new List < ushort > {
+      TileID.WorkBenches// i don't currently remember the method of getting modded tiles, but in short the only ones its really gonna be interested in are the genesis and its assorted flowers.
+    };
+
+    ///<summary>
+    /// the position of the rift this intruder is hanging out of
+    ///</summary>
+    public Vector2 RiftPos {
+      get;
+      private set;
+    }
+    ///<summary>
+    /// used to dictate the angle the intruder should be looking towards.
+    ///</summary> 
+    public float IntAngle;
+    ///<summary>
+    /// The current alpha interpolant of the intruder.
+    ///</summary>
+    public float AlphaInterp;
+
+    ///<summary>
+    /// how open the portal of this intruder is.
+    ///</summary>
+    public float PortalInterp;
+
+    ///<summary>
+    /// How far out of the portal this intruder is hanging.
+    ///</summary>
+    public float HangoutInterp
+
+    ///<summary>
+    /// The intention of this float is to determine how quickly the intruder runs away, as well as their tolerance of other npcs entities getting close to them.
+    /// Its on a scale of 0-1, where 0 is they're not scared at all (you can almost walk right up to it), and 1 is the biggest coward you've ever met.
+    ///</summary>
+    public float Cowardice {
+      get;
+      private set;
+    }
+    private List < Tendril > tendrils;
+    private
+    const int TendrilCount = 6;
+
+    public ref float Time => ref NPC.ai[0];
+    
+    public override void SetStaticDefaults() {
+      //DisplayName.SetDefault("???");
+
+    }
+
+    public override void SetDefaults() {
+      NPC.width = 34;
+      NPC.height = 48;
+      NPC.damage = -1;
+      NPC.defense = 999;
+      NPC.lifeMax = 5;
+      NPC.noGravity = true;
+      NPC.noTileCollide = true;
+      NPC.friendly = false;
+      NPC.hostile = false;
+      // //=======\\
+      LeaveTime = Main.rand.Next(600, 1200);
+      Cowardice = Main.rand.Next(0, 1);
+      CurrentState = IntruderState.EmergeFromPortal;
+      // \\=======//
+      // Initialize tendrils
+      tendrils = new List < Tendril > (TendrilCount);
+      for (int j = 0; j < TendrilCount; j++)
+        tendrils.Add(new Tendril(NPC, j, TendrilCount));
+      RiftPos = new Vector2(NPC.Center.X, NPC.Center.Y);
+
+    }
+    #endregion
+
+    #region AI
+    public override void AI() {
+      if (Interest.Type == InterestType.None)
+        FindInterest();
+      StateMachine();
+      HandleFear();
+      foreach(var t in tendrils)
+      t.Update(Interest, CurrentState);
+      Time++;
+    }
+
+    private void StateMachine() {
+      switch (CurrentState) {
+      case IntruderState.EmergeFromPortal:
+        HandleEmerge();
+        break;
+      case IntruderState.Idle:
+        HandleIdle();
+        break;
+      case IntruderState.LookAtInterest:
+        HandleLookAtInterest();
+        break;
+      case IntruderState.ScareOff:
+        HandleScareOff();
+        break;
+      case IntruderState.Leave:
+        HandleLeave();
+        break;
+      }
+    }
+
+    private void HandleEmerge() {
+      if (Time > 60) {
+        Time = 0;
+        CurrentState = IntruderState.Idle;
+      }
+    }
+    private void HandleIdle() {
+      if (Time > LeaveTime) {
+        Time = 0;
+        CurrentState = IntruderState.Leave;
+      }
+    }
+    private void HandleLookAtInterest() {
+      Time--;
+      if (Interest != null) {
+        Vector2 toInterest = Interest?.Center.ToVector2() ?? Vector2.Zero - NPC.Center;
+        float angleToLook = toInterest.ToRotation();
+        IntAngle = angleToLook;
+      }
+    }
+    ///<summary>
+    ///called when my poor, precious child either gets too scared or gets hurt :(
+    /// how could you do this to my child?
+    ///</summary>
+    private void HandleScareOff() {
+
+    }
+    private void HandleLeave() {
+      //todo: Lerp Back into portal
+      HangoutInterp = float.Lerp(HangoutInterp, 0, 0.4 f);
+      if (HangoutInterp <= 0.4 f) {
+        PortalInterp = float.Lerp(PortalInterp, 0, 0.3 f);
+      }
+    }
+    private void FindInterest() {
+      // 0: Player, 1: NPC, 2: Projectile, 3: Tile
+      int choice = Main.rand.Next(4);
+      switch (choice) {
+      case 0:
+        var activePlayers = Main.player.Where(p => p.active && !p.dead).ToArray();
+        if (activePlayers.Length > 0) {
+          int idx = Main.rand.Next(activePlayers.Length);
+          Interest = new InterestData {
+            Type = InterestType.Player, Index = Array.IndexOf(Main.player, activePlayers[idx])
+          };
+        }
+        break;
+      case 1:
+        var hostiles = Main.npc.Where(n => n.active && n.CanBeChasedBy() && !n.friendly).ToArray();
+        if (hostiles.Length > 0) {
+          int idx = Main.rand.Next(hostiles.Length);
+          Interest = new InterestData {
+            Type = InterestType.NPC, Index = Array.IndexOf(Main.npc, hostiles[idx])
+          };
+        }
+        break;
+      case 2:
+        var projs = Main.projectile.Where(pr => pr.active && !pr.hostile).ToArray();
+        if (projs.Length > 0) {
+          int idx = Main.rand.Next(projs.Length);
+          Interest = new InterestData {
+            Type = InterestType.Projectile, Index = Array.IndexOf(Main.projectile, projs[idx])
+          };
+        }
+        break;
+      case 3:
+        // Find valid tiles within 100 tiles of the NPC
+        List < Point > foundTiles = new List < Point > ();
+        Point centerTile = NPC.Center.ToTileCoordinates();
+        int radius = 100;
+        for (int x = centerTile.X - radius; x <= centerTile.X + radius; x++) {
+          if (x < 0 || x >= Main.maxTilesX) continue;
+          for (int y = centerTile.Y - radius; y <= centerTile.Y + radius; y++) {
+            if (y < 0 || y >= Main.maxTilesY) continue;
+            Tile tile = Main.tile[x, y];
+            if (tile != null && tile.HasTile && ValidTileTypes.Contains(tile.TileType))
+              foundTiles.Add(new Point(x, y));
+          }
+        }
+        if (foundTiles.Count > 0) {
+          Point chosen = foundTiles[Main.rand.Next(foundTiles.Count)];
+          Interest = new InterestData {
+            Type = InterestType.Tile, TilePos = chosen
+          };
+        }
+        break;
+      }
+    }
+
+    ///<summary>
+    ///Runs every so often to check if the intruder should run away.
+    ///takes cowardice into account. if the object they're interested in gets too close, be afraid!
+    ///</summary>
+    private void HandleFear() {
+      if (CurrentState == IntruderState.ScareOff)
+        return;
+
+      if (--fearCheckCooldown > 0)
+        return;
+
+      fearCheckCooldown = 110; // run every 110 ticks
+
+      float fearScore = 0 f;
+
+      // Count hostile NPCs
+      int hostileCount = Main.npc.Count(n => n.active && n.CanBeChasedBy() && !n.friendly);
+      fearScore += hostileCount * 0.05 f;
+
+      // Distance to all players
+      foreach(Player player in Main.player) {
+        if (player != null && player.active && !player.dead) {
+          float playerDist = Vector2.Distance(NPC.Center, player.Center);
+          fearScore += MathHelper.Clamp(1 f - (playerDist / 600 f), 0 f, 1 f) * 0.4 f;
+        }
+      }
+
+      // Distance to interest
+      if (Interest != null) {
+        float interestDist = Vector2.Distance(NPC.Center, Interest.Center);
+        fearScore += MathHelper.Clamp(1 f - (interestDist / 400 f), 0 f, 1 f) * 0.3 f;
+      }
+
+      // Check for summoner projectiles nearby
+      foreach(Projectile proj in Main.projectile) {
+        if (proj.active && (proj.minion || proj.sentry) && proj.timeLeft > 5 && Vector2.Distance(NPC.Center, proj.Center) < 500 f) {
+          fearScore += 0.3 f;
+          break;
+        }
+      }
+
+      // Time of day adjustment
+      fearScore += Main.dayTime ? 0.2 f : -0.2 f;
+
+      // Adjust by cowardice
+      fearScore *= Cowardice;
+
+      if (fearScore > 1 f) {
+        Time = 0;
+        CurrentState = IntruderState.ScareOff;
+      }
+      Main.NewText($"Fear score: {fearScore}");
+    }
+
+    #endregion
+
+    #region DrawCode From hell
+    private void DrawRift(SpriteBatch spriteBatch) {
+      Vector2 DrawPos = RiftPos - Main.screenPosition
+      float Rotation = 0; 
+      Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
+
+      Vector2 offset = Velocity.SafeNormalize(Vector2.Zero);
+      Main.spriteBatch.End();
+
+      Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+      Main.EntitySpriteDraw(glow, DrawPos, glow.Frame(), Color.Red with {
+        A = 200
+      }, Rotation, glow.Size() * 0.5 f, new Vector2(0.12 f, 0.25 f), 0, 0);
+
+      Texture2D innerRiftTexture = AssetDirectory.Textures.VoidLake.Value;
+      Color edgeColor = new Color(1 f, 0.06 f, 0.06 f);
+      float timeOffset = Main.myPlayer * 2.5552343 f;
+
+      ManagedShader riftShader = ShaderManager.GetShader("NoxusBoss.DarkPortalShader");
+      riftShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 0.2 f + timeOffset);
+      riftShader.TrySetParameter("baseCutoffRadius", 0.3 f);
+      riftShader.TrySetParameter("swirlOutwardnessExponent", 0.2 f);
+      riftShader.TrySetParameter("swirlOutwardnessFactor", 3 f);
+      riftShader.TrySetParameter("vanishInterpolant", 0.01 f);
+      riftShader.TrySetParameter("edgeColor", edgeColor.ToVector4());
+      riftShader.TrySetParameter("edgeColorBias", 0.1 f);
+      riftShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 1, SamplerState.AnisotropicWrap);
+      riftShader.SetTexture(GennedAssets.Textures.Noise.BurnNoise, 2, SamplerState.AnisotropicWrap);
+      riftShader.Apply();
+
+      Main.spriteBatch.Draw(innerRiftTexture, DrawPos, null, Color.White, Rotation + MathHelper.Pi, innerRiftTexture.Size() * 0.5 f, new Vector2(0.2 f, 0.4 f), 0, 0);
+
+      Main.spriteBatch.End();
+
+      Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+
+    }
+    private void DrawTalisman() {
+
+    }
+    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+      Vector2 DrawPos = NPC.Center - Main.ScreenPosition;
+      DrawRift(spriteBatch);
+      foreach(var t in tendrils)
+      t.Draw(spriteBatch, screenPos);
+
+      Utils.DrawBorderString(Main.Spritebatch, Time.ToString(), DrawPos, Color.AntiqueWhite);
+      return false;
+    }
+    #endregion
+
+    #region Hit Responses
+    public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
+      Time = 0;
+      CurrentState = IntruderState.ScareOff;
+    }
+    public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
+      Time = 0;
+      CurrentState = IntruderState.ScareOff;
+    }
+    public override void PartyHatPosition(ref Vector2 position, ref SpriteEffects spriteEffects) {
+      // maybe implement later for the funnies
+    }
+    public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers) {
+
+      modifiers.SetMaxDamage(1);
+      modifiers.HideCombatText();
+    }
+
+    public override void ModifyHitByProjectile(Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection) {
+      modifiers.SetMaxDamage(1);
+      modifiers.HideCombatText();
+    }
+    #endregion
+
+  }
+  private class Tendril {
+    private NPC parent;
+    private readonly int index;
+    private readonly int total;
+    private readonly int controlCount;
+    private readonly float segmentDistance;
+    private Vector2[] controlPoints;
+
+    public Tendril(NPC parent, int index, int total, int controlCount, float segmentDistance) {
+      this.parent = parent;
+      this.index = index;
+      this.total = total;
+      this.controlCount = controlCount;
+      this.segmentDistance = segmentDistance;
+      controlPoints = new Vector2[controlCount];
+      for (int i = 0; i < controlCount; i++)
+        controlPoints[i] = parent.Center;
+    }
+
+    public void Update(Entity interest, IntruderState state) {
+      float baseAngle = MathHelper.TwoPi * index / total;
+      Vector2 origin = parent.Center;
+      controlPoints[0] = origin;
+
+      float angle = baseAngle;
+      if (state == IntruderState.LookAtInterest && interest?.active == true) {
+        float target = (interest.Center - origin).ToRotation();
+        angle = MathHelper.Lerp(baseAngle, target, 0.3 f);
+      }
+
+      for (int i = 1; i < controlCount; i++) {
+        float phase = Main.GlobalTimeWrappedHourly * 2 f + index * 0.5 f + i * 0.3 f;
+        float offsetAngle = angle + (float) System.Math.Sin(phase) * 0.2 f;
+        controlPoints[i] = controlPoints[i - 1] + offsetAngle.ToRotationVector2() * segmentDistance;
+      }
+    }
+
+    public void Draw(SpriteBatch sb, Vector2 screenPos) {
+      Texture2D pixel = ModContent.Request < Texture2D > ("Terraria/Images/UI/Pixel").Value;
+      // Loop each control segment and draw intermediate points
+      float maxScale = 3 f;
+      for (int i = 1; i < controlPoints.Length; i++) {
+        Vector2 prev = controlPoints[i - 1] - screenPos;
+        Vector2 curr = controlPoints[i] - screenPos;
+
+        // Number of subdivisions for smoothness
+        int steps = (int)(segmentDistance);
+        for (int s = 0; s <= steps; s++) {
+          float f = s / (float) steps;
+          Vector2 point = Vector2.Lerp(prev, curr, f);
+          
+          // Calculate overall t from start of tendril
+          float t = ((i - 1) + f) / (float)(controlCount - 1);
+          // Scale decreases along the tendril
+          float scale = MathHelper.Lerp(maxScale, 0.5 f, t);
+          Color c = Color.Lerp(Color.Black, Color.DarkViolet, t) * (1 f - t);
+          sb.Draw(pixel, point, null, c, 0 f, Vector2.Zero, scale, SpriteEffects.None, 0 f);
+        }
+      }
+    }
+  }
+
+}
