@@ -58,7 +58,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             get => (int)NPC.ai[1];
             set => NPC.ai[1] = value;
         }
-
+        
         //private Vector2 MoveTarget = Vector2.Zero;
         
 
@@ -99,13 +99,13 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
                 case HemocrabAI.Idle:
                     CurrentState = HemocrabAI.Traverse;
                     break;
-
+            
                 case HemocrabAI.Traverse:
                    
                     break;
             }
         }
-
+        
 
 
         private void HoverAboveGround(int hoverPixels)
@@ -191,16 +191,16 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         public void MoveFinger(ref float animationCompletion, ref Vector2 currentPosition, ref Vector2 start, Vector2 end, float moveDistanceThreshold = 140f)
         {
             bool fingerAStarted = FingerAnimationCompletionA > 0f && FingerAnimationCompletionA < 0.48f;
-
+          
             bool animationJustStarted = fingerAStarted;
             if (animationCompletion <= 0f && !currentPosition.WithinRange(end, moveDistanceThreshold) && !animationJustStarted)
             {
                 start = currentPosition;
                 animationCompletion = 0.03f;
-            }
+        }
 
             if (animationCompletion >= 0.03f)
-            {
+        {
                 animationCompletion = Saturate(animationCompletion + 0.067f);
                 currentPosition = Vector2.SmoothStep(start, end, InverseLerp(0.1f, 0.9f, animationCompletion));
                 currentPosition -= Vector2.UnitY * Convert01To010(animationCompletion) * 70f;
@@ -219,7 +219,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         public Vector2 FingerPositionA;
 
         private void RenderFingerA(Vector2 handPosition, float generalScale, float armRotation)
-        {
+            {             
             float digitAScale = generalScale * 0.95f;
             Vector2 digitAStart = handPosition + new Vector2(NPC.spriteDirection * -20f, 0).RotatedBy(armRotation) * NPC.scale;
             Texture2D digitA1 = GennedAssets.Textures.Hands.FrontHandLeftFinger1Digit1;
@@ -239,7 +239,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             ], [digitA1, digitA2, digitA3],
                 [digitA[0].Offset.RotatedBy(0), digitA[1].Offset.RotatedBy(0 * 2f), digitA[2].Offset.RotatedBy(0 * 3f)],
                 [0f, 0f, -0.3f]);
-        }
+            }
 
         public void ForwardKinematics(float scale, Color color, Vector2 start, Vector2[] origins, Texture2D[] textures, Vector2[] offsets, float[] rotationOffsets, Vector2[]? manualOffsets = null)
         {
@@ -250,10 +250,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             {
                 drawPositions[i] = currentDrawPosition + (manualOffsets?[i] ?? Vector2.Zero);
                 currentDrawPosition += offsets[i];
-            }
+        }
 
             for (int i = 0; i < textures.Length; i++)
-            {
+        {
                 float rotation = offsets[i].ToRotation() - rotationOffsets[i] - MathHelper.PiOver2;
                 Texture2D texture = textures[i];
                 Vector2 origin = origins[i];
@@ -282,10 +282,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             Rectangle frame = texture.Frame(1, 13, 0, currentFrame);
 
             float Rot = NPC.rotation +MathHelper.PiOver2;
-
+            
             texture.Frame(5, 1, 0, 0);
             Main.EntitySpriteDraw(texture, DrawPos, frame, drawColor, Rot, origin, NPC.scale, Direction, 0);
 
+            Rectangle CrabFrame = new Rectangle(0, BodyFrame * frameHeight, texture.Width, frameHeight);
 
             Utils.DrawBorderString(spriteBatch, FingerAnimationCompletionA.ToString(), DrawPos - Vector2.UnitY * 120, Color.AliceBlue);
             return false;
