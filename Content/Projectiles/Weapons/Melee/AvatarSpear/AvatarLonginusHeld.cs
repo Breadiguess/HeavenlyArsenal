@@ -967,16 +967,22 @@ public class AvatarLonginusHeld : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        string texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld_Alt";
-        if(Main.LocalPlayer.name == "ModTester2")
-            texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld_Alt1";
+        string texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld_Alt1";
+        //if(Main.LocalPlayer.name == "ModTester2")
+        //    texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld";
 
 
         Texture2D texture = ModContent.Request<Texture2D>(texturePath).Value;
-            //default: TextureAssets.Projectile[Type].Value;
+        //default: TextureAssets.Projectile[Type].Value;
 
 
-        Rectangle frame = texture.Frame(1, 11, 0, CurrentFrame);
+        Rectangle frame;
+        //if (Main.LocalPlayer.name == "ModTester2")
+        //    frame = texture.Frame(1, 2,0, IsEmpowered? 2 :1);
+       
+        {
+            frame = texture.Frame(1, 11, 0, CurrentFrame);
+        }
         Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
 
         float scale = Projectile.scale;

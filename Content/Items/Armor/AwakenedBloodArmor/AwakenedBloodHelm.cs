@@ -85,7 +85,19 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
+            // Add this tooltip before vanilla armor tooltips. Do not add tooltip if the item is in vanity slot.
+            Player player = Main.LocalPlayer;
+            int bodySlot = player.armor[10].type == Item.type ? 10 : -1;
+            // In Terraria, armor[10..13] are vanity slots for body, legs, head, etc.
+            // Body vanity slot is armor[10]
+            bool isInVanitySlot = false;
 
+            if (player.armor[10].type == Item.type)
+            {
+                isInVanitySlot = true;
+            }
+            if (isInVanitySlot)
+                return;
             // build a single combined tooltip line
             string text =
                 $"+{DamageBoost * 100:F0}% to all damage\n" +
@@ -96,7 +108,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             {
                 OverrideColor = new Color(200, 50, 50)  // optional
             };
-            tooltips.Add(line);
+
+            // Insert before vanilla armor tooltips (which have Mod == "Terraria" and Name == "Tooltip#")
+            int insertIndex = tooltips.FindIndex(t => t.Mod == "Terraria" && t.Name.StartsWith("Tooltip"));
+            if (insertIndex == -1)
+                tooltips.Add(line);
+            else
+                tooltips.Insert(insertIndex, line);
         }
         public override void AddRecipes()
         {

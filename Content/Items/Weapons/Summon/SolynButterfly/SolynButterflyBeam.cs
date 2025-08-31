@@ -43,7 +43,7 @@ public class SolynButterflyBeam : ModProjectile, INotResistedByMars
     /// <summary>
     /// How long this laserbeam should exist for, in frames.
     /// </summary>
-    public static int Lifetime => SecondsToFrames(3.75f);
+    public static int Lifetime => SecondsToFrames(4.75f);
 
     /// <summary>
     /// The maximum length of this laserbeam.
@@ -58,7 +58,7 @@ public class SolynButterflyBeam : ModProjectile, INotResistedByMars
     /// <summary>
     /// The speed at which this laserbeam aims towards the mouse.
     /// </summary>
-    public static float MouseAimSpeedInterpolant => MarsBody.GetAIFloat("TagTeamBeamMouseAimSpeed") * 0.1f;
+    public static float MouseAimSpeedInterpolant => 0.02f;
 
 
     public Projectile Creator;
@@ -82,7 +82,7 @@ public class SolynButterflyBeam : ModProjectile, INotResistedByMars
         Projectile.MaxUpdates = 2;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.hide = true;
-        Projectile.DamageType = DamageClass.Generic;
+        Projectile.DamageType = DamageClass.Summon ;
     }
 
     public override void AI()
@@ -102,7 +102,7 @@ public class SolynButterflyBeam : ModProjectile, INotResistedByMars
         AimTowardsMouse(solyn);
 
 
-        Projectile.Center = solyn.Center + Projectile.velocity * 100f;
+        Projectile.Center = solyn.Center + Projectile.velocity*100;
 
         LaserbeamLength = Utils.Clamp(LaserbeamLength + 175f, 0f, MaxLaserbeamLength);
 
@@ -115,6 +115,9 @@ public class SolynButterflyBeam : ModProjectile, INotResistedByMars
     public override void OnKill(int timeLeft)
     {
         Creator.ai[1] = 0;
+        ButterflyMinion a = Creator.ModProjectile as ButterflyMinion;
+        a.AttackCooldown = ButterflyMinion.AttackCooldownMax;
+            //a.AttackCooldownMax;
     }
     /// <summary>
     /// Makes this beam slowly aim towards the user's mouse.
@@ -125,7 +128,7 @@ public class SolynButterflyBeam : ModProjectile, INotResistedByMars
             return;
 
         Vector2 oldVelocity = Projectile.velocity;
-        //todo: get the instance of the butterfly inorder to access its TargetNPC property.
+
         ButterflyMinion butterflyInstance = butterfly.ModProjectile as ButterflyMinion;
         if (butterflyInstance == null)
             return;
@@ -196,21 +199,21 @@ public class SolynButterflyBeam : ModProjectile, INotResistedByMars
         float theMagicFactorThatMakesEveryElectricShineEffectSoMuchBetter = Cos01(Main.GlobalTimeWrappedHourly * 85f);
 
         List<Vector2> laserPositions = Projectile.GetLaserControlPoints(12, LaserbeamLength);
-        laserPositions[0] -= Projectile.velocity * 10f;
+        laserPositions[0] -= Projectile.velocity * 10;
 
         // Draw bloom.
         ManagedShader shader = ShaderManager.GetShader("NoxusBoss.PrimitiveBloomShader");
         shader.TrySetParameter("innerGlowIntensity", 0.45f);
-        PrimitiveSettings bloomSettings = new PrimitiveSettings(BloomWidthFunction, BloomColorFunction, Shader: shader, UseUnscaledMatrix: true);
+        PrimitiveSettings bloomSettings = new PrimitiveSettings(BloomWidthFunction, BloomColorFunction, Shader: shader, UseUnscaledMatrix: false);
         PrimitiveRenderer.RenderTrail(laserPositions, bloomSettings, 46);
 
         // Draw the beam.
         ManagedShader deathrayShader = ShaderManager.GetShader("NoxusBoss.SolynTagTeamBeamShader");
         deathrayShader.TrySetParameter("secondaryColor", new Color(255, 196, 36).ToVector4());
         deathrayShader.TrySetParameter("lensFlareColor", LensFlareColor.ToVector4());
-        deathrayShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 1, SamplerState.LinearWrap);
+        deathrayShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 1, SamplerState.PointWrap);
 
-        PrimitiveSettings laserSettings = new PrimitiveSettings(LaserWidthFunction, LaserColorFunction, Shader: deathrayShader, UseUnscaledMatrix: true);
+        PrimitiveSettings laserSettings = new PrimitiveSettings(LaserWidthFunction, LaserColorFunction, Shader: deathrayShader, UseUnscaledMatrix: false);
         PrimitiveRenderer.RenderTrail(laserPositions, laserSettings, 75);
 
         // Draw a superheated lens flare and bloom instance at the center of the beam.

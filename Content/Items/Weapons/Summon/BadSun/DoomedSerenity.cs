@@ -98,40 +98,41 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BadSun
         }
 
 
-        private void DrawEye(SpriteBatch spriteBatch)
+        private void DrawEye(SpriteBatch spriteBatch, float sizeMulti)
         {
             Texture2D Eye = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Summon/BadSun/DoomedSerenityEye").Value;
             Vector2 DrawPos = EyePos - Main.screenPosition;
             Vector2 Origin = Eye.Size() * 0.5f;
-            Main.EntitySpriteDraw(Eye, DrawPos, null, Color.White, 0, Origin, 1f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(Eye, DrawPos, null, Color.White, 0, Origin, 1f * sizeMulti, SpriteEffects.None, 0);
         }
-        private void DrawFlower()
+        private void DrawFlower(float sizeMulti)
         {
             Texture2D Flower = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Summon/BadSun/BadSunComponent_Flower").Value;
             Vector2 DrawPos = Projectile.Center - Main.screenPosition;
             Vector2 Origin = Flower.Size() * 0.5f;
-            Main.EntitySpriteDraw(Flower, DrawPos, null, Color.White, 0, Origin, 0.6f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(Flower, DrawPos, null, Color.White, 0, Origin, 0.6f * sizeMulti, SpriteEffects.None, 0);
         }
-        private void DrawDiadem()
+        private void DrawDiadem(float sizeMulti)
         {
             Texture2D Diadem = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Summon/BadSun/BadSunComponent_Diadem").Value;
             Vector2 DrawPos = Projectile.Center - Main.screenPosition;
             Vector2 Origin = Diadem.Size() * 0.5f;
-            Main.EntitySpriteDraw(Diadem, DrawPos, null, Color.White, 0, Origin, 0.2f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(Diadem, DrawPos, null, Color.White, 0, Origin, 0.2f * sizeMulti, SpriteEffects.None, 0);
         }
-        private void DrawMask()
+        private void DrawMask(float sizeMulti)
         {
             Texture2D Mask = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Summon/BadSun/BadSunComponent_Mask").Value;
-            Vector2 DrawPos = Projectile.Center - Main.screenPosition;
+            Vector2 DrawPos = EyePos - Main.screenPosition;
             Vector2 Origin = Mask.Size() * 0.5f;
-            Main.EntitySpriteDraw(Mask, DrawPos, null, Color.White, 0, Origin, 0.2f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(Mask, DrawPos, null, Color.White, 0, Origin, 0.2f * sizeMulti, SpriteEffects.None, 0);
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            DrawFlower();
-            DrawDiadem();
-            DrawMask();
-            DrawEye(Main.spriteBatch);
+            float sizeMulti = 0.25f;
+            DrawFlower(sizeMulti);
+            DrawDiadem(sizeMulti);
+            DrawMask(sizeMulti);
+            DrawEye(Main.spriteBatch, sizeMulti);
             return false;
         }
     }

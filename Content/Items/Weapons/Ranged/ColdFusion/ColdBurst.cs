@@ -19,7 +19,7 @@ using NoxusBoss.Assets;
 using System.Linq;
 using Luminance.Assets;
 
-using HeavenlyArsenal.common;
+using HeavenlyArsenal.Common;
 using NoxusBoss.Content.Particles.Metaballs;
 using Dust = Terraria.Dust;
 using HeavenlyArsenal.Content.Particles.Metaballs;

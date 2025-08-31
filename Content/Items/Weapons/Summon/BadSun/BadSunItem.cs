@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
+﻿
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;

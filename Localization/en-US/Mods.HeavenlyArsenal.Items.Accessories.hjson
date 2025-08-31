@@ -2,8 +2,12 @@ ElectricVambrace: {
 	DisplayName: Vambrace of Otonilou
 	Tooltip:
 		'''
-		your dashes are empowered by the storm
-		20% reduced dash cooldown
+		"Empowered by the storm"
+		lightning shreds any enemies nearby
+		effects of the transformer
+		effects of amadias' spark
+		33% reduced dash cooldown
+		20% reduced damage taken while dashing
 
 
 		'''
@@ -12,4 +16,17 @@ ElectricVambrace: {
 VoidCrestOath: {
 	DisplayName: Void Crest Oath
 	Tooltip: ""
+}
+
+ChiUpgrade: {
+	DisplayName: Strange Trinket
+	Tooltip:
+		'''
+		effects of the chi trinket
+		hitting an enemy summons a floating orb around them
+		upon reaching 9 orbs, they drift outwards and then strike that enemy
+
+		additionally, you gain increased crit chance based on the total damage you've dealt recently
+		"Now, you are balanced."
+		'''
 }

@@ -4,7 +4,6 @@ using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
-using HeavenlyArsenal.ArsenalPlayer;
 using Luminance.Core.Hooking;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,12 +29,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 	public class ShintoArmorBreastplate : ModItem
 	{
         #region static values
-        public static int BarrierCooldown = 20 * 60;
+        public static int BarrierCooldown = 18 * 60;
         
         public static int ShieldDurabilityMax = 200;
-        public static int ShieldRechargeDelay = 400;
-        public static int ShieldRechargeRate = 25;
-        public static int TotalShieldRechargeTime = 220;
+        public static int ShieldRechargeDelay = 725;
+        public static int ShieldRechargeRate = 24;
+        public static int TotalShieldRechargeTime = 575;
 
         public static readonly SoundStyle ShieldHurtSound = GennedAssets.Sounds.Avatar.DeadStarCoreCrack with { PitchVariance = 0.6f, Volume = 0.6f, MaxInstances = 0 };
         public static readonly SoundStyle ActivationSound = GennedAssets.Sounds.Avatar.DeadStarCoreCritical with { PitchVariance = 0.6f, Volume = 0.6f, MaxInstances = 0 };
@@ -61,13 +60,9 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         // gonna keep it real chief, this chestplate code is a mess lmao.
         public override void Load()
         {
-            if (Main.netMode != NetmodeID.Server)
-            {
-                //register the faulds texture. This appears either when the leggings  or the chestplate is equipped (both works)
-                //EquipLoader.AddEquipTexture(Mod, Texture + "_Bulk", EquipType.Front, this);
-                //EquipLoader.AddEquipTexture(Mod, Texture + "_Waist", EquipType.Waist, this);
-                //EquipLoader.AddEquipTexture(Mod, "HeavenlyArsenal/Content/Items/Armor/ShintoArmorFaulds_Waist", EquipType.Waist, name: "ShintoArmorFaulds");
-            }
+            
+
+            EquipLoader.AddEquipTexture(Mod, Texture + "_Waist", EquipType.Waist, this);
             EquipLoader.AddEquipTexture(Mod, Texture.Replace("Breastplate", "Wings"), EquipType.Wings, this);
             On_Main.DrawInfernoRings += On_Main_DrawInfernoRings;
         }
@@ -96,12 +91,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
       
         public override void SetDefaults() {
             Item.wingSlot = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Wings);
-            Item.width = 18; // Width of the item
-			Item.height = 18; // Height of the item
+            Item.width = 38; 
+			Item.height = 22; 
 			Item.value = Item.sellPrice(gold: 4445); // How many coins the item is worth
 			Item.rare = ModContent.RarityType<AvatarRarity>(); // The rarity of the item
 			Item.defense = 63; // The amount of defense the item will give when equipped
-            Item.lifeRegen = 3; 
+            Item.lifeRegen += 3; 
         }
 
 
@@ -367,9 +362,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            int lastTooltipIndex = tooltips.FindLastIndex(t => t.Name.Contains("Tooltip"));
+            if (Main.LocalPlayer.GetModPlayer<ShintoArmorPlayer>().SetActive)
+            {
+                int lastTooltipIndex = tooltips.FindLastIndex(t => t.Name.Contains("Tooltip"));
 
-            tooltips.Add(new TooltipLine(Mod, "PressDownNotif", Language.GetTextValue("CommonItemTooltip.PressDownToHover")));
+                tooltips.Add(new TooltipLine(Mod, "PressDownNotif", Language.GetTextValue("CommonItemTooltip.PressDownToHover")));
+
+            }
         }
 
         public override void VerticalWingSpeeds(Player player, ref float ascentWhenFalling, ref float ascentWhenRising, ref float maxCanAscendMultiplier, ref float maxAscentMultiplier, ref float constantAscend)
@@ -381,28 +380,70 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             constantAscend = 0.29f;
         }
 
-       
-        
-        
+        public override bool WingUpdate(Player player, bool inUse)
+        {
+            if (player.GetModPlayer<ShintoArmorPlayer>().SetActive)
+            {
+                if (player.controlJump && player.wingTime > 0 && player.velocity.Y != 0)
+                {
+                    int frameRate = 5; // FPS
+                    int maxFrames = 7; // Total frames
+
+
+                    if (player.wingFrame == 0)
+                    {
+                        player.wingFrame = 1;
+                    }
+                    // Reset frames
+                    if (player.wingFrame >= maxFrames)
+                    {
+                        player.wingFrameCounter = 0;
+                        player.wingFrame = 0;
+                    }
+                    // Animation
+                    if (player.wingFrameCounter % frameRate == 0)
+                    {
+                        player.wingFrame++;
+                    }
+                    player.wingFrameCounter++;
+                }
+                else
+                {
+                    player.wingFrameCounter = 0;
+                    player.wingFrame = 0; // On ground
+                    if (player.velocity.Y != 0)
+                    {
+                        player.wingFrame = 1; // Falling
+                        if (player.controlJump && player.velocity.Y > 0)
+                            player.wingFrame = 1; // Gliding
+                    }
+                }
+                return true;
+            }
+            else
+                return false;
+        }
+
+
         public override void EquipFrameEffects(Player player, EquipType type)
         {
-            //if (player.equippedWings != null)
+            if (player.equippedWings != null)
             {
-             //   if (player.equippedWings.wingSlot == player.wingsLogic)
-                {
-           //         player.wings = Item.wingSlot;
-           //wtf         player.cWings = player.cBody;
-                }
+               //if (player.equippedWings.wingSlot == player.wingsLogic)
+               // {
+               //     player.wings = Item.wingSlot;
+               //     player.cWings = player.cBody;
+               // }
             }
 
-           // if (player.wingsLogic == Item.wingSlot && player.wings <= 0)
+            if (player.wingsLogic == Item.wingSlot && player.wings <= 0)
             {
-                //player.wings = Item.wingSlot;
+               //player.wings = Item.wingSlot;
             }
 
-           // if (player.body == Item.bodySlot)
+            if (player.body == Item.bodySlot)
             {
-                //player.waist = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Waist);
+               // player.waist = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Waist);
                // player.cWaist = player.cBody;
             }
         }

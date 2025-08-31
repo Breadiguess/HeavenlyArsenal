@@ -19,38 +19,7 @@ namespace HeavenlyArsenal.Content.NPCs
 {
     public partial class AnAffrontToGod : ModNPC
     {
-        public bool DrawnFromTelescope
-        {
-            get;
-            set;
-        }
-
-        public bool BackgroundProp
-        {
-            get;
-            set;
-        }
-        public int? TargetIdentifierOverride
-        {
-            get;
-            set;
-        }
-        public Matrix TransformPerspective
-        {
-            get
-            {
-                if (DrawnFromTelescope)
-                    return Matrix.Identity;
-
-                if (BackgroundProp)
-                    return Main.GameViewMatrix.EffectMatrix;
-
-                if (NPC.IsABestiaryIconDummy)
-                    return Main.UIScaleMatrix;
-
-                return Main.GameViewMatrix.TransformationMatrix;
-            }
-        }
+        
 
         public override void SetStaticDefaults() 
         {
@@ -110,45 +79,7 @@ namespace HeavenlyArsenal.Content.NPCs
 
 
 
-        public void DrawSelf(Vector2 screenPos)
-        {
-            // Draw the backglow.
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, TransformPerspective);
-
-            // NPC.position -= NPC.Size * 0.5f;
-
-            float backglowScale = NPC.scale * (DrawnFromTelescope ? 0.3f : 0.74f);
-            float backglowOpacity = BackgroundProp ? RiftEclipseSky.RiftScaleFactor : 1f;
-            Vector2 drawPosition = NPC.Center - screenPos + new Vector2(24f, -120f) * backglowScale;
-
-            if (!DrawnFromTelescope)
-            {
-                float growInterpolant = RiftEclipseSky.RiftScaleFactor / RiftEclipseSky.ScaleWhenOverSun;
-                float growPulse = Convert01To010(growInterpolant.Squared()).Cubed();
-                backglowScale += growPulse.Cubed() * Cos01(Main.GlobalTimeWrappedHourly * 56f) * 0.6f + growPulse * 1.3f;
-            }
-
-
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, TransformPerspective);
-
-            ManagedShader riftShader = ShaderManager.GetShader("NoxusBoss.DarkPortalShader");
-            riftShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 0.2f);
-            riftShader.TrySetParameter("baseCutoffRadius", 0.1f);
-            riftShader.TrySetParameter("swirlOutwardnessExponent", 0.42f);
-            riftShader.TrySetParameter("swirlOutwardnessFactor", 5f);
-            riftShader.TrySetParameter("vanishInterpolant", 1f);
-            riftShader.TrySetParameter("edgeColor", Color.Crimson);
-            riftShader.TrySetParameter("edgeColorBias", 0.15f);
-            riftShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 1, SamplerState.AnisotropicWrap);
-            riftShader.SetTexture(GennedAssets.Textures.Noise.BurnNoise, 2, SamplerState.AnisotropicWrap);
-            riftShader.Apply();
-
-
-
-        }
+   
 
         public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
@@ -157,7 +88,7 @@ namespace HeavenlyArsenal.Content.NPCs
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             // Main.NewText("PreDraw is running!", Color.LimeGreen);
-            DrawSelf(screenPos);
+          
             Texture2D bodyTexture = TextureAssets.Npc[NPC.type].Value;
             Texture2D Glow = GennedAssets.Textures.FirstPhaseForm.AvatarRift;
             Vector2 bodyOrigin = new Vector2(bodyTexture.Width / 2f, bodyTexture.Height / 2f);

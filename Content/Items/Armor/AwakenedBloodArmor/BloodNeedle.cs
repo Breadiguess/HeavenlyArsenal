@@ -744,7 +744,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                     npc.lifeRegen -= 2 * LOVE;
                     damage += 10 * LOVE;
                     npc.SimpleStrikeNPC(damage, 1, false, 0, null, true, 0, true);
-                    Main.NewText($"OWW!! {npc.FullName}.{npc.whoAmI} just took {damage} Bleed damage at tier {LOVE} !!!");
+                    //Main.NewText($"OWW!! {npc.FullName}.{npc.whoAmI} just took {damage} Bleed damage at tier {LOVE} !!!");
                 }
             }
 
@@ -761,7 +761,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         {
             if (npc.HasBuff<LacerationBuff>())
             {
-                Utils.DrawBorderString(spriteBatch, "I'm bleeding out!! | " + LOVE.ToString() + " | TimeLeft: " + Time.ToString(), npc.Center - screenPos, Color.White);
+                //Utils.DrawBorderString(spriteBatch, "I'm bleeding out!! | " + LOVE.ToString() + " | TimeLeft: " + Time.ToString(), npc.Center - screenPos, Color.White);
 
             }
           

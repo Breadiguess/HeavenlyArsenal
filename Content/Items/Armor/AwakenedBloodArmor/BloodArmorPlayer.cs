@@ -125,10 +125,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         /// <summary>
         /// Total of all “blood” across every BloodUnit.
         /// </summary>
-        public float CurrentBlood => bloodUnits.Sum(u => u.Amount);
+        public float CurrentBlood => (float)Math.Round(bloodUnits.Sum(u => u.Amount),2);
 
         /// <summary>
-        /// Combined “blood” + “clot” clamped between 0 and MaxResource.
+        /// Combined “blood” + “clot” clamped between 0 and 1.
         /// </summary>
         public float TotalResource => Math.Clamp(CurrentBlood + Clot, 0f, MaxResource);
 
@@ -325,11 +325,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             for (int i = 0; i < bloodUnits.Count && !convertedThisTick; i++)
             {
                 BloodUnit unit = bloodUnits[i];
+                
                 unit.Age += 1f / 60f; // each tick is ~1/60th of a second
+                
 
                 if (unit.Age >= AgingThreshold)
                 {
-                    Clot = Math.Clamp(Clot + unit.Amount, 0f, MaxResource);
+                    Clot = (float)Math.Round(Math.Clamp(Clot + unit.Amount, 0f, MaxResource),3);
                     bloodUnits.RemoveAt(i);
                     convertedThisTick = true;
                 }
@@ -391,7 +393,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                        float cost = 0.25f;
                        Main.NewText($"Clot subtracted: {Clot - BloodHarpoonCost}. Cost: {BloodHarpoonCost}");
                        Clot -= cost;
-                       Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, Vector2.Zero, ModContent.ProjectileType<BloodHarpoon>(), 3000, 0f, Main.myPlayer);
+                       Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, Vector2.Zero, ModContent.ProjectileType<BloodHarpoon>(), 400, 0f, Main.myPlayer);
                     }
 
                    
@@ -464,7 +466,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             float damageUp = 0.4f;
             int critUp = 9;
 
-            if (TotalResource >= MaxResource && CurrentBlood > 0f && !Frenzy)
+            if (TotalResource >= MaxResource && CurrentBlood > 0f && !Frenzy && CurrentForm!= BloodArmorForm.Defense)
             {
 
                 Frenzy = true;
@@ -494,6 +496,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                 frenzyTimer -= 1f / 60f;
                 if (frenzyTimer <= 0f)
                 {
+                    Clot += 0.25f;
                     Frenzy = false;
                     SoundEngine.PlaySound(
                         GennedAssets.Sounds.Common.LargeBloodSpill with
@@ -524,7 +527,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
 
             // Calculate how much blood to drain per frame
             float drainPerFrame = bloodAtTime / framesLeft;
-            Main.NewText($"DrainPerframe:{drainPerFrame}");
+            //Main.NewText($"DrainPerframe:{drainPerFrame}");
             // Drain from each unit, removing empty units
             for (int i = bloodUnits.Count - 1; i >= 0; i--)
             {
@@ -652,7 +655,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         }
         public override bool IsHeadLayer => false;
         protected override void Draw(ref PlayerDrawSet drawInfo)
-        {
+        {   
+
             var modPlayer = drawInfo.drawPlayer.GetModPlayer<BloodArmorPlayer>();
             /*
             string BloodClotString = (" | Blood = " + modPlayer.CurrentBlood + " | Clot = " + modPlayer.Clot + " | Total = " + modPlayer.TotalResource.ToString());

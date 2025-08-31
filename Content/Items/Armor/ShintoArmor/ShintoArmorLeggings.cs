@@ -9,7 +9,6 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using NoxusBoss.Content.Rarities;
-using HeavenlyArsenal.ArsenalPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.DataStructures;
 using Microsoft.Xna.Framework;

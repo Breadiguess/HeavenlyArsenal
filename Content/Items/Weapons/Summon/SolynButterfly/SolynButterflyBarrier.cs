@@ -44,7 +44,7 @@ public class SolynButterflyBarrier : ModProjectile, IProjOwnedByBoss<BattleSolyn
 
     public override void AI()
     {
-        if (!Owner.active || Owner.dead )
+        if (!Owner.active || Owner.dead || Owner.GetModPlayer<ButterflyMinionPlayer>().ButterflyBarrierActive == false)
         {
             Projectile.Kill();
             return;
@@ -53,7 +53,7 @@ public class SolynButterflyBarrier : ModProjectile, IProjOwnedByBoss<BattleSolyn
         Projectile.timeLeft++;
        
         Time++;
-        Projectile.scale = 0.75f;//Utils.Remap(Time, 0f, 25f, 2f, (float)Math.Cos(MathHelper.TwoPi * Time / 7f) * 0.05f + 0.6f) + InverseLerp(20f, 0f, Projectile.timeLeft) * 1.1f;
+        Projectile.scale = 0.35f;//Utils.Remap(Time, 0f, 25f, 2f, (float)Math.Cos(MathHelper.TwoPi * Time / 7f) * 0.05f + 0.6f) + InverseLerp(20f, 0f, Projectile.timeLeft) * 1.1f;
         Projectile.Opacity = 1;//InverseLerp(0f, 30f, Time) * InverseLerp(0f, 20f, Projectile.timeLeft);
         Projectile.Center = Vector2.Lerp(Projectile.Center,Owner.Center,0.9f);
     }
@@ -65,18 +65,29 @@ public class SolynButterflyBarrier : ModProjectile, IProjOwnedByBoss<BattleSolyn
 
     public void DrawWithShader(SpriteBatch spriteBatch)
     {
+        ManagedShader forcefieldShader = ShaderManager.GetShader("NoxusBoss.SolynForcefieldShader");
+        Main.spriteBatch.End();
+
+
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.AnisotropicWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.Transform);
+
         Texture2D WhitePixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel.Value;
         Vector4[] palette = HomingStarBolt.StarPalette;
-        ManagedShader forcefieldShader = ShaderManager.GetShader("NoxusBoss.SolynForcefieldShader");
+      
         forcefieldShader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut.Value, 1, SamplerState.LinearWrap);
         forcefieldShader.TrySetParameter("forcefieldPalette", palette);
         forcefieldShader.TrySetParameter("forcefieldPaletteLength", palette.Length);
-        forcefieldShader.TrySetParameter("shapeInstability", (Projectile.scale - 1f) * 0.07f + 0.012f);
+        forcefieldShader.TrySetParameter("shapeInstability", 0);//(Projectile.scale - 1f) * 0.07f + 0.012f);
         forcefieldShader.TrySetParameter("flashInterpolant", 0f);
         forcefieldShader.TrySetParameter("bottomFlattenInterpolant", 0f);
         forcefieldShader.Apply();
 
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Main.spriteBatch.Draw(WhitePixel, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation, WhitePixel.Size() * 0.5f, Projectile.Size / WhitePixel.Size() * Projectile.scale, 0, 0f);
+
+
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+
     }
 }

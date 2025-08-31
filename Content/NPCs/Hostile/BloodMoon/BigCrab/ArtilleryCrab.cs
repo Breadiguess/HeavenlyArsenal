@@ -1,6 +1,7 @@
 ﻿using CalamityMod;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Assets;
 using ReLogic.Content;
 using System;
 using Terraria;
@@ -41,6 +42,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         public ref float AmmoCount => ref NPC.ai[1];
         public ref float EnrageFlag => ref NPC.ai[2];
 
+        public override void Load()
+        {
+        }
+
         public override void SetDefaults()
         {
             NPC.width = 100;
@@ -52,6 +57,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             NPC.aiStyle = -1;
             NPC.npcSlots = 3f;
             NPC.knockBackResist = 0f;
+
+        }
+        public override void SetStaticDefaults()
+        {
+            
         }
 
         public override void AI()
@@ -111,7 +121,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
                     break;
             }
         }
-
 
         private void DoIdle(Player target)
         {
@@ -403,9 +412,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         {
             if (!NPC.IsABestiaryIconDummy)
             {
-                Utils.DrawBorderString(spriteBatch, " | State: " + CurrentState, NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-                Utils.DrawBorderString(spriteBatch, " | Ammo: " + AmmoCount, NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
-                Utils.DrawBorderString(spriteBatch, " | Timer: " + Time, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(spriteBatch, " | State: " + CurrentState, NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(spriteBatch, " | Ammo: " + AmmoCount, NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(spriteBatch, " | Timer: " + Time, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
 
             }
 
@@ -425,12 +434,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
             if (Main.bloodMoon && DownedBossSystem.downedProvidence)
-                return SpawnCondition.OverworldNightMonster.Chance * 0.01f;
+                return SpawnCondition.OverworldNightMonster.Chance * 0.12f;
             return 0f;
         }
     }
 
-    class BloodMortar   : ModNPC
+    class BloodMortar : ModNPC
     {
         public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/BigCrab/Bloodproj";
         public ref float Xcoord => ref NPC.localAI[0];
@@ -478,7 +487,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color lightColor)
         {
-            Texture2D texture = TextureAssets.Projectile[Type].Value;
+            Texture2D texture = GennedAssets.Textures.Gores.AvatarRubble_0_0_1;
             float GlowScale = 0.1f;
             Vector2 glowScale = new Vector2(1f, 1f);
             Vector2 Gorigin = new Vector2(texture.Size().X / 2, texture.Size().Y / 2);

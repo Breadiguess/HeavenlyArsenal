@@ -180,7 +180,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             for (int i = points.Count - 1; i > 0; i--)
             {
 
-                float rot = points[i].AngleTo(points[i - 1]); // MathHelper.PiOver2;
+                float rot = points[i].AngleTo(points[i - 1]);
                 Vector2 stretch = new Vector2((1.1f - (float)i / points.Count ) * Projectile.scale, 
                     i > points.Count - 2 ? points[i].Distance(points[i - 1]) 
                     / (body.Height / 2f) : 1.1f);
@@ -191,10 +191,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                 //   Otherwise, it uses a default stretch value of 1.1f.
                 // This ensures the HarpoonTendril looks smooth and natural as it connects between points.
                 Vector2 drawPos = points[i] - Main.screenPosition;
-                Main.EntitySpriteDraw(body, drawPos, body.Frame(), Color.White, rot, body.Size() * 0.5f, new Vector2(0.5f, 0.5f), 0, 0);
+                Vector2 BOrigin = new Vector2(body.Width / 2, body.Height / 2 / 2);
+                Main.EntitySpriteDraw(body, drawPos, body.Frame(1, 2, 0, 0), Color.White, rot, BOrigin, new Vector2(1f, 1f), 0, 0);
                 
             }
-            Main.EntitySpriteDraw(head, Projectile.Center - Main.screenPosition, head.Frame(), lightColor, Projectile.rotation, head.Size()*0.5f, Projectile.scale, SpriteEffects.None, 0);
+            Vector2 Origin = new Vector2(0, head.Height/2);
+            Main.EntitySpriteDraw(head, Projectile.Center - Main.screenPosition, head.Frame(), lightColor, Projectile.rotation, Origin, Projectile.scale, SpriteEffects.None, 0);
             return false;
         }
         public override void EmitEnchantmentVisualsAt(Vector2 boxPosition, int boxWidth, int boxHeight)

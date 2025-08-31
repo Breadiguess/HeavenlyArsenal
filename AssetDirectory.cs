@@ -15,8 +15,7 @@ public static class AssetDirectory
 
     public static class Textures
     {
-        //public static readonly Asset<Texture2D> Sparkle = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/Sparkle");
-        //public static readonly Asset<Texture2D> ShockRing = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/ShockRing");
+      
         #region blockaroz stuff
         public static readonly Asset<Texture2D> BigGlowball = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/BigGlowball");
         public static readonly Asset<Texture2D> VoidLake = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/VoidLake");
@@ -29,16 +28,7 @@ public static class AssetDirectory
         public static readonly Asset<Texture2D> UmbralLeechTendril = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/NPCs/Hostile/BloodMoon/UmbralLeech/UmbralLeech_TailTendril");
         public static readonly Asset<Texture2D> UmbralLeechTelegraph = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/NPCs/Hostile/BloodMoon/UmbralLeech/LeechTelegraph");
         #endregion
-        public static class Inventors
-        {
-           
-        }
-
-        public static class Buffs
-        {
-         //   public static readonly Asset<Texture2D>[] SlimeCane = AssetUtilities.RequestArrayImmediate<Texture2D>(AssetPath + "Textures/Buffs/SlimeCane_", 2);
-        }
-
+       
         public static class Bars
         {
          public static readonly Asset<Texture2D>[] Bar = AssetUtilities.RequestArrayTotalImmediate<Texture2D>(AssetPath + "Textures/UI/Bars/BarBase_");
@@ -66,18 +56,40 @@ public static class AssetDirectory
         //public static Effect TextureMap => Scene["Primitive_TextureMap"].GetShader().Shader;
 
     }
-    public static class Music
-    {
-      //  public static readonly int GoozmaPhase1 = MusicLoader.GetMusicSlot(AssetPath + "Music/GlutinousArbitration");
-      //  public static readonly int GoozmaPhase2 = MusicLoader.GetMusicSlot(AssetPath + "Music/ViscousDesperation");
 
-        //auric soul shorts
-      //  public static readonly int ChromaticSoul = MusicLoader.GetMusicSlot(AssetPath + "Music/Souls/Iridescence");
-      //  public static readonly int DraconicSoul = MusicLoader.GetMusicSlot(AssetPath + "Music/Souls/YharonAuricSoulMusic");
-    }
 
     public static class Sounds
     {
+        internal static class NPCs
+        {
+            internal static class Hostile
+            {
+                internal static class BloodMoon
+                {
+                    internal static class UmbralLeech
+                    {
+                        public static readonly SoundStyle Bash = new SoundStyle("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/UmbralLeech/UmbralLeech_Bash_", 3);
+
+                        public static readonly SoundStyle Explode = new SoundStyle("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/UmbralLeech/GORE - Head_Crush_3");
+
+                        public static readonly SoundStyle GibletDrop = new SoundStyle("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/UmbralLeech/GORE - Giblet_Drop_3");
+                        public static readonly SoundStyle DyingNoise = new SoundStyle("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/UmbralLeech/Dying1");
+                    }
+                }
+            }
+        }
+        public static class Nightfall   
+        {
+            public static readonly SoundStyle Nightfall_Burst = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Accessories/Nightfall/Nightfall_Burst");
+            public static readonly SoundStyle Nightfall_Burst_Hard = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Accessories/Nightfall/Nightfall_Burst_Hard");
+            public static readonly SoundStyle Nightfall_Burst_Heavy = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Accessories/Nightfall/Nightfall_Burst_Heavy");
+
+            public static readonly SoundStyle Nightfall_Windup = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Accessories/Nightfall/Nightfall_Windup");
+            public static readonly SoundStyle Nightfall_3 = new SoundStyle(AssetPath + "Sounds/Items/Accessories/Nightfall/Nightfall_3");
+        
+            public static readonly SoundStyle Hit = new SoundStyle(AssetPath + "Sounds/Items/Accessories/Nightfall/Nightfall_Hit");
+
+        }
     }
 
     public static class Effects

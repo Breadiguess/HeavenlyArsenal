@@ -1,5 +1,5 @@
 ﻿using CalamityMod.Particles;
-using HeavenlyArsenal.common;
+using HeavenlyArsenal.Common;
 using Luminance.Assets;
 using Microsoft.Xna.Framework;
 using NoxusBoss.Assets;

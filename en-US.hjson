@@ -7,7 +7,13 @@ Mods: {
 
 		Items: {
 			ShintoArmorHelmetAll: {
-				SetBonus: Mods.HeavenlyArsenal.Items.ShintoArmorHelmetAll.SetBonus
+				SetBonus:
+					'''
+					double tap down to Enrage
+					while Enraged, deal and take 3x damage
+					an Antishadow barrier is forged around you that absorbs some of the damage you would've taken
+					the barrier cannot sustain itself while you are enraged
+					'''
 				DisplayName: Shinto Armor Helmet All
 				Tooltip: ""
 			}
@@ -264,6 +270,28 @@ Mods: {
 
 			ButterflyStaff: {
 				DisplayName: Butterfly Staff
+				Tooltip: ""
+			}
+
+			ShintoArmorWings: {
+				DisplayName: Shinto Armor Wings
+				Tooltip: ""
+			}
+
+			ChiUpgrade: {
+				DisplayName: Chi Upgrade
+				Tooltip: ""
+			}
+
+			Materials: {
+				UmbralLeechDrop: {
+					DisplayName: Umbral Leech Drop
+					Tooltip: ""
+				}
+			}
+
+			Closure: {
+				DisplayName: Closure
 				Tooltip: ""
 			}
 		}

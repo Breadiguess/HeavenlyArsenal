@@ -1,16 +1,10 @@
-﻿
-using HeavenlyArsenal.common;
-using HeavenlyArsenal.Common.Graphics;
-using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
-using HeavenlyArsenal.Content.Particles;
-using Luminance.Core.Graphics;
+﻿using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using System;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.ID;
 using Terraria.ModLoader;
 using Player = Terraria.Player;
 

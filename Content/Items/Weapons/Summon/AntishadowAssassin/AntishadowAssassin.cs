@@ -1,7 +1,7 @@
 ﻿using CalamityMod;
 using CalamityMod.Items.Weapons.Melee;
 using HeavenlyArsenal.Content.Buffs;
-using HeavenlyArsenal.Content.NPCs.Friendly.ForgottenShrine;
+//using HeavenlyArsenal.Content.NPCs.Friendly.ForgottenShrine;
 using HeavenlyArsenal.Core.Physics.ClothManagement;
 using Luminance.Assets;
 using Luminance.Common.Easings;
@@ -968,6 +968,7 @@ public class AntishadowAssassin : ModProjectile
 
     private int FindPotentialSpirit()
     {
+        /*
         int spiritID = ModContent.NPCType<FadingSpirit>();
         List<NPC> potentialSpirits = new List<NPC>(Main.maxNPCs);
         foreach (NPC npc in Main.ActiveNPCs)
@@ -986,7 +987,7 @@ public class AntishadowAssassin : ModProjectile
         // Pick the closest valid target to the owner, since it's expected that the assassin will remain stationary.
         if (potentialSpirits.Count >= 1)
             return potentialSpirits.OrderBy(p => p.DistanceSQ(Owner.Center)).First().whoAmI;
-
+        */
         return -1;
     }
 

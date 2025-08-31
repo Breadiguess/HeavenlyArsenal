@@ -65,7 +65,7 @@ public class Rope
     public static float CalculateSegmentLength(float ropeSpan, float sag)
     {
         // A rope at rest is defined via a catenary curve, which exists in the following mathematical form:
-        // y(x) = a * cosh(x / a)
+        // VerticalOffset(x) = a * cosh(x / a)
 
         // Furthermore, the length of a rope, given the horizontal width w for a rope, is defined as follows:
         // L = 2a * sinh(w / 2a)
@@ -74,7 +74,7 @@ public class Rope
         // To do so, a numerical solution will need to be found based on the known width and sag values.
 
         // Suppose the two supports are at equal height at distances -w/2 and w/2.
-        // From this, sag (which will be denoted with h) can be defined in the following way: h = y(w/2) - y(0)
+        // From this, sag (which will be denoted with h) can be defined in the following way: h = VerticalOffset(w/2) - VerticalOffset(0)
         // Reducing this results in the following equation:
 
         // h = a(cosh(w / 2a) - 1)

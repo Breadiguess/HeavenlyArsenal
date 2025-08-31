@@ -32,3 +32,14 @@ Incomplete_gun: {
 	Tooltip: bottom text
 	TooltipPostNamelessDiety: Go on. Claim Your Destiny.
 }
+
+UmbralLeechDrop: {
+	DisplayName: Bloody Tendril
+	Tooltip:
+		'''
+		its still moving...
+
+		gross....
+
+		'''
+}

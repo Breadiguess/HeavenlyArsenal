@@ -1,5 +1,5 @@
 ﻿using CalamityMod;
-using HeavenlyArsenal.common;
+using HeavenlyArsenal.Common;
 using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Items.Misc;

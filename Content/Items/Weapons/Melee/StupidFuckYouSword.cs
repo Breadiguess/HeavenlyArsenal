@@ -1,5 +1,5 @@
 using CalamityMod.Buffs.DamageOverTime;
-using HeavenlyArsenal.ArsenalPlayer;
+using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using Microsoft.Xna.Framework; // Using another one library
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Content.Buffs;

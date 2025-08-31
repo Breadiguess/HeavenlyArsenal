@@ -10,7 +10,6 @@ using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.Items.Weapons.Magic;
 using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 using HeavenlyArsenal.Content.Items.Weapons.Melee;
-using HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
 using HeavenlyArsenal.Content.Items.Weapons.Summon;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
@@ -116,6 +115,7 @@ namespace HeavenlyArsenal.Core.Systems
             ModContent.ItemType<DevWing>(), 1
               
             ));
+            /*
             //rock to cessation
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
@@ -127,7 +127,7 @@ namespace HeavenlyArsenal.Core.Systems
                ModContent.ItemType<LifeAndCessation>(), 1
 
                 ));
-
+            */
             //coin for coin
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade

@@ -326,8 +326,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.siphonophore
                 !spawnInfo.Player.InSunkenSea() &&
                 Main.hardMode && !spawnInfo.PlayerInTown && !spawnInfo.Player.ZoneOldOneArmy && !Main.snowMoon && !Main.pumpkinMoon ? 0.045f : 0f;
        */
-            if(Main.bloodMoon && DownedBossSystem.downedYharon)
-                return 0.045f;
+            if (Main.bloodMoon && DownedBossSystem.downedYharon)
+                return 0f;
             else
                 return 0f;
         }

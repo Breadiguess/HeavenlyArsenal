@@ -1,5 +1,4 @@
-﻿using HeavenlyArsenal.ArsenalPlayer;
-using HeavenlyArsenal.common;
+﻿using HeavenlyArsenal.Common;
 using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Content.Particles.Metaballs;
 using HeavenlyArsenal.Core.Physics.ClothManagement;
@@ -236,10 +235,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             Main.QueueMainThreadAction(() =>
             {
                 drawToTarget += DrawRobeToTarget;
-                //frenziedParticles = new MonoParticleSystem<FrenziedFlameParticle>(200);
                 RobeMapTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, backSize, backSize);
                 RobeTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, backSize, backSize);
-                //frenziedTargetFront = new RenderTarget2D(Main.graphics.GraphicsDevice, frontSize, frontSize);
             });
         }
 
@@ -254,7 +251,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                 Main.spriteBatch.GraphicsDevice.Clear(Color.Transparent);
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
 
-                Vector2 robePosition = Player.Center + new Vector2(4 * Player.direction, -50f).RotatedBy(Player.fullRotation);
+                Vector2 robePosition = Player.Center + new Vector2(4 * Player.direction, -50f * Player.gravDir).RotatedBy(Player.fullRotation);
 
                 Matrix world = Matrix.CreateTranslation(-robePosition.X + backSize / 2, -robePosition.Y + backSize / 2, 0f);
 
@@ -323,7 +320,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                         ConstrainParticle(robePosition + new Vector2((6 - x) * Player.direction, 0), Robe.particleGrid[x, y], 0f);
                 }
 
-                Robe.Simulate(0.06f, false, Vector3.UnitY * 5f + wind * Player.direction);
+                Robe.Simulate(0.06f, false, Vector3.UnitY * (5f * Player.gravDir) + wind * Player.direction);
             }
         }
 
