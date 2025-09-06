@@ -9,7 +9,9 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using NoxusBoss.Content.Rarities;
-using HeavenlyArsenal.ArsenalPlayer;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.DataStructures;
+using Microsoft.Xna.Framework;
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 {
@@ -49,20 +51,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             player.accRunSpeed *= 0.5f;
             player.runSlowdown *= 2f;
             var modPlayer = player.Calamity();
-            modPlayer.shadowSpeed = true;
             player.moveSpeed += 0.3f;
 
             player.autoJump = true;
             player.jumpSpeedBoost += 1.6f;
             player.noFallDmg = true;
             player.GetModPlayer<ShintoArmorPlayer>().VoidBeltEquipped = true;
-            //ModContent.GetModPlayer<ShintoArmorPlayer>().ShadowVeil = true;
-            if (player.GetModPlayer<ShintoArmorPlayer>().empoweredDash == true)
-            {
-                modPlayer.DashID = AbyssDash.ID;
-            }
-            else
-                modPlayer.DashID = ShintoArmorDash.ID;
+            modPlayer.DashID = ShintoArmorDash.ID;
             player.dashType = 0;
             player.spikedBoots = 2;
         }
@@ -92,4 +87,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             }
         }
 	}
+
+  
+
+   
 }

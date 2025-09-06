@@ -1,5 +1,5 @@
-﻿using HeavenlyArsenal.ArsenalPlayer;
-using HeavenlyArsenal.Common;
+﻿using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Content.Items.Consumables.CombatStim;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets.Fonts;

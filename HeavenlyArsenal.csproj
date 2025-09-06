@@ -9,65 +9,99 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <AdditionalFiles Remove="Assets\Textures\Backpacks\**" />
+	  <AdditionalFiles Remove="Content\Items\Armor\Haemsong\**" />
+	  <AdditionalFiles Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
+	  <AdditionalFiles Remove="Content\NPCs\Bosses\**" />
+	  <AdditionalFiles Remove="Content\NPCs\Friendly\**" />
 	  <AdditionalFiles Remove="Content\Projectiles\Weapons\Holdout\**" />
+	  <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\ND_Rogue\**" />
+	  <AdditionalFiles Remove="Content\Subworlds\**" />
+	  <AdditionalFiles Remove="Content\Tiles\ForgottenShrine\**" />
+	  <AdditionalFiles Remove="Content\Tiles\Generic\**" />
+	  <AdditionalFiles Remove="Content\Waters\**" />
 	  <AdditionalFiles Remove="Core\Autoloaders\**" />
+	  <AdditionalFiles Remove="Core\Fixes\**" />
 	  <AdditionalFiles Remove="Sounds\**" />
 	  <Compile Remove="Assets\Textures\Backpacks\**" />
+	  <Compile Remove="Content\Items\Armor\Haemsong\**" />
+	  <Compile Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
+	  <Compile Remove="Content\NPCs\Bosses\**" />
+	  <Compile Remove="Content\NPCs\Friendly\**" />
 	  <Compile Remove="Content\Projectiles\Weapons\Holdout\**" />
+	  <Compile Remove="Content\Projectiles\Weapons\Rogue\ND_Rogue\**" />
+	  <Compile Remove="Content\Subworlds\**" />
+	  <Compile Remove="Content\Tiles\ForgottenShrine\**" />
+	  <Compile Remove="Content\Tiles\Generic\**" />
+	  <Compile Remove="Content\Waters\**" />
 	  <Compile Remove="Core\Autoloaders\**" />
+	  <Compile Remove="Core\Fixes\**" />
 	  <Compile Remove="Sounds\**" />
 	  <EmbeddedResource Remove="Assets\Textures\Backpacks\**" />
+	  <EmbeddedResource Remove="Content\Items\Armor\Haemsong\**" />
+	  <EmbeddedResource Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
+	  <EmbeddedResource Remove="Content\NPCs\Bosses\**" />
+	  <EmbeddedResource Remove="Content\NPCs\Friendly\**" />
 	  <EmbeddedResource Remove="Content\Projectiles\Weapons\Holdout\**" />
+	  <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\ND_Rogue\**" />
+	  <EmbeddedResource Remove="Content\Subworlds\**" />
+	  <EmbeddedResource Remove="Content\Tiles\ForgottenShrine\**" />
+	  <EmbeddedResource Remove="Content\Tiles\Generic\**" />
+	  <EmbeddedResource Remove="Content\Waters\**" />
 	  <EmbeddedResource Remove="Core\Autoloaders\**" />
+	  <EmbeddedResource Remove="Core\Fixes\**" />
 	  <EmbeddedResource Remove="Sounds\**" />
 	  <None Remove="Assets\Textures\Backpacks\**" />
+	  <None Remove="Content\Items\Armor\Haemsong\**" />
+	  <None Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
+	  <None Remove="Content\NPCs\Bosses\**" />
+	  <None Remove="Content\NPCs\Friendly\**" />
 	  <None Remove="Content\Projectiles\Weapons\Holdout\**" />
+	  <None Remove="Content\Projectiles\Weapons\Rogue\ND_Rogue\**" />
+	  <None Remove="Content\Subworlds\**" />
+	  <None Remove="Content\Tiles\ForgottenShrine\**" />
+	  <None Remove="Content\Tiles\Generic\**" />
+	  <None Remove="Content\Waters\**" />
 	  <None Remove="Core\Autoloaders\**" />
+	  <None Remove="Core\Fixes\**" />
 	  <None Remove="Sounds\**" />
 	</ItemGroup>
 	<ItemGroup>
 	  <AdditionalFiles Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.png" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Remove="Common\Graphics\FramedFastParticleSystem.cs" />
+	  <Compile Remove="Common\Graphics\PrimitiveTrail.cs" />
 	  <Compile Remove="Common\utils\Debug.cs" />
 	  <Compile Remove="Common\utils\MusicKiller.cs" />
 	  <Compile Remove="Content\Buffs\ShintoArmorEnrage.cs" />
-	  <Compile Remove="Content\Items\Accessories\Cosmetic\AuraCosmetic.cs" />
 	  <Compile Remove="Content\Items\Accessories\NDWings.cs" />
 	  <Compile Remove="Content\Items\Accessories\Vambrace\ElectricVambraceDash.cs" />
-	  <Compile Remove="Content\Items\Armor\Vanity\LightCultist_Helmet.cs" />
-	  <Compile Remove="Content\Items\Armor\Vanity\LightCultist_Pants.cs" />
-	  <Compile Remove="Content\Items\Armor\Vanity\LightCultist_Robe.cs" />
-	  <Compile Remove="Content\Items\Consumables\spinel_tonic.cs" />
+	  <Compile Remove="Content\Items\Accessories\Vambrace\VambraceDash.cs" />
+	  <Compile Remove="Content\Items\Accessories\Vambrace\VambraceDischarge.cs" />
+	  <Compile Remove="Content\Items\Misc\ForgottenShrineTeleporter.cs" />
 	  <Compile Remove="Content\Items\Misc\GoodAppleSling.cs" />
-	  <Compile Remove="Content\Items\Weapons\Melee\StupidFuckYouSword.cs" />
-	  <Compile Remove="Content\Items\Weapons\Ranged\AvatarBow.cs" />
-	  <Compile Remove="Content\Items\Weapons\Ranged\BloodFall.cs" />
-	  <Compile Remove="Content\Items\Weapons\Ranged\FileName.cs" />
-	  <Compile Remove="Content\Items\Weapons\Ranged\HotFusion\Temp.cs" />
-	  <Compile Remove="Content\Items\Weapons\Rogue\LifeAndCessationGlobalNPC.cs" />
-	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech.cs" />
+	  <Compile Remove="Content\Items\Misc\IdolSummoner.cs" />
+	  <Compile Remove="Content\Items\Weapons\Melee\CircularSaw.cs" />
+	  <Compile Remove="Content\Items\Weapons\Melee\Rapture.cs" />
+	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\Goreca\Goreca.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech2.cs" />
+	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech_Baby.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\NobleWorm.cs" />
-	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\siphonophore\Cryonophore_Basic.cs" />
+	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\siphonophore\Cryonophore.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\wormEnemy.cs" />
 	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\ZombeReskin.cs" />
+	  <Compile Remove="Content\Particles\CartoonWaveParticle.cs" />
+	  <Compile Remove="Content\Particles\SpiritCandleParticle.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\CombatStim_Held.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\CosmicWatergun_proj.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\GoodAppleSlingFolder\GoodAppleProj.cs" />
 	  <Compile Remove="Content\Projectiles\Misc\GoodAppleSlingFolder\GoodAppleSlingHeld.cs" />
+	  <Compile Remove="Content\Projectiles\Weapons\Melee\CircularSawProjectile.cs" />
 	  <Compile Remove="Content\Projectiles\Weapons\Melee\FileName.cs" />
 	  <Compile Remove="Content\Projectiles\Weapons\Ranged\AvatarBow_Held.cs" />
 	  <Compile Remove="Core\Overrides\CeaselessRiftOverride.cs" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="Content\Items\auric_catalyst.png" />
-	  <None Remove="Content\Items\avatar_fishingRod.png" />
-	  <None Remove="Content\Items\fusionrifle.png" />
-	  <None Remove="Content\Items\incomplete_gun.png" />
-	  <None Remove="Content\Items\nadir2.png" />
-	  <None Remove="Content\Items\paradiseparasiteprojectile.png" />
-	  <None Remove="Content\Items\Armor\Vanity\devMask.png" />
 	  <None Remove="Content\Projectiles\fusionrifleHoldout.png" />
 	  <None Remove="Content\Projectiles\incomplete_gunHoldout.png" />
 	  <None Remove="Content\Projectiles\nadir2_Holdout.png" />
@@ -76,7 +110,8 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Common\Scenes\" />
-	  <Folder Include="Content\Items\Weapons\Ranged\HotFusion\" />
+	  <Folder Include="Content\Gores\Enemy\BloodMoon\UmbralLeech\" />
+	  <Folder Include="Content\Projectiles\Weapons\Rogue\" />
 	  <Folder Include="Core\Overrides\" />
 	  <Folder Include="Core\Visuals\" />
 	</ItemGroup>

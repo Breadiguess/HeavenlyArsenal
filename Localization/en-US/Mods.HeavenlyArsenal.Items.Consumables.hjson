@@ -2,17 +2,11 @@ CombatStim: {
 	DisplayName: Experimental Combat Stim
 	Tooltip:
 		'''
-		A cocktail of various blood types, bound together with the power of a pheonix
-
-		grants powerful buffs to all of your stats, in exchange for costing a portion of your health
-		additionally, consuming too many stims within a short time period has an increasing chance to get you addicted to them
-		while addicted, you must take a stim every minute, else you will suffer from withdrawal.
-		during withdrawl, you will suffer heavy penalties to your stats until the last traces of the stim leave your system
-		if you take a stim while in withdrawl, you will instantly become addicted aagin, but will clear the effects of withdrawl
-		 
+		A cocktail of blood and phoenix flame
+		Grants powerful buffs at the cost of life
+		May cause addiction and subsequent withdrawal if overused
 		"Do not worry, according to a study Stims are not addictive!*"
-		 
-		"*Study funded by permacura. Permacura: Put your life in our hands."
+		*Study funded by Permacura. Permacura: Put your life in our hands.
 		'''
 	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStim.StimDuration
 }

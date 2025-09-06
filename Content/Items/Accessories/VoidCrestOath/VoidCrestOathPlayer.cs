@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HeavenlyArsenal.Content.Projectiles;
 using Microsoft.Xna.Framework;
 using static Luminance.Luminance;
 using Terraria;
@@ -10,6 +9,7 @@ using Terraria.ModLoader;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.Projectiles;
 using NoxusBoss.Content.NPCs.Bosses.NamelessDeity.Projectiles;
 using HeavenlyArsenal.Common.Ui;
+using HeavenlyArsenal.Content.Projectiles;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
 {
@@ -41,7 +41,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
         /// <summary>
         /// Maximum resource value for intercepting hostile projectiles.
         /// </summary>
-        public float MaxInterceptCount = 100f;
+        public float MaxInterceptCount = 1000f;
 
         /// <summary>
         /// How much resource is consumed per intercept.
@@ -51,7 +51,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
         /// <summary>
         /// How much resource is regenerated per tick if no intercept is occurring.
         /// </summary>
-        public float InterceptRegenRate = 0.5f;
+        public float InterceptRegenRate = 110;
 
         /// <summary>
         /// A list to keep track of hostile projectile indices that we are watching.
@@ -62,12 +62,12 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
         /// <summary>
         /// Detection radius (in pixels) for adding enemy projectiles to the tracking list.
         /// </summary>
-        private float TrackingRadius = 650f;
+        private float TrackingRadius = 1050f;
 
         /// <summary>
         /// Distance at which an intercept is triggered (in pixels).
         /// </summary>
-        private float InterceptDistance = 300f;
+        private float InterceptDistance = 100f;
 
         /// <summary>
         /// Interceptor projectile type. 

@@ -10,11 +10,11 @@ using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.Items.Weapons.Magic;
 using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 using HeavenlyArsenal.Content.Items.Weapons.Melee;
-using HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue;
 using HeavenlyArsenal.Content.Items.Weapons.Summon;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.Items.Accessories.Wings;
 using NoxusBoss.Content.Items.Fishing;
 using NoxusBoss.Core.Autoloaders.SolynBooks;
 using NoxusBoss.Core.World.GameScenes.AvatarUniverseExploration;
@@ -107,7 +107,7 @@ namespace HeavenlyArsenal.Core.Systems
             //drew wings to dev wings
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
-            ModContent.ItemType<DrewsWings>(),
+            ModContent.ItemType<DivineWings>(),
             1000f,
             ItemReturnType.None,
                //Items to get back
@@ -115,6 +115,7 @@ namespace HeavenlyArsenal.Core.Systems
             ModContent.ItemType<DevWing>(), 1
               
             ));
+            /*
             //rock to cessation
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
@@ -126,18 +127,7 @@ namespace HeavenlyArsenal.Core.Systems
                ModContent.ItemType<LifeAndCessation>(), 1
 
                 ));
-            //solynel
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ItemID.BlandWhip,
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<SolynWhip_Item>(), 1
-
-                ));
-
+            */
             //coin for coin
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade

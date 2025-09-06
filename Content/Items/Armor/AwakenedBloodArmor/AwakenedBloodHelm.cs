@@ -1,12 +1,11 @@
 ﻿using CalamityMod;
-using CalamityMod.CalPlayer;
 using CalamityMod.Items;
 using CalamityMod.Items.Armor.Bloodflare;
 using CalamityMod.Items.Armor.OmegaBlue;
 using CalamityMod.Items.Materials;
-using CalamityMod.Rarities;
 using CalamityMod.Tiles.Furniture.CraftingStations;
-using HeavenlyArsenal.Content.Items.Armor.Haemsong;
+using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
+using HeavenlyArsenal.Content.Rarities;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
@@ -46,9 +45,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         {
             Item.width = 18;
             Item.height = 18;
+            Item.rare = ModContent.RarityType<BloodMoonRarity>();
             Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
             Item.defense = 49; //85
-            Item.rare = ModContent.RarityType<PureGreen>();
+            
         }
         public override bool IsArmorSet(Item head, Item body, Item legs) => body.type == ModContent.ItemType<AwakenedBloodplate>() && legs.type == ModContent.ItemType<AwakenedBloodStrides>();
 
@@ -60,18 +60,17 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         
         public override void UpdateArmorSet(Player player)
         {
+           
             //player.setBonus = this.GetLocalizedValue("SetBonus") + "\n";
             player.setBonus = Language.GetOrRegister(("Items.Armor.AwakenedBloodArmor.AwakenedBloodHelm.SetBonus")).Value;
             player.setBonus = this.GetLocalizedValue("SetBonus");
             var modPlayer = player.Calamity();
             player.GetAttackSpeed<MeleeDamageClass>() += 0.18f;
             modPlayer.bloodflareSet = true;
-            modPlayer.bloodflareMelee = true;
-            modPlayer.abyssalDivingSuitPlates = true;
-            modPlayer.abyssalAmulet = true;
+          
             modPlayer.reaverRegen = true;
-            player.GetModPlayer<BloodArmorPlayer>().BloodArmorEquipped = true;
-
+            //player.GetModPlayer<BloodArmorPlayer>().BloodArmorEquipped = true;
+            player.GetModPlayer<AwakenedBloodPlayer>().AwakenedBloodSetActive = true;
             player.crimsonRegen = true;
             player.aggro += 900;
         }
@@ -85,8 +84,19 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
+           
+            Player player = Main.LocalPlayer;
+            int bodySlot = player.armor[10].type == Item.type ? 10 : -1;
+            
+            bool isInVanitySlot = false;
 
-            // build a single combined tooltip line
+            if (player.armor[10].type == Item.type)
+            {
+                isInVanitySlot = true;
+            }
+            if (isInVanitySlot)
+                return;
+           
             string text =
                 $"+{DamageBoost * 100:F0}% to all damage\n" +
                 $"+{CritBoost}% crit chance";
@@ -96,7 +106,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             {
                 OverrideColor = new Color(200, 50, 50)  // optional
             };
-            tooltips.Add(line);
+
+            int insertIndex = tooltips.FindIndex(t => t.Mod == "Terraria" && t.Name.StartsWith("Tooltip"));
+            if (insertIndex == -1)
+                tooltips.Add(line);
+            else
+                tooltips.Insert(insertIndex, line);
         }
         public override void AddRecipes()
         {
@@ -104,14 +119,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                      AddIngredient<OmegaBlueHelmet>().
                      AddRecipeGroup("HeavenlyArsenal:BloodflareHelmets", 1).
                      AddIngredient<YharonSoulFragment>(15).
+                     //AddIngredient<UmbralLeechDrop>(3).
                      AddCondition(conditions: Condition.BloodMoon).
                      AddTile<CosmicAnvil>().
                      Register();
 
-            CreateRecipe().
-                    AddIngredient<BloodArmorHead>().
-                    AddTile<CosmicAnvil>().
-                    Register();
+          
         }
     }
 

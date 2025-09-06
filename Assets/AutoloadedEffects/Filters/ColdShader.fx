@@ -37,7 +37,7 @@
         float intensity = opacity * intensityFactor;
     
         // Apply a general microdistortion to everything.
-        float microdistortionTime = globalTime * 0.3;
+        float microdistortionTime = globalTime * 0.7;
         float warpNoise = tex2D(noiseTexture, coords * 1.3 + globalTime * 0.1) * 0.05;
         float microdistortionX = tex2D(noiseTexture, coords * 0.8 + microdistortionTime * float2(0.1, 0.1) + warpNoise);
         float microdistortionY = tex2D(noiseTexture, coords * 0.9 + microdistortionTime * float2(0.05, -0.1) - warpNoise);

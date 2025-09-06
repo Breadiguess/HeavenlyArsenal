@@ -1,4 +1,5 @@
 ﻿using CalamityMod;
+using CalamityMod;
 using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.Ui;

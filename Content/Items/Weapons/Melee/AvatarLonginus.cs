@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static NoxusBoss.Assets.GennedAssets.Sounds;
@@ -17,6 +18,7 @@ public class AvatarLonginus : ModItem
     {
         ItemID.Sets.Spears[Type] = true;
         ItemID.Sets.gunProj[Type] = true;
+        CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
 
     public override void SetDefaults()

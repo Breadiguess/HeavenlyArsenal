@@ -68,3 +68,13 @@ LacerationBuff: {
 	DisplayName: Laceration Buff
 	Description: Mods.HeavenlyArsenal.Buffs.LacerationBuff.Description
 }
+
+SquidDebuff: {
+	DisplayName: Squid Debuff
+	Description: Mods.HeavenlyArsenal.Buffs.SquidDebuff.Description
+}
+
+BlissFallen: {
+	DisplayName: Bliss Fallen
+	Description: Mods.HeavenlyArsenal.Buffs.BlissFallen.Description
+}

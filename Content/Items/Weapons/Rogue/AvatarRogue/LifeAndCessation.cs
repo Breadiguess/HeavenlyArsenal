@@ -1,21 +1,16 @@
 ﻿using CalamityMod;
-using CalamityMod.Buffs.DamageOverTime;
 using HeavenlyArsenal.ArsenalPlayer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Security.Cryptography.X509Certificates;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
 {
-    class LifeAndCessation : ModItem
+    public class LifeAndCessation : ModItem
     {
-
-
         public override void SetStaticDefaults()
         {
             ItemID.Sets.gunProj[Item.type] = true;
@@ -40,7 +35,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
 
             Item.useStyle = ItemUseStyleID.Shoot;
             Item.noUseGraphic = true;
-            Item.shoot = ModContent.ProjectileType<HeldLifeCessationProjectile>();
+            Item.shoot = ModContent.ProjectileType<AvatarRogueHeld>();
             Item.shootSpeed = 1;
             Item.autoReuse = true;
 
@@ -64,7 +59,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
                 }
             }
         }
-        public override bool CanUseItem(Player player) => player.ownedProjectileCounts[ModContent.ProjectileType<HeldLifeCessationProjectile>()] <= 0;
+        public override bool CanUseItem(Player player) => player.ownedProjectileCounts[ModContent.ProjectileType<AvatarRogueHeld>()] <= 0;
 
         public override void UseItemFrame(Player player)
         {
@@ -95,181 +90,182 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
 
     }
 
-    class CessationPlayer : ModPlayer
+    public class AvatarRogueHeld : ModProjectile
     {
-        public float CessationHeat;
-        public int CessationHeatTimer;
-        public override void ResetEffects()
+        public enum AvatarRogueHeldState
         {
-            CessationHeat = 0;
-            CessationHeatTimer = 0;
-        }
-        public override void UpdateDead()
-        {
-            CessationHeat = 0;
-            CessationHeatTimer = 0;
-        }
-    }
-
-    class LifeAndCessationGlobalNPC : GlobalNPC
-    {
-        //so why is this here? as in, why use a global npc?
-        //i would say this global NPC is here to allow me more freedom to apply any effects i want to happen after an NPC gets hit by life and cessation.
-        //
-        public bool IsFreezingToDeath;
-        public bool IsBoilingAlive;
-
-        public float HeatAmmount;
-        public int warmupTimer;
-
-        public float GoldilocksMin = 150;
-        public float GoldilocksZone = 200;
-        public float GoldilocksMax = 250;
-        public override bool InstancePerEntity => true;
-        public override bool PreAI(NPC npc)
-        {
-            //todo: rewrite all of this so that its not shit
-            /*
-            //todo: if not within min or max of golidlocks, begin attemping to heat up or cool down.
-
-            //subtract the difference of heat amount - max or min and use that to determine whether heat amount should go up or down
-            //when within the goldilocks zone, heat amount should quickly equal out to the goldilocks zone.
-            // Check if HeatAmmount is outside the Goldilocks range and adjust accordingly.
-            if (HeatAmmount < GoldilocksMin || HeatAmmount > GoldilocksMax)
-            {
-                // Increment or decrement HeatAmmount based on its position relative to the Goldilocks range.
-                if (HeatAmmount < GoldilocksMin)
-                {
-                    if (warmupTimer >= 40)
-                        HeatAmmount += 1; // Heat up if below the minimum.
-                }
-                else if (HeatAmmount > GoldilocksMax)
-                {
-                   if(warmupTimer >= 40)
-                     HeatAmmount -= 1; // Cool down if above the maximum.
-                }
-
-
-                if (HeatAmmount > GoldilocksMin && HeatAmmount < GoldilocksMax)
-                {
-                    IsFreezingToDeath = false;
-                    IsBoilingAlive = false;
-                }
-                    
-
-
-                // Use a timer to control the rate of adjustment.
-                if (warmupTimer >= 40)
-                {
-                    warmupTimer = 0;
-                }
-                
-            }
-            else 
-            {
-                if(warmupTimer >= 0)
-                    HeatAmmount = MathHelper.Lerp(HeatAmmount, GoldilocksZone, 0.1f);
-            }
+            Spawn,
+            Idle,
+            //todo: basic fire
+            PreWhip,
+            Whip
             
-            warmupTimer++;
-            if(warmupTimer< -10)
-            {
-                warmupTimer = 0;
-            }
-            if (HeatAmmount < GoldilocksMin)
-            {
-                IsFreezingToDeath = true;
-            }
-            if(HeatAmmount > GoldilocksMax)
-            {               
-                 IsBoilingAlive = true;
-            }
-
-            if(IsBoilingAlive && IsFreezingToDeath)
-            {
-                IsBoilingAlive = false;
-                IsFreezingToDeath = false;
-
-                npc.takenDamageMultiplier = 4f;
-            }
-
-            if (IsBoilingAlive)
-            {
-                npc.AddBuff(ModContent.BuffType<Dragonfire>(), 60);
-                npc.AddBuff(ModContent.BuffType<CalamityMod.Buffs.DamageOverTime.BrimstoneFlames>(), 60);
-            }
-
-            */
-            return base.PreAI(npc);
         }
 
-
-        public override void UpdateLifeRegen(NPC npc, ref int damage)
+        public float SwingProgress;
+        public int SwingStage;
+        public AvatarRogueHeldState CurrentState = AvatarRogueHeldState.Spawn;
+        public ref Player Owner => ref Main.player[Projectile.owner];
+        public ref float Time => ref Projectile.ai[0];
+       
+        public override void SetDefaults()
         {
-            if (IsFreezingToDeath)
-            {
-                npc.lifeRegen -= 10;
-                npc.coldDamage = true;
-
-            }
-
-            if (IsBoilingAlive)
-            {
-
-            }
-            base.UpdateLifeRegen(npc, ref damage);
+            Projectile.friendly = true;
+            Projectile.hostile = false;
+            Projectile.width = Projectile.height = 6;
+            Projectile.timeLeft = 2;
         }
-        public override void OnSpawn(NPC npc, IEntitySource source)
+
+        public override void SetStaticDefaults()
         {
-            HeatAmmount = 200;
-            base.OnSpawn(npc, source);
+            ProjectileID.Sets.CanHitPastShimmer[Projectile.type] = true;
         }
 
+        public override void AI()
+        {
+            Owner.heldProj = Projectile.whoAmI;
+            //mandatory check to see if the item is still held
+            if (Owner.HeldItem.type != ModContent.ItemType<LifeAndCessation>() || Owner.CCed || Owner.dead)
+            {
+                Projectile.Kill();
+                return;
+            }
+            Projectile.Center = Owner.Center + new Vector2(10 * Owner.direction, 0);
+            Projectile.timeLeft = 2;
+            StateMachine();
+            ManagePlayer();
+            Time++;
+            
         
-
-
-
-        public override void SetDefaults(NPC npc)
-        {
-           
-            /*
-            if (npc.type == NPCID.TargetDummy)
-            {
-                npc.damage = 0;
-                npc.defense = 0;
-                npc.lifeMax = 1;
-                npc.value = 0;
-            }
-            */
         }
-        public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        private void StateMachine()
         {
-           /*
-
-            if (IsBoilingAlive)
+            switch (CurrentState)
             {
-                Texture2D texture = AssetDirectory.Textures.BigGlowball.Value;
-                spriteBatch.Draw(texture, npc.Center - screenPos, null, Color.Red, 0f, texture.Size() * 0.5f, 0.25f, SpriteEffects.None, 0f);
+                case AvatarRogueHeldState.Spawn:
+                    Projectile.rotation = 0;//(Owner.Center - Owner.Calamity().mouseWorld).ToRotation() + MathHelper.PiOver2;
+                    CurrentState = AvatarRogueHeldState.Idle;
+                    break;
+                case AvatarRogueHeldState.Idle:
+                    HandleIdleState();
+                    break;
+                case AvatarRogueHeldState.PreWhip:
+                    HandlePreWhip();
+                    break;
+                case AvatarRogueHeldState.Whip:
+                    HandleWhipState();
+                    break;
             }
-            if (IsFreezingToDeath)
-            {
-                Texture2D texture = AssetDirectory.Textures.BigGlowball.Value;
-                spriteBatch.Draw(texture, npc.Center - screenPos, null, Color.White, 0f, texture.Size() * 0.5f, 0.25f, SpriteEffects.None, 0f);
-            }
-
-            Utils.DrawBorderString(Main.spriteBatch, "| Is Freezing: " + IsFreezingToDeath.ToString(), npc.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(Main.spriteBatch, "| Is Boiling Alive: " + IsBoilingAlive.ToString(), npc.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(Main.spriteBatch, "| HeatAmmount: " + HeatAmmount.ToString() + " | Warmup Timer: " + warmupTimer.ToString(), npc.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
-           */
-
-            base.PostDraw(npc, spriteBatch, screenPos, drawColor);
+        
         }
-
-      
-     
-        public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref NPC.HitModifiers modifiers)
+        private void HandleIdleState()
         {
-            base.ModifyHitByProjectile(npc, projectile, ref modifiers);
+            SwingProgress = 0;
+            Vector2 ToMouse = Main.MouseWorld - Owner.Center;
+            
+            Vector2 SpawnOffset = Projectile.Center + ToMouse;
+            if (Owner.controlUseItem)
+            {
+                Time = 0;
+                CurrentState = AvatarRogueHeldState.PreWhip; 
+            }
+        }
+       
+        private void HandlePreWhip()
+        {
+            Vector2 TargetLocation = Owner.Center + Vector2.UnitX * 100;
+            if (Time== 1)
+            {
+                
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), TargetLocation, Vector2.Zero, ModContent.ProjectileType<LifeCessationStealthStrike>(), 10, 0, default, default, default, 2);
+            }
+            //Owner.SetDummyItemTime(2);
+            Vector2 handOffset = new Vector2(10 * Owner.direction, 6 * Owner.gravDir); // Offset from player center to hand
+                                                                                       // Rotate the offset by the projectile's rotation
+            Vector2 rotatedOffset = handOffset.RotatedBy(Projectile.rotation);
+            // Set the projectile's center to the hand position
+            Projectile.Center = Owner.Center + rotatedOffset;
+            Projectile.rotation = float.Lerp(Projectile.rotation, MathHelper.ToRadians(Owner.direction * -120)  + MathHelper.ToRadians(Owner.direction * 180) * SwingProgress,0.2f);
+            if (Time > 30)
+            {
+                Time = 0;
+                CurrentState = AvatarRogueHeldState.Whip;
+            }
+
+
+        }
+        private void HandleWhipState()
+        {
+            //Projectile.rotation = (Owner.Center - Owner.Calamity().mouseWorld).ToRotation() + MathHelper.PiOver2;
+            
+            Vector2 ToMouse = Main.MouseWorld - Owner.Center;
+
+            float thing = ToMouse.Length();
+            Vector2 TargetLocation = Projectile.Center + Projectile.rotation.ToRotationVector2() * thing;
+            Dust.NewDustPerfect(TargetLocation, DustID.Cloud, Vector2.Zero, 100);
+            
+
+            //todo: set this once and then not again
+            float InitialMouse = 0;
+            if (Time == 1)
+            {
+                
+                InitialMouse = ToMouse.ToRotation();
+            }
+                
+            
+            switch (SwingStage)
+            {
+                case 0:
+
+                    Projectile.rotation = MathHelper.ToRadians(Owner.direction*-120) + InitialMouse + MathHelper.ToRadians(Owner.direction*180)* SwingProgress;
+                    
+                    //Projectile.velocity = Projectile.rotation.ToRotationVector2()*20;
+                    //todo: set position of the projectile to the hand. the hand is rotated by projectile.
+                    Vector2 handOffset = new Vector2(10 * Owner.direction, 6 * Owner.gravDir); // Offset from player center to hand
+                    // Rotate the offset by the projectile's rotation
+                    Vector2 rotatedOffset = handOffset.RotatedBy(Projectile.rotation);
+                    // Set the projectile's center to the hand position
+                    Projectile.Center = Owner.Center + rotatedOffset;
+                    SwingProgress = float.Lerp(SwingProgress, 1, 0.2f);
+                    if (SwingProgress >= 0.99 && Time > 40)
+                        CurrentState = AvatarRogueHeldState.Idle;
+
+
+                    break;
+                case 1:
+                    break;
+            }
+        }
+        private void ManagePlayer()
+        {
+            //Owner.ChangeDir(Projectile.direction);
+            Owner.heldProj = Projectile.whoAmI;
+
+
+            float frontArmRotation = Projectile.rotation - MathHelper.PiOver2;
+
+            //frontArmRotation = MathHelper.PiOver2;// - frontArmRotation;
+            //frontArmRotation += Projectile.rotation + MathHelper.Pi + Owner.direction * MathHelper.PiOver2 + 0.12f;
+            
+            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, frontArmRotation);
+            Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, frontArmRotation);// Projectile.velocity.ToRotation() - MathHelper.PiOver2);
+        }
+        public override bool? CanCutTiles() => false;
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Texture2D texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Jellyfish/Jellyfish_DebugArrow").Value;
+
+            Vector2 DrawPos = Projectile.Center - Main.screenPosition;
+            Vector2 Origin = new Vector2(texture.Width / 2, texture.Height / 2);
+
+            float Rot = Projectile.rotation + MathHelper.PiOver2;
+
+            //Utils.DrawBorderString(Main.spriteBatch, "SwingStage: " + SwingStage.ToString() + ", SwingProgress: " + SwingProgress.ToString(), DrawPos - Vector2.UnitY * 100, Color.AntiqueWhite);
+            //Utils.DrawBorderString(Main.spriteBatch, "State: " + CurrentState.ToString() + ", Rotation: " + MathHelper.ToDegrees(Projectile.rotation), DrawPos - Vector2.UnitY * 120, Color.AntiqueWhite);
+            //Utils.DrawBorderString(Main.spriteBatch, "Time: " + Time.ToString(), DrawPos - Vector2.UnitY * 80, lightColor);
+            Main.EntitySpriteDraw(texture, DrawPos, null, lightColor, Rot, Origin, 0.4f, SpriteEffects.None, 0);
+            return false;
         }
     }
 }

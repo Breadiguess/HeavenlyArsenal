@@ -27,7 +27,7 @@ namespace HeavenlyArsenal.Common.utils
 
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (npc.type == solynType && (Main.zenithWorld || Main.specialSeedWorld))
+            if (npc.type == solynType && (Main.zenithWorld ))
             {
                 Vector2 drawPosition = npc.Center - screenPos + Vector2.UnitY * (npc.gfxOffY - 6f);
                 if (npc.IsShimmerVariant)

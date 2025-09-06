@@ -1,3 +1,11 @@
-Modify this file with a description of your mod.
 I have long felt that WoTG has been too weaponless, and this is my attempt to fix that.
 thank you all :3
+
+credit where it's due: 
+Thank you to lucille for providing code and content (Shuuren, Brutal Forgiveness, Roche limit)
+Thank you to Blockaroz for not only the content (Flyrift, Avatar Spear), but also the constant support and aid rendered for all manner of bugs
+Thank you to Bobulous and Pil for the various textures and sprites
+Thank you to Stardustink and Origamiskies for the concept art of various weapons, locations
+Thank you to Multieye for the music and sound effects
+credit to Conway for the concept art of the butterfly staff
+and thank you to you, the community. This mod wouldn't exist without all of you!

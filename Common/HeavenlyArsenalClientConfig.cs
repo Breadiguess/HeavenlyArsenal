@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Content.Items.Consumables;
+﻿using HeavenlyArsenal.Content.Items.Consumables.CombatStim;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

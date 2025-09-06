@@ -3,13 +3,13 @@ using CalamityMod.Balancing;
 using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Tiles.Furniture.CraftingStations;
-using HeavenlyArsenal.ArsenalPlayer;
 using NoxusBoss.Content.Rarities;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 {

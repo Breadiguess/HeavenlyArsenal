@@ -1,14 +1,6 @@
-﻿using CalamityMod.Items.Accessories;
-using CalamityMod.Items.Armor.Demonshade;
-using HeavenlyArsenal.Content.Projectiles.Misc.GoodAppleSlingFolder;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Content.Items;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;

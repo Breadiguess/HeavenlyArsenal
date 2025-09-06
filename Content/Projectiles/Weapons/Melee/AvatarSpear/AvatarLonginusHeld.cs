@@ -61,6 +61,7 @@ public class AvatarLonginusHeld : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public ref float AttackState => ref Projectile.ai[1];
+    public int CurrentFrame = 0;
 
     public bool canHit;
     public bool throwMode;
@@ -105,6 +106,11 @@ public class AvatarLonginusHeld : ModProjectile
         {
             Projectile.Kill();
             return;
+        }
+
+        if (IsEmpowered)
+        {
+            CurrentFrame = (int)float.Lerp(CurrentFrame, 11, 0.25f);
         }
 
         Projectile.damage = (int)Player.GetTotalDamage(DamageClass.Melee).ApplyTo(Player.HeldItem.damage);
@@ -945,6 +951,7 @@ public class AvatarLonginusHeld : ModProjectile
         writer.Write(IsEmpowered);
         writer.Write(HitTimer);
         writer.WriteVector2(JavelinOffset);
+        writer.Write(CurrentFrame);
     }
 
     public override void ReceiveExtraAI(BinaryReader reader)
@@ -952,6 +959,7 @@ public class AvatarLonginusHeld : ModProjectile
         IsEmpowered = reader.ReadBoolean();
         HitTimer = reader.Read();
         JavelinOffset = reader.ReadVector2();
+        CurrentFrame = reader.Read();
     }
 
     private bool useSlash;
@@ -959,21 +967,29 @@ public class AvatarLonginusHeld : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        string texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld_Alt";
-        if(Main.LocalPlayer.name == "ModTester2")
-            texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld";
+        string texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld_Alt1";
+        //if(Main.LocalPlayer.name == "ModTester2")
+        //    texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld";
 
 
         Texture2D texture = ModContent.Request<Texture2D>(texturePath).Value;
-            //default: TextureAssets.Projectile[Type].Value;
-        Rectangle frame = texture.Frame(1, 2, 0, IsEmpowered ? 1 : 0);
+        //default: TextureAssets.Projectile[Type].Value;
+
+
+        Rectangle frame;
+        //if (Main.LocalPlayer.name == "ModTester2")
+        //    frame = texture.Frame(1, 2,0, IsEmpowered? 2 :1);
+       
+        {
+            frame = texture.Frame(1, 11, 0, CurrentFrame);
+        }
         Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
 
         float scale = Projectile.scale;
         int direction = Projectile.spriteDirection;
         SpriteEffects flipEffect = direction > 0 ? 0 : SpriteEffects.FlipVertically;
         int gripDistance = IsEmpowered ? 40 : 60;
-        Vector2 origin = new Vector2(frame.Width / 2 - gripDistance, frame.Height / 2 + (gripDistance - 4) * Player.gravDir * direction);
+        Vector2 origin = new Vector2(frame.Width / 2 - gripDistance, frame.Height /2 + (gripDistance - 4) * Player.gravDir * direction);
         Vector2 spearHeadPosition = Projectile.Center + new Vector2(90 * Projectile.scale, 0).RotatedBy(Projectile.rotation);
 
         float glowAmt = (IsEmpowered ? 0.7f : 0.4f) + MathF.Cbrt(Math.Clamp(HitTimer / 5f, 0f, 1f)) * 0.4f;

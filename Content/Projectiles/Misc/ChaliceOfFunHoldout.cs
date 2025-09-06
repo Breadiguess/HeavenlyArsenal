@@ -23,8 +23,8 @@ using NoxusBoss.Assets;
 using Luminance.Core.Graphics;
 using Humanizer;
 using Terraria.ID;
-using HeavenlyArsenal.ArsenalPlayer;
 using HeavenlyArsenal.Content.Buffs.Stims;
+using HeavenlyArsenal.Content.Items.Consumables.CombatStim;
 
 namespace HeavenlyArsenal.Content.Projectiles.Misc
 {
@@ -140,7 +140,7 @@ namespace HeavenlyArsenal.Content.Projectiles.Misc
                 player.AddBuff(ModContent.BuffType<BloodflareBloodFrenzy>(),1200,true,false);
                 player.AddBuff(ModContent.BuffType<BrutalCarnage>(), 1200, true, false);
                 player.AddBuff(ModContent.BuffType<DivineBless>(), 1200, true, false);
-                player.AddBuff(ModContent.BuffType<KamiBuff>(), 1200, true, false);
+                // rip kami player.AddBuff(ModContent.BuffType<KamiBuff>(), 1200, true, false);
                 player.AddBuff(ModContent.BuffType<TarraLifeRegen>(), 1200, true, false);
                 player.AddBuff(ModContent.BuffType<TarragonCloak>(), 1200, true, false);
                 player.AddBuff(ModContent.BuffType<TarragonImmunity>(), 1200, true, false);

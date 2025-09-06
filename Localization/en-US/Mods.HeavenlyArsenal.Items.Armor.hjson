@@ -1,33 +1,64 @@
 ShintoArmor: {
 	ShintoArmorHelmetRogue: {
 		SetBonus: Mods.HeavenlyArsenal.Items.Armor.ShintoArmor.ShintoArmorHelmetRogue.SetBonus
-		DisplayName: Shinto Armor Helmet Rogue
-		Tooltip: ""
+		DisplayName: Darkened Cap
+		Tooltip: Might've belonged to an assassin at one point or another...
 	}
 
 	ShintoArmorHelmetAll: {
-		DisplayName: Shinto Armor Helmet All
-		Tooltip: ""
+		DisplayName: Sight Of Bygone Shadow
+		Tooltip:
+			'''
+			Effects of Occult Skull Crown
+			20% increased damage
+			15% increased crit chance
+			15% increased attackspeed
+
+			'''
+		SetBonus:
+			'''
+
+			double tap down to enrage
+			while Enraged, deal and take 3x damage
+			an Antishadow barrier is forged around you that absorbs most of the damage you would've taken
+			the barrier cannot sustain itself while you are enraged
+			'''
+		LoreTip:
+			'''
+			kris
+
+			get the bannana, kris
+
+			potassium 
+			'''
+		LoreTipGFB:
+			'''
+			i was once a shadow, now i am a shadow of a shadow. 
+			i am the shadow of a shadow of a shadow. 
+			i am the shadow of a shadow of a shadow of a shadow.
+			'''
 	}
 
 	ShintoArmorBreastplate: {
-		DisplayName: Mantle of Dimming Radiance
+		DisplayName: Plate of Bygone Shadow
 		Tooltip:
 			'''
-			20% increased damage
-			Reduces damage taken by 9% and greatly increases life regeneration
-			Increases max life by {0} and Mana by {1}
+			increases max life by 300 and max mana by 200
+			15% increased damage
+			18% increased crit chance
+			25% increased attack speed
 			'''
 	}
 
 	ShintoArmorLeggings: {
-		DisplayName: Steps of the darkened passage
+		DisplayName: Treads of Bygone Shadow
 		Tooltip:
 			'''
 			20% increased damage
 			50% increased movement speed
-			Shadow Speed
-			Greatly improved acceleration and maneuverability
+			provides a chance to dodge attacks
+			provides a fast dash that renders you immune to damage for a short time
+
 			'''
 	}
 }
@@ -69,17 +100,17 @@ BloodflareHelmetGroup: Any Bloodflare Helmet
 Vanity: {
 	LightCultist: {
 		LightCultist_Helmet: {
-			DisplayName: Blinding vision of the firmament
+			DisplayName: Blinding vision of the Firmament
 			Tooltip: ""
 		}
 
 		LightCultist_Pants: {
-			DisplayName: Light Cultist_ Pants
+			DisplayName: Blinding Pantaloons of the Firmament
 			Tooltip: ""
 		}
 
 		LightCultist_Robe: {
-			DisplayName: Light Cultist_ Robe
+			DisplayName: Classy Attire of the Firmament
 			Tooltip: ""
 		}
 	}

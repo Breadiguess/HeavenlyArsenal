@@ -1,16 +1,8 @@
-﻿using HeavenlyArsenal.common;
-using HeavenlyArsenal.Content.Projectiles.Weapons.Rogue.ND_Rogue;
-using Luminance.Common.Utilities;
+﻿using Luminance.Common.Utilities;
 using Luminance.Core.Sounds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
-using NoxusBoss.Content.NPCs.Bosses.NamelessDeity.SpecificEffectManagers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;

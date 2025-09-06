@@ -39,6 +39,11 @@ Ranged: {
 		DisplayName: Good Apple Sling
 		Tooltip: ""
 	}
+
+	NoxusWeapon: {
+		DisplayName: Noxious Fumes
+		Tooltip: ""
+	}
 }
 
 Magic: {
@@ -95,6 +100,15 @@ Summon: {
 			bound by blood and seal, it shall always be by your side
 
 			[c/ff4dff:There can be only one.]
+			'''
+	}
+
+	BadSunItem: {
+		DisplayName: Bad Sun Item
+		Tooltip:
+			'''
+			Hey, that apple... its quite good, actually
+			- Nameless Deity
 			'''
 	}
 }
