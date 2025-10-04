@@ -19,41 +19,15 @@ namespace HeavenlyArsenal.Common.Players
 
 
             string msg = "";
-            msg += $"Empowered Attack Count: {Owner.GetModPlayer<VoidCrestOathPlayer>().InterceptCount}\n";
-            /* if (Owner.HeldItem != null)
-                 msg = $"Held Item: {Owner.HeldItem.Name} \n" +
-                 $"Use Time: {Owner.HeldItem.useTime} \n" +
-                 $"Use Animation: {Owner.HeldItem.useAnimation} \n" +
-                 $"Use Style: {Owner.HeldItem.useStyle} \n" +
-                 $"Attack Speed: {Owner.GetWeaponAttackSpeed(Owner.HeldItem)} \n" +
-                 $"Empowered Attack Count: {Owner.GetModPlayer<VoidCrestOathPlayer>().InterceptCount}\n" +
-
-                 $"{Owner.GetModPlayer<VoidCrestOathPlayer>().MaxInterceptCount} \n";
-             else
-                 msg = "No Held Item";
-
-           */
-            for (int i = 0; i < Owner.GetModPlayer<VoidCrestOathPlayer>().trackedProjectileIndices.Count; i++)
-            {
-                int projIndex = Owner.GetModPlayer<VoidCrestOathPlayer>().trackedProjectileIndices[i];
-                if (Main.projectile[projIndex] != null && Main.projectile[projIndex].active)
-                {
-                    msg += $"Proj {i}: Name: {Main.projectile[projIndex].Name} WhoamI: {Main.projectile[projIndex].whoAmI},Damage:{Main.projectile[projIndex].damage}\n";
-                }
-                else
-                {
-                    msg += $"Proj {i}: NULL\n";
-                }
-            }
-            // msg = $"Cooldown: {Owner.GetModPlayer<VoidCrestOathPlayer>().Cooldown}\n"+ $"InterceptCount: {Owner.GetModPlayer<VoidCrestOathPlayer>().InterceptCount}";
-
 
 
 
             msg = $"modStealth: {Owner.Calamity().modStealth} \n"
                 + $"rogueStealth: {Owner.Calamity().rogueStealth}\n"
-                + $"{Owner.Calamity().accStealthGenBoost}";
-            Utils.DrawBorderString(Main.spriteBatch, msg, Owner.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, -0.2f);
+                + $"Stealth Max:{Owner.Calamity().rogueStealthMax * 100}\n"
+                + $"StealthAcceleration: {Owner.Calamity().stealthAcceleration}\n"
+                + $"{Owner.Calamity().stealthGenMoving}";
+            Utils.DrawBorderString(Main.spriteBatch, msg, Owner.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, -1.2f);
         }
     }
     public class DebugProj : GlobalProjectile

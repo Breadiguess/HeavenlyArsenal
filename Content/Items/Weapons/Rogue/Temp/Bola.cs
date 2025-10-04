@@ -1,10 +1,10 @@
 ﻿using CalamityMod;
-using CalamityMod.CalPlayer;
 using HeavenlyArsenal.Common.utils;
 using Luminance.Assets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Core.Physics.VerletIntergration;
 using System;
 using System.Collections.Generic;
 
@@ -17,6 +17,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
     public class Bola : ModProjectile
     {
         #region Values / setup
+        public int BolaCount = 3;
         public NPC BoundTarget
         {
             get;
@@ -32,6 +33,22 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
         public BolaState CurrentState = BolaState.Windup;
         public ref float Time => ref Projectile.ai[0];
         public ref float Charge => ref Projectile.ai[1];
+        public float SwingStrength
+        {
+            get => MathF.Pow((1 + Charge / 180), 4);
+
+        }
+        public int MaxCharge
+        {
+            get
+            {
+                if (Owner.Calamity().wearingRogueArmor)
+                    return (int)(Owner.Calamity().rogueStealthMax * 100);
+                else
+                    return 100;
+            }
+
+        }
         public ref float ArmRot => ref Projectile.localAI[0];
         public ref Player Owner => ref Main.player[Projectile.owner];
         public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
@@ -43,18 +60,15 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
             Projectile.timeLeft = 540;
             Projectile.Size = new Vector2(20, 20);
         }
-        private void ClearStealth()
-        {
-            Owner.Calamity().rogueStealth = 0;
-        }
+
         public override void OnSpawn(IEntitySource source)
         {
             ClearStealth();
-         
+
             Owner.StartChanneling();
-            
-           //Projectile.rotation = Projectile.velocity.ToRotation();
-            Balls = new List<Vector2>(3);
+
+            //Projectile.rotation = Projectile.velocity.ToRotation();
+            Balls = new List<Vector2>(BolaCount);
             for (int i = 0; i < Balls.Capacity; i++)
             {
                 Vector2 Pos = new Vector2(30, 0).RotatedBy(MathHelper.TwoPi * i);
@@ -71,6 +85,34 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
 
         }
         #endregion
+
+        // TODOS FOR TOMORROW:
+        // 1. MAKE STEALTH BUILD SLOWLY OVER TIME. DON'T FORGET TO FACTOR IN MAX STEALTH AND STEALTH ACCELERATION.
+        // 2. MAYBE REWRITE THE CODE FOR THE BOLAS SO THAT INSTEAD OF DOING COSTLY ROPE PHYSICS SIMS, ITS JUST VERLET STRINGS.
+        // THIS WILL MAKE ME FEEL A BIT BETTER.
+        // 3. START DANGLING, THEN MOVE TO SPINNING THE BOLAS WHILE CHARGING. REMEMBER TO TRY TO GET THIS OFFSET A 45 DEGREE ANGLE
+        // - THINK LIKE HOW VOIDCREST OATH'S HALO LOOKS.
+        // STARTS OFF SLOW, BUT RAPIDLY SPINS UP. 
+        // MAYBE IT ENDS UPLOOKING LIKE A STREAK OF LIGHT? LIKE ITS MOVING SO FAST THAT YOU CAN ONLY SEE A CONTINUOUS CIRCLE.
+        // THAT WOULD PROBABLY MAKE IT A LOT EASIER TO CODE, ACTUALLY.
+        //
+        // 4. HERE'S A LIST OF SEVERAL IDEAS I'VE HAD FOR THE STEALTH STRIKE:
+        //      a. OPENS A PORTAL TO THE DEAD UNIVERSE AND DRAGS THE TARGET INSIDE. THIS DEALS A "YES" AMOUNT OF DAMAGE.
+        //      b. WRAPS THE TARGET IN SHADOWY CLOTH AND THEN DRAINS THEM. MAYBE BETTER ON NON STEALTH STRIKE?
+        //      c. TRANSFORMATION. AT MAX CHARGE, THE BOLAS TRANSFORM INTO A DIVINE WEAPON AND DEALS A "YESSER" AMOUNT OF DAMAGE. 
+        //       HONESTLY ONE OF THE MORE BORING OPTIONS. I DON'T WANT TO MAKE ANOTHER ENDGAME JAVELIN.
+        //      
+        // HONESTLY IM LOOKING FORWARD TO THIS. THIS SEEMS LIKE A FUN WEAPON CONCEPT, AND I CAME UP WITH IT ALL ON MY OWN.
+        // OTHER ASSORTED IDEAS INCLUDE:
+        // ALT FIRE SCATTERING SOME KIND OF TRAP AROUND THAT YOU CAN THEN SEND NPCS INTO WITH THE BOLA.
+        // SOME KIND OF CALTROPS? EVIL AND FUCKED UP CALTROPS.
+        // PORTALS RIPPING OUT OF SPACE AND SPEARS IMPALING AND RIPPING APART ENEMIES BY TRYING TO DRAG THEM IN DIFFERENT DIRECTIONS.
+        // PROBALBY NOT GONNA BE USED BECAUSE I'VE OVERUSED THAT ASTHETIC/THEMATIC/VISUAL SO MUCH ALREADY.
+        // HITTING THE GROUND WITH THE BOLA CREATES A TRAP/SPRAYS THE ORBS AROUND.
+        // I THINK THATS IT. 
+        // I LOVE YOU.
+
+        #region AI
         public override void AI()
         {
 
@@ -106,6 +148,63 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
             }
         }
 
+
+
+        private void ManageCharge()
+        {
+
+
+
+            Projectile.timeLeft++;
+
+            if(Owner.Calamity().wearingRogueArmor)
+                Owner.Calamity().rogueStealth = Charge / 100;
+            float toMouse = Owner.MountedCenter.AngleTo(Main.MouseWorld);
+            ArmRot = MathHelper.ToRadians(-Owner.direction * -150 + MathHelper.ToDegrees(toMouse)) + MathHelper.ToRadians(MathF.Sin(Time / 10));
+
+            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, ArmRot);
+            Vector2 HandPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, ArmRot);
+
+            Projectile.velocity = Owner.MountedCenter.AngleTo(Main.MouseWorld).ToRotationVector2() *0.1f;
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            Projectile.Center = HandPos;
+            if (Owner.channel)
+            {
+                Charge = Math.Clamp(Charge + CalculateStealthMulti(), 0, MaxCharge);
+                //Main.NewText($"Charge: {Charge}, \n Stealth: {Owner.Calamity().rogueStealth}");
+            }
+            if (!Owner.channel)
+            {
+                if (Charge < 10)
+                {
+                    Projectile.Kill();
+                }
+                else
+                {
+                    if (Owner.Calamity().StealthStrikeAvailable())
+                    {
+
+                        Owner.Calamity().ConsumeStealthByAttacking();
+                        StealthStrike = true;
+                    }
+                    CurrentState = BolaState.Throw;
+                    Time = 0;
+                    Projectile.velocity = Owner.MountedCenter.AngleTo(Main.MouseWorld).ToRotationVector2() * 20 * Charge / 100;
+                }
+
+            }
+
+        }
+        private void ManageThrow()
+        {
+            float val = calculateSpeed() * Charge / 100;
+            Projectile.rotation = (Projectile.velocity).ToRotation();
+
+            if (Time > 60)
+            {
+                Projectile.velocity.Y += 1f;
+            }
+        }
         private void ManageTangled()
         {
             if (BoundTarget == null)
@@ -114,81 +213,33 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
             Projectile.Center = BoundTarget.Center;
         }
 
-
-        // TODOS FOR TOMORROW:
-        // 1. MAKE STEALTH BUILD SLOWLY OVER TIME. DON'T FORGET TO FACTOR IN MAX STEALTH AND STEALTH ACCELERATION.
-        // 2. MAYBE REWRITE THE CODE FOR THE BOLAS SO THAT INSTEAD OF DOING COSTLY ROPE PHYSICS SIMS, ITS JUST VERLET STRINGS.
-        // THIS WILL MAKE ME FEEL A BIT BETTER.
-        // 3. START DANGLING, THEN MOVE TO SPINNING THE BOLAS WHILE CHARGING. REMEMBER TO TRY TO GET THIS OFFSET A 45 DEGREE ANGLE
-        // - THINK LIKE HOW VOIDCREST OATH'S HALO LOOKS.
-        // STARTS OFF SLOW, BUT RAPIDLY SPINS UP. 
-        // MAYBE IT ENDS UPLOOKING LIKE A STREAK OF LIGHT? LIKE ITS MOVING SO FAST THAT YOU CAN ONLY SEE A CONTINUOUS CIRCLE.
-        // THAT WOULD PROBABLY MAKE IT A LOT EASIER TO CODE, ACTUALLY.
-        //
-        // 4. HERE'S A LIST OF SEVERAL IDEAS I'VE HAD FOR THE STEALTH STRIKE:
-        //      a. OPENS A PORTAL TO THE DEAD UNIVERSE AND DRAGS THE TARGET INSIDE. THIS DEALS A "YES" AMOUNT OF DAMAGE.
-        //      b. WRAPS THE TARGET IN SHADOWY CLOTH AND THEN DRAINS THEM. MAYBE BETTER ON NON STEALTH STRIKE?
-        //      c. TRANSFORMATION. AT MAX CHARGE, THE BOLAS TRANSFORM INTO A DIVINE WEAPON AND DEALS A "YESSER" AMOUNT OF DAMAGE. 
-        //       HONESTLY ONE OF THE MORE BORING OPTIONS. I DON'T WANT TO MAKE ANOTHER ENDGAME JAVELIN.
-        //      
-        // HONESTLY IM LOOKING FORWARD TO THIS. THIS SEEMS LIKE A FUN WEAPON CONCEPT, AND I CAME UP WITH IT ALL ON MY OWN.
-        // 
-        private void ManageCharge()
-        {
-            Projectile.timeLeft++;
-            Owner.Calamity().stealthGenMoving *= 0;
-            Owner.Calamity().stealthGenStandstill *= 0;
-
-            Owner.Calamity().rogueStealth = Charge / 180f;
-            float toMouse = Owner.MountedCenter.AngleTo(Main.MouseWorld);
-            ArmRot = MathHelper.ToRadians(-Owner.direction * -150 + MathHelper.ToDegrees(toMouse)) + MathHelper.ToRadians(MathF.Sin(Time/10));
-            Projectile.velocity = Vector2.Zero;
-            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, ArmRot);
-            Vector2 HandPos = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, ArmRot);
-
-            Projectile.Center = HandPos;
-            if (Owner.channel)
-            {
-                Charge = Math.Clamp(Charge+ 1, 0, 60 * 3);
-            }
-            if (!Owner.channel)
-            {
-                if (Charge < 60)
-                {
-                    Projectile.Kill();
-                }
-                else
-                {
-                    if(Owner.Calamity().StealthStrikeAvailable())
-                        Owner.Calamity().ConsumeStealthByAttacking();
-                    CurrentState = BolaState.Throw;
-                    Time = 0;
-                    Projectile.velocity = Owner.MountedCenter.AngleTo(Main.MouseWorld).ToRotationVector2() * 10;
-                }
-                    
-            }
-
-        }
-        private void ManageThrow()
-        {
-            float val = calculateSpeed();
-            Projectile.rotation = (Projectile.velocity * Math.Abs(val - 1)).ToRotation();
-
-            if (Time > 60)
-            {
-                Projectile.velocity.Y += 1f;
-            }
-        }
+        #endregion
         #region Collisions
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if(BoundTarget == null)
+
+            if (BoundTarget == null)
             {
                 BoundTarget = target;
             }
             if (CurrentState == BolaState.Throw)
                 CurrentState = BolaState.Tangled;
-            
+
+            if (StealthStrike)
+            {
+                //oh boy here we go
+
+                Projectile A = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<DeadUniverse_Rift>(), 1, 0);
+                DeadUniverse_Rift b = A.ModProjectile as DeadUniverse_Rift;
+                if (b.goToBrazil.TrappedNPCs.Contains(target))
+                    b.goToBrazil.TrappedNPCs.Add(target);
+                target.GetGlobalNPC<BrazilVictim>().Rift = b;
+                target.GetGlobalNPC<BrazilVictim>().Banisher = Owner;
+
+                Projectile.Kill();
+            }
+
+
         }
         public override void ModifyDamageHitbox(ref Rectangle hitbox)
         {
@@ -200,8 +251,29 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
         }
         #endregion
         #region HelpersAndStructs
+        private void ClearStealth()
+        {
+            Owner.Calamity().rogueStealth = 0;
+        }
+        private float CalculateStealthMulti()
+        {
+            if (!Owner.Calamity().wearingRogueArmor)
+                return 1;
+
+            float thing = 0.5f;
+            if (Owner.velocity.Length() > 0.01f)
+                thing *= Owner.Calamity().stealthGenMoving;
+            thing *= Owner.Calamity().stealthAcceleration;
+            //todo: make it take exponentially longer past 75
+
+            if (Charge > 75)
+                thing = MathF.Pow(1.1f, thing);
+            return thing;
+        }
+
         public struct Ties
         {
+            public VerletSimulatedSegment a;
             public Rope String;
             public Vector2 Start;
             public Vector2 End;
@@ -214,6 +286,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
             }
         }
         public Vector2 tieCenter;
+
+        public List<Vector2> BallTrail = new List<Vector2>(10);
         public List<Vector2> Balls;
 
         public List<Ties> bolaRope;
@@ -225,7 +299,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
 
                 return HandPos;
             }
-            else 
+            else
             {
                 Vector2 Center = Vector2.Zero;
                 float x = 0;
@@ -244,7 +318,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
                 }
                 return Center;
             }
-            
+
         }
 
         private float calculateSpeed()
@@ -259,56 +333,60 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
             // Example: 1f = normal speed, <1f = slower, >1f = faster.
             // Adjust the divisor (like 10f here) based on your design.
             float multiplier = speed / 20f;
-            
+
             multiplier = MathHelper.Clamp(speed / 20f, 0.0f, 2f);
 
 
             return multiplier;
         }
-       
-      
+
+
         private void Updateballs()
         {
+            float xScale;
+            float yScale;
+            Vector2 local;
+            Vector2 world;
             for (int i = 0; i < Balls.Count; i++)
             {
                 //okay, no.
+                //so the current issue is that this doesn't feel like its weighted properly.
+                //i'd say its becuase of the fact that the string is updated based on the bola, rather than the other way around. 
+                //ughh i shouldn't have stayed up until almost 1. that was a huge mistake.
                 if (CurrentState == BolaState.Windup)
                 {
+                    float val2 = MathF.Pow(CalculateStealthMulti() + Charge / 100, 3);
+                    float rotationSpeed = 0.15f * val2;
+                    float orbitRadius = 30f;
+                    float ovalX = orbitRadius * 1.5f;
+                    float ovalY = orbitRadius * 0.5f;
 
-                    //float thing = Projectile.direction * MathHelper.ToRadians((Time * 16) + i * (360f / Balls.Count) + Projectile.whoAmI * 100);
-                    float val = MathF.Cos(Time/10 + i *(100/Balls.Count)) * 10;
-                    Vector2 t = new Vector2(val, 30);
-                    Vector2 Agony = t;
+                    float angle = Projectile.direction * (Time * rotationSpeed + Projectile.whoAmI * 100);
 
-                    Balls[i] = Agony;
+                    local = new Vector2(MathF.Cos(angle+Main.rand.NextFloat(-0.1f,0.1f)), MathF.Sin(angle));
+                    local *= new Vector2(ovalX, ovalY);
+
+                    world = local.RotatedBy(Projectile.rotation);
+                    Balls[i] = world;
                     continue;
                 }
 
                 float speedMulti = calculateSpeed();
 
-                float value = Projectile.direction * MathHelper.ToRadians((Time * 16) + i * (360f / Balls.Count) + Projectile.whoAmI * 100);
+                //todo: mutliply this by time so that when its initially thrown its not immediately spread out.
+                float BallOffset = i * (360f / Balls.Count) * Math.Clamp(Time / 20, 0, 1);
+                float value = Projectile.direction * MathHelper.ToRadians((Time * 16 * Charge / 100) + BallOffset + Projectile.whoAmI * 100);
 
-                Vector2 local = new Vector2(MathF.Cos(value), MathF.Sin(value));
+                local = new Vector2(MathF.Cos(value), MathF.Sin(value));
+                xScale = 30f * speedMulti * (1 + 1.25f * Math.Abs(2 - speedMulti));
+                yScale = 30f * speedMulti * (1 - 0.15f * Math.Abs(2 - speedMulti));
 
-                float xScale;
-                float yScale;
 
-                if (CurrentState == BolaState.Windup)
-                {
-                    xScale = 30f * 0.2f;
-                    yScale = 30f * 1.4f;
-                }
-                else
-                {
-                    xScale = 30f * speedMulti * (1 + 1.25f * Math.Abs(2 - speedMulti));
-                    yScale = 30f * speedMulti * (1 - 0.15f * Math.Abs(2 - speedMulti));
 
-                }
-
-                    local *= new Vector2(xScale, yScale).RotatedBy(MathHelper.ToRadians(Time));
+                local *= new Vector2(xScale, yScale);
 
                 // Now rotate oval into world space
-                Vector2 world = local.RotatedBy(Projectile.rotation);
+                world = local.RotatedBy(Projectile.rotation);
 
                 Balls[i] = world;
             }
@@ -341,6 +419,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
                 bolaRope[i].String.segments[^1].oldPosition = bolaRope[i].End;
                 bolaRope[i].String.segments[^1].pinned = true;
 
+
+
                 bolaRope[i].String.Update();
             }
         }
@@ -358,6 +438,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
 
             return false;
         }
+
+
         private void DrawBalls()
         {
             Texture2D ball = AssetDirectory.Textures.Items.Weapons.Rogue.BolaBall.Value;
@@ -366,7 +448,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
             if (Balls != null && Balls.Count > 0)
             {
 
-               
+
                 for (int i = 0; i < Balls.Count; i++)
                 {
                     float Rot = tieCenter.AngleTo(Balls[i]);
@@ -379,31 +461,41 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.Temp
         private void DrawTies()
         {
             Color thing = Color.AliceBlue;
+
             if (bolaRope != null)
             {
-
-               
-                foreach (Ties t in bolaRope)
-                {
-                    // Get rope points
-                    Vector2[] points = t.String.GetPoints();
-
-
-                    Texture2D pixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
-
-                    for (int i = 0; i < points.Length - 1; i++)
+                if (CurrentState == BolaState.Windup)
+                    for (int i = 0; i < bolaRope.Count; i++)
                     {
-                        Vector2 start = points[i] + Projectile.Center - Main.screenPosition;
-                        Vector2 end = points[i + 1] + Projectile.Center - Main.screenPosition;
-
-                        Vector2 edge = end - start;
-                        float length = edge.Length();
-                        float rotation = edge.ToRotation();
-
-
-                        Main.EntitySpriteDraw(pixel, start, null, thing, rotation, pixel.Size() * 0.5f, new Vector2(length, 2f), 0);
+                        Utils.DrawLine(Main.spriteBatch, bolaRope[i].Start + Projectile.Center, bolaRope[i].End + Projectile.Center, Color.AntiqueWhite, Color.AntiqueWhite, 2);
                     }
-                }
+                else
+
+                    foreach (Ties t in bolaRope)
+                    {
+
+                        // Get rope points
+                        Vector2[] points = t.String.GetPoints();
+
+
+                        Texture2D pixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+
+                        for (int i = 0; i < points.Length - 1; i++)
+                        {
+                            Vector2 start = points[i] + Projectile.Center - Main.screenPosition;
+                            Vector2 end = points[i + 1] + Projectile.Center - Main.screenPosition;
+
+                            Vector2 edge = end - start;
+                            float length = edge.Length();
+                            float rotation = edge.ToRotation();
+
+
+                            Main.EntitySpriteDraw(pixel, start, null, thing, rotation, pixel.Size() * 0.5f, new Vector2(length, 2f), 0);
+                        }
+
+
+
+                    }
             }
         }
 
