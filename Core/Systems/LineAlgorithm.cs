@@ -1,9 +1,6 @@
 ﻿using CalamityMod;
+using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 
 namespace HeavenlyArsenal.Core.Systems
@@ -48,5 +45,49 @@ namespace HeavenlyArsenal.Core.Systems
                 }
             }
         }
+
+
+        public static Point? RaycastTo(int x0, int y0, int x1, int y1, bool ignoreHalfTiles = false)
+        {
+            int dx = Math.Abs(x1 - x0);
+            int dy = Math.Abs(y1 - y0);
+            int sx = (x1 > x0) ? 1 : -1;
+            int sy = (y1 > y0) ? 1 : -1;
+
+            int x = x0;
+            int y = y0;
+            int err = dx - dy;
+
+            while (true)
+            {
+                Tile tile = Main.tile[x, y];
+                if (tile != null && tile.HasTile && tile.IsTileSolid() &&
+                    (!ignoreHalfTiles || !tile.IsHalfBlock))
+                {
+                    // Return the first solid tile hit
+                    return new Point(x, y);
+                }
+
+                if (x == x1 && y == y1)
+                    break;
+
+                int e2 = err * 2;
+                if (e2 > -dy)
+                {
+                    err -= dy;
+                    x += sx;
+                }
+                if (e2 < dx)
+                {
+                    err += dx;
+                    y += sy;
+                }
+            }
+
+            // No solid tile found
+            return null;
+        }
+
+
     }
 }

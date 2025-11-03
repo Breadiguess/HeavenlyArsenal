@@ -53,13 +53,15 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.DarkestNight
             writer.Write(canHit);
             writer.Write(CreatingGlass);
             writer.Write(SwingInProgress);
-
+            writer.Write(t);
 
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-           // reader.ReadDouble();
-            reader.Read();
+            canHit = reader.ReadBoolean();
+            CreatingGlass = reader.ReadBoolean();
+            SwingInProgress = reader.ReadBoolean();
+            t = reader.ReadSingle();
         }
 
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)

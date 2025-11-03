@@ -6,12 +6,14 @@ using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
@@ -67,7 +69,18 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
         public Player StackOwner;
         public override bool InstancePerEntity => true;
 
-
+        public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter)
+        {
+            binaryWriter.Write(StackOwner.whoAmI);
+            binaryWriter.Write(DamageBucketNPC);
+            binaryWriter.Write(BurstCooldown);
+        }
+        public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader)
+        {
+            StackOwner = Main.player[binaryReader.Read()];
+            DamageBucketNPC = binaryReader.Read();
+            BurstCooldown = binaryReader.Read();
+        }
         public override bool PreAI(NPC npc)
         {
             if(BucketLossTimer > 0)
@@ -143,7 +156,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
                         float DamageReduction = 0.75f;
 
                         int damage = (int) (StackOwner.GetModPlayer<NightfallPlayer>().DamageBucketTotal * DamageReduction);
-                        bool crit = Main.rand.NextBool(StackOwner.GetWeaponCrit(StackOwner.HeldItem));
+                        bool crit = true;
 
                        
 
@@ -183,8 +196,8 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
                         {
                             //Main.NewText($"Before: {OrbitInterp}, t: {t}");
 
-                            // Drive t in [0,1]
                             t = MathHelper.Clamp(t + 0.02f, 0f, 1f);
+                            //ain.NewText(t);
                             OrbitInterp = Interpolant.Evaluate(t);
 
                             //Main.NewText($"{t}, orbit: {OrbitInterp}");
@@ -254,9 +267,9 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
                     Vector2 DrawPos = BasePos + RotationOffset + HaloOffset;
 
 
-                    Main.EntitySpriteDraw(Glow, DrawPos, null, Color.Red with { A = 1 }, 0, GlowOrigin, 0.17f * (1+WindupInterp), SpriteEffects.None);
-                    Main.EntitySpriteDraw(Orb, DrawPos, null, Color.Red, 0, Origin, 0.11f, SpriteEffects.None, 0);
-                    Main.EntitySpriteDraw(Orb, DrawPos, null, Color.White * 0.85f, 0, Origin, 0.1f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(Glow, DrawPos, null, Color.Red with { A = 1 } * npc.Opacity, 0, GlowOrigin, 0.17f * (1+WindupInterp), SpriteEffects.None);
+                    Main.EntitySpriteDraw(Orb, DrawPos, null, Color.Red * npc.Opacity, 0, Origin, 0.11f, SpriteEffects.None, 0);
+                    Main.EntitySpriteDraw(Orb, DrawPos, null, Color.White * 0.85f * npc.Opacity, 0, Origin, 0.1f, SpriteEffects.None);
                     Main.EntitySpriteDraw(WoodenBall, DrawPos, ballframe, drawColor, 0, WoodenOrigin, 1, SpriteEffects.None);
                     //Utils.DrawBorderString(spriteBatch, RotationOffset.Y.ToString(), DrawPos, Color.AliceBlue);
                 }

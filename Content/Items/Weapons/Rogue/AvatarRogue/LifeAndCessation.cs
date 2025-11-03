@@ -124,7 +124,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
         public override void AI()
         {
             Owner.heldProj = Projectile.whoAmI;
-            //mandatory check to see if the item is still held
+
             if (Owner.HeldItem.type != ModContent.ItemType<LifeAndCessation>() || Owner.CCed || Owner.dead)
             {
                 Projectile.Kill();

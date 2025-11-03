@@ -22,7 +22,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         {
             ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false;
             ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] =false ;
-            // Setting IsTallHat is the only special thing this item does.
             ArmorIDs.Head.Sets.IsTallHat[Item.headSlot] = true;
             ArmorIDs.Head.Sets.PreventBeardDraw[Item.headSlot] = true;
         }
@@ -56,9 +55,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                     new Vector2(-1f * player.direction, -1.25f),
                     new Vector2(7f * player.direction, -1.25f),
             };
-
-            //Utils.DrawBorderString(Main.spriteBatch, $"Frame: {frameIndex},  WalkOffset: {walkOffset}", drawInfo.HeadPosition() + new Vector2(0, 60), Color.LightGreen);
-
             Color BaseheadColor = Color.Red;
             if (drawInfo.cHead != 0)
             {
@@ -73,15 +69,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                 DrawData dots = new DrawData(
                     facePixel, drawPos, null, BaseheadColor * thing, 0f, facePixel.Size() * 0.5f, 0.9f, SpriteEffects.None, 0);
                 dots.shader = drawInfo.cHead;
-
-
-                //drawInfo.DrawDataCache.Add(dots);
-
-
                 DrawData GlowingEyes = new DrawData(Glow, drawPos, null, BaseheadColor with { A = 0 } * thing, 0f, Glow.Size() * 0.5f, 0.05f, SpriteEffects.None, 0);
-
-
-
                 GlowingEyes.shader = drawInfo.cHead;
                 drawInfo.DrawDataCache.Add(GlowingEyes);
 

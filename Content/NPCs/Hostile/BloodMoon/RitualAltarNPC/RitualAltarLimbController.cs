@@ -45,7 +45,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
             }
             if (Strength > 0.2f)
                 Strength /= LimbCount;
-            NPC.velocity.Y = float.Lerp(NPC.velocity.Y, NPC.velocity.Y - Strength, 0.6f);
+            NPC.velocity.Y = -Strength;// float.Lerp(NPC.velocity.Y, NPC.velocity.Y - Strength, 0.6f);
         }
         void UpdateLimbMotion()
         {

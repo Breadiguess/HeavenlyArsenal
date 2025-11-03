@@ -88,3 +88,8 @@ AntishadowRetaliation: {
 	DisplayName: Antishadow Retaliation
 	Description: Mods.HeavenlyArsenal.Buffs.AntishadowRetaliation.Description
 }
+
+UmbralSickness: {
+	DisplayName: Umbral Sickness
+	Description: Mods.HeavenlyArsenal.Buffs.UmbralSickness.Description
+}

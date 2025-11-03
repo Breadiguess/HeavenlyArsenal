@@ -1,17 +1,18 @@
 ﻿using CalamityMod;
-using CalamityMod.CalPlayer.Dashes;
 using CalamityMod.CalPlayer;
+using CalamityMod.CalPlayer.Dashes;
 using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Items.Materials;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Content.Rarities;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using NoxusBoss.Content.Rarities;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.DataStructures;
-using Microsoft.Xna.Framework;
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 {
@@ -67,6 +68,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             if (ModLoader.TryGetMod("CalamityHunt", out Mod CalamityHunt))
             {
                 CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
                 .AddIngredient<DemonshadeGreaves>()
                 .AddIngredient(ItemID.NinjaPants)
                 .AddIngredient(ItemID.CrystalNinjaLeggings)
@@ -78,6 +80,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             else
             {
                 CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
                 .AddIngredient<DemonshadeGreaves>()
                 .AddIngredient(ItemID.NinjaPants)
                 .AddIngredient(ItemID.CrystalNinjaLeggings)

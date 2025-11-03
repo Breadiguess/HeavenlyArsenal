@@ -122,14 +122,14 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
 
         public override void PostUpdateMiscEffects()
         {
-            
-            
-           if (Cooldown <= 1 && !Vanity)
-              ResourceInterp = float.Lerp(ResourceInterp, InterceptCount / MaxInterceptCount, 0.2f);
+
+
+            if (Cooldown <= 1 && !Vanity)
+                ResourceInterp = float.Lerp(ResourceInterp, InterceptCount / MaxInterceptCount, 0.2f);
 
             if (Vanity)
                 ResourceInterp = float.Lerp(ResourceInterp, 1, 0.2f);
-            
+
             if (!voidCrestOathEquipped)
                 return;
             if (Main.specialSeedWorld)
@@ -187,9 +187,9 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
             InterceptCost = 30;
 
             trackedProjectileIndices.Clear();
+            targetedProjectiles.RemoveAll(id => !Main.projectile[id].active || Main.projectile[id].friendly);
 
             InterceptRegenRate = 1;
-            //Main.NewText(InterceptRegenRate);
 
 
             bool interceptedSomethingThisTick = false;
@@ -198,14 +198,14 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                 if (BlacklistedProjectiles.Contains(proj.type))
                     continue;
 
-                    continue;
+
                 float distance = Vector2.Distance(proj.Center, Player.Center);
 
 
                 if (proj.hostile &&
                     proj.type != interceptorType
                     && !proj.friendly &&
-                    distance <= TrackingRadius
+                    distance <= TrackingRadius)
                 {
                     trackedProjectileIndices.Add(proj.whoAmI);
                 }
@@ -277,6 +277,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                             mom.BaseSize = proj.Size.X / proj.scale;
                         }
 
+                        if (InterceptCount <= 1)
                         {
                             InterceptCount = 0;
                             Cooldown = CooldownMax;
@@ -285,8 +286,6 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
                             return;
                         }
                     }
-
-
                 }
             }
             if (!interceptedSomethingThisTick)

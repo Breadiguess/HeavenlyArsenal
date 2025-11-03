@@ -5,10 +5,11 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
+namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy
 {
-    public class PerversionOfFaith : BloodmoonBaseNPC
+    partial class PerversionOfFaith : BloodmoonBaseNPC
     {
+        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/ShieldGuy/PerversionOfFaith";
         public int Time
         {
             get => (int)NPC.ai[0];
@@ -38,23 +39,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         }
         public override void AI()
         {
-            this.playerTarget = Main.player[NPC.FindClosestPlayer()];
+            playerTarget = Main.player[NPC.FindClosestPlayer()];
             NPC.velocity = NPC.Center.AngleTo(playerTarget.Center).ToRotationVector2();
             NPC.velocity += new Vector2(0, MathF.Sin(Time));
 
             Time++;
         }
-        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
-        {
-            Texture2D tex = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Mouth").Value;
-
-            Vector2 DrawPos = NPC.Center - Main.screenPosition;
-            Vector2 origin = tex.Size() * 0.5f;
-
-            SpriteEffects effects = NPC.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, 0, origin, 1, effects);
-
-            return base.PreDraw(spriteBatch, screenPos, drawColor);
-        }
+        
     }
 }

@@ -13,6 +13,7 @@ using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.SwagRain;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,22 +52,26 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
 
     public class BloodmoonSpawnControl : GlobalNPC
     {
+        public override void EditSpawnRange(Player player, ref int spawnRangeX, ref int spawnRangeY, ref int safeRangeX, ref int safeRangeY)
+        {
+            base.EditSpawnRange(player, ref spawnRangeX, ref spawnRangeY, ref safeRangeX, ref safeRangeY);
+        }
         public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
         {
-            // Only affect surface, night, Blood Moon
             if (Main.bloodMoon && !Main.dayTime && spawnInfo.Player.ZoneOverworldHeight && RiftEclipseBloodMoonRainSystem.EffectActive)
             {
-                // Clear all vanilla spawns
+               
                 pool.Clear();
 
-                // Add your custom NPCs to the pool
-                // The float value is the spawn weight relative to others in the pool
-                pool[ModContent.NPCType<ArtilleryCrab>()] = SpawnCondition.OverworldNightMonster.Chance * 0.12f;
-                pool[ModContent.NPCType<UmbralLeech>()] = SpawnCondition.OverworldNightMonster.Chance * 0.074f;
-                pool[ModContent.NPCType<Umbralarva>()] = SpawnCondition.OverworldNightMonster.Chance * 0.14f;
+                // The float value is the spawn weight relative to others in the pool stupid
+                pool[ModContent.NPCType<ArtilleryCrab>()] = SpawnCondition.OverworldNightMonster.Chance * 0.17f;
+                //pool[ModContent.NPCType<UmbralLeech>()] = SpawnCondition.OverworldNightMonster.Chance * 0.074f;
+                pool[ModContent.NPCType<newLeech>()] = SpawnCondition.OverworldNightMonster.Chance * 0.074f;
+                
+                //pool[ModContent.NPCType<Umbralarva>()] = SpawnCondition.OverworldNightMonster.Chance * 0.14f;
 
-                pool[ModContent.NPCType<RitualAltar>()] = SpawnCondition.OverworldNightMonster.Chance * 0.03f;
-                pool[ModContent.NPCType<FleshlingCultist.FleshlingCultist>()] = SpawnCondition.OverworldNightMonster.Chance * 0.22f;
+                pool[ModContent.NPCType<RitualAltar>()] = SpawnCondition.OverworldNightMonster.Chance * 0.008f;
+                pool[ModContent.NPCType<FleshlingCultist.FleshlingCultist>()] = SpawnCondition.OverworldNightMonster.Chance * 0.42f;
                
             }
         }
@@ -77,8 +82,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
             {
                 // spawnRate is how often spawns happen (lower = more frequent)
                 // maxSpawns is how many can exist near the player at once
-                spawnRate = 20; // vanilla ~600; lowering makes spawns faster
-                maxSpawns = 30; 
+                spawnRate = 80; // vanilla ~600; lowering makes spawns faster
+                maxSpawns = 60; 
             }
         }
     }
@@ -99,6 +104,18 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
 
         public virtual bool ResistantToTrueMelee => true;
 
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(blood);
+            writer.Write(buffPrio);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            blood = (int)reader.ReadSingle();
+            buffPrio = reader.ReadSingle();
+        }
+
         public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers)
         {
 
@@ -109,7 +126,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
             }
 
         }
-        
+        //public ref float Time => ref NPC.ai[0];
 
         ///<summary>
         /// the current blood in this npc.
@@ -121,7 +138,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         public virtual int bloodBankMax { get; set; } = 100;
 
 
-        //todo: a target NPC, a target Player (maybe use entity? and just exclude projectiles)
         public Player playerTarget = null;
 
         public NPC NPCTarget = null;
@@ -132,8 +148,19 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         /// <summary>
         /// How likely this npc is to recieve a buff compared to it's neighbors when another npc is sacrificed.
         /// </summary>
-        public virtual float buffPrio => 0;
-
+        public virtual float buffPrio
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// Basically the priority of an npc to be sacrificed. if this is zero, they basically will almost never be sacrificed.
+        /// </summary>
+        public virtual float SacrificePrio
+        {
+            get => !canBeSacrificed ? 0 : default;
+            set => canBeSacrificed = value > 0;
+        }
         /// <summary>
         /// Determine whether this npc can be sacrificed.
         /// this is a virtual because I feel like the ability to be sacrificed should be adjustable.
@@ -142,16 +169,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         {
             get; 
             set; 
-        } = true;
-
-        /// <summary>
-        /// Basically the priority of an npc to be sacrificed. if this is zero, they basically will almost never be sacrificed.
-        /// </summary>
-        public virtual int SacrificePrio
-        {
-            get => !canBeSacrificed ? 0 : default;
-            set => canBeSacrificed = value > 0;
         }
+
+       
+      
         ///<summary>
         /// calculate the value of the sacrificed npc. we'll later multiply this depending on their value, but im coding blind at the time of writing this, so that should best be left for later.
         ///</summary>

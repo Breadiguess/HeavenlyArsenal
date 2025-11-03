@@ -57,6 +57,18 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         public int MaxResource = 100;
         #endregion
 
+        public override void PostUpdate()
+        {
+
+            if (!AwakenedBloodSetActive)
+                return;
+
+            HandleForm();
+
+            ManageBloodBoost();
+
+            ConvertClot();
+        }
         public override void PreUpdate()
         {
             if (GainTimer > 0)
@@ -75,10 +87,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             //this shit sucks
 
             //Main.NewText($"{bloodPercent}, clot: {clotPercent}, decay timer: {clotDecayTimer}");
-            HandleForm();
-            ManageBloodBoost();
+          
 
-            ConvertClot();
             ControlResource();
             
         }
@@ -174,7 +184,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         }
         private void ManageOffense()
         {
-            int Type = ModContent.ProjectileType<AwakenedBloodTendril>();
+            int Type = ModContent.ProjectileType<BloodNeedle>();
             int TendrilCount = 2;
             int TendrilBaseDamage = 600;
             if (Player.ownedProjectileCounts[Type] < TendrilCount)
@@ -294,8 +304,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
                 return; 
 
             
-            Player.HealEffect(clot, true);
-            Player.statLife += clot;
+            Player.HealEffect(clot*4, true);
+            Player.statLife += clot*4;
             clot = 0;
         }
 

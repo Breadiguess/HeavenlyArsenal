@@ -68,6 +68,9 @@ public static class AssetDirectory
         public static readonly Asset<Texture2D> UmbralLeechWhisker = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/NPCs/Hostile/BloodMoon/UmbralLeech/UmbralLeech_Whisker");
         public static readonly Asset<Texture2D> UmbralLeechTendril = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/NPCs/Hostile/BloodMoon/UmbralLeech/UmbralLeech_TailTendril");
         public static readonly Asset<Texture2D> UmbralLeechTelegraph = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/NPCs/Hostile/BloodMoon/UmbralLeech/LeechTelegraph");
+        public static readonly Asset<Texture2D> UmbralLeech_Legs = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/NPCs/Hostile/BloodMoon/UmbralLeech/UmbralLeech_Legs");
+
+        public static readonly Asset<Texture2D> Umbral_Sore = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/NPCs/Hostile/BloodMoon/UmbralLeech/Umbral_Sore");
         #endregion
 
         public static class Bars

@@ -951,18 +951,20 @@ public class AvatarLonginusHeld : ModProjectile
 
     public override void SendExtraAI(BinaryWriter writer)
     {
+        writer.Write(canHit);
         writer.Write(IsEmpowered);
         writer.Write(HitTimer);
         writer.WriteVector2(JavelinOffset);
-        //writer.Write(CurrentFrame);
+        writer.Write(CurrentFrame);
     }
 
     public override void ReceiveExtraAI(BinaryReader reader)
     {
+        canHit = reader.ReadBoolean();
         IsEmpowered = reader.ReadBoolean();
         HitTimer = reader.Read();
         JavelinOffset = reader.ReadVector2();
-        //CurrentFrame = reader.Read();
+        CurrentFrame = (int)reader.ReadSingle();
     }
 
     private bool useSlash;

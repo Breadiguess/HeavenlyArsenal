@@ -365,6 +365,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                 {
                     case UmbralLeechAI.Idle:
                         HandleIdle();
+
                         break;
 
                     case UmbralLeechAI.SeekTarget:
@@ -1271,14 +1272,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             Vector2 origin = sourceRect.Size() / 2f;
 
 
-            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition,
-                sourceRect,
-                lightColor,
-                NPC.rotation,
-                origin,
-                1f,
-                Leech
-            );
+            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition, sourceRect, lightColor, NPC.rotation, origin, 1f, Leech);
 
             if (!NPC.IsABestiaryIconDummy && WhiskerAnchors != null)
             {

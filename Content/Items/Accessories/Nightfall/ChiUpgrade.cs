@@ -31,7 +31,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
             Item.defense = 4;
             Item.rare = ModContent.RarityType<CalamityMod.Rarities.Turquoise>();
 
-            Item.value = 30;
+            Item.value = Terraria.Item.sellPrice(0, 10, 3, 0);
 
             Item.width = 28;
             Item.height = 28; 

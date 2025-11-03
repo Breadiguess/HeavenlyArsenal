@@ -1,10 +1,14 @@
 global using LumUtils = Luminance.Common.Utilities.Utilities;
 global using WotGUtils = NoxusBoss.Core.Utilities.Utilities;
 using CalamityMod.Particles;
+using CalamityMod.Projectiles.Enemy;
 using CalamityMod.UI.CalamitasEnchants;
 //using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
 
 using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
+using Microsoft.Xna.Framework;
+
 //using HeavenlyArsenal.Content.Items.Misc;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.RuntimeDetour;
@@ -13,6 +17,7 @@ using NoxusBoss.Content.Items;
 using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
 using ReLogic.Content;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Terraria;
 using Terraria.Graphics.Shaders;
@@ -26,10 +31,9 @@ namespace HeavenlyArsenal
     {
         
         public static bool forceOpenRift = false;
-
         public override void Load()
         {
-          EnchantmentManager.ItemUpgradeRelationship[ModContent.ItemType<MetallicChunk>()] = ModContent.ItemType<VoidCrestOath>();
+            EnchantmentManager.ItemUpgradeRelationship[ModContent.ItemType<MetallicChunk>()] = ModContent.ItemType<VoidCrestOath>();
             /*
             if (ModLoader.GetMod("NoxusBoss") != null)
             {
@@ -55,42 +59,107 @@ namespace HeavenlyArsenal
             */
 
 
-
-            if (Main.netMode != NetmodeID.Server)
+            On_Projectile.Damage += MultisegmentCollideEnabler;
+            On_Projectile.CanHitWithMeleeWeapon += MultisegmentCheckSetter;
+            On_Projectile.Colliding += ExtraHitboxCollide;
+        }
+        public static IMultiSegmentNPC CurrentMultiSegmnetNPC = null;
+        public static bool MultiSegmentEnabler = false;
+        public static void MultisegmentCollideEnabler(On_Projectile.orig_Damage orig, Projectile self)
+        {
+            if (self.owner == Main.myPlayer && self.type != ModContent.ProjectileType<SulphuricAcidBubble>())
             {
-                // First, you load in your shader file.
-                // You'll have to do this regardless of what kind of shader it is,
-                // and you'll have to do it for every shader file.
-                // This example assumes you have both armor and screen Shaders.
+                foreach (NPC npc in Main.ActiveNPCs)
+                {
+                    if (npc.ModNPC is IMultiSegmentNPC multisegmentguy)
+                    {
+                        if (self.friendly && CombinedHooks.CanHitNPCWithProj(self, npc) is not false)
+                        {
+                            ref List<ExtraNPCSegment> extrahitboxes = ref multisegmentguy.ExtraHitBoxes();
+                            for (int i = 0; i < extrahitboxes.Count; i++)
+                            {
+                                //if (self.Distance(extrahitboxes[i].Hitbox.Center()) < 100)
+                                //    Main.NewText(self.ToString());
+                                if (extrahitboxes[i].Active)
+                                    if (extrahitboxes[i].UniqueIframes && extrahitboxes[i].ProjectileCollide && extrahitboxes[i].ImmuneTime <= 0)
+                                    {
+                                       
+                                        if (extrahitboxes[i].Hitbox.IntersectsConeFastInaccurate(self.Center, 100, 0, 360) )
+                                        {
+                                           // Main.NewText("slap that bitchass mf");
 
-                //Asset<Effect> dyeShader = this.Assets.Request<Effect>("Assets/AutoloadedEffects/Shaders/UncannyDye");
-                //Asset<Effect> specialShader = this.Assets.Request<Effect>("Effects/MySpecials");
-                //Asset<Effect> filterShader = this.Assets.Request<Effect>("Effects/MyFilters");
+                                            multisegmentguy.OnHitBoxCollide(i, self);
+                                            extrahitboxes[i].ImmuneTime = extrahitboxes[i].Immunity;
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                }
+            }
+            MultiSegmentEnabler = true;
+            orig(self);
+            MultiSegmentEnabler = false;
+        }
+        public static bool MultisegmentCheckSetter(On_Projectile.orig_CanHitWithMeleeWeapon orig, Projectile Self, Entity entity)
+        {
+            if (MultiSegmentEnabler)
+                if (entity is NPC npc && npc.ModNPC is IMultiSegmentNPC multi)
+                    CurrentMultiSegmnetNPC = multi;
+            return orig(Self, entity);
+        }
+        public static bool ExtraHitboxCollide(On_Projectile.orig_Colliding orig, Projectile self, Rectangle myRect, Rectangle targetRect)
+        {
+            bool result = orig(self, myRect, targetRect);
 
-                // To add a dye, simply add this for every dye you want to add.
-                // "PassName" should correspond to the name of your pass within the *technique*,
-                // so if you get an error here, make sure you've spelled it right across your effect file.
-
-                //GameShaders.Armor.BindShader(ModContent.ItemType<UncannyDye>(), new ArmorShaderData(dyeShader, "ArmorAnimatedSine"));
-
-                // If your dye takes specific parameters such as color, you can append them after binding the shader.
-                // IntelliSense should be able to help you out here.   
-
-                //GameShaders.Armor.BindShader(ModContent.ItemType<UncannyDye>(), new ArmorShaderData(dyeShader, "ColorPass")).UseColor(10f, 100f, 1.4f);
-                //GameShaders.Armor.BindShader(ModContent.ItemType<MyNoiseDyeItem>(), new ArmorShaderData(dyeShader, "NoisePass")).UseImage("Images/Misc/noise"); // Uses the default Terraria noise map.
-
-                // To bind a miscellaneous, non-filter effect, use this.
-                // If you're actually using this, you probably already know what you're doing anyway.
-                // This type of shader needs an additional parameter: float4 uShaderSpecificData;
-                //GameShaders.Misc["EffectName"] = new MiscShaderData(specialShader, "PassName");
-
-                // To bind a screen shader, use this.
-                // EffectPriority should be set to whatever you think is reasonable.   
-
-                // Filters.Scene["FilterName"] = new Filter(new ScreenShaderData(filterShader, "PassName"), EffectPriority.Medium);
+            // Find which NPC this targetRect belongs to.
+            NPC targetNPC = null;
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                if (npc.active && npc.Hitbox == targetRect)
+                {
+                    targetNPC = npc;
+                    break;
+                }
             }
 
+            // Only run if it’s one of *your* NPCs.
+            if (targetNPC?.ModNPC is IMultiSegmentNPC multi)
+            {
+                ref var extraHitboxes = ref multi.ExtraHitBoxes();
+
+                for (int i = 0; i < extraHitboxes.Count; i++)
+                {
+                    var box = extraHitboxes[i];
+                    if (!box.Active || !box.ProjectileCollide)
+                        continue;
+
+                    if (myRect.Intersects(box.Hitbox))
+                    {
+                        result = true;
+                        multi.OnHitBoxCollide(i, self);
+                    }
+                }
+            }
+
+            return result;
         }
+
+        public static void ClearAllBuffs(NPC npc)
+        {
+            for (int i = 0; i < NPC.maxBuffs; i++)
+            {
+                
+                if (npc.buffType[i] > 0)
+                {
+                    Main.NewText(npc.ToString() + $", {npc.FindBuffIndex(i).ToString()} ");
+                    npc.DelBuff(i);
+                    i--;
+                }
+            }
+        }
+
+
         public override void PostSetupContent()
         {
            

@@ -15,7 +15,8 @@ namespace HeavenlyArsenal.Common.Players
 
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
-            Player Owner = drawInfo.drawPlayer;
+            /*
+             * Player Owner = drawInfo.drawPlayer;
 
 
 
@@ -33,15 +34,8 @@ namespace HeavenlyArsenal.Common.Players
            
            // msg = $"{Owner.GetModPlayer<ShintoArmorPlayer>().ShadeTeleportInterpolant}";
             Utils.DrawBorderString(Main.spriteBatch, msg, Owner.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, -1.2f);
+            */
         }
-    }
-    public class DebugProj : GlobalProjectile
-    {
-        public override bool InstancePerEntity => true;
-        public override void PostDraw(Projectile projectile, Color lightColor)
-        {
-           // if (!projectile.isAPreviewDummy && projectile.type != ModContent.ProjectileType<VoidCrest_Spear>())
-            //    Utils.DrawBorderString(Main.spriteBatch, $"{projectile.whoAmI}", projectile.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, -0.2f);
-        }
+
     }
 }

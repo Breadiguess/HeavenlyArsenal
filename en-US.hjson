@@ -362,6 +362,16 @@ Mods: {
 				DisplayName: Light Halo
 				Tooltip: ""
 			}
+
+			AvatarMaterial: {
+				DisplayName: Avatar Material
+				Tooltip: ""
+			}
+
+			DebugLeechSummon: {
+				DisplayName: Debug Leech Summon
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {

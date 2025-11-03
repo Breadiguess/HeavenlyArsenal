@@ -6,6 +6,7 @@ using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.Common;
 using HeavenlyArsenal.Common.Utilities;
+using HeavenlyArsenal.Content.Items.Materials;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
@@ -163,6 +164,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             if (ModLoader.TryGetMod("CalamityHunt", out Mod CalamityHunt))
             {
                 CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
                 .AddIngredient<DemonshadeHelm>()
                 .AddIngredient(ItemID.NinjaHood)
                 .AddIngredient(ItemID.CrystalNinjaHelmet)
@@ -175,6 +177,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             else
             {
                 CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
                .AddIngredient<DemonshadeHelm>()
                .AddIngredient(ItemID.NinjaHood)
                .AddIngredient(ItemID.CrystalNinjaHelmet)

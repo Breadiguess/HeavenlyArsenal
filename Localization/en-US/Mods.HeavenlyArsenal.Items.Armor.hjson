@@ -30,20 +30,8 @@ ShintoArmor: {
 			While enraged, deal and take 3x damage.
 			The barrier cannot sustain itself while you are enraged.
 			'''
-		LoreTip:
-			'''
-			kris
-
-			get the bannana, kris
-
-			potassium 
-			'''
-		LoreTipGFB:
-			'''
-			i was once a shadow, now i am a shadow of a shadow. 
-			i am the shadow of a shadow of a shadow. 
-			i am the shadow of a shadow of a shadow of a shadow.
-			'''
+		LoreTip: ""
+		LoreTipGFB: ""
 	}
 
 	ShintoArmorBreastplate: {

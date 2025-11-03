@@ -4,9 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -15,6 +12,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
 {
     public class RitualBuffNPC : GlobalNPC
     {
+
+        //todo: Arm buff???
+
         public static List<string> NameModifiers = new()
         {
             "",
@@ -33,9 +33,19 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
             LifeRegen,
             Vampirism
         }
+        public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
+        {
+            if (entity.ModNPC != null && entity.ModNPC is BloodmoonBaseNPC)
+                return lateInstantiation && true;
+            else
+                return false;
+
+        }
         public override bool InstancePerEntity => true;
         public bool WasRessurectedRecently = false;
         public bool hasRitualBuff = false;
+
+        public bool isBeingBuffed = false;
         public int ritualBuffTier;
         public int ritualBuffTimer = 0;
         public int ritualBuffDuration = 60 * 17;
@@ -47,55 +57,65 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
         public bool IsRessurecting = false;
         public int Ressurectiontimer = 0;
 
+
+        public void PerformRitualOn(NPC npc)
+        {
+            if (!isBeingBuffed)
+                return;
+            if (BuffGranter != null)
+            {
+                RitualAltar altar = BuffGranter.ModNPC as RitualAltar;
+
+                npc.velocity = Vector2.Zero;
+                npc.Center = Vector2.Lerp(npc.Center, BuffGranter.Top + new Vector2(0, -npc.height - 120).RotatedBy(BuffGranter.rotation + MathHelper.PiOver2), 0.2f);
+                int cultistAmount = 1;
+                if (CultistCoordinator.GetCultOfNPC(BuffGranter) != null)
+                    foreach (NPC a in CultistCoordinator.GetCultOfNPC(BuffGranter).Cultists)
+                    {
+                        if (a.Distance(BuffGranter.Center) < 100)
+                        {
+                            FleshlingCultist.FleshlingCultist d = a.ModNPC as FleshlingCultist.FleshlingCultist;
+                            d.CurrentState = FleshlingCultist.FleshlingCultist.Behaviors.Worship;
+                            if (d.isWorshipping)
+                            {
+                                cultistAmount++;
+                            }
+                        }
+                    }
+                ritualBuffTimer++;
+
+                if (ritualBuffTimer > 180 && isBeingBuffed)
+                {
+                    altar.blood -= altar.bloodBankMax / 5;
+
+                    altar.NPCTarget = null;
+                    isBeingBuffed = false;
+                    ritualBuffTimer = 0;
+                    ApplyRitualBuff(npc, cultistAmount);
+                    npc.velocity = Vector2.Zero;
+                    //altar.currentAIState = RitualAltar.AltarAI.lookForBuffTargets;
+                }
+                return;
+            }
+        }
+
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
-            if(hasRitualBuff && BuffType == RitualBuffType.LifeRegen)
+            if (hasRitualBuff && BuffType == RitualBuffType.LifeRegen)
             {
                 npc.lifeRegenCount += 13000;
             }
         }
 
-
-
-        private void ManageRessurection(NPC npc)
-        {
-            Ressurectiontimer++;
-
-            if (Ressurectiontimer > 120)
-            {
-                npc.life = npc.lifeMax;
-                npc.immortal = false;
-                ClearRitualBuff(npc);
-                Ressurectiontimer = 0;
-                IsRessurecting = false;
-                WasRessurectedRecently = true;
-                CombatText.NewText(npc.getRect(), CombatText.HealLife, npc.lifeMax, true);
-            }
-            
-
-
-        }
-      
-        public override bool CheckDead(NPC npc)
-        {
-            if ((hasRitualBuff && BuffType == RitualBuffType.Ressurection) || IsRessurecting)
-            {
-                npc.life = 2;
-                IsRessurecting = true;
-                npc.immortal = true;
-                return false;//prevent death because FUCK YOU
-            }
-            return base.CheckDead(npc);
-        }
-
         public override bool PreAI(NPC npc)
         {
-            if (npc.immortal && npc.life <= 2 && WasRessurectedRecently && !IsRessurecting)
+            if (isBeingBuffed && !hasRitualBuff)
             {
-                Main.NewText(npc.FullName);
-
-                npc.immortal = false;
+                PerformRitualOn(npc);
+                return false;
             }
+
+
             if (BuffGranter == null || !BuffGranter.active || BuffGranter.life <= 0)
             {
                 DestroyBuffString();
@@ -110,52 +130,93 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
             }
 
             ApplyEffects(npc);
-          
-                return base.PreAI(npc);
-        }
 
+            return base.PreAI(npc);
+        }
+        private void ManageRessurection(NPC npc)
+        {
+            npc.velocity *= 0.98f;
+            Ressurectiontimer++;
+
+            if (Ressurectiontimer > 120 - ritualBuffTier * 20)
+            {
+                npc.life = npc.lifeMax;
+                npc.immortal = false;
+                ClearRitualBuff(npc);
+                Ressurectiontimer = 0;
+                IsRessurecting = false;
+                WasRessurectedRecently = true;
+                CombatText.NewText(npc.getRect(), CombatText.HealLife, npc.lifeMax, true);
+            }
+
+
+
+        }
+        public override bool CheckDead(NPC npc)
+        {
+            if ((hasRitualBuff && BuffType == RitualBuffType.Ressurection) || IsRessurecting)
+            {
+                npc.life = 2;
+                IsRessurecting = true;
+                npc.immortal = true;
+                return false;
+            }
+            return base.CheckDead(npc);
+        }
         public void ApplyEffects(NPC npc)
         {
-            if(BuffType == RitualBuffType.Damagebuff)
+            if (BuffType == RitualBuffType.Damagebuff)
             {
-                npc.damage = npc.defDamage * 3;
+                npc.damage = npc.defDamage * (1 + ritualBuffTier);
             }
             if (BuffType == RitualBuffType.CooldownReduction)
             {
-                npc.velocity *= 2;
+                npc.velocity *= (1 + ritualBuffTier);
             }
         }
 
         public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
         {
             if (hasRitualBuff && BuffType == RitualBuffType.Vampirism)
-                npc.life = Math.Clamp( npc.life + (int)(hurtInfo.Damage * 1.2f), 0, npc.lifeMax);
+                npc.life = Math.Clamp(npc.life + (int)(hurtInfo.Damage * 1.2f), 0, npc.lifeMax);
         }
         public override void PostAI(NPC npc)
         {
-            if (hasRitualBuff)
-            {
-                ManageBuffstring(npc);
-                if (ritualBuffTimer > 0)
-                    ritualBuffTimer--;
+            if (ritualBuffTimer > 0 && !isBeingBuffed)
+                ritualBuffTimer--;
 
-                if (ritualBuffTimer <= 0)
-                    hasRitualBuff = false;
+            ManageBuffstring(npc);
+            if (Math.Abs(npc.velocity.Y) > 30 && hasRitualBuff)
+            {
+                Main.NewText("WTF, " + npc.velocity.Y.ToString());
+                npc.velocity.Y = 0;
             }
+
+            if (ritualBuffTimer <= 0)
+            {
+
+                ClearRitualBuff(npc);
+
+            }
+
         }
 
 
         private void ManageBuffstring(NPC npc)
         {
-            Vector2 StringStart = BuffGranter.Top;
+            if (!hasRitualBuff)
+                return;
+            Vector2 StringStart = BuffGranter.Top + new Vector2(0, 20);
 
             if (BuffString == null)
             {
                 BuffString = new Rope(StringStart, npc.Center, 40, 10, Vector2.Zero);
             }
 
+            if(npc.Opacity >0)
             for (int i = 1; i < BuffString.segments.Length - 1; i++)
             {
+
                 if (Main.rand.NextBool(15) && i < BuffString.segments.Length - BuffString.segments.Length / 6)
                 {
                     Dust blood = Dust.NewDustPerfect(BuffString.segments[i].position, DustID.CrimtaneWeapons, new Vector2(0, -3f), 10, Color.Crimson, 1);
@@ -180,22 +241,30 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
         }
 
         #region apply/remove buff
-        public void ApplyRitualBuff()
+
+        public void ApplyRitualBuff(NPC npc, int Tier)
         {
 
+            CombatText.NewText(npc.Hitbox, Color.Red, "Buffed!", true);
             int buffType = Main.rand.Next(1, 6);
             hasRitualBuff = true;
-            BuffType = RitualBuffType.Ressurection;// (RitualBuffType)buffType;
-            ritualBuffTimer = ritualBuffDuration;
-            
+            RitualSystem.AddNPC(npc);
+            BuffType = (RitualBuffType)buffType;
+            ritualBuffTier = Tier;
+            ritualBuffTimer = ritualBuffDuration + 80 * Tier;
+
         }
 
         public void ClearRitualBuff(NPC npc)
         {
+
+            if (BuffType == RitualBuffType.Ressurection)
+                WasRessurectedRecently = true;
+            if (IsRessurecting)
+                IsRessurecting = false;
             hasRitualBuff = false;
             BuffType = 0;
             BuffGranter = null;
-            
             if (npc.immortal)
                 npc.immortal = false;
         }
@@ -204,12 +273,13 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
 
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            //Utils.DrawBorderString(spriteBatch, isBeingBuffed.ToString() + $"\n" + ritualBuffTimer.ToString(), npc.Center - screenPos, Color.AntiqueWhite, anchory:-2);
             if (BuffString != null && hasRitualBuff)
             {
                 Texture2D a = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
                 Texture2D Glow = GennedAssets.Textures.GreyscaleTextures.BloomLine2;
-                float theMagicFactorThatMakesEveryElectricShineEffectSoMuchBetter = MathF.Sin(Main.GlobalTimeWrappedHourly*7 + npc.whoAmI);
-                Color color = Color.Lerp(drawColor.MultiplyRGBA(Color.Red), Color.Red, theMagicFactorThatMakesEveryElectricShineEffectSoMuchBetter);
+                float theMagicFactorThatMakesEveryElectricShineEffectSoMuchBetter = MathF.Sin(Main.GlobalTimeWrappedHourly * 7 + npc.whoAmI);
+                Color color = Color.Lerp(drawColor.MultiplyRGBA(Color.Red), Color.Red, theMagicFactorThatMakesEveryElectricShineEffectSoMuchBetter) * npc.Opacity;
 
                 List<Vector2> points = new List<Vector2>();
                 points.AddRange(BuffString.GetPoints());
@@ -223,9 +293,17 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
                     Vector2 diff = points[i + 1] - element;
                     Vector2 scale = new Vector2(diff.Length() + 2f, 2f);
                     Main.EntitySpriteDraw(a, DrawPos, null, color, rot, a.Size() / 2, scale, SpriteEffects.None);
-                    Main.EntitySpriteDraw(Glow, DrawPos, null, color with { A = 0 }, rot + MathHelper.PiOver2, Glow.Size() / 2, new Vector2(scale.X*0.03f, scale.Y * 0.00905f), SpriteEffects.None);
+                    Main.EntitySpriteDraw(Glow, DrawPos, null, color with { A = 0 }, rot + MathHelper.PiOver2, Glow.Size() / 2, new Vector2(scale.X * 0.01f, diff.Length() * 0.00195f), SpriteEffects.None);
                     //Utils.DrawBorderString(spriteBatch, i.ToString(), DrawPos, Color.AntiqueWhite);
                 }
+
+                RitualBuffNPC Ba = npc.GetGlobalNPC<RitualBuffNPC>();
+
+                //String d = "";
+                //d += $"{Ba.BuffType}\n";
+                //d += $"tier: {Ba.ritualBuffTier}\n";
+                //Utils.DrawBorderString(Main.spriteBatch, d, npc.Center - Main.screenPosition, Color.AntiqueWhite, 1, anchory: -2);
+
                 /*
                 string r = "null";
                 if (BuffGranter != null)

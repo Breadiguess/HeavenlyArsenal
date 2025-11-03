@@ -1,26 +1,19 @@
-﻿using CalamityMod.Buffs.StatBuffs;
-using CalamityMod.Cooldowns;
-using NoxusBoss.Assets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
-using static System.Net.Mime.MediaTypeNames;
+using Terraria.WorldBuilding;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
 {
     internal class NightfallPlayer : ModPlayer
     {
 
-        
+
         public bool NightfallActive;
 
         public static int CooldownMax = 4 * 60;
-                
+
         public static int MaxStack = 9;
 
         public int HitCooldownMax = 20;
@@ -43,47 +36,39 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
 
             DamageBucketTotal = 0;
             NightfallActive = false;
-            
+
         }
         public override void ModifyWeaponCrit(Item item, ref float crit)
         {
-           
-            // Create an interpolant out of damage bucket total / damagebucketmax
-            // Increase the crit chance of the player based on that interpolant x 100
-            if (NightfallActive && DamageBucketMax > 0)
-            {
-                
-              
-                float interpolant = Math.Clamp((float)DamageBucketTotal / DamageBucketMax, 0f, 1f);
-                //bruh
-                /*
-                if (item.crit > 0)
-                {
+            if (!NightfallActive || DamageBucketMax <= 0)
+                return;
 
-                    crit += (1 + interpolant) * item.crit;
-                    CritModifier = (int)crit;
-                    Main.NewText($" {CritModifier}");
-                }
-                */
+            float baseCrit = crit;
+            float interpolant = Math.Clamp((float)DamageBucketTotal / DamageBucketMax, 0f, 1f);
 
-                if(crit > 0)
-                {
-                    //todo: factor in item attack speed/whatever to help further balance this crit chance increase;
-                    //faster attacking weapons should get less crit chance, and slower weapons should get more crit chance.
-                    //
-                    crit += (1 + interpolant) * 25;
-                    CritModifier = (int)crit;
+            // Calculate a speed bias (slower weapons benefit more)
+            float speedBias = MathF.Pow(Math.Clamp(item.useTime / 30f, 0.4f, 2.0f), 0.75f);
+            // High-damage weapons gain slightly less (to prevent stacking with armor multipliers)
+            float dmgBias = 1f / MathF.Pow(Math.Clamp(item.damage / 100f, 0.6f, 2f), 0.5f);
 
-                    Main.NewText($" {CritModifier}");
-                }
-            }
+            float baseBonus = 10f;
+
+            float bonus = interpolant * baseBonus * speedBias * dmgBias;
+
+            bonus = 20f * (1f - MathF.Exp(-bonus / 30f));
+
+            crit += bonus;
+            CritModifier = (int)crit;
+            //Main.NewText($"{item.Name}: base = {baseCrit:F1}, speed = {item.useTime}, damage = {item.damage}, bonus = {bonus:F1}, total = {crit:F1}");
+
         }
+
         public override void PostUpdateMiscEffects()
         {
             //todo: for each npc, is active, and has a stack (NightfallNPC stack), get its damage bucket
             // add the value inside of the damagebucket total
-            
-            if(HitCooldown > 0)
+
+            if (HitCooldown > 0)
             {
                 HitCooldown--;
             }
@@ -100,26 +85,26 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
                 }
             }
 
-            
+
             if (DamageBucketTotal > DamageBucketMax)
                 DamageBucketTotal = DamageBucketMax;
-            
-                //Main.NewText($"{DamageBucketTotal}");
+
+            //Main.NewText($"{DamageBucketTotal}");
         }
 
         public override void OnHitAnything(float x, float y, Entity victim)
         {
             if (!NightfallActive || HitCooldown > 0 || victim is Player ba)
                 return;
-            
-            if(victim is NPC npc)
+
+            if (victim is NPC npc)
             {
                 NightfallNPC a = npc.GetGlobalNPC<NightfallNPC>();
                 if (a.Stack >= MaxStack || a.BurstCooldown > 0)
                 {
                     return;
                 }
-                if(a.StackOwner != Player)
+                if (a.StackOwner != Player)
                 {
                     a.StackTimer = 0;
                     a.Stack = 0;
@@ -139,7 +124,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if(!NightfallActive)
+            if (!NightfallActive)
                 base.OnHitNPC(target, hit, damageDone);
 
             if (target.active && !target.friendly && !target.dontTakeDamage && !target.immortal)

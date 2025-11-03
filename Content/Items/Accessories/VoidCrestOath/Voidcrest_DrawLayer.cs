@@ -85,13 +85,13 @@ namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath
             ManagedShader riftShader = ShaderManager.GetShader("NoxusBoss.DarkPortalShader");
             riftShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 0.1f);
             riftShader.TrySetParameter("baseCutoffRadius", 0.24f);
-            riftShader.TrySetParameter("swirlOutwardnessExponent", 0.2f);
+            riftShader.TrySetParameter("swirlOutwardnessExponent", 0.151f);
             riftShader.TrySetParameter("swirlOutwardnessFactor", 6f);
-            riftShader.TrySetParameter("vanishInterpolant", 0.01f);
+            riftShader.TrySetParameter("vanishInterpolant", 0.001f);
             riftShader.TrySetParameter("edgeColor", new Vector4(1f, 0.08f, 0.08f, 1f));
             riftShader.TrySetParameter("edgeColorBias", 0.15f);
             riftShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 1, SamplerState.AnisotropicWrap);
-            riftShader.SetTexture(GennedAssets.Textures.Noise.BurnNoise, 2, SamplerState.AnisotropicWrap);
+            riftShader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 2, SamplerState.AnisotropicWrap);
             riftShader.Apply();
 
             Main.spriteBatch.Draw(innerRiftTexture, ViewportSize * 0.5f, null, new Color(77, 0, 2), 0f, innerRiftTexture.Size() * 0.5f, ViewportSize / innerRiftTexture.Size() * new Vector2(0.1f, 0.05f), 0, 0f);

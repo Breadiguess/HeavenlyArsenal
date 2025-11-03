@@ -4,6 +4,7 @@ using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Items.Materials;
 using Luminance.Core.Hooking;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -100,7 +101,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         public override void Load()
         {
             EquipLoader.AddEquipTexture(Mod, Texture + "_Waist", EquipType.Waist, this);
-           
+            On_Main.DrawInfernoRings += On_Main_DrawInfernoRings;
         }
         public override void EquipFrameEffects(Player player, EquipType type)
         {
@@ -262,28 +263,41 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             if (ModLoader.TryGetMod("CalamityHunt", out Mod CalamityHunt))
             {
                 CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
                 .AddIngredient<DemonshadeBreastplate>()
                 .AddIngredient(ItemID.NinjaShirt)
                 .AddIngredient(ItemID.CrystalNinjaChestplate)
                 .AddIngredient(CalamityHunt.Find<ModItem>("ShogunChestplate").Type)
                 .AddIngredient<TheSponge>()
                 .AddTile<DraedonsForge>()
+                .AddCustomShimmerResult(ModContent.ItemType<ShintoArmorWings>(), 1)
                 .Register();
             }
             else
             {
                 CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
                 .AddIngredient<DemonshadeBreastplate>()
                 .AddIngredient(ItemID.NinjaShirt)
                 .AddIngredient(ItemID.CrystalNinjaChestplate)
                 .AddIngredient<StatigelArmor>()
                 .AddIngredient<TheSponge>()
                 .AddTile<DraedonsForge>()
+                .AddCustomShimmerResult(ModContent.ItemType<ShintoArmorWings>(), 1)
                 .Register();
             }
 
 
         }
 
+    }
+
+    public class ShintoCraftPlayer : ModPlayer
+    {
+        public override IEnumerable<Item> AddMaterialsForCrafting(out ItemConsumedCallback itemConsumedCallback)
+        {
+            
+            return base.AddMaterialsForCrafting(out itemConsumedCallback);
+        }
     }
 }

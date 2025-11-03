@@ -56,3 +56,8 @@ PenumbralMembrane: {
 	DisplayName: Penumbral Membrane
 	Tooltip: ""
 }
+
+AvatarMaterial: {
+	DisplayName: Avatar Material
+	Tooltip: ""
+}

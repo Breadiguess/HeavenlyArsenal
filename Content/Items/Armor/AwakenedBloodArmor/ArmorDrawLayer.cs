@@ -155,4 +155,64 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
             PlayerDrawLayers.DrawCompositeArmorPiece(ref drawInfo, CompositePlayerDrawContext.FrontShoulder, shoulder);
         }
     }
+    /*
+     * 
+    public class MyArmOverlay_Front : PlayerDrawLayer
+    {
+        // Token: 0x06003246 RID: 12870
+        public override PlayerDrawLayer.Position GetDefaultPosition()
+        {
+            return new PlayerDrawLayer.AfterParent(PlayerDrawLayers.ArmOverItem);
+        }
+
+        // Token: 0x06003247 RID: 12871
+        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
+        {
+            return drawInfo.drawPlayer.body == EquipLoader.GetEquipSlot(base.Mod, "AwakenedBloodplate", EquipType.Body);
+        }
+
+        // Token: 0x06003248 RID: 12872
+        protected override void Draw(ref PlayerDrawSet drawInfo)
+        {
+            if (drawInfo.shadow != 0f)
+            {
+                return;
+            }
+            if (!drawInfo.usesCompositeTorso)
+            {
+                return;
+            }
+            if (drawInfo.armorHidesArms)
+            {
+                return;
+            }
+            Player Owner = drawInfo.drawPlayer;
+            Vector2 walkOffset = Owner.gravDir * Main.OffsetsPlayerHeadgear[Owner.bodyFrame.Y / Owner.bodyFrame.Height];
+
+            string texString = "HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/AwakenedBloodplate";
+            string a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().CurrentForm.ToString();
+            texString += $"{a}_Body";
+            Texture2D chestplate = ModContent.Request<Texture2D>(texString).Value;
+            Vector2 drawPos = new Vector2((float)((int)(drawInfo.Position.X - Main.screenPosition.X - (float)(drawInfo.drawPlayer.bodyFrame.Width / 2) + (float)(drawInfo.drawPlayer.width / 2))), (float)((int)(drawInfo.Position.Y - Main.screenPosition.Y + (float)drawInfo.drawPlayer.height - (float)drawInfo.drawPlayer.bodyFrame.Height))) + new Vector2(20f, 30f);
+
+            CompositePlayerDrawContext contexts = CompositePlayerDrawContext.Torso;
+            DrawData drawData = new DrawData(chestplate, drawInfo.drawPlayer.bodyPosition + walkOffset - Main.screenPosition, new Rectangle?(drawInfo.compFrontArmFrame), drawInfo.colorArmorBody, drawInfo.compositeFrontArmRotation, drawInfo.compFrontArmFrame.Size() * 0.5f, 1f, drawInfo.playerEffect, 0f)
+            {
+                shader = drawInfo.cBody
+            };
+            PlayerDrawLayers.DrawCompositeArmorPiece(ref drawInfo, contexts, drawData); 
+           
+
+            CompositePlayerDrawContext context = CompositePlayerDrawContext.FrontArm;
+            PlayerDrawLayers.DrawCompositeArmorPiece(ref drawInfo, context, drawData);
+            drawData = new DrawData(chestplate, drawPos + walkOffset, new Rectangle?(drawInfo.compFrontArmFrame), Color.White, drawInfo.compositeFrontArmRotation, drawInfo.bodyVect, 1f, drawInfo.playerEffect, 0f)
+            {
+                shader = drawInfo.cBody
+            };
+            DrawData fArm = drawData;
+            PlayerDrawLayers.DrawCompositeArmorPiece(ref drawInfo, CompositePlayerDrawContext.FrontArm, fArm);
+        }
+    }
+     */
+
 }

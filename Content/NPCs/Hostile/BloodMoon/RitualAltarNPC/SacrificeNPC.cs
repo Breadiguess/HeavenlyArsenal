@@ -24,20 +24,23 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
         {
             if (isSacrificed)
             {
-                if (RitualSystem.BuffedNPCs.Contains(npc))
+                if (RitualSystem.IsNPCBuffed(npc))
                     isSacrificed = false;
                 BloodmoonBaseNPC a = npc.ModNPC as BloodmoonBaseNPC;
 
-                npc.noGravity = false;
-
-
+                if(!npc.noGravity)
+                    npc.noGravity = false;
                 npc.Center = Vector2.Lerp(OriginalPosition, OriginalPosition + new Vector2(0, -75), SacrificeTimer / (float)SacrificeDuration);
 
                 if (SacrificeTimer >= SacrificeDuration)
                 {
                    // SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.BloodCry with { MaxInstances = 0 }, npc.Center);
                     npc.StrikeInstantKill();
+                    if (npc.life > 0)
+                        npc.active = false;
                     Priest.blood += a.blood;
+                    Priest.SacrificeCooldown = 60 * 5;
+                    Priest.NPCTarget = null;
                     if(a.blood <= 0)
                     {
                         Priest.blood += Priest.bloodBankMax / 5;
