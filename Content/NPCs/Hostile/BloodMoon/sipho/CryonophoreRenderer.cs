@@ -37,18 +37,23 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
             {
                 var limb = plac.Value.Item2;
                 if (limb != null)
-                    return;
+                    
+                    continue;
+                var zooid = plac.Value.Item1;
                 //todo: replace wiht appropriate texture paths later
-                Texture2D tex = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
-                Vector2 drawPos = NPC.Center - screenPos - new Vector2(plac.Value.Item1.id * 10 - 20, 0);
-                float rot = MathHelper.ToRadians(MathF.Sin(Main.GlobalTimeWrappedHourly + plac.Value.Item1.id) * 30);
-                Main.EntitySpriteDraw(tex, drawPos, null, drawColor with { A = 0 }, rot, new Vector2(tex.Width/2, 0), new Vector2(2,40), 0);
+                Texture2D tex = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/sipho/CryonophoreLimb_Fist").Value;
+
+
+                Vector2 drawPos = zooid.position - screenPos;
+                float rot = zooid.rotation;//MathHelper.ToRadians(MathF.Sin(Time/10.1f + plac.Value.Item1.id) * 30);
+                Main.EntitySpriteDraw(tex, drawPos, null, drawColor, rot, new Vector2(tex.Width/2, 0), new Vector2(1,1), 0);
             }
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             RenderCore(screenPos, drawColor);
             RenderLimbs(screenPos, drawColor);
+            Utils.DrawBorderString(spriteBatch, Time.ToString(), NPC.Center - screenPos, Color.AntiqueWhite, 1f);
             return base.PreDraw(spriteBatch, screenPos, drawColor);
         }
     }

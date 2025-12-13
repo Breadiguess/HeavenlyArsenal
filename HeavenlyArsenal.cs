@@ -3,10 +3,11 @@ global using WotGUtils = NoxusBoss.Core.Utilities.Utilities;
 using CalamityMod.Particles;
 using CalamityMod.Projectiles.Enemy;
 using CalamityMod.UI.CalamitasEnchants;
+using HeavenlyArsenal.Common;
+
 //using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
 
 using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
-using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using Microsoft.Xna.Framework;
 
 //using HeavenlyArsenal.Content.Items.Misc;
@@ -19,6 +20,7 @@ using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
@@ -29,7 +31,57 @@ namespace HeavenlyArsenal
     // Please read https://github.com/tModLoader/tModLoader/wiki/Basic-tModLoader-Modding-Guide#mod-skeleton-contents for more information about the various files in a mod.
     public class HeavenlyArsenal : Mod
     {
-        
+        public static class MultiSegmentNPCIterator
+        {
+            /// <summary>
+            /// Iterates ONLY NPCs whose ModNPC implements IMultiSegmentNPC.
+            /// </summary>
+            public static IMultiSegIterator<NPC> All
+                => new(Main.npc.AsSpan(0, Main.maxNPCs));
+        }
+
+        public readonly ref struct IMultiSegIterator<T> where T : NPC
+        {
+            private readonly ReadOnlySpan<T> span;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public IMultiSegIterator(ReadOnlySpan<T> span)
+            {
+                this.span = span;
+            }
+
+            public Enumerator GetEnumerator()
+                => new(span.GetEnumerator());
+
+            public ref struct Enumerator
+            {
+                private ReadOnlySpan<T>.Enumerator enumerator;
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public Enumerator(ReadOnlySpan<T>.Enumerator enumerator)
+                {
+                    this.enumerator = enumerator;
+                }
+
+                public T Current
+                    => enumerator.Current;
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public bool MoveNext()
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        var npc = enumerator.Current;
+                        if (npc.active && npc.ModNPC is IMultiSegmentNPC)
+                            return true;
+                    }
+
+                    return false;
+                }
+            }
+        }
+
+
         public static bool forceOpenRift = false;
         public override void Load()
         {
@@ -69,7 +121,7 @@ namespace HeavenlyArsenal
         {
             if (self.owner == Main.myPlayer && self.type != ModContent.ProjectileType<SulphuricAcidBubble>())
             {
-                foreach (NPC npc in Main.ActiveNPCs)
+                foreach (NPC npc in MultiSegmentNPCIterator.All)
                 {
                     if (npc.ModNPC is IMultiSegmentNPC multisegmentguy)
                     {
@@ -78,7 +130,7 @@ namespace HeavenlyArsenal
                             ref List<ExtraNPCSegment> extrahitboxes = ref multisegmentguy.ExtraHitBoxes();
                             for (int i = 0; i < extrahitboxes.Count; i++)
                             {
-                                //if (self.Distance(extrahitboxes[i].Hitbox.Center()) < 100)
+                                //if (self.Distance(extrafhitboxes[i].Hitbox.Center()) < 100)
                                 //    Main.NewText(self.ToString());
                                 if (extrahitboxes[i].Active)
                                     if (extrahitboxes[i].UniqueIframes && extrahitboxes[i].ProjectileCollide && extrahitboxes[i].ImmuneTime <= 0)
@@ -108,80 +160,16 @@ namespace HeavenlyArsenal
                     CurrentMultiSegmnetNPC = multi;
             return orig(Self, entity);
         }
-/*
-        public static bool ExtraHitboxCollide(On_Projectile.orig_Colliding orig, Projectile self, Rectangle myRect, Rectangle targetRect)
-        {
-            bool result = orig(self, myRect, targetRect);
 
-            // Skip if projectile can't damage anything right now
-            if (!self.active || !self.friendly || self.damage <= 0 || self.owner < 0)
-                return result;
-
-            NPC targetNPC = null;
-            foreach (NPC npc in Main.ActiveNPCs)
-            {
-                if (npc.active && npc.Hitbox == targetRect)
-                {
-                    targetNPC = npc;
-                    break;
-                }
-            }
-
-            if (targetNPC?.ModNPC is not IMultiSegmentNPC multi)
-                return result;
-
-            // Respect global immunity + mod projectile hit conditions
-            if (targetNPC.dontTakeDamage || targetNPC.immortal || !targetNPC.active)
-                return result;
-
-            if (self.ModProjectile is { } modProj)
-            {
-                bool? modCheck = modProj.CanHitNPC(targetNPC);
-                if (modCheck.HasValue && !modCheck.Value)
-                    return result;
-            }
-
-            // Optional: skip if immune to this projectile owner
-            if (targetNPC.immune[self.owner] > 0)
-                return result;
-
-            ref var extraHitboxes = ref multi.ExtraHitBoxes();
-
-            for (int i = 0; i < extraHitboxes.Count; i++)
-            {
-                var box = extraHitboxes[i];
-                if (!box.Active || !box.ProjectileCollide)
-                    continue;
-
-                if (myRect.Intersects(box.Hitbox))
-                {
-                    bool canDamage = true;
-                    if (self.ModProjectile is { } modProj2)
-                    {
-                        bool? modCanDamage = modProj2.Colliding(myRect,targetRect);
-                        if (modCanDamage.HasValue && !modCanDamage.Value)
-                            canDamage = false;
-                    }
-                    if (canDamage && self.CanHitWithMeleeWeapon(targetNPC))
-                    {
-                        result = true;
-                        multi.OnHitBoxCollide(i, self);
-                    }
-                }
-            }
-
-            return result;
-        }
-*/
         public static bool ExtraHitboxCollide(On_Projectile.orig_Colliding orig, Projectile self, Rectangle myRect, Rectangle targetRect)
         {
             bool result = orig(self, myRect, targetRect);
 
             // Find which NPC this targetRect belongs to.
             NPC targetNPC = null;
-            foreach (NPC npc in Main.ActiveNPCs)
+            foreach (var npc in MultiSegmentNPCIterator.All)
             {
-                if (npc.active && npc.Hitbox == targetRect)
+                if (npc.Hitbox == targetRect)
                 {
                     targetNPC = npc;
                     break;
@@ -203,13 +191,43 @@ namespace HeavenlyArsenal
                     bool canDamage = true;
                     if (self.ModProjectile is { } modProj2)
                     {
+                        
+
                         bool? modCanDamage = modProj2.Colliding(myRect, box.Hitbox);
                         if (modCanDamage.HasValue && !modCanDamage.Value)
                             canDamage = false;
+                        
+                    }
+
+                    if (self.WhipPointsForCollision.Count > 0)
+                    {
+                      
+                        for (int x = 0; x < self.WhipPointsForCollision.Count; x++)
+                        {
+                            if (self.WhipPointsForCollision[x].Distance(box.Hitbox.Center()) > 20)
+                                continue;
+                            //Rectangle whip = new Rectangle((int)self.WhipPointsForCollision[x].X, (int)self.WhipPointsForCollision[x].Y, 30, 30);
+                            //Main.NewText($"{x}, whip: {whip.Center()}, target: {targetRect.Center}");
+                            //Dust.NewDustPerfect(self.WhipPointsForCollision[x], DustID.Cloud, Vector2.Zero);
+                            if (box.Hitbox.IntersectsConeFastInaccurate(self.WhipPointsForCollision[x], 20, 0, MathHelper.TwoPi) )
+                            {
+                                //for(int y = 0; y < 40;y++)
+                               // {
+                               //     Vector2 pos = Vector2.Lerp(self.WhipPointsForCollision[x], box.Hitbox.Center(), y/40f);
+                               //     Dust a = Dust.NewDustPerfect(pos, DustID.Blood, Vector2.Zero, 0, Color.Red);
+                               //     a.noGravity = true;
+                               //     a.scale = 3;
+                               // }
+                                //Main.NewText(self.ToString());
+                                result = true;
+                                multi.OnHitBoxCollide(i, self);
+                            }
+                        }
                     }
 
                     if (myRect.Intersects(box.Hitbox) && canDamage)
                     {
+                       
                         result = true;
                         multi.OnHitBoxCollide(i, self);
                     }
@@ -219,26 +237,15 @@ namespace HeavenlyArsenal
             return result;
         }
 
-        public static void ClearAllBuffs(NPC npc)
+        public static void TryAddModIngredient(Recipe recipe, string modName, string itemName)
         {
-            for (int i = 0; i < NPC.maxBuffs; i++)
+            if (ModLoader.TryGetMod(modName, out Mod mod))
             {
-                
-                if (npc.buffType[i] > 0)
-                {
-                    Main.NewText(npc.ToString() + $", {npc.FindBuffIndex(i).ToString()} ");
-                    npc.DelBuff(i);
-                    i--;
-                }
+                ModItem item = mod.Find<ModItem>(itemName);
+                if (item != null)
+                    recipe.AddIngredient(item.Type);
             }
         }
-
-
-        public override void PostSetupContent()
-        {
-           
-        }
-
 
         private static bool CanEnterRift_Hook(Func<bool> orig)
         {

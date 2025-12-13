@@ -7,6 +7,7 @@ using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
 using static Luminance.Common.Utilities.Utilities;
 
@@ -213,26 +214,62 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
         /// </summary>
         private void HandleExplosion()
         {
-            int Crystals = 4 * Owner.GetModPlayer<NoxusWeaponPlayer>().CrystalCount;
-            //todo: manipulate the offset so that each portal is placed perfectly spaced around the StuckNPC.
-            // if there are too many portals, and they'd have to be too far away from the target to hit them, create an inner ring of portals that will be placed closer to the stuck npc.
-            // this can happen as many times as necessary.
-            Vector2 offset = Main.rand.NextVector2CircularEdge(200 + Crystals, 200 + Crystals);
-            // Only create one portal per crystal
-            if (!Projectile.localAI[0].Equals(1f))
+            NPC npc = StuckNPC as NPC;
+            if (npc == null)
+                return;
+
+            CrystalStorageNPC crystalNPC;
+            npc.TryGetGlobalNPC<CrystalStorageNPC>(out crystalNPC);
+            if (crystalNPC == null)
+                return;
+
+            int index = crystalNPC.storedProjectiles.IndexOf(this.Projectile);
+            if (index < 0)
+                return;
+
+            // how many points per ring
+            int pointsPerRing = 6;
+
+            // find ring + local position
+            int ring = index / pointsPerRing;
+            int pos = index % pointsPerRing;
+
+            // rotation logic
+            float baseRotation = 0f;  // rotate whole formation
+            float ringOffset = 0.5f;  // stagger rings
+            float angle = MathHelper.TwoPi * pos / pointsPerRing
+                          + baseRotation
+                          + ring * ringOffset;
+
+            // radius logic
+            float baseRadius = 100f;
+            float radius = baseRadius * (1f + ring * 0.35f);
+
+
+            // final spawn offset
+            Vector2 offset = angle.ToRotationVector2() * radius;
+            Vector2 spawnPos = npc.Center + offset;
+
+            // only spawn once
+            Dust d = Dust.NewDustPerfect(spawnPos, DustID.Cloud);
+            d.velocity = Vector2.Zero;
+            d.color = Color.AntiqueWhite;
+            if (Projectile.localAI[0] != 1f)
             {
                 Projectile.localAI[0] = 1f;
+                
                 int portal = Projectile.NewProjectile(
                     Projectile.GetSource_FromThis(),
-                    Projectile.Center + offset,
+                    spawnPos,
                     Vector2.Zero,
                     ModContent.ProjectileType<EntropicBlast>(),
-                    Projectile.damage,
+                    (int)(Owner.HeldItem.damage * 3f),
                     0,
                     Projectile.owner
                 );
             }
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -251,6 +288,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
+            target.GetGlobalNPC<CrystalStorageNPC>().AttachtoNPC(target, this.Projectile);
             SoundEngine.PlaySound(GennedAssets.Sounds.Common.TwinkleMuffled with { Pitch = 0.3f, PitchVariance = 0.4f });
             Projectile.ai[1] = (float)EntropicCrystalState.PostHit;
             Projectile.timeLeft = 180;
@@ -266,10 +304,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             {
                 Projectile.active = false;
             }
-
-
-
-                Projectile.netUpdate = true;
+            Projectile.netUpdate = true;
         }
         public override bool PreDraw(ref Color lightColor)
         {

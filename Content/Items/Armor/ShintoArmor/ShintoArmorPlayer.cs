@@ -478,10 +478,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
                     if (lastHitDamage > maxBarrier / 3)
                     {
-                        SoundEngine.PlaySound(ShintoArmorBreastplate.ShieldHurtSound with { Pitch = 0.2f }, Player.Center);
+                        SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Armor.Antishield_Hit with { Pitch = 0.2f }, Player.Center);
                     }
                     else
-                        SoundEngine.PlaySound(ShintoArmorBreastplate.ShieldHurtSound, Player.Center);
+                        SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Armor.Antishield_Hit, Player.Center);
                 }
                 else if (barrier <= 0)
                 {
@@ -489,11 +489,11 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                     {
                         if (lastHitDamage >= maxBarrier)
                         {
-                            SoundEngine.PlaySound(ShintoArmorBreastplate.BreakSound with { Volume = 1, Pitch = 1.1f }, Player.Center);
+                            SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Armor.Antishield_Break with { Volume = 1, Pitch = 1.1f }, Player.Center);
 
                         }
                         else
-                            SoundEngine.PlaySound(ShintoArmorBreastplate.BreakSound, Player.Center);
+                            SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Armor.Antishield_Break, Player.Center);
                         barrier = 0;
 
                     }
@@ -528,7 +528,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         #endregion
         public override bool FreeDodge(Player.HurtInfo info)
         {
-            if (VoidBeltEquipped && barrier <= 0 && Main.rand.NextBool(8))
+            if (VoidBeltEquipped && Player.GetModPlayer<ShintoArmorBarrier>().barrier <= 0 && Main.rand.NextBool(8))
             {
                 VoidBelt();
                 return true;

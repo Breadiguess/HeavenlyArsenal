@@ -3,6 +3,7 @@ using CalamityMod.CalPlayer;
 using CalamityMod.CalPlayer.Dashes;
 using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
+using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.Content.Items.Materials;
 using Microsoft.Xna.Framework;
@@ -16,8 +17,6 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 {
-	// The AutoloadEquip attribute automatically attaches an equip texture to this item.
-	// Providing the EquipType.Legs value here will result in TML expecting a X_Legs.png file to be placed next to the item's main texture.
 	[AutoloadEquip(EquipType.Legs)]
 	public class ShintoArmorLeggings : ModItem
 	{
@@ -36,12 +35,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             }
         }
 
-        public override void SetDefaults() {
-			Item.width = 18; // Width of the item
-			Item.height = 18; // Height of the item
-			Item.value = Item.sellPrice(gold: 1); // How many coins the item is worth
-            Item.rare = ModContent.RarityType<AvatarRarity>();  // The rarity of the item
-            Item.defense = 54; // The amount of defense the item will give when equipped
+        public override void SetDefaults()
+        {
+			Item.width = 18; 
+			Item.height = 18; 
+			Item.value = Item.sellPrice(platinum: 7,gold: 43,0,2); // How many coins the item is worth
+            Item.rare = ModContent.RarityType<AvatarRarity>();  
+            Item.defense = 55;
 		}
         public override void UpdateEquip(Player player)
         {
@@ -62,9 +62,19 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             player.dashType = 0;
             player.spikedBoots = 2;
         }
-        // Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.
         public override void AddRecipes() {
+              Recipe recipe = CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
+                .AddIngredient<DemonshadeGreaves>()
+                .AddIngredient(ItemID.NinjaPants)
+                .AddIngredient(ItemID.CrystalNinjaLeggings)
+                .AddIngredient<StatigelGreaves>()
+                .AddTile<DraedonsForge>();
+            HeavenlyArsenal.TryAddModIngredient(recipe, "CalamityHunt", "ShogunPants");
 
+            recipe.AddIngredient<StatisVoidSash>();
+            recipe.Register();
+        
             if (ModLoader.TryGetMod("CalamityHunt", out Mod CalamityHunt))
             {
                 CreateRecipe()

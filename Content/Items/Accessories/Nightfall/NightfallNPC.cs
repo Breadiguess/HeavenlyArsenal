@@ -69,17 +69,22 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
         public Player StackOwner;
         public override bool InstancePerEntity => true;
 
-        public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter)
+        public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter writer)
         {
-            binaryWriter.Write(StackOwner.whoAmI);
-            binaryWriter.Write(DamageBucketNPC);
-            binaryWriter.Write(BurstCooldown);
+            writer.Write(StackOwner != null ? StackOwner.whoAmI : -1);
+            writer.Write(Stack);
+            writer.Write(DamageBucketNPC);
+            writer.Write(BurstCooldown);
         }
-        public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader)
+
+        public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
         {
-            StackOwner = Main.player[binaryReader.Read()];
-            DamageBucketNPC = binaryReader.Read();
-            BurstCooldown = binaryReader.Read();
+            int ownerIndex = reader.ReadInt32();
+            StackOwner = ownerIndex >= 0 && ownerIndex < Main.maxPlayers ? Main.player[ownerIndex] : null;
+
+            Stack = reader.ReadInt32();
+            DamageBucketNPC = reader.ReadInt32();
+            BurstCooldown = reader.ReadInt32();
         }
         public override bool PreAI(NPC npc)
         {

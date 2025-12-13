@@ -5,7 +5,7 @@ BloodMortar.DisplayName: Blood Mortar
 NewLeech.DisplayName: Umbral Leech
 OtherworldlyIntruder.DisplayName: Otherworldly Intruder
 Umbralarva.DisplayName: Umbralarva
-RitualAltar.DisplayName: Ritual Altar
+RitualAltar.DisplayName: Creeping Monolith
 DebugNPC.DisplayName: John Arsenal
 PerversionOfFaith.DisplayName: Perversion Of Faith
 FleshlingCultist.DisplayName: Fleshling Cultist
@@ -15,3 +15,11 @@ UmbralLeech.DisplayName: Umbral Leech
 JellyBloom.DisplayName: Jelly Bloom
 Cryonophore.DisplayName: Cryonophore
 CryonophoreLimb.DisplayName: Cryonophore Limb
+BloodCrab.DisplayName: Blood Crab
+voidVulture.DisplayName: void Vulture
+Chum.DisplayName: Chum
+Goreca.DisplayName: Goreca
+ShadowHand.DisplayName: Shadow Hand
+IkCreature.DisplayName: Ik Creature
+OtherworldlyCore.DisplayName: Otherworldly Core
+BattleSolynBird.DisplayName: Solyn

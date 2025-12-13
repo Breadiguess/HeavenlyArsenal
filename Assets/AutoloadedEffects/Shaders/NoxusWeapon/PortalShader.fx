@@ -1,4 +1,4 @@
-sampler uImage0 : register(s0);
+﻿sampler uImage0 : register(s0);
 sampler uImage1 : register(s1);
 sampler uImage2 : register(s2);
 sampler uImage3 : register(s3);
@@ -58,7 +58,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     
     // Calculate the space color for the inside of the portal.
     float4 spaceColor = tex2D(uImage3, frac(coords + uTime * float2(0.1, 0)));
-    spaceColor.rgb *= 0.5;
+    spaceColor.rgb *= 0.25;
     finalColor = lerp(finalColor, spaceColor, InverseLerp(-0.05, 0.04, signedDistanceFromPortalEdge)) * edgeFade;
     
     // Apply forward light ray intensity effects to the portal.
@@ -73,7 +73,8 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     if (coords.x < 0.5)
         forwardLightIntensity *= InverseLerp(-0.07, -0.01, signedDistanceFromPortalEdge);
     
-    return finalColor + forwardLightIntensity * spike;
+    return (finalColor + forwardLightIntensity * spike) * circleStretchInterpolant;
+
 }
 technique Technique1
 {

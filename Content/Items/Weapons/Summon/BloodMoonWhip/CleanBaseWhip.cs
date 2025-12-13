@@ -2,14 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Enums;
-using Terraria.GameContent.Animations;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -49,10 +45,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             get;
             set;
         }
-        public virtual float RangeMult 
-        { 
-            get; 
-            set; 
+        public virtual float RangeMult
+        {
+            get;
+            set;
         }
         protected virtual int handleHeight => DefaultHandleHeight;
         protected virtual int segHeight => DefaultSegHeight;
@@ -78,7 +74,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             base.OnSpawn(source);
             if (Main.player[Projectile.owner].HeldItem != null)
                 _ownerItemType = Main.player[Projectile.owner].HeldItem.type;
-           
+
         }
 
         #region Helpers
@@ -89,7 +85,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
         protected virtual float ComputeFlyTime()
         {
             Player p = Main.player[Projectile.owner];
-           
+
             int baseAnim = p.itemAnimationMax > 0 ? p.itemAnimationMax : 20;
             return baseAnim * Projectile.MaxUpdates;
         }
@@ -124,13 +120,13 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             }
         }
 
-        public float FlyProgress => (_flyTime <= 0) ? 0f : ( Time / _flyTime);
+        public float FlyProgress => (_flyTime <= 0) ? 0f : (Time / _flyTime);
         protected virtual bool HitboxActive(float progress) => progress >= 0.1f && progress <= 0.7f;
 
 
         public static void GetWhipSettingsBetter(Projectile proj, out float timeToFlyOut, out int segments, out float rangeMultiplier)
         {
-            
+
             timeToFlyOut = Main.player[proj.owner].itemAnimationMax * proj.MaxUpdates;
             segments = DefaultSegments;
             rangeMultiplier = DefaultRangeMult;
@@ -162,7 +158,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             GetWhipSettingsBetter(Projectile, out float fly, out int segs, out float range);
             Projectile.GetWhipSettings(Projectile, out outFlyTime, out outSegments, out outRangeMult);
             // Replace with values from our system
-            
+
 
         }
         #endregion
@@ -175,19 +171,25 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             {
                 _initialized = true;
 
-               
+
 
                 float ft = 0; int segs = 0; float range = 0;
                 ModifyWhipSettings(ref ft, ref segs, ref range);
 
                 _flyTime = ft > 0 ? ft : ComputeFlyTime();
 
-               
+
                 Segments = segs > 0 ? segs : DefaultSegments;
                 //Main.NewText(Segments);
                 RangeMult = range > 0 ? range : DefaultRangeMult;
                 //Main.NewText(RangeMult);
             }
+            float toProjectile = player.MountedCenter.AngleTo(Projectile.Center) - MathHelper.PiOver2;
+            float flyProgress = FlyProgress; // normalized 0→1
+            var stretch = GetAnimatedArmStretch(flyProgress);
+
+            player.SetCompositeArmFront(true, stretch, toProjectile);
+            //Main.NewText(player.compositeFrontArm.stretch.ToString());
 
 
             Time++;
@@ -241,9 +243,30 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             }
 
             WhipAI();
-            
+
             return false;
         }
+        private Player.CompositeArmStretchAmount GetAnimatedArmStretch(float t)
+        {
+            // t goes from 0 → 1 over the whip's flytime
+            if (t < 0.2f)
+                return Player.CompositeArmStretchAmount.None;               // 0%–20%
+
+            if (t < 0.35f)
+                return Player.CompositeArmStretchAmount.ThreeQuarters;            // 20%–35%
+
+            if (t < 0.55f)
+                return Player.CompositeArmStretchAmount.Full;      // 35%–55%
+
+            if (t < 0.75f)
+                return Player.CompositeArmStretchAmount.Full;               // 55%–75%
+
+            if (t < 0.9f)
+                return Player.CompositeArmStretchAmount.Full;      // 75%–90%
+
+            return Player.CompositeArmStretchAmount.None;                   // 90%–100%
+        }
+
         protected virtual void WhipAI() { }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -322,9 +345,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             _controlPoints.Clear();
             FillWhipControlPointsBetter(Projectile, _controlPoints, Segments, RangeMult, _flyTime);
             ModifyControlPoints(_controlPoints);
-            
+
             DrawStrings(_controlPoints);
-            DrawSegs(_controlPoints);
+            DrawSegs(_controlPoints, 4);
 
             return false; // we've drawn it
         }
@@ -335,18 +358,18 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             {
                 Vector2 mid = Vector2.Lerp(points[i - 1], points[i], 0.5f);
                 Color color = Color.Lerp(Lighting.GetColor((int)(mid.X / 16f), (int)(mid.Y / 16f), StringColor), StringColor, Projectile.light);
-                Utils.DrawLine(Main.spriteBatch,points[i - 1], points[i], color, color, 2 * Projectile.scale);
+                Utils.DrawLine(Main.spriteBatch, points[i - 1], points[i], color, color, 2 * Projectile.scale);
                 //Utils.DrawBorderString(Main.spriteBatch, i.ToString(), points[i] - Main.screenPosition, Color.Red, 0.4f);
             }
         }
 
-        protected virtual void DrawSegs(List<Vector2> points)
+        protected virtual void DrawSegs(List<Vector2> points, int FrameCount)
         {
             for (int i = 0; i < points.Count; i++)
             {
                 int frameY = 0, frameHeight = 0;
                 Vector2 origin = Vector2.Zero;
-                GetFrame(i, points.Count, ref frameY, ref frameHeight, ref origin);
+                //GetFrame(i, points.Count, ref frameY, ref frameHeight, ref origin);
                 float drawScale = Projectile.scale * GetSegScale(i, points.Count);
 
                 Vector2 lightPos = i == 0 ? points[i] : Vector2.Lerp(points[i - 1], points[i], 0.5f);
@@ -361,11 +384,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
 
                 Texture2D whipTex = ModContent.Request<Texture2D>(Texture).Value;
 
-             //   Main.EntitySpriteDraw(whipTex, points[i] - Main.screenPosition, new Rectangle(0, frameY, whipTex.Width, frameHeight), color, rot, origin, drawScale, Projectile.spriteDirection > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                Main.EntitySpriteDraw(whipTex, points[i] - Main.screenPosition, new Rectangle(0, frameY, whipTex.Width, frameHeight), color, rot, origin, drawScale, Projectile.spriteDirection > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
             }
         }
 
-     
+
         public virtual void GetFrame(int segIndex, int segCount, ref int frameY, ref int frameHeight, ref Vector2 origin)
         {
             Texture2D whipTex = ModContent.Request<Texture2D>(Texture).Value;

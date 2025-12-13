@@ -10,6 +10,7 @@ using ReLogic.Content;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -30,7 +31,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
         public override void SetStaticDefaults()
         {
-            
+            ItemID.Sets.ShimmerTransformToItem[Type] = ModContent.ItemType<ShintoArmorBreastplate>();
             Item.wingSlot = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Wings);
             WingSlotID = Item.wingSlot;
             ArmorIDs.Wing.Sets.Stats[Item.wingSlot] = new WingStats(100000000, 16.67f, 3.7f, true, 23.5f, 4f);
@@ -133,7 +134,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             Item.rare = ModContent.RarityType<AvatarRarity>();
             Item.accessory = true;
         }
-
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
 

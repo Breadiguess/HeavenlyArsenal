@@ -85,6 +85,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.LeverAction
             ParticleEngine.Particles.Add(MuzzleFlash);
             riflePlayer.ShotCount--;
             CurrentState = State.Cycle;
+            Owner.SetDummyItemTime(18);
             Time = -1;
         }
         void ManageCycle()
@@ -116,7 +117,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.LeverAction
 
 
             t = Math.Clamp(t + 0.04f, 0, 1);
-            if (t == 1 && Time> 40)
+            Owner.SetDummyItemTime(2);
+            if (t == 1)
             {
                 t = 0;
                 CurrentState = State.Idle;

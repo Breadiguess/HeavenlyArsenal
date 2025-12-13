@@ -93,3 +93,8 @@ UmbralSickness: {
 	DisplayName: Umbral Sickness
 	Description: Mods.HeavenlyArsenal.Buffs.UmbralSickness.Description
 }
+
+ButterflyMinionBuff: {
+	DisplayName: Butterfly Minion Buff
+	Description: Mods.HeavenlyArsenal.Buffs.ButterflyMinionBuff.Description
+}

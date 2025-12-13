@@ -75,7 +75,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
                         {
                             ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, shakeMagnitude,
                             shakeDirection: Projectile.velocity.SafeNormalize(Vector2.Zero) * 2,
-                            shakeStrengthDissipationIncrement: 0.7f - strength * 0.1f);
+                            shakeStrengthDissipationIncrement: 0.7f - strength * 0.01f);
                         }
                     }
                 }

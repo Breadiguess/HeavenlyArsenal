@@ -298,7 +298,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
                 if (Main.netMode != NetmodeID.Server)
                     CombatText.NewText(npc.Hitbox, Color.Red, "SHREDDED!");
 
-                Main.NewText($"{npc.FullName} is shredded! Defense reduced by 45% for {time / 60f:F1} seconds.", Color.Orange);
+                //Main.NewText($"{npc.FullName} is shredded! Defense reduced by 45% for {time / 60f:F1} seconds.", Color.Orange);
             }
         }
 

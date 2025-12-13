@@ -64,7 +64,7 @@ namespace HeavenlyArsenal.Content.Buffs.Stims
 
         public override void Update(Player player, ref int buffIndex)
         {
-            bool isNotHoldingCursedItems = player.HeldItem.type != ModContent.ItemType<ExecutionersBlade>() && player.HeldItem.type != ModContent.ItemType<Hypothermia>();
+            bool isNotHoldingCursedItems = player.HeldItem.type != ModContent.ItemType<ExecutionersBlade>() && player.HeldItem.type != ModContent.ItemType<Hypothermia>() && player.HeldItem.type != ModContent.ItemType<Wrathwing>();
             if (HeavenlyArsenalClientConfig.Instance != null && HeavenlyArsenalClientConfig.Instance.StimVFX)
             {
                 if (!GeneralScreenEffectSystem.ChromaticAberration.Active)

@@ -1,6 +1,7 @@
 ﻿using CalamityMod;
 using CalamityMod.CalPlayer;
 using CalamityMod.Items;
+using CalamityMod.Items.Accessories;
 using CalamityMod.Rarities;
 using Luminance.Assets;
 using Microsoft.Xna.Framework;
@@ -39,6 +40,16 @@ namespace HeavenlyArsenal.Content.Items.Accessories.RadiantRampart
 
         }
 
+        public override void AddRecipes()
+        {
+            
+            Recipe recipe = CreateRecipe()
+                .AddIngredient(ModContent.ItemType<RampartofDeities>())
+                .AddIngredient(ModContent.ItemType<Radiance>())
+                .AddTile(TileID.MythrilAnvil);
+          
+            recipe.Register();
+        }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
 

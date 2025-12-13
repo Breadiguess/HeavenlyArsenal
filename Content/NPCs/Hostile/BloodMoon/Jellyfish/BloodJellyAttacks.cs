@@ -144,39 +144,42 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
             }
             NPC.rotation = NPC.rotation.AngleLerp(NPC.AngleTo(currentTarget.Center) + MathHelper.PiOver2, 0.6f);
             NPC.velocity *= 0.8f;
-            if (Time % Main.rand.Next(1,4) ==0)
-            for (int i = 0; i < ThreatCount; i++)
-            {
+            if (Time % Main.rand.Next(1, 4) == 0)
+                for (int i = 0; i < ThreatCount; i++)
+                {
+                    int uuid = ThreatIndicies[i];
+                    //Main.NewText(uuid);
+                    Projectile threat = Main.projectile[uuid];//Main.projectile[ThreatIndicies[i]];
+                    //Main.NewText("success!");
+                    if (threat == null)
+                    {
+                        ThreatIndicies.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+                    if (Main.rand.NextBool(ThreatCount * 4))
+                    {
+                        TheThreat theThreat = threat.ModProjectile as TheThreat;
 
-                Projectile threat = Main.projectile[ThreatIndicies[i]];
-                if (threat == null)
-                {
-                    ThreatIndicies.RemoveAt(i);
-                    i--;
-                    continue;
+                        theThreat.Target = this.currentTarget;
+                        theThreat.Time = 0;
+                        theThreat.CurrentState = TheThreat.Behavior.Concussive;
+                        SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.FeatherAppear with { MaxInstances = 2, PitchVariance = 0.2f, Volume = 0.25f });
+                        NPC.velocity += (NPC.rotation + MathHelper.PiOver2).ToRotationVector2() * ThreatCount / 4;
+                        ThreatIndicies.RemoveAt(i);
+                        i--;
+                    }
                 }
-                if (Main.rand.NextBool(ThreatCount * 4))
-                {
-                    TheThreat theThreat = threat.ModProjectile as TheThreat;
-                    theThreat.Target = currentTarget;
-                    theThreat.Time = 0;
-                    theThreat.CurrentState = TheThreat.Behavior.Concussive;
-                    SoundEngine.PlaySound(GennedAssets.Sounds.NamelessDeity.FeatherAppear with { MaxInstances = 2, PitchVariance = 0.2f, Volume = 0.25f });
-                    NPC.velocity += (NPC.rotation + MathHelper.PiOver2).ToRotationVector2() * ThreatCount/4;
-                    ThreatIndicies.RemoveAt(i);
-                    i--;
-                }
-            }
         }
         public float recoilInterp;
         void RailGun()
         {
-            const int fireInterval = 60;   
+            const int fireInterval = 60;
             const int lockOnDuration = 55;
             const int chargeDuration = 5;
             const int attackEnd = 60 * 3 + 10;
 
-            OpenInterpolant = float.Lerp(OpenInterpolant, 1, 0.2f);
+            OpenInterpolant = float.Lerp(OpenInterpolant, 1, 0.09f);
             NPC.velocity *= 0.1f;
 
             int attackCycleTime = Time % fireInterval;
@@ -254,7 +257,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
                 NPC.velocity *= 0.9f;
                 NPC.Center = NPC.Center + Main.rand.NextVector2Unit(NPC.rotation);
             }
-            else if (Time >=WindupTime)
+            else if (Time >= WindupTime)
             {
                 NPC.noTileCollide = false;
 
@@ -264,7 +267,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
                 // Ensure downward and within cone
                 if (Vector2.Dot(diveDir, down) < MathF.Cos(MathHelper.PiOver4))
                     diveDir = Vector2.Normalize(Vector2.Lerp(down, diveDir, 0.5f));
-                if (Time == WindupTime+1)
+                if (Time == WindupTime + 1)
                     NPC.velocity = diveDir * 30f;
                 else
                     NPC.velocity *= 1.12f;
@@ -286,7 +289,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
 
                     // Handle impact immediately
                     OnRayImpact(hitWorld);
-                    return; // Stop further logic after impact
+                    return;
                 }
             }
 
@@ -303,7 +306,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
             NPC.noTileCollide = false;
             int SpawnCount = 30;
             NPC.Center += NPC.rotation.ToRotationVector2();
-            //NPC.Center = hitWorld + NPC.rotation.ToRotationVector2() * 30;
             for (int i = 0; i < SpawnCount; i++)
             {
                 Collision.HitTiles(hitWorld, NPC.velocity, NPC.width, NPC.height);
@@ -335,7 +337,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
                     // Normalize strength between 0 (at maxRange) and 1 (at minRange)
                     float strength = 1f - MathHelper.Clamp((distance - minRange) / (maxRange - minRange), 0f, 1f);
 
-                    // Optional: make strength fall off nonlinearly
                     strength = MathF.Pow(strength, 2f); // smoother falloff
 
                     // Convert to shake magnitude — tweak to taste
@@ -386,6 +387,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
             }
             else
             {
+                if (Time < 200)
+                    return;
                 Time = 0;
                 CurrentState = Behavior.Drift;
                 // When player is far enough, maybe hover or patrol?

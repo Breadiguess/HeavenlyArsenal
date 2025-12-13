@@ -156,6 +156,14 @@ public static class AssetDirectory
 
         public static class Items
         {
+
+            public static class Armor
+            {
+                public static readonly SoundStyle Antishield_Regen = new SoundStyle(AssetPath + "Sounds/Items/Armor/HAvatarShieldRegenerate");
+                public static readonly SoundStyle Antishield_Break = new SoundStyle(AssetPath + "Sounds/Items/Armor/HAvatarShieldBreak");
+
+                public static readonly SoundStyle Antishield_Hit = new SoundStyle(AssetPath + "Sounds/Items/Armor/HAvatarShieldHit", 3);
+            }
             public static class CombatStim
             {
                     public static readonly SoundStyle PsychosisWhisper = new SoundStyle(AssetPath + "Sounds/Items/CombatStim/PsychosisWhisper_", 5);
@@ -181,8 +189,7 @@ public static class AssetDirectory
                 }
                 public static class Rapture
                 {
-                    public static readonly SoundStyle Swing = new SoundStyle(AssetPath + "Sounds/Items/Melee/Swing1");
-                    public static readonly SoundStyle Swing2 = new SoundStyle(AssetPath + "Sounds/Items/Melee/Swing2");
+                    public static readonly SoundStyle Swing = new SoundStyle(AssetPath + "Sounds/Items/Melee/rapture_swing_", 3);
                     public static readonly SoundStyle Collapse = new SoundStyle(AssetPath + "Sounds/Items/Melee/Collapse_1");
 
                     public static readonly SoundStyle CollapseImpact = new SoundStyle(AssetPath + "Sounds/Items/Melee/Collapse_Impact");

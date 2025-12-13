@@ -3,6 +3,7 @@ using CalamityMod.Graphics.Metaballs;
 using CalamityMod.NPCs.Other;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 using Microsoft.Xna.Framework;
+using NoxusBoss.Assets;
 using NoxusBoss.Content.Particles.Metaballs;
 using System.Collections.Generic;
 using Terraria;
@@ -290,13 +291,27 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     if (Time > 60)
                         if (currentTarget is Player)
                         {
+                            if (currentTarget.Distance(NPC.Center) > 70)
+                            {
+
+                                blood += bloodBankMax / 5;
+                                Time = 0;
+                                NPC.damage = NPC.defDamage;
+                                CurrentState = Behavior.flee;
+                                SoundEngine.PlaySound(GennedAssets.Sounds.Common.MediumBloodSpill, NPC.Center);
+                            }
+                                
                             Player temp = currentTarget as Player;
                             if (!temp.HasIFrames())
                             {
                                 temp.AddBuff(ModContent.BuffType<UmbralSickness>(), 600);
-                                temp.Heal(-1);
-
+                                temp.Heal(-100);
+                                if (Main.netMode == NetmodeID.SinglePlayer)
+                                    temp.statLife -= 100;
+                                SoundEngine.PlaySound(GennedAssets.Sounds.Common.MediumBloodSpill, NPC.Center);
                             }
+                            else
+                                return;
                             blood += bloodBankMax / 5;
                             Time = 0;
                             NPC.damage = NPC.defDamage;
@@ -330,8 +345,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             if(currentTarget != null)
             NPC.rotation = currentTarget.AngleFrom(NPC.Center);
 
-            if(Main.netMode == NetmodeID.SinglePlayer || Main.netMode == NetmodeID.Server)
-                HeavenlyArsenal.ClearAllBuffs(NPC);
             if(NPC.Opacity<0.5f)
             ForceResetHitboxes();
             if (Time < 200)
@@ -414,7 +427,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             if (Time == 1 && Main.netMode != NetmodeID.Server)
             {
                 SoundEngine.PlaySound(AssetDirectory.Sounds.NPCs.Hostile.BloodMoon.UmbralLeech.DyingNoise with { MaxInstances = 1 });
-
+                NPC.velocity *= 0.1f;
 
             }
 

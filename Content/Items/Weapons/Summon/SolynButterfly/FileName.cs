@@ -1,4 +1,5 @@
-﻿using Luminance.Assets;
+﻿using HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture.Solyn;
+using Luminance.Assets;
 using Luminance.Common.DataStructures;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

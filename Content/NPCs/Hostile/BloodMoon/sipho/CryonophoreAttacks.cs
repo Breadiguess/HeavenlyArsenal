@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
@@ -29,6 +26,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
                     findTarget();
                     break;
                 case Behavior.Attack:
+                    ManageAttack();
                     break;
                 case Behavior.DetachLimb:
                     DetachLimb();
@@ -51,27 +49,41 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
             }
             else
             {
-                NPC.velocity = NPC.AngleTo(currentTarget.Center).ToRotationVector2();
+                CurrentState = Behavior.Attack;
             }
 
-          
-            
-        }
 
+
+        }
+        void ManageAttack()
+        {
+            if (NPC.Distance(currentTarget.Center) < 100)
+            {
+                Time = 0;
+                CurrentState = Behavior.DetachLimb;
+                return;
+            }
+            NPC.velocity = NPC.AngleTo(currentTarget.Center).ToRotationVector2();
+        }
         void DetachLimb()
         {
-            foreach (var zooid in OwnedZooids)
-            {
-                if (Main.rand.NextBool())
-                    continue;
-                else if (blood <= 0)
-                    continue;
+            if (Time == 1)
+                foreach (var zooid in OwnedZooids)
+                {
+                    if (!Main.rand.NextBool(6))
+                        continue;
+                    //else if (blood <= 0)
+                    //    continue;
 
                     var id = zooid.Value.Item1.id;
-                var type = zooid.Value.Item1.type;
-                //Main.NewText(id + ", " + type);
-                SpawnZooid(id);
-            }
+                    var type = zooid.Value.Item1.type;
+                    if (zooid.Value.Item2 != null)
+                        Main.NewText(id + ", " + type);
+                    SpawnZooid(id);
+                }
+            NPC.velocity = NPC.AngleTo(currentTarget.Center).ToRotationVector2() * -10;
+            if (Time > 60)
+                CurrentState = Behavior.Attack;
         }
     }
 }

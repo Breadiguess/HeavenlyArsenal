@@ -27,6 +27,13 @@ namespace HeavenlyArsenal.Common.utils
 
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            if(npc.type == solynType)
+            {
+                //Solyn solyn = npc.ModNPC as Solyn;
+                
+                //Utils.DrawBorderString(spriteBatch, solyn.CurrentState.ToString(), npc.Center - screenPos, Color.AntiqueWhite, anchory: 2);
+            }
+
             if (npc.type == solynType && (Main.zenithWorld ))
             {
                 Vector2 drawPosition = npc.Center - screenPos + Vector2.UnitY * (npc.gfxOffY - 6f);

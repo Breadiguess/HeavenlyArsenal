@@ -5,12 +5,10 @@ using CalamityMod.Items.Weapons.Melee;
 using CalamityMod.Items.Weapons.Rogue;
 using HeavenlyArsenal.Content.Items.Accessories.Cosmetic;
 using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
-using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.Items.Weapons.Magic;
 using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 using HeavenlyArsenal.Content.Items.Weapons.Melee.AvatarSpear;
-using HeavenlyArsenal.Content.Items.Weapons.Summon;
 using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using NoxusBoss.Assets;
@@ -80,30 +78,7 @@ namespace HeavenlyArsenal.Core.Systems
         /// //TODO: Conditions such as bosses defeated
        
         public override void OnWorldLoad()
-        
         {
-            //fun to Blood
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<ChaliceOfFun>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<ChaliceOfTheBloodGod>(), 1
-                ));
-
-            //Blood to fun
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<ChaliceOfTheBloodGod>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<ChaliceOfFun>(), 1
-                ));
-
             //drew wings to dev wings
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
@@ -115,19 +90,7 @@ namespace HeavenlyArsenal.Core.Systems
             ModContent.ItemType<DevWing>(), 1
               
             ));
-            /*
-            //rock to cessation
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<Rock>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<LifeAndCessation>(), 1
-
-                ));
-            */
+           
             //coin for coin
             tradeDefinitions.Add(new TradeDefinition(
                //item to trade
@@ -139,19 +102,7 @@ namespace HeavenlyArsenal.Core.Systems
                ModContent.ItemType<AncientCoin>(), 1
                 ));
 
-            //armor bargain
-            tradeDefinitions.Add(new TradeDefinition(
-              //item to trade
-              ModContent.ItemType<AncientCoin>(),
-              1000f,
-              ItemReturnType.None,
-               //Items to get back
-               ModContent.ItemType<ShintoArmorLeggings>(), 1,
-               ModContent.ItemType<ShintoArmorBreastplate>(), 1,
-               ModContent.ItemType<ShintoArmorHelmetAll>(), 1
-
-               ));
-           
+        
             //nadir to nadir2
             tradeDefinitions.Add(new TradeDefinition(
               //item to trade
@@ -216,28 +167,7 @@ namespace HeavenlyArsenal.Core.Systems
 
                ModContent.ItemType<RocheLimit>(), 1
                 ));
-
-            //Helmet to hat
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<ShintoArmorHelmetAll>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<ShintoArmorHelmetRogue>(), 1
-                ));
-            //Hat to helmet
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<ShintoArmorHelmetRogue>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<ShintoArmorHelmetAll>(), 1
-                ));
-
+            
 
             TradeInputRegistry.RegisterTrades(tradeDefinitions);
         }
@@ -297,7 +227,7 @@ namespace HeavenlyArsenal.Core.Systems
                             if (Vector2.Distance(worldItem.Center, player.Center) > trade.MinDistance)
                             {
                                 // Log the deletion for debugging.
-                                Main.NewText($"Deleting trade input item: {worldItem.Name}", Color.AntiqueWhite);
+                                //Main.NewText($"Deleting trade input item: {worldItem.Name}", Color.AntiqueWhite);
 
                                 // Remove the input item.
                                 worldItem.TurnToAir();
@@ -317,7 +247,7 @@ namespace HeavenlyArsenal.Core.Systems
                                         int index = Item.NewItem(new EntitySource_Misc("VoidTradingSystem"),
                                             (int)spawnPosition.X, (int)spawnPosition.Y,
                                             player.width, player.height, outputItemType); // Ensure outputItemType is correctly used here.
-                                        Main.NewText($"Created item: {Main.item[index].Name} (Type: {outputItemType}), Index: {index}", Color.AntiqueWhite);
+                                        //Main.NewText($"Created item: {Main.item[index].Name} (Type: {outputItemType}), Index: {index}", Color.AntiqueWhite);
                                         if (index >= 0 && index < Main.maxItems)
                                         {
                                             // Optional: additional properties

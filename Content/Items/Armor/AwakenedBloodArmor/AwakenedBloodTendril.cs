@@ -137,12 +137,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         public void CheckDespawnConditions()
         {
             Projectile.timeLeft = 4;
-            AwakenedBloodPlayer a = Owner.GetModPlayer<AwakenedBloodPlayer>();
-            if (Owner.dead || !a.AwakenedBloodSetActive || a.CurrentForm != AwakenedBloodPlayer.Form.Offense)
-            {
-                Projectile.active = false;
-                return;
-            }
+           
         }
         public void UpdateHomePos()
         {

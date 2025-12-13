@@ -446,18 +446,22 @@ public class AntishadowAssassin : ModProjectile
 
     public override void SetStaticDefaults()
     {
-        BodyTarget = new InstancedRequestableTarget();
-        Main.ContentThatNeedsRenderTargets.Add(BodyTarget);
-        ArmOutlineTarget = new InstancedRequestableTarget();
-        Main.ContentThatNeedsRenderTargets.Add(ArmOutlineTarget);
-        ResultsTarget = new InstancedRequestableTarget();
-        Main.ContentThatNeedsRenderTargets.Add(ResultsTarget);
+        if (!Main.dedServ)
+        {
+            BodyTarget = new InstancedRequestableTarget();
+            Main.ContentThatNeedsRenderTargets.Add(BodyTarget);
+            ArmOutlineTarget = new InstancedRequestableTarget();
+            Main.ContentThatNeedsRenderTargets.Add(ArmOutlineTarget);
+            ResultsTarget = new InstancedRequestableTarget();
+            Main.ContentThatNeedsRenderTargets.Add(ResultsTarget);
 
-        ProjectileID.Sets.TrailingMode[Type] = 2;
-        ProjectileID.Sets.TrailCacheLength[Type] = 12;
-        ProjectileID.Sets.MinionSacrificable[Projectile.type] = true;
-        ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true;
+            ProjectileID.Sets.TrailingMode[Type] = 2;
+            ProjectileID.Sets.TrailCacheLength[Type] = 12;
+            ProjectileID.Sets.MinionSacrificable[Projectile.type] = true;
+            ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true;
 
+           
+        }
         PerformStupidAssetBoilerplateLoading();
     }
 
@@ -1070,6 +1074,7 @@ public class AntishadowAssassin : ModProjectile
     /// </summary>
     private void HandleRepositionMotion(Vector2 destination)
     {
+
         float minMovementInterpolant = 0.02f;
         bool doneMoving = MovementInterpolant <= minMovementInterpolant;
 
@@ -1150,6 +1155,8 @@ public class AntishadowAssassin : ModProjectile
     /// </summary>
     private void CreateMotionVisuals()
     {
+        if (Main.dedServ)
+            return;
         Vector2 previous = DashStart;
         Vector2 current = Projectile.Center;
         Vector2 directionalForce = (current - previous).RotatedByRandom(0.4f) * 0.1f;
@@ -1217,6 +1224,8 @@ public class AntishadowAssassin : ModProjectile
     /// </summary>
     private void CreateFootSmoke()
     {
+        if (Main.dedServ)
+            return;
         // Create idle smoke.
         int fireBrightness = Main.rand.Next(26);
         float fireSpeed = -2.67f;
@@ -1328,6 +1337,8 @@ public class AntishadowAssassin : ModProjectile
     /// </summary>
     private void DrawKatana(Vector2 bladeDrawStartingPosition, bool flip, float angle)
     {
+        if (Main.dedServ)
+            return;
         float katanaWidthFunction(float completionRatio)
         {
             float baseWidth = 4f;
@@ -1515,7 +1526,8 @@ public class AntishadowAssassin : ModProjectile
     /// </summary>
     private void RenderIntoResultsTarget()
     {
-
+        if (Main.dedServ)
+            return;
 
         ArmOutlineTarget.Request(400, 400, Projectile.identity, DrawIntoArmOutlineTarget);
         BodyTarget.Request(400, 400, Projectile.identity, DrawIntoBodyTarget);
@@ -1576,6 +1588,8 @@ public class AntishadowAssassin : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
+        if (Main.netMode == NetmodeID.Server)
+            return false;
         ResultsTarget.Request(600, 600, Projectile.identity, RenderIntoResultsTarget);
         if (ResultsTarget.TryGetTarget(Projectile.identity, out RenderTarget2D target) && target is not null)
         {

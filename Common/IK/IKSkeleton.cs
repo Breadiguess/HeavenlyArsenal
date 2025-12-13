@@ -11,6 +11,7 @@ namespace HeavenlyArsenal.Common.IK
 {
     public struct IKSkeleton
     {
+
         public struct Constraints()
         {
             public float MinAngle = -MathF.PI;
@@ -19,6 +20,8 @@ namespace HeavenlyArsenal.Common.IK
 
         [InlineArray(MaxJointCount + 1)]
         struct PositionData { Vector2 _; }
+        public bool SolveFailed { get; private set; }
+        public float FinalDistance { get; private set; }
 
         public readonly int JointCount => _options.Length;
         public readonly int PositionCount => JointCount + 1;
@@ -28,7 +31,7 @@ namespace HeavenlyArsenal.Common.IK
         readonly (float length, Constraints constraints)[] _options;
         PositionData _previousPositions;
         PositionData _positions;
-        float _maxDistance;
+        public float _maxDistance;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly Vector2 Position(int index) => _positions[index];
@@ -45,8 +48,20 @@ namespace HeavenlyArsenal.Common.IK
         public void Update(Vector2 startPosition, Vector2 targetEndPosition)
         {
             _previousPositions = _positions;
+            SolveFailed = false;
+
+            float dist = UpdateInner(startPosition, targetEndPosition);
+            FinalDistance = MathF.Sqrt(dist);
+
+            bool outOfReach = FinalDistance > _maxDistance;
+            bool tooFarAfterSolve = FinalDistance > 26f;
 
             var distance = UpdateInner(startPosition, targetEndPosition);
+            if (outOfReach || tooFarAfterSolve)
+            {
+                SolveFailed = true;
+                _positions = _previousPositions;
+            }
             if (distance > 26f)
             {
                 _positions = _previousPositions;
@@ -59,6 +74,8 @@ namespace HeavenlyArsenal.Common.IK
 
         float UpdateInner(Vector2 startPosition, Vector2 targetEndPosition)
         {
+            float lastDistance = float.MaxValue;
+
             var iterations = 2 << 4;
             var distance = startPosition.DistanceSQ(targetEndPosition);
             if (distance > _maxDistance * _maxDistance) iterations = 1;
@@ -99,9 +116,40 @@ namespace HeavenlyArsenal.Common.IK
 
                 distance = _positions[PositionCount - 1].DistanceSQ(targetEndPosition);
                 if (distance <= 0.01f) break;
+                // Check stagnation (solver cannot improve → impossible pose under constraints)
+                if (Math.Abs(lastDistance - distance) < 0.0001f)
+                {
+                    SolveFailed = true;
+                    break;
+                }
+
+                lastDistance = distance;
+
             }
 
             return distance;
+        }
+
+        /// <summary>
+        /// attempts to mutate the values stored inside this limb's _options tuple.
+        /// </summary>
+        /// <param name="joint">the index of the bone to adjust parameters for</param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        public void SetConstraint(int joint, float min, float max)
+        {
+            var (len, c) = _options[joint];
+            c.MinAngle = min;
+            c.MaxAngle = max;
+            _options[joint] = (len, c); // assign tuple back (struct copy)
+        }
+
+        public float GetConstraint(int joint)
+        {
+            float max = _options[joint].constraints.MaxAngle;
+            float min = _options[joint].constraints.MinAngle;
+
+            return MathHelper.ToDegrees(max - min);
         }
     }
 }

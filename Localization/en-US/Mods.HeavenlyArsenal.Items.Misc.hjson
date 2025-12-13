@@ -11,8 +11,6 @@ Materials: {
 			the ultimate culmination of gunsmithing.
 			Years of the craft have gone into this, and the end result lies before you
 			these parts are capable of creating a weapon of unimaginable power...
-			 
-			I F  O N L Y  Y O U  W I L L  B R I N G  A B O U T  T H E  E N D
 			'''
 	}
 }
@@ -49,15 +47,15 @@ UmbralLeechDrop: {
 
 ShellFragment: {
 	DisplayName: Shell Fragment
-	Tooltip: ""
+	Tooltip: a thick fragment of keratin, laced with red veins and still warm to the touch
 }
 
 PenumbralMembrane: {
 	DisplayName: Penumbral Membrane
-	Tooltip: ""
+	Tooltip: a thin, dark membrane of an unknown origin
 }
 
 AvatarMaterial: {
 	DisplayName: Avatar Material
-	Tooltip: ""
+	Tooltip: a placeholder name for a placeholder part </3
 }

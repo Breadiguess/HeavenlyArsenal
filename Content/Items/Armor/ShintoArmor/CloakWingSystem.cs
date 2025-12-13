@@ -23,181 +23,8 @@ using Player = Terraria.Player;
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 {
-    internal class CloakWingSystem : ModPlayer
-    {
-        public bool Active;
-
-        public float WingRotation = 0f;
-        public float WingFlapProgress = 0;
-        public float WingActivationProgress = 0;
-        public static float WingCycleTime = 57;
-        
-        public int Time = 0;
-
-        private PiecewiseCurve _flapCurve;
-        private float _cachedStartRot = float.NaN;
-
-        public bool WingsActive
-        {
-            get;
-            set;
-        }
-        public override void PostUpdateEquips()
-        {
-            Active = false;
-        }
-
-        private void FlapWings(float flapCompletion, float startingRotation)
-        {
-
-            if (_flapCurve == null || !startingRotation.Equals(_cachedStartRot))
-            {
-                _cachedStartRot = startingRotation;
-
-                _flapCurve = new PiecewiseCurve()
-                .Add(EasingCurves.Exp, EasingType.In, startingRotation + 2.3f, 0.5f, startingRotation)
-                .Add(EasingCurves.Quadratic, EasingType.InOut, startingRotation + 1.86f, 0.6f)
-                .Add(EasingCurves.Quadratic, EasingType.Out, startingRotation, 1f);
-            }
-            float previousWingRotation = WingRotation;
-            float t = flapCompletion % 1f;
-            WingRotation = _flapCurve.Evaluate(t);
-            float wingSpeed = Math.Abs(previousWingRotation - WingRotation);
-
-            if (wingSpeed >= 0.2f)
-            {
-                AntishadowBlob Blob = ModContent.GetInstance<AntishadowBlob>();
-                for (int i = 0; i < 1; i++)
-
-                {
-                    float randomoffset = Main.rand.Next(-4, 4);
-                    Vector2 bloodSpawnPosition = Player.Center + Main.rand.NextVector2CircularEdge(120 + randomoffset, 50);
-
-                    //var dust = Dust.NewDustPerfect(bloodSpawnPosition, DustID.AncientLight, Vector2.Zero, default, Color.Red);
-                    //dust.noGravity = true;
-                    Blob.player = Player;
-
-                    Blob.CreateParticle(bloodSpawnPosition, Vector2.Zero, 0, 0);
-                }
-            }
-            Main.NewText($"{WingRotation}");
-        }
-        public override void FrameEffects()
-        {
-            //If the wing logic isnt the same as the visual wings that means its vanity. Vanilla does the same to check if the wings are real or not
-           
-            if (Player.GetModPlayer<ShintoArmorPlayer>().ShadowVeil)
-            {
-                
-                if (WingsActive)
-                {
-                    WingActivationProgress = float.Lerp(WingActivationProgress, 1, 0.5f);
-                    float baseRotation = Math.Abs(Player.velocity.Y)*-0.02f;
-                    if (Player.controlJump)
-                    {
-                        
-                        FlapWings((float)Time / WingCycleTime, baseRotation);
-                        WingFlapProgress = (float)Math.Sin(Time / 8f) * 1.15f - 0.75f;
-                        Time++;
-                        if (Time > WingCycleTime + 1)
-                            Time = 0;
-                    }
-
-                    else
-                    {
-                        Time = (int)float.Lerp(Time, 0, 0.12f);
-                        FlapWings(Time/WingCycleTime, baseRotation);
-                    }
-
-
-                }
-                else
-                {
-                    
-                    Time = 0;
-                    WingActivationProgress = float.Lerp(WingActivationProgress, 0, 0.15f);
-                    WingFlapProgress = float.Lerp(WingFlapProgress, -4, 0.25f);
-                }
-                    
-                
-            }
-        }
-
-        public override void PreUpdateMovement()
-        {
-
-            // Start flying if wings are triggered
-            //if (!IsOnGround(Player))
-            //{
-             //   WingsActive = true;
-            //}
-            //else
-            //    WingsActive = false;
-
-           // if (Player.velocity.Y == 0f)
-            //{
-           //     WingsActive = false;
-         //   }
-        }
-        bool IsOnGround(Player player)
-        {
-            // Only check when the player isn't moving vertically
-           
-
-            // Check the tile directly below the player
-            int tileX = (int)(player.Center.X / 16f);
-            int tileY = (int)((player.position.Y + player.height + 1f) / 16f);
-
-            Tile tileBelow = Framing.GetTileSafely(tileX, tileY);
-
-            // Solid tiles or solid-top tiles (like platforms)
-            return tileBelow.HasUnactuatedTile && Main.tileSolid[tileBelow.TileType] && !Main.tileSolidTop[tileBelow.TileType];
-        }
-    }
-
-    public class AntishadowWing : PlayerDrawLayer
-    {
-        public override Position GetDefaultPosition() => new BeforeParent(PlayerDrawLayers.BackAcc);
-
-        public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.body == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorBreastplate), EquipType.Body);
-
-        public override bool IsHeadLayer => false;
-
-        protected override void Draw(ref PlayerDrawSet drawInfo)
-        {
-            CloakWingSystem cloakWingSystem = drawInfo.drawPlayer.GetModPlayer<CloakWingSystem>();
-            Player player = drawInfo.drawPlayer;
-
-
-
-            if (!cloakWingSystem.WingsActive && cloakWingSystem.WingActivationProgress <=0.1f)
-                return;
-            float Rot = cloakWingSystem.WingRotation;//WingFlapProgress * MathHelper.Pi/3 * (drawInfo.drawPlayer.gravDir < 0 ? 1 : -1);
-
-            Utils.DrawBorderString(Main.spriteBatch, "Rotation: " + Rot.ToString() + ", WingProgress: " + cloakWingSystem.WingFlapProgress.ToString(), player.Center - Main.screenPosition - Vector2.UnitY * -100, Color.AntiqueWhite);
-
-            Utils.DrawBorderString(Main.spriteBatch, "Time: " + cloakWingSystem.Time.ToString(), player.Center - Main.screenPosition - Vector2.UnitY * -120, Color.AntiqueWhite);
-
-            Vector2 Scale = new Vector2(0.75f * cloakWingSystem.WingActivationProgress, 0.75f* cloakWingSystem.WingActivationProgress);
-
-            Texture2D wing = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Items/WingTexture").Value;
-            Vector2 DrawPosL = drawInfo.BodyPosition() + new Vector2(10, 10);
-            
-            Vector2 LeftOrigin = new Vector2(0, wing.Height);
-
-            SpriteEffects ef = player.direction == 1 ? SpriteEffects.None : SpriteEffects.None;
-
-            DrawData leftwing = new DrawData(wing, DrawPosL, null, Color.AntiqueWhite, Rot, LeftOrigin, Scale, ef);
-            
-            drawInfo.DrawDataCache.Add(leftwing);
-
-            Vector2 DrawPosR = drawInfo.BodyPosition() + new Vector2(-7.5f, 10);
-
-            Vector2 RightOrigin = new Vector2(wing.Width, wing.Height);
-            DrawData rightwing = new DrawData(wing, DrawPosR, null, Color.AntiqueWhite, -Rot, RightOrigin, Scale, SpriteEffects.FlipHorizontally);
-            drawInfo.DrawDataCache.Add(rightwing);
-        }
-    }
+   
+   
     class ShintoArmorCapePlayer : ModPlayer
     {
         private float ExistenceTimer;
@@ -211,15 +38,18 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
         public override void Load()
         {
+            if(Main.netMode != NetmodeID.Server)
             On_Main.CheckMonoliths += DrawAllTargets;
         }
         private void DrawAllTargets(On_Main.orig_CheckMonoliths orig)
         {
-            drawToTarget?.Invoke(Main.spriteBatch);
+            if (Main.netMode != NetmodeID.Server)
+            {
+                drawToTarget?.Invoke(Main.spriteBatch);
 
-            Main.spriteBatch.GraphicsDevice.SetRenderTarget(null);
-            Main.spriteBatch.GraphicsDevice.Clear(Color.Transparent);
-
+                Main.spriteBatch.GraphicsDevice.SetRenderTarget(null);
+                Main.spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+            }
             orig();
         }
 
@@ -234,7 +64,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         {
             Main.QueueMainThreadAction(() =>
             {
-                if(Main.graphics.GraphicsDevice != null) {
+                if(Main.netMode != NetmodeID.Server) {
                     drawToTarget += DrawRobeToTarget;
                     RobeMapTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, backSize, backSize);
                     RobeTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, backSize, backSize);
@@ -245,7 +75,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
         public void DrawRobeToTarget(SpriteBatch spritebatch)
         {
-            if (Player != null)
+            if (Player != null && Main.netMode != NetmodeID.Server)
             {
                 
                 if (!IsReady() || !ShaderManager.HasFinishedLoading) // God damn Luminance you slowpoke
@@ -355,8 +185,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
             ShintoArmorCapePlayer capePlayer = drawInfo.drawPlayer.GetModPlayer<ShintoArmorCapePlayer>();
-            CloakWingSystem cloakWing = drawInfo.drawPlayer.GetModPlayer<CloakWingSystem>();
-
 
             if (!capePlayer.IsReady() || drawInfo.shadow > 0f)
                 return;
@@ -365,7 +193,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
             DrawData data = capePlayer.GetRobeTarget();
             data.position = drawInfo.BodyPosition() + new Vector2(2 * drawInfo.drawPlayer.direction, ((drawInfo.drawPlayer.gravDir < 0 ? 11 : 0) + -8) * drawInfo.drawPlayer.gravDir);
-            data.color = Color.White *  (1-cloakWing.WingActivationProgress);
+            data.color = Color.White;
             data.effect = Main.GameViewMatrix.Effects;
             data.shader = drawInfo.cBody;
             

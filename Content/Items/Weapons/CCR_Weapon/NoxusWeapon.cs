@@ -43,19 +43,19 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
 
         public override void SetDefaults()
         {
-            //Item.CloneDefaults(ItemID.BloodRainBow);
-            //Item.shoot = ModContent.ProjectileType<EntropicCrystal>();
             Item.shoot = ModContent.ProjectileType<TheDarkOne>();
             Item.DamageType = DamageClass.Ranged;
             Item.useAmmo = AmmoID.Arrow;
             Item.useStyle = ItemUseStyleID.Shoot;
-            Item.crit = 40;
+            Item.crit = 10;
             Item.damage = 4900;
             Item.rare = ModContent.RarityType<Violet>();
             Item.value = CalamityGlobalItem.RarityVioletBuyPrice;
+            Item.useTime = 1;
+            Item.useAnimation = 1;
             Item.shootSpeed = 40;
             Item.noUseGraphic = true;
-            Item.UseSound = GennedAssets.Sounds.Common.TwinkleMuffled with { Volume = 0,Pitch = 0.3f, PitchVariance = 0.4f };
+            Item.UseSound = GennedAssets.Sounds.Common.TwinkleMuffled with { Volume = 0, Pitch = 0.3f, PitchVariance = 0.4f };
             if (ModLoader.TryGetMod("CalRemix", out Mod CalamityRemix))
             {
 
@@ -79,49 +79,22 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
         #endregion
 
         #region UseStuff
+        public override bool CanShoot(Player player) => false;
         public override bool? UseItem(Player player)
         {
-            if (player.altFunctionUse == 2) 
+            if (player.altFunctionUse == 2)
             {
                 TriggleExplosion(player);
-                return true; 
+                return false;
             }
             else
 
-                return base.UseItem(player);
+                return false;
         }
-        public override void UseAnimation(Player player)
-        {
-            // Copy the Blood Rain Bow's use animation: raise the bow above the player and tilt it forward.
-            // This mimics the vanilla Blood Rain Bow animation.
-            player.itemLocation.X = player.MountedCenter.X + (player.direction * 10f);
-            player.itemLocation.Y = player.MountedCenter.Y - 10f;
-
-            // Set the item rotation to point upward and slightly forward.
-            float rotation = -MathHelper.PiOver4 * player.direction;
-            player.itemRotation = rotation;
-
-            // Optionally, you can set itemAnimation and itemTime to match the Blood Rain Bow's timing.
-            // These are handled by CloneDefaults(ItemID.DaedalusStormbow), but can be tweaked if needed.
-        }
-        public override void UseStyle(Player player, Rectangle heldItemFrame)
-        {
-
-        }
-        public override void OnConsumeAmmo(Item ammo, Player player)
-        {
-            if(!ConsumeAmmo(player))
-            {
-                //prevent ammo from decreasing
-                
-            }
-            
-        }
-        public override bool CanUseItem(Player player)
-        {
-            return base.CanUseItem(player);
-        }
-        public override bool AltFunctionUse(Player player){return true;}
+     
+        public override bool CanConsumeAmmo(Item ammo, Player player) => true;
+        public override bool CanUseItem(Player player) => true;
+        public override bool AltFunctionUse(Player player) => true;
 
         #endregion
 
@@ -129,67 +102,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
 
         public override void HoldItem(Player player)
         {
-            if (player.whoAmI == Main.myPlayer)
+            if (!BowOut(player))
             {
-                if (!BowOut(player))
-                {
-                    Projectile Bow = Projectile.NewProjectileDirect(player.GetSource_ItemUse(Item), player.Center, Vector2.Zero, Item.shoot, Item.damage, Item.knockBack, player.whoAmI);
-                    Bow.rotation = MathHelper.PiOver2 - 1f * player.direction;
-                }
-            }
-        }
-        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
-        {
-            return false;
-            if (player.altFunctionUse == 2)
-                return false;
-
-            int CrystalAmount = 3;
-            float spawnHeight = 600f;
-            float horizSpread = 200f;
-            int delayPerCrystal = 3;  // ticks between each
-
-            // center X of spawn is player.Center.X, not adding MouseWorld.X twice
-            for (int i = 0; i < CrystalAmount; i++)
-            {
-                // random X offset
-                float offsetX = Main.rand.NextFloat(-horizSpread, horizSpread);
-                Vector2 spawnPos = new Vector2(Main.MouseWorld.X + offsetX, (Main.MouseWorld.Y + player.Center.Y)/2 - spawnHeight);
-
-                
-                Vector2 aimDir = (Main.MouseWorld - spawnPos).SafeNormalize(Vector2.UnitY);
-                aimDir = Vector2.Lerp(Vector2.UnitY, aimDir, 0.5f);
-                Vector2 projVel = aimDir * Item.shootSpeed;
-
-               
-                float startDelay = i * delayPerCrystal;
-
-                Projectile.NewProjectile(
-                    source,
-                    spawnPos,
-                    projVel,
-                    ModContent.ProjectileType<EntropicCrystal>(),
-                    damage,
-                    knockback,
-                    player.whoAmI,
-                    ai0: startDelay,
-                    ai1: 0f
-                );
-
+                Projectile Bow = Projectile.NewProjectileDirect(player.GetSource_ItemUse(Item), player.Center, Vector2.Zero, Item.shoot, Item.damage, Item.knockBack, player.whoAmI);
+                Bow.rotation = MathHelper.PiOver2 - 1f * player.direction;
             }
 
-            // we handled the spawning ourselves
-            return false;
-        }
-
-
-        // Prevent ammo from being consumed if the player uses the alt function
-        public bool ConsumeAmmo(Player player)
-        {
-            // If using alt function (right-click), do not consume ammo
-            if (player.altFunctionUse == 2)
-                return false;
-            return true;
         }
         
         /// <summary>
@@ -198,11 +116,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
         /// </summary>
         private void TriggleExplosion(Player player)
         {
-            
+
             if (!player.dead)
             {
                 for (int i = 0; i < player.ownedProjectileCounts[ModContent.ProjectileType<EntropicCrystal>()]; i++)
-                    
+
                 {
                     //todo: fix this code only triggering the first crystal it finds, instead of all of them.
                     var crystals = Main.projectile.Where(p => p.active && p.type == ModContent.ProjectileType<EntropicCrystal>() && p.owner == player.whoAmI);
@@ -213,13 +131,13 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
                             crystal.ai[1] = (float)EntropicCrystalState.Exploding;
                         }
                     }
-                   
+
                 }
             }
         }
 
     }
-    public class NoxusWeaponPlayer: ModPlayer
+    public class NoxusWeaponPlayer : ModPlayer
     {
         /// <summary>
         /// track the amount of crystals currently lodged in NPCs for the purposes of crit scaling and maybe some other fun things
@@ -230,7 +148,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             set;
         }
 
-      
+
         public int CrystalCap = 100;
         public float CrystalSpeedMulti = 1;
 
@@ -252,7 +170,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             // how many are over-cap?
             int over = Math.Max(0, liveCrystals.Count - CrystalCap);
 
-           
+            /*
             if (over > 0)
             {
                 var toExplode = liveCrystals.OrderBy(p => p.timeLeft).Take(over);
@@ -263,7 +181,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
                     proj.netUpdate = true;
                 }
             }
-
+            */
             float interp = Math.Clamp(liveCrystals.Count / 16f, 0f, 2f);
             CrystalSpeedMulti = MathHelper.Lerp(CrystalSpeedMulti, 2f, interp);
         }
@@ -284,7 +202,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             set;
         }
         public override bool InstancePerEntity => true;
-        
+
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
             if (ChokingOnFumes)
@@ -295,7 +213,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
         public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (ChokingOnFumes)
-            {               
+            {
                 for (int i = 0; i < 2; i++)
                 {
                     Vector2 spawnPosition = npc.Center + Main.rand.NextVector2Circular(20f, 20f);
@@ -306,14 +224,14 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             }
         }
     }
-    
-    class EntropicBlast : ModProjectile
+
+    public class EntropicBlast : ModProjectile
     {
         #region setup
         public ref Player Owner => ref Main.player[Projectile.owner];
-        private Vector2 SpawnPos;
+        public Vector2 SpawnPos;
         private Vector2 Offset;
-        
+
         public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
         private enum BlastStage
         {
@@ -325,11 +243,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
         public ref float thing => ref Projectile.ai[2];
         private Projectile Crystal;
 
-        private float FadeInterp;
+        public float FadeInterp;
         public byte Fadeout = 255;
 
         private bool PortalOpen = true;
-        private float portalInterp = 0f;
+        public float portalInterp = 0f;
         private bool HasHit;
         public override void SetDefaults()
         {
@@ -337,24 +255,26 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             Projectile.tileCollide = false;
             Projectile.hostile = false;
             Projectile.friendly = true;
-            Projectile.penetrate = - 1;
+            Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
             Projectile.timeLeft = 240;
             Projectile.damage = NoxusWeapon.AltDamage;
             Projectile.width = Projectile.height = 60;
-            
-            
+
+
         }
         #endregion
-        public override bool? CanDamage() {
-            if (Projectile.ai[1] == 0) 
-                return false; 
-            else 
-                return true; 
+        public override bool? CanDamage()
+        {
+            if (Projectile.ai[1] == 0)
+                return false;
+            else
+                return true;
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
+            
             Crystal.ai[1] = (float)EntropicCrystalState.DisipateHarmlessly;
             HasHit = true;
         }
@@ -366,8 +286,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
 
         public override void OnSpawn(IEntitySource source)
         {
-            
-           
             portalInterp = 0;
             if (source is EntitySource_Parent parentSource && parentSource.Entity is Projectile parentProj)
             {
@@ -376,7 +294,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
                     Crystal = parentProj;
                     if (Crystal != null && Crystal.active && Crystal.ModProjectile is EntropicCrystal entropicCrystal)
                     {
-
                         SpawnPos = Projectile.Center;
                         Offset = Projectile.Center - Crystal.Center;
                     }
@@ -386,7 +303,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
         public override void AI()
         {
             ManageState();
-            portalInterp =(float)Math.Clamp(Math.Round(MathHelper.Lerp(portalInterp, PortalOpen ? 1.1f : -0.1f, PortalOpen ? 0.3f : 0.05f),2),0,1);
+            portalInterp = (float)Math.Clamp(Math.Round(MathHelper.Lerp(portalInterp, PortalOpen ? 1.1f : -0.1f, PortalOpen ? 0.3f : 0.05f), 2), 0, 1);
             if (Crystal.active == false)
             {
                 PortalOpen = false;
@@ -394,18 +311,16 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             else
             {
                 //todo: set the spawn pos and normal velocity to be offest in comparison to the crystal, while still allowing the projectile to move under its own power.
-                
-
             }
-            if(portalInterp == 0.5f)
+            if (portalInterp == 0.5f)
             {
-                
+
             }
             if (portalInterp == 0 && PortalOpen == false)
             {
                 Projectile.Kill();
             }
-            //Main.NewText($"Portal: {PortalOpen}, Interpolant: {portalInterp}");
+            
             Time++;
         }
         private void ManageState()
@@ -422,12 +337,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
         }
         private void HandleBolt()
         {
-            /*
-            if(Time== 1) 
-            Projectile.NewProjectile(Projectile.GetSource_FromThis(), SpawnPos,
-                Projectile.rotation.ToRotationVector2() * 40, ModContent.ProjectileType<EntropicComet>(),
-                NoxusWeapon.AltDamage,0,default, default,default, Crystal.whoAmI);*/
-
             if (Time == 1)
             {
                 for (int i = 0; i < 20; i++)
@@ -440,7 +349,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
                 ScreenShakeSystem.SetUniversalRumble(screenshakePower, MathHelper.TwoPi, null, 0.2f);
                 //Main.NewText($"screenshakePower: {screenshakePower}, {Owner.GetModPlayer<NoxusWeaponPlayer>().CrystalCount}");
             }
-            
+
             if (Time <= 10 || !HasHit)
             {
                 //todo: make the projectile always stay relative to the crystal,
@@ -489,10 +398,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
 
             }
 
-         
-            
+
+
         }
-           
+
         private void HandlePortal()
         {
             Projectile.Opacity = (float)Math.Pow(Projectile.scale, 2.6f);
@@ -505,11 +414,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
                     if (targetNpc != null && targetNpc.active)
                     {
                         Projectile.rotation = (targetNpc.Center - Projectile.Center).ToRotation();
-                        SpawnPos = Offset + targetNpc.Center;
+                        //SpawnPos = Offset + targetNpc.Center;
                         Projectile.Center = SpawnPos;
-                        
+
                         thing = npcIndex;
-                        
+
                     }
                 }
             }
@@ -523,11 +432,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
                 SquishyLightParticle light = new(lightSpawnPosition, lightVelocity, 0.33f * portalInterp, Color.Pink, 19, 0.04f, 3f, 8f);
                 GeneralParticleHandler.SpawnParticle(light);
             }*/
-            if(Time == 1)
+            if (Time == 0)
             {
                 NoxusPortal darkParticle = NoxusPortal.pool.RequestParticle();
-                darkParticle.Prepare(SpawnPos, Projectile.velocity, Color.AntiqueWhite, Projectile.rotation, Projectile.timeLeft, portalInterp,Projectile);
-                ParticleEngine.Particles.Add(darkParticle);
+                darkParticle.Prepare(SpawnPos, Vector2.Zero, Color.AntiqueWhite, Projectile.rotation, Projectile.timeLeft, portalInterp, Projectile);
+                ParticleEngine.BehindProjectiles.Add(darkParticle);
             }
             if (Time > 60)
             {
@@ -552,21 +461,21 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             PortalShader.TrySetParameter("circleStretchInterpolant", portalInterp);
             PortalShader.TrySetParameter("transformation", (Matrix.CreateScale(10f, 2f, 2f)));
             //PortalShader.TrySetParameter("aimDirection", Projectile.rotation + MathHelper.PiOver2);
-            PortalShader.TrySetParameter("uColor", Color.MediumPurple with { A = 255});
+            PortalShader.TrySetParameter("uColor", Color.MediumPurple with { A = 0 });
             //PortalShader.TrySetParameter("uSecondaryColor", Color.White);
-            PortalShader.TrySetParameter("edgeFadeInSharpness", 20.3f);
+            PortalShader.TrySetParameter("edgeFadeInSharpness", 2.3f);
             PortalShader.TrySetParameter("aheadCircleMoveBackFactor", 0.67f);
             PortalShader.TrySetParameter("aheadCircleZoomFsctor", 0.09f);
             //PortalShader.TrySetParameter("uProgress", portalInterp * Main.GlobalTimeWrappedHourly);
             PortalShader.TrySetParameter("uTime", Main.GlobalTimeWrappedHourly);
-            
+
             PortalShader.SetTexture(GennedAssets.Textures.GreyscaleTextures.StarDistanceLookup, 0);
             PortalShader.SetTexture(GennedAssets.Textures.Noise.TurbulentNoise, 1);
             PortalShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 2);
             PortalShader.SetTexture(GennedAssets.Textures.Extra.Void, 3);
             PortalShader.SetTexture(GennedAssets.Textures.GreyscaleTextures.Spikes, 4);
-            
-            
+
+
             PortalShader.Apply();
             Texture2D pixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
             float maxScale = 5f;
@@ -577,31 +486,31 @@ namespace HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon
             Main.spriteBatch.Draw(pixel, DrawPos, null, Projectile.GetAlpha(Color.MediumPurple), Projectile.rotation, pixel.Size() * 0.5f, textureArea, 0, 0f);
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
-            
+
 
         }
         public void DrawBolt(Vector2 DrawPos)
         {
             Color Drawcolor = Color.Purple with { A = Fadeout };
             Texture2D texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/CCR_Weapon/DarkComet").Value;
-            Main.EntitySpriteDraw(texture, DrawPos, null, Drawcolor, Projectile.rotation, texture.Size() * 0.5f, 1f, SpriteEffects.None);
-            CalamityUtils.DrawAfterimagesCentered(Projectile, ProjectileID.Sets.TrailingMode[Projectile.type], Drawcolor);
+            Main.EntitySpriteDraw(texture, DrawPos, null, Drawcolor * Projectile.Opacity, Projectile.rotation, texture.Size() * 0.5f, 1f, SpriteEffects.None);
+            CalamityUtils.DrawAfterimagesCentered(Projectile, ProjectileID.Sets.TrailingMode[Projectile.type], Drawcolor * Projectile.Opacity);
 
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Vector2 PortalDraw = SpawnPos - Main.screenPosition; 
-           // if(portalInterp > 0)
-           // DrawPortal(PortalDraw);
+            Vector2 PortalDraw = SpawnPos - Main.screenPosition;
+            // if(portalInterp > 0)
+            // DrawPortal(PortalDraw);
 
             //Utils.DrawBorderString(Main.spriteBatch, "Interp: " + portalInterp.ToString() + " | Pos: " + SpawnPos.ToString(), PortalDraw - Vector2.UnitY * 110, Color.AntiqueWhite, 1);
-            
-            if(Projectile.ai[1] == (float)BlastStage.Bolt) 
+
+            if (Projectile.ai[1] == (float)BlastStage.Bolt)
                 DrawBolt(Projectile.Center - Main.screenPosition);
 
             return false;
         }
     }
-   
+
 }
 

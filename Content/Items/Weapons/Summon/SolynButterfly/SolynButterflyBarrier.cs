@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Items.Weapons.Summon.SolynButterfly;
+using HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture.Solyn;
 using Luminance.Assets;
 using Luminance.Common.DataStructures;
 using Luminance.Core.Graphics;
@@ -17,7 +18,7 @@ using static Luminance.Common.Utilities.Utilities;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.SolynButterfly;
 
-public class SolynButterflyBarrier : ModProjectile, IProjOwnedByBoss<BattleSolyn>, IDrawsWithShader
+public class SolynButterflyBarrier : ModProjectile, IProjOwnedByBoss<BattleSolynBird>, IDrawsWithShader
 {
     /// <summary>
     /// How long this forcefield has existed for, in frames.

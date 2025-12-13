@@ -47,11 +47,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             bestiaryEntry.Info.AddRange([
-				// Sets the preferred biomes of this town NPC listed in the bestiary.
-				// With Town NPCs, you usually set this to what biome it likes the most in regards to NPC happiness.
-				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
-
-				// Sets your NPC's flavor text in the bestiary. (use localization keys)
+				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,  
 				new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.ArtilleryCrab1"),
 
 				//new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.ArtilleryCrab2")
@@ -171,6 +167,23 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 
         private void DoBombardTarget(Player target, float distance)
         {
+            float pushRadius = 40f;
+            float pushStrength = 13f;
+
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC other = Main.npc[i];
+                if (other.active && other.whoAmI != NPC.whoAmI && other.type == NPC.type)
+                {
+                    float dist = Vector2.Distance(NPC.Center, other.Center);
+                    if (dist < pushRadius && dist > 0f)
+                    {
+                        Vector2 pushDir = (NPC.Center - other.Center).SafeNormalize(Vector2.Zero);
+                        float pushAmount = (pushRadius - dist) / pushRadius;
+                        NPC.velocity += pushDir * pushStrength * pushAmount;
+                    }
+                }
+            }
             // Only bombard when on ground
             NPC.takenDamageMultiplier = 0.25f;
             NPC.velocity.X *= 0.4f;
@@ -236,7 +249,23 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
         private void DoDisembowl(Player target)
         {
             float ChargeDistance = NPC.Center.X - target.Center.X;
+            float pushRadius = 40f;
+            float pushStrength = 13f; 
 
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC other = Main.npc[i];
+                if (other.active && other.whoAmI != NPC.whoAmI && other.type == NPC.type)
+                {
+                    float dist = Vector2.Distance(NPC.Center, other.Center);
+                    if (dist < pushRadius && dist > 0f)
+                    {
+                        Vector2 pushDir = (NPC.Center - other.Center).SafeNormalize(Vector2.Zero);
+                        float pushAmount = (pushRadius - dist) / pushRadius; 
+                        NPC.velocity += pushDir * pushStrength * pushAmount;
+                    }
+                }
+            }
             if (!(ChargeDistance > 300))
                 NPC.velocity.X = 0;
 
@@ -384,6 +413,23 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             int dirX = Math.Sign(pos.X - NPC.Center.X);
             NPC.velocity.X = dirX * speed;
             HandleJump(dirX);
+            float pushRadius = 40f;
+            float pushStrength = 13f; 
+
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC other = Main.npc[i];
+                if (other.active && other.whoAmI != NPC.whoAmI && other.type == NPC.type)
+                {
+                    float dist = Vector2.Distance(NPC.Center, other.Center);
+                    if (dist < pushRadius && dist > 0f)
+                    {
+                        Vector2 pushDir = (NPC.Center - other.Center).SafeNormalize(Vector2.Zero);
+                        float pushAmount = (pushRadius - dist) / pushRadius; 
+                        NPC.velocity += pushDir * pushStrength * pushAmount;
+                    }
+                }
+            }
         }
         public override void OnSpawn(IEntitySource source)
         {

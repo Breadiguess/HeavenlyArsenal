@@ -23,12 +23,7 @@ ShintoArmor: {
 			Standing still calls upon the shadows to regenerate your physical form
 			While no other wings are equipped, a powerful pair of wings are braided into existence.
 			While no other dash accessories are equipped, provides a powerful dash that allows you to phase through enemies.
-
-			allows the user to phase through shadows for a short range teleport ( {0} )
-
-			Upon activating the setbonus, become enraged.
-			While enraged, deal and take 3x damage.
-			The barrier cannot sustain itself while you are enraged.
+			Hold down while falling to accelerate at astronomical speeds.
 			'''
 		LoreTip: ""
 		LoreTipGFB: ""
@@ -94,7 +89,7 @@ Vanity: {
 	LightCultist: {
 		LightCultist_Helmet: {
 			DisplayName: Blinding vision of the Firmament
-			Tooltip: ""
+			Tooltip: How can I see out of this?
 		}
 
 		LightCultist_Pants: {

@@ -23,7 +23,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         Vector2 StartPos;
         if (NPC.IsABestiaryIconDummy)
         {
-            StartPos = RitualAltarLimb.skeleton.Position(0);
+            StartPos = RitualAltarLimb.Skeleton.Position(0);
         }
         else
             StartPos = RitualAltarLimb.Skeleton.Position(0) - Main.screenPosition;
@@ -40,7 +40,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         );
         if (NPC.IsABestiaryIconDummy)
         {
-            StartPos = RitualAltarLimb.skeleton.Position(1);
+            StartPos = RitualAltarLimb.Skeleton.Position(1);
         }
         else
             StartPos = RitualAltarLimb.Skeleton.Position(1) - Main.screenPosition;
@@ -97,7 +97,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
     }
     void renderIsohedron(Vector2 AnchorPos, Color DrawColor)
     {
-        if (Main.netMode == NetmodeID.Server)
+        if (Main.netMode == NetmodeID.Server || NPC.IsABestiaryIconDummy)
             return;
         var gd = Main.graphics.GraphicsDevice;
 
@@ -105,7 +105,8 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         isohedron ??= new BasicEffect(gd)
         {
             VertexColorEnabled = true,
-            LightingEnabled = false
+            LightingEnabled = false,
+            //TextureEnabled = true
         };
 
         var vertices = Generate(100f, DrawColor);
@@ -131,6 +132,8 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         gd.RasterizerState = new RasterizerState { CullMode = CullMode.None, FillMode = FillMode.WireFrame };
         gd.DepthStencilState = DepthStencilState.None;
         gd.BlendState = BlendState.AlphaBlend;
+        //isohedron.TextureEnabled = true;
+        //isohedron.Texture = GennedAssets.Textures.GreyscaleTextures.Corona;
         // Draw
         foreach (EffectPass pass in isohedron.CurrentTechnique.Passes)
         {
@@ -295,7 +298,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         // Create concentric rings (center to rim)
         for (int ring = 0; ring <= ringSegments; ring++)
         {
-            float r = ring / (float)ringSegments; // 0→1
+            float r = ring / (float)ringSegments; // 0 -> 1
             float z = -curvature * (r * r);       // gentle downward bend (−Z toward camera)
 
             for (int seg = 0; seg <= radialSegments; seg++)
@@ -344,6 +347,8 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
     void UpdateFaceAim(Vector2 toPlayer, int spriteDir, float yawMaxDeg = 28f, float pitchMaxDeg = 20f, float degPerSec = 180f)
     {
+        yawMaxDeg = 50;
+        pitchMaxDeg = 30;
         // Map screen delta to “desire” in [-1,1] then to limited angles
         float nx = MathHelper.Clamp(toPlayer.X / 180f, -1f, 1f);
         float ny = MathHelper.Clamp(toPlayer.Y / 180f, -1f, 1f);
@@ -368,6 +373,8 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
     void mask(SpriteBatch spriteBatch, Color drawColor)
     {
+        if (NPC.IsABestiaryIconDummy)
+            return;
         spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
                DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
@@ -396,7 +403,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
 
         Texture2D face = ModContent.Request<Texture2D>(
-                "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/RitualAltarNPC/RitualAltarFace_"+Variant).Value;
+                "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/RitualAltarNPC/RitualAltarFace_" + Variant).Value;
 
         DrawMask(anchor, face, pixelSize: 50f);
         //DrawMask_ColorDebug(anchor, 50);
@@ -417,7 +424,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
             if (_limbs == null)
             {
                 CreateLimbs();
-                
+
             }
             for (int i = 0; i < _limbs.Length; i++)
             {
@@ -427,8 +434,8 @@ internal partial class RitualAltar : BloodMoonBaseNPC
                 _limbs[i].TargetPosition = new Vector2(-20 + i * 10, 40) + NPC.Center;
                 _limbs[i].EndPosition = _limbs[i].TargetPosition;
                 DrawArm(ref _limbs[i], drawColor, a);
-               
-                UpdateLimbState(ref _limbs[i], _limbBaseOffsets[i], 0.2f, 5);
+
+                UpdateLimbState(ref _limbs[i], _limbBaseOffsets[i], 0.2f, 5, i);
             }
         }
     }
@@ -437,8 +444,11 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         // if (NPC.IsABestiaryIconDummy) return false;
 
         Texture2D BodyTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/RitualAltarNPC/RitualAltarConcept").Value;
-
-
+        string a = "";
+        if (CultistCoordinator.GetCultOfNPC(NPC) != null)
+            a += $"CultID: {CultistCoordinator.GetCultOfNPC(NPC).CultID}\n";
+        a += $"{NPC.whoAmI}\n";
+        Utils.DrawBorderString(spriteBatch, a, NPC.Center - screenPos, Color.AntiqueWhite, 1, 0, -1);
         SpriteEffects sp = 0;
         float rot = NPC.rotation + MathHelper.PiOver2;
         Vector2 Origin = BodyTexture.Size() * 0.5f + new Vector2(0, 30);
@@ -454,20 +464,24 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
 
         drawLegs(drawColor);
-        //Utils.DrawBorderString(spriteBatch, currentAIState.ToString(), NPC.Center - screenPos, Color.AntiqueWhite);
-        /*
-         for (int i = 0; i < _limbs.Length; i++)
-         {
-             Vector2 DrawPos2 = _limbs[i].TargetPosition - screenPos;
-            Vector2 DrawPos3 = _limbs[i].EndPosition - screenPos;
-             spriteBatch.Draw(GennedAssets.Textures.GreyscaleTextures.WhitePixel, DrawPos2, new Rectangle(0, 0, 5, 5), Color.Lime);
-            spriteBatch.Draw(GennedAssets.Textures.GreyscaleTextures.WhitePixel, DrawPos3, new Rectangle(0, 0, 5, 5), Color.Azure);
+        Utils.DrawBorderString(spriteBatch, currentAIState.ToString(), NPC.Center - screenPos, Color.AntiqueWhite);
+        Texture2D Debug = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+        for (int i = 0; i < _limbs.Length; i++)
+        {
+            if (_limbs[i].GrabPosition.HasValue)
+            {
+                Vector2 DrawPos2 = _limbs[i].GrabPosition.Value - screenPos;
+                Vector2 DrawPos3 = _limbs[i].PreviousGrabPosition.Value - screenPos;
+                spriteBatch.Draw(Debug, DrawPos2, new Rectangle(0, 0, 5, 5), Color.LimeGreen);
+                spriteBatch.Draw(Debug, DrawPos3, new Rectangle(0, 0, 5, 5), Color.Orange);
 
-            string msgd = $"{i + 1}\n touching ground:{_limbs[i].IsTouchingGround}";
-            if (_limbs[i].IsTouchingGround)
-             Utils.DrawBorderString(Main.spriteBatch, msgd, DrawPos2, Color.AntiqueWhite, 0.4f,0, (float)i/4);
 
-         }*/
+            }
+            spriteBatch.Draw(Debug, NPC.Center + _limbBaseOffsets[i] - screenPos, Color.AntiqueWhite);
+
+
+
+        }
         Vector2 anchor;
         if (!NPC.IsABestiaryIconDummy)
             anchor = NPC.Center - Main.screenPosition + new Vector2(NPC.height * 2.0f, 0).RotatedBy(NPC.rotation);
@@ -475,6 +489,10 @@ internal partial class RitualAltar : BloodMoonBaseNPC
             anchor = NPC.Center + new Vector2(NPC.height * 2.0f, 0).RotatedBy(-MathHelper.PiOver2);
         renderIsohedron(anchor, drawColor);
 
+        Texture2D arrow = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Jellyfish/Jellyfish_DebugArrow").Value;
+
+       // Main.EntitySpriteDraw(arrow, NPC.Center - screenPos, null, Color.AntiqueWhite, NPC.velocity.ToRotation() + MathHelper.PiOver2, new Vector2(arrow.Width / 2, arrow.Height), 1, 0);
+        //Utils.DrawBorderString(spriteBatch, , NPC.Center - screenPos, Color.AntiqueWhite);
         return false;
     }
 }

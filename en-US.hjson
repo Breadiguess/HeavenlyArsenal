@@ -382,6 +382,16 @@ Mods: {
 				DisplayName: Debug Cryonophore Summon
 				Tooltip: ""
 			}
+
+			FakeFlowerDebugItem: {
+				DisplayName: Fake Flower Debug Item
+				Tooltip: ""
+			}
+
+			GenesisFlowerSeeder: {
+				DisplayName: Genesis Flower Seeder
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {
@@ -409,6 +419,11 @@ Mods: {
 			"Blood Rift Moon": {
 				DisplayName: Blood  Rift  Moon
 				TownNPCDialogueName: the Blood  Rift  Moon
+			}
+
+			"Torrential Downpour": {
+				DisplayName: Torrential  Downpour
+				TownNPCDialogueName: the Torrential  Downpour
 			}
 		}
 

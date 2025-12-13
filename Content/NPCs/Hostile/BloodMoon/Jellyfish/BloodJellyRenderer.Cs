@@ -69,16 +69,17 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
                 RenderRailgun(rot, screenPos);
 
             Vector2 Scale = new Vector2(1, 1);
+            int remap = (int)Utils.Remap(OpenInterpolant, 0, 1, 0, 5);
             for (int i = 0; i < 2; i++)
             {
-                Rectangle Frame = cap.Frame(2, 1, i);
-                Vector2 origin = new Vector2(i != 1 ? Frame.Width : 0, Frame.Height);
+                Rectangle Frame = cap.Frame(2, 5, i, remap);
+                Vector2 origin = new Vector2(i != 1 ? Frame.Width : 0, Frame.Height -36);
 
-                float offset = i != 1 ? -30 : 30;
+                float offset = 0;//i != 1 ? -30 : 30;
                
-                offset *= OpenInterpolant;
+                //offset *= OpenInterpolant;
                 offset = MathHelper.ToRadians(offset);
-                Main.EntitySpriteDraw(cap, DrawPos, Frame, drawColor, rot + offset, origin, Scale, 0);
+                Main.EntitySpriteDraw(cap, DrawPos, Frame, drawColor *0.8f, rot + offset, origin, Scale, 0);
             }
 
 
@@ -203,12 +204,34 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
                     Rectangle frame = tex.Frame(1, 2, 0, style);
 
                     float rotation = _tendrilPos[i].AngleTo(_tendrilPos[i + 1]);
-                    Vector2 stretch = new Vector2(0.25f + LumUtils.InverseLerp(0, _tendrilPos.Length, i, true),//Utils.GetLerpValue(0, _tendrilPos.Length, i, true),
-                        _tendrilPos[i].Distance(_tendrilPos[i + 1]) / (frame.Height - 5) * 1.2f
-                    ) * 1.2f;
+
+                    int segmentCount = _tendrilPos.Length;
+                    float t = 0f;
+                    if (segmentCount > 1)
+                        t = i / (float)(segmentCount - 1); // 0 at base, 1 at tip
+
+                    float baseWidth = 1.9f; // thicker near body
+                    float tipWidth = 0.65f; // thinner near tip
+
+                    // Horizontal thickness (X) tapers from baseWidth to tipWidth
+                    float width = MathHelper.Lerp(baseWidth, tipWidth, t);
+
+                    // Vertical stretch based on actual distance to next segment and texture height
+                    float segmentDistance = _tendrilPos[i].Distance(_tendrilPos[i + 1]);
+                    float lengthFactor = 1f;
+                    float denom = Math.Max(1, frame.Height - 5);
+                    lengthFactor = (segmentDistance / denom) * 1.2f;
+
+                    // Combine into final stretch vector and apply a small global multiplier for visual tuning
+                    Vector2 stretch = new Vector2(width, lengthFactor) * 1.2f;
+                    Vector2 Origin = frame.Size() * 0.5f;
                     if (i == _tendrilPos.Length - 2)
+                    {
                         stretch = Vector2.One;
-                    Main.EntitySpriteDraw(tex, DrawPos, frame, drawColor, rotation - MathHelper.PiOver2, frame.Size() * 0.5f, stretch, 0);
+                        Origin = new Vector2(frame.Width / 2, 2);
+                    }
+
+                    Main.EntitySpriteDraw(tex, DrawPos, frame, drawColor, rotation - MathHelper.PiOver2, Origin, stretch, 0);
                     Texture2D bomb = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Jellyfish/JellyBomb").Value;
                     Texture2D bombGlow = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Jellyfish/JellyBomb_Glow").Value;
 
@@ -230,11 +253,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
             RenderRailgunTelegraph(spriteBatch, screenPos);
 
           
-            Texture2D thing = AssetDirectory.Textures.BigGlowball.Value;
            
             RenderTendrils(screenPos, drawColor);
-            Texture2D debug = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
-            Main.EntitySpriteDraw(debug, NPC.Center - screenPos, null, Color.AntiqueWhite, NPC.rotation, debug.Size() * 0.5f, 5, 0);
+            Texture2D debug = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Jellyfish/JellyFish_Core").Value;
+            Texture2D glow = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Jellyfish/JellyFish_Core_Glow").Value;
+            Vector2 Scale = new Vector2(1+0.1f*MathF.Sin(CosmeticTime / 10.1f  + 10), 1);
+            Main.EntitySpriteDraw(debug, NPC.Center - screenPos, null, drawColor, NPC.rotation, debug.Size() * 0.5f, Scale, 0);
+
+            Main.EntitySpriteDraw(glow, NPC.Center - screenPos, null, Color.AntiqueWhite, NPC.rotation, debug.Size() * 0.5f, Scale, 0);
 
             RenderCap(screenPos, drawColor, NPC.rotation);
 

@@ -59,19 +59,12 @@ public class NoxusPortal : BaseParticle
         {
             TimeLeft = Bolt.timeLeft;
             Rotation = Bolt.rotation;
-            
-            var portalInterpolant = typeof(EntropicBlast).GetField("portalInterp", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (portalInterpolant != null)
-            {
-                PortalInterp = (float)portalInterpolant.GetValue(entropicBlast);
 
-            }
-            var PortalPos = typeof(EntropicBlast).GetField("SpawnPos", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (PortalPos != null)
-            {
-                Position = (Vector2)PortalPos.GetValue(entropicBlast);
+            EntropicBlast blast = Bolt.ModProjectile as EntropicBlast;
+            PortalInterp = blast.portalInterp;
 
-            }
+            Position = blast.SpawnPos;
+           
         }
         else
         {
@@ -98,17 +91,17 @@ public class NoxusPortal : BaseParticle
 
         PortalShader.TrySetParameter("circleStretchInterpolant", PortalInterp);
         PortalShader.TrySetParameter("transformation", (Matrix.CreateScale(3f, 1f, 1f)));
-        //PortalShader.TrySetParameter("aimDirection", Projectile.rotation + MathHelper.PiOver2);
+        PortalShader.TrySetParameter("aimDirection", Rotation + MathHelper.PiOver2);
         PortalShader.TrySetParameter("uColor", Color.MediumPurple with { A = 0 });
-        //PortalShader.TrySetParameter("uSecondaryColor", Color.White);
-        PortalShader.TrySetParameter("edgeFadeInSharpness", 2.3f);
+        PortalShader.TrySetParameter("uSecondaryColor", Color.White);
+        PortalShader.TrySetParameter("edgeFadeInSharpness", 0.3f);
 
-        //PortalShader.TrySetParameter("uProgress", portalInterp * Main.GlobalTimeWrappedHourly);
+        PortalShader.TrySetParameter("uProgress", PortalInterp * Main.GlobalTimeWrappedHourly + TimeLeft);
         PortalShader.TrySetParameter("uTime", Main.GlobalTimeWrappedHourly);
-        PortalShader.TrySetParameter("uIntensity", Main.GlobalTimeWrappedHourly);
+        PortalShader.TrySetParameter("uIntensity", Math.Sin(Main.GlobalTimeWrappedHourly));
 
         PortalShader.SetTexture(GennedAssets.Textures.GreyscaleTextures.StarDistanceLookup, 1);
-        PortalShader.SetTexture(GennedAssets.Textures.Noise.TurbulentNoise, 0);
+        PortalShader.SetTexture(GennedAssets.Textures.Noise.CheckeredNoise, 0);
         PortalShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 2);
         PortalShader.SetTexture(GennedAssets.Textures.Extra.Void, 3);
         //PortalShader.SetTexture(GennedAssets.Textures.GreyscaleTextures.Spikes, 4);
@@ -118,7 +111,7 @@ public class NoxusPortal : BaseParticle
         Texture2D pixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
         float maxScale = 6.5f;
         Vector2 textureArea = (Bolt.Size) / pixel.Size() * maxScale;
-        float scaleMod = 1f + (float)(Math.Cos(Main.GlobalTimeWrappedHourly * 15f + (Bolt.identity)) * 0.012f);
+        float scaleMod = 0.5f;// + (float)(Math.Cos(Main.GlobalTimeWrappedHourly * 15f + (Bolt.identity)) * 0.012f);
         textureArea *= scaleMod;
 
         Main.spriteBatch.Draw(pixel, DrawPos, null, Color.White, Rotation, pixel.Size() * 0.5f, textureArea, 0, 0f);

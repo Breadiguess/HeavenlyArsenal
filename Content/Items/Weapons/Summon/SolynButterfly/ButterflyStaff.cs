@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HeavenlyArsenal.Content.Buffs;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
 using NoxusBoss.Assets;
@@ -7,6 +8,8 @@ using NoxusBoss.Content.NPCs.Bosses.Draedon.Projectiles.SolynProjectiles;
 using NoxusBoss.Content.NPCs.Bosses.Draedon.SpecificEffectManagers;
 using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.AdvancedProjectileOwnership;
+using NoxusBoss.Core.DataStructures;
+using NoxusBoss.Core.Utilities;
 using System;
 using Terraria;
 using Terraria.Audio;
@@ -14,6 +17,8 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static HeavenlyArsenal.Content.Items.Weapons.Ranged.LeverAction.AvatarRifle_Held;
+using static HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin.AntishadowAssassin;
 using static NoxusBoss.Assets.GennedAssets.Textures;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.SolynButterfly
@@ -147,6 +152,16 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.SolynButterfly
 
 
         }
+        private void HandleMinionBuffs()
+        {
+            Owner.AddBuff(ModContent.BuffType<ButterflyMinionBuff>(), 3);
+            Referenced<bool> hasMinion = Owner.GetValueRef<bool>("HasSolyn");
+            if (Owner.dead)
+                hasMinion.Value = false;
+            if (hasMinion.Value)
+                Projectile.timeLeft = 2;
+            
+        }
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true; // This allows the minion to target enemies\
@@ -197,7 +212,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.SolynButterfly
         }
         public override void AI()
         {
-            Projectile.timeLeft++;
+            HandleMinionBuffs();
             Projectile.direction = 1;
             if (AttackCooldown > 0)
                 AttackCooldown--;

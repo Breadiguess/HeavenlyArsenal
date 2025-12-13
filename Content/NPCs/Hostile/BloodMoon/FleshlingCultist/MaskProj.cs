@@ -38,6 +38,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist
         }
         public override void OnSpawn(IEntitySource source)
         {
+            Projectile.netUpdate = true;
             if (Fragment)
             {
                 Projectile.frame = variant;
@@ -46,6 +47,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist
             {
                 Projectile.frame = 0;
             }
+            Projectile.netUpdate = true;
         }
 
         public override void AI()

@@ -38,7 +38,7 @@ namespace HeavenlyArsenal.ArsenalPlayer
 
         public override void PostUpdateMiscEffects()
         {
-
+            //Main.NewText(Player.GetModPlayer<GenderSwapPlayer>().IsTrans.ToString());
         }
         public override void ResetEffects()
         {

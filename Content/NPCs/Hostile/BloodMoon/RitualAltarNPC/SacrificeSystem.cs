@@ -211,11 +211,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
                     }
                 }
                 // Skip if recently resurrected & already in the ritual set
-                var gn = npc.GetGlobalNPC<RitualBuffNPC>();
+                RitualBuffNPC gn;
+                npc.TryGetGlobalNPC(out gn);
                 if (RitualSystem.BuffedNPCs.Contains(npc) && gn.WasRessurectedRecently)
                     continue;
-
-                // Only consider UmbralLeech "head"
+                
               
                 bool isFleshling = npc.type == ModContent.NPCType<FleshlingCultist.FleshlingCultist>();
                 if (isFleshling && npc.Distance(NPC.Center) >= FleshlingLeniency)
@@ -251,7 +251,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
             if (NPCTarget == null || !NPCTarget.active)
                 NPCTarget = target;
 
-            var tgtGN = NPCTarget.GetGlobalNPC<RitualBuffNPC>();
+            RitualBuffNPC tgtGN;
+            NPCTarget.TryGetGlobalNPC<RitualBuffNPC>(out tgtGN);
             bool alreadyBuffed = tgtGN.hasRitualBuff || RitualSystem.BuffedNPCs.Contains(NPCTarget);
 
             if (!alreadyBuffed)
@@ -290,7 +291,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
                 }
             }
 
-            // Face/slide a bit toward the target (optional)
             float distToTarget = Vector2.Distance(NPC.Center, NPCTarget.Center);
             float slide = MathF.Tanh(distToTarget) * SpeedMulti*3;
             NPC.velocity.X = NPC.AngleTo(NPCTarget.Center).ToRotationVector2().X * slide;
@@ -310,7 +310,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
 
                 if (NPCTarget == null)
                 {
-                    if (!RitualSystem.BuffedNPCs.Contains(Sacrifices[0]) || Sacrifices[0].active)
+                    if (!RitualSystem.BuffedNPCs.Contains(Sacrifices[0]) && Sacrifices[0].active)
                         NPCTarget = Sacrifices[0];
                     else
                         NPCTarget = null;

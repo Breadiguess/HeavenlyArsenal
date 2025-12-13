@@ -1,0 +1,64 @@
+SolynCommentOnRiftBloodMoon: {
+	Start: comment about the state of the world.
+	Solyn1: comment about all the nasties.
+	Player1: Sure. How can I help?
+	Solyn2: Thank you.
+	Solyn3: As you can tell, I... don't really have a home now.
+	Solyn4: Once you do, I'll set up a camp site nearby.
+}
+
+SolynBossActiveDialogue: {
+	Start: I feel like you probably have more important things to be doing than talking to me right now.
+	Solyn1: The air is tense. Something powerful is still out there.
+	Player1: You can sense it too, huh?
+	Solyn2: Yes... we should be careful.
+}
+
+SolynUmbralLeechDialogue: {
+	Start: There be leeches about....
+	Player1: You mean the leech?
+	Solyn1: Yes.
+}
+
+SolynChiUpgradeEquipped: {
+	Start: That strange energy... what are you wearing?
+	Player1: You mean this accessory? I found it a long time ago and thought I could upgrade it with a few of the loose souls roaming around.
+	Solyn1: Yes. Its aura feels...  &ancient...
+	Solyn2: Are you sure you made this? Not to question your story, of course.
+	Solyn3: Could I have a look at it?
+	Player2: Maybe later.
+	Solyn4: Very well.
+}
+
+SolynHoverEventDialogue: {
+	Start: &Oh, you startled me!
+	Solyn1: You don't mind if I take a quick look from above, do you?
+	Solyn2: The view from here is... magnificent.
+	Solyn3: Alright, that's enough sightseeing.
+}
+
+SolynGenderChangePotionUsed: {
+	Start: Is there something different about you?^ I can't quite put my finger on it, but I feel like something changed.
+	Solyn1: I'm just kidding!^ I'm happy for you! Be your true self, and don't let anyone tell you who you can or can't be.
+	Solyn2: Till you've shown them all every bit of you!
+	Player1: Thank you, Solyn.
+}
+
+SolynRiftFirstPartyDialogue: {
+	Start: How can they celebrate during this?
+	Solyn1: The rift eats away at their world, plunging it into an era of freezing cold darkness. ^Yet... ^they party as if it were a normal day.
+	Solyn2: It's... ^It's just... ^&I... ^&I don't understand...
+	Player1: It's going to be okay, Solyn.
+	Solyn3: Maybe you're right... ^I guess they're partying to forget, ^or maybe... they have faith. ^Faith in you, I mean.
+	Solyn4: There's something about you that's... ^different. ^Something good. ^Never change, okay?
+}
+
+SolynRiftPartyDialogue: {
+	# Plays after the first dialogue is played only during rift parties
+	Start: Hello...
+	Player1: Hello, Solyn.
+	Solyn1: I've been thinking... ^about our previous talk. ^I'm trying to be more optimistic.
+	Solyn2: I've been trying to, ^at least. ^It's difficult to not be sad when everything is freezing and wilting around me. ^I can't help but feel melancholic.
+	Player2: I understand. I miss the greenery too. Just don't let it bother you too much.
+	Solyn3: I'll... ^I'll try.
+}

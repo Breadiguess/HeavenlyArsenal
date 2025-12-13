@@ -5,6 +5,8 @@ using Luminance.Core.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Core.Utilities;
+using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,8 +53,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
        
         public override void AI()
         {
-            if (Time % ExplodeTime == 0 && Time>0)
-                SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundSuper, Projectile.Center);
+            if (Time % ExplodeTime == 0 && Time > 0)
+                SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundSuper, Projectile.Center).WithVolumeBoost(10);
              if (Time < ExplodeTime)
             {
                 Projectile.scale = float.Lerp(Projectile.scale, 1, 0.04f);

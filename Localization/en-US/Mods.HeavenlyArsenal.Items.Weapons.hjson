@@ -16,7 +16,7 @@ Ranged: {
 			'''
 	}
 
-	AvatarRifle: {
+	AvatarRifle2: {
 		DisplayName: Funeral Dirge of a dead world
 		Tooltip:
 			'''
@@ -30,19 +30,18 @@ Ranged: {
 		Tooltip: Fires Seeds of possibilty that bloom into devastating lasers.
 	}
 
-	GoodAppleSling: {
-		DisplayName: Good Apple Sling
-		Tooltip: ""
-	}
-
 	NoxusWeapon: {
-		DisplayName: Noxious Fumes
-		Tooltip: ""
+		DisplayName: Breath the of the Last God
+		Tooltip:
+			'''
+			Hold <left> to draw the bow, and release to fire a powerful arrow of crystalized entropy.
+			Press <right> to detonate all crystals
+			'''
 	}
 
-	AvatarRifle2: {
-		DisplayName: Avatar Rifle2
-		Tooltip: ""
+	AvatarRifle: {
+		DisplayName: Avatar Rifle Test
+		Tooltip: "go away! content not finish yet! "
 	}
 }
 
@@ -109,6 +108,7 @@ Summon: {
 		DisplayName: Scroll of Brightest Shadow
 		Tooltip:
 			'''
+			Summons a warrior blanketed in Antishadow to slash at your foes.
 			bound by blood and seal, it shall always be by your side
 
 			[c/ff4dff:There can be only one.]
@@ -126,7 +126,12 @@ Summon: {
 
 	ViscousWhip_Item: {
 		DisplayName: Bloody Sting
-		Tooltip: ""
+		Tooltip:
+			'''
+			Minion hits while holding this item generate blood
+			<right> when enough blood has been stockpiled to rapidly throw daggers that home in on nearby enemies
+			after enough daggers have been impaled in an enemy, strike them again with the whip to rip out the daggers
+			'''
 	}
 }
 

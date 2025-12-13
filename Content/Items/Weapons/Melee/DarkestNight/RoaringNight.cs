@@ -91,7 +91,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.DarkestNight
             const int slashLength = 24;
             _slashPositions = new Vector2[slashLength];
             _slashRotations = new float[slashLength];
-
+            Projectile.DamageType = DamageClass.Melee;
             SwingInProgress = false;
             Projectile.scale = 0;
             Projectile.usesLocalNPCImmunity = true;
@@ -171,7 +171,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.DarkestNight
                 {
                     swingDirection = Owner.Center.AngleTo(Main.MouseWorld) + MathHelper.ToRadians(-230) * Owner.direction;
                     //Main.NewText($"{Projectile.rotation}");
-                    SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.Rapture.Swing with { PitchVariance = 0.2f, Pitch = 0.4f, }, Projectile.Center);
+                    SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.Rapture.Swing with { Volume = 0.4f, MaxInstances = 0}, Projectile.Center);
 
 
                 }
@@ -217,7 +217,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.DarkestNight
                     float basedir = Owner.direction == 1 ? MathHelper.ToRadians(-125) : MathHelper.ToRadians(230);
                     swingDirection = basedir * Owner.direction + Owner.Center.AngleTo(Main.MouseWorld);
                     //Main.NewText($"{Projectile.rotation}");
-                    SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.Rapture.Swing2 with { PitchVariance = 0.2f }, Projectile.Center);
+                    SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.Rapture.Swing with { Volume = 0.4f, MaxInstances = -1 }, Projectile.Center);
                     Owner.direction = Math.Sign(Main.MouseWorld.X - Owner.Center.X);
 
                 }
@@ -337,7 +337,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.DarkestNight
                 GlowSizeInterpolant = float.Lerp(GlowSizeInterpolant, 0, 0.01f);
 
 
-            int GlassCount = 3;
+            int GlassCount = 3  ;
 
 
             Owner.SetDummyItemTime(2);
@@ -350,7 +350,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.DarkestNight
             Owner.direction = Math.Sign(Direction.X);
             Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, swingDirection);
 
-            //Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, 0);
 
             ConeVFXInterp = GlowSizeInterpolant;
             Vector2 AdjustedSpawn = Owner.GetBackHandPositionImproved(Owner.compositeBackArm) + new Vector2(0, -2).RotatedBy(swingDirection);
@@ -358,21 +357,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.DarkestNight
 
             if (Time < placeholder && Time % 2 == 0)
             {
-                //Time = placeholder - 30;
                 float thing = Main.rand.NextFloat(100, 230);
 
                 ScreenShakeSystem.StartShake(0.1f);
 
-                /*
-               AdjustedSpawn -= Owner.Center;
-               AdjustedSpawn *= 2f;
-               AdjustedSpawn += new Vector2(thing, 0).RotatedBy(MathHelper.ToRadians(Main.rand.NextFloat(-25, 26)) + swingDirection + MathHelper.PiOver2);
-               AdjustedSpawn += Owner.Center;
-
-               float Rot = desiredHand + MathHelper.PiOver2;
-
-               Projectile.velocity = Rot.ToRotationVector2();
-               */
                 float RotationOffset = swingDirection + MathHelper.ToRadians(Main.rand.NextFloat(-25, 26)) + MathHelper.PiOver2;
 
             }

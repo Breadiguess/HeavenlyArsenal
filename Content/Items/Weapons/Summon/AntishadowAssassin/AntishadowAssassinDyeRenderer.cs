@@ -22,14 +22,19 @@ public class AntishadowAssassinDyeRenderer : ModSystem
 
     public override void OnModLoad()
     {
-        Target = new InstancedRequestableTarget();
-        Main.ContentThatNeedsRenderTargets.Add(Target);
-        On_Main.DrawProjectiles += RenderWrapper;
+        if (!Main.dedServ)
+        {
+
+            Target = new InstancedRequestableTarget();
+            Main.ContentThatNeedsRenderTargets.Add(Target);
+            On_Main.DrawProjectiles += RenderWrapper;
+        }
     }
 
     private static void RenderWrapper(On_Main.orig_DrawProjectiles orig, Main self)
     {
-        
+        if (Main.dedServ)
+            return;
         orig(self);
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
 
@@ -41,8 +46,9 @@ public class AntishadowAssassinDyeRenderer : ModSystem
 
     private static void Render(int playerIndex)
     {
-        
-            int assassinID = ModContent.ProjectileType<AntishadowAssassin>();
+        if (Main.dedServ)
+            return;
+        int assassinID = ModContent.ProjectileType<AntishadowAssassin>();
         int slashID = ModContent.ProjectileType<AntishadowAssassinSlash>();
         int unidirectionalSlashID = ModContent.ProjectileType<AntishadowUnidirectionalAssassinSlash>();
         int identifier = playerIndex + Main.maxPlayers;

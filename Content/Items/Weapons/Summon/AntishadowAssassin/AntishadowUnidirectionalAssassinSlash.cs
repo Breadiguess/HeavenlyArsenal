@@ -70,6 +70,8 @@ public class AntishadowUnidirectionalAssassinSlash : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
+        if (Main.dedServ)
+            return false;
         float lifetimeRatio = Time / Lifetime;
         ManagedShader trailShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssassinSlashShader");
         trailShader.TrySetParameter("sheenEdgeColorWeak", new Vector4(2f, 0f, lifetimeRatio * 0.3f, 1f));

@@ -3,6 +3,7 @@ using CalamityMod.NPCs.TownNPCs;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Core;
+using Luminance.Assets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
@@ -707,7 +708,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor
         /// </summary>
         public int LOVE { get; set; } = 0;
 
-
+        public override string Texture =>  MiscTexturesRegistry.InvisiblePixelPath;
         public override void PostDraw(SpriteBatch spriteBatch, int buffIndex, BuffDrawParams drawParams)
         {
             Utils.DrawBorderString(spriteBatch, LOVE.ToString(), drawParams.Position, Color.White);

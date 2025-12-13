@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Content.Particles.Metaballs;
 using NoxusBoss.Core.AdvancedProjectileOwnership;
 using System;
+using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
@@ -23,6 +24,15 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist
 
         public bool isWorshipping;
         public static float BaseKnockback = 0.4f;
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(isWorshipping);
+
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            isWorshipping = reader.ReadBoolean();
+        }
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             bestiaryEntry.Info.AddRange([
@@ -48,11 +58,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist
         public override void SetDefaults()
         {
             NPC.aiStyle = -1;
-            NPC.lifeMax = 40_000;
-            NPC.damage = 100;
+            NPC.lifeMax = 30_000;
+            NPC.damage = 70;
             NPC.defense = 27;
-            NPC.knockBackResist = 0.4f;
+            NPC.knockBackResist = 0.6f;
             NPC.Size = new Vector2(32, 50);
+            NPC.HitSound = SoundID.NPCHit1;
 
             SpawnModBiomes =
             [
@@ -158,6 +169,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist
         int worshipLoopFrameEnd = 27;
         public override void FindFrame(int frameHeight)
         {
+           
 
             if (isWorshipping)
             {
@@ -221,7 +233,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist
             a += $"worshipping: {isWorshipping}\n";
             a += $"CanBeSacrificed: {this.canBeSacrificed}\n";
              if (!NPC.IsABestiaryIconDummy)
-                Utils.DrawBorderString(spriteBatch, a, NPC.Center - screenPos, Color.AntiqueWhite, anchory:-2);
+                Utils.DrawBorderString(spriteBatch, a, NPC.Center - screenPos, Color.AntiqueWhite, anchory:-1);
             */
 
             return base.PreDraw(spriteBatch, screenPos, drawColor);

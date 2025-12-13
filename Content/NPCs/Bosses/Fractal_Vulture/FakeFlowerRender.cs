@@ -1,0 +1,201 @@
+﻿using Luminance.Common.Easings;
+using Luminance.Common.Utilities;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using NoxusBoss.Content.Tiles.GenesisComponents;
+using NoxusBoss.Core.Graphics.LightingMask;
+using NoxusBoss.Core.Graphics.RenderTargets;
+using NoxusBoss.Core.Netcode;
+using NoxusBoss.Core.Netcode.Packets;
+using NoxusBoss.Core.World.TileDisabling;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
+
+namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
+{
+    public abstract class FakeFlowerRender : ModSystem
+    {
+        public class PlantTileData
+        {
+            public Point Position;
+
+            public float GrowthInterpolant;
+
+            public PlantTileData(Point p)
+            {
+                Position = p;
+            }
+        }
+
+        protected readonly List<PlantTileData> tilePoints = new List<PlantTileData>();
+
+        internal static Dictionary<string, FakeFlowerRender> renderSystems = new Dictionary<string, FakeFlowerRender>();
+
+        internal static Dictionary<FakeFlowerRender, List<PlantTileData>> allTilePoints
+        {
+            get
+            {
+                Dictionary<FakeFlowerRender, List<PlantTileData>> dictionary = new Dictionary<FakeFlowerRender, List<PlantTileData>>();
+                foreach (FakeFlowerRender value in renderSystems.Values)
+                {
+                    dictionary[value] = value.tilePoints;
+                }
+
+                return dictionary;
+            }
+        }
+
+        public virtual bool DropAfterAnimation => true;
+
+        public virtual bool AffectedByLight => true;
+
+        public abstract int ItemID { get; }
+
+        public abstract int TileID { get; }
+
+        public InstancedRequestableTarget OverallTarget { get; private set; } = new InstancedRequestableTarget();
+
+
+        public abstract void InstaceRenderFunction(bool disappearing, float growthInterpolant, float growthInterpolantModified, int i, int j, SpriteBatch spriteBatch);
+
+        public override void OnModLoad()
+        {
+            renderSystems[Name] = this;
+            On_Main.DoDraw_Tiles_Solid += RenderPlantInstancesWrapper;
+            Main.ContentThatNeedsRenderTargets.Add(OverallTarget);
+        }
+
+        public override void OnWorldLoad()
+        {
+            tilePoints.Clear();
+        }
+
+        public override void OnWorldUnload()
+        {
+            tilePoints.Clear();
+        }
+
+        public override void PostUpdateEverything()
+        {
+            if (TileDisablingSystem.TilesAreUninteractable)
+            {
+                return;
+            }
+
+            int tileID = TileID;
+            for (int i = 0; i < tilePoints.Count; i++)
+            {
+                Tile tileSafely = Framing.GetTileSafely(tilePoints[i].Position);
+                bool value = !tileSafely.HasTile || tileSafely.TileType != tileID;
+                tilePoints[i].GrowthInterpolant = Luminance.Common.Utilities.Utilities.Saturate(tilePoints[i].GrowthInterpolant - (float)value.ToDirectionInt() * 0.01f);
+                UpdatePoint(tilePoints[i].Position);
+            }
+
+            for (int j = 0; j < tilePoints.Count; j++)
+            {
+                if (tilePoints[j].GrowthInterpolant <= 0f)
+                {
+                    Point position = tilePoints[j].Position;
+                    if (Main.netMode != 1 && DropAfterAnimation)
+                    {
+                        int num = Item.NewItem(new EntitySource_TileBreak(position.X, position.Y), position.ToWorldCoordinates(0f, 12f), ItemID);
+                        Main.item[num].velocity = Vector2.UnitY * -0.4f;
+                    }
+
+                    tilePoints.RemoveAt(j);
+                    j--;
+                }
+            }
+        }
+
+        private void RenderPlantInstancesWrapper(On_Main.orig_DoDraw_Tiles_Solid orig, Main self)
+        {
+            if (tilePoints.Count >= 1 && !TileDisablingSystem.TilesAreUninteractable)
+            {
+                OverallTarget.Request(global::NoxusBoss.Core.Utilities.Utilities.ViewportArea.Width, global::NoxusBoss.Core.Utilities.Utilities.ViewportArea.Height, 0, RenderInstances);
+                if (OverallTarget.TryGetTarget(0, out RenderTarget2D target) && target != null)
+                {
+                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                    if (AffectedByLight)
+                    {
+                        LightingMaskTargetManager.PrepareShader();
+                    }
+
+                    Main.spriteBatch.Draw(target, Main.screenLastPosition - Main.screenPosition, Color.White);
+                    Main.spriteBatch.End();
+                }
+                
+            }
+
+            orig(self);
+        }
+
+        private void RenderInstances()
+        {
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+            try
+            {
+                int tileID = TileID;
+                foreach (PlantTileData tilePoint in tilePoints)
+                {
+                    float growthInterpolant = tilePoint.GrowthInterpolant;
+                    float value = EasingCurves.Elastic.Evaluate(EasingType.Out, growthInterpolant.Squared());
+                    value = MathHelper.Lerp(value, 1f, Luminance.Common.Utilities.Utilities.InverseLerp(0.25f, 0.5f, growthInterpolant));
+                    Tile tileSafely = Framing.GetTileSafely(tilePoint.Position);
+                    bool disappearing = !tileSafely.HasTile || tileSafely.TileType != tileID;
+                    InstaceRenderFunction(disappearing, growthInterpolant, value, tilePoint.Position.X, tilePoint.Position.Y, Main.spriteBatch);
+                }
+            }
+            finally
+            {
+                Main.spriteBatch.End();
+            }
+        }
+
+        internal void AddPointInternal(Point point)
+        {
+            if (!tilePoints.Any((PlantTileData p) => p.Position == point))
+            {
+                tilePoints.Add(new PlantTileData(point));
+            }
+        }
+
+        public void AddPoint(Point point)
+        {
+            if (Main.netMode == 1 && !tilePoints.Any((PlantTileData p) => p.Position == point))
+            {
+                PacketManager.SendPacket<AddGenesisPlantPointPacket>(new object[3] { Name, point.X, point.Y });
+            }
+
+            AddPointInternal(point);
+        }
+
+        public virtual void UpdatePoint(Point p)
+        {
+        }
+
+        public override void SaveWorldData(TagCompound tag)
+        {
+            tag["PlantPoints"] = tilePoints.Select((PlantTileData d) => d.Position).ToList();
+        }
+
+        public override void LoadWorldData(TagCompound tag)
+        {
+            List<Point> list = tag.GetList<Point>("PlantPoints").ToList();
+            for (int i = 0; i < list.Count; i++)
+            {
+                tilePoints.Add(new PlantTileData(list[i])
+                {
+                    GrowthInterpolant = 1f
+                });
+            }
+        }
+    }
+}

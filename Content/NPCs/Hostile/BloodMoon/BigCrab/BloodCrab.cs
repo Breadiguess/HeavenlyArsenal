@@ -9,20 +9,22 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
 {
-    partial class BloodCrab : BloodmoonBaseNPC
+    partial class BloodCrab : BloodMoonBaseNPC
     {
-        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/BigCrab/ArtillerCrab";
+        public override int blood => 0;
+        public override int bloodBankMax => 50;
+        public bool Anchored = false;
+        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/BigCrab/ArtilleryCrab";
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             bestiaryEntry.Info.AddRange([
-				// Sets the preferred biomes of this town NPC listed in the bestiary.
-				// With Town NPCs, you usually set this to what biome it likes the most in regards to NPC happiness.
 				BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
 				new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.ArtilleryCrab1")
             ]);
         }
         public override void SetDefaults()
         {
+            base.SetDefaults();
             NPC.width = 100;
             NPC.height = 55;
             NPC.damage = 200;
@@ -31,12 +33,23 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab
             NPC.value = 10000;
             NPC.aiStyle = -1;
             NPC.npcSlots = 3f;
-            NPC.knockBackResist = 0f;
+            NPC.knockBackResist = 0.5f;
         }
 
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = 13;
+        }
+
+        public override void AI()
+        {
+            StateMachine();
+            Time++;
+        }
+
+        public override void PostAI()
+        {
+            
         }
     }
 }

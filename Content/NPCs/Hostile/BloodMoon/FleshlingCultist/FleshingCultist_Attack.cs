@@ -127,14 +127,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist
         {
             if (playerTarget == null)
                 FindPlayer();
-            NPC.velocity.X = NPC.velocity.X = NPC.AngleTo(playerTarget.Center).ToRotationVector2().X * 6;
+            NPC.velocity.X = float.Lerp(NPC.velocity.X,NPC.AngleTo(playerTarget.Center).ToRotationVector2().X * 6, 0.2f);
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
             float horizontalRange = 100f;
 
             // Check if horizontally close but vertically offset
             if (Math.Abs(playerTarget.Center.X - NPC.Center.X) < horizontalRange &&
-                playerTarget.Center.Y < NPC.Center.Y - 16f && // player is above
-                NPC.velocity.Y == 0) // NPC is on the ground
+                playerTarget.Center.Y < NPC.Center.Y - 16f && 
+                NPC.velocity.Y == 0) 
             {
                 // Jump
                 NPC.velocity.Y = -10f; // Adjust jump strength

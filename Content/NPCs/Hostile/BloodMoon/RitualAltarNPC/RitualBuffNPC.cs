@@ -1,5 +1,6 @@
 ﻿using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.utils;
+using Luminance.Common.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
@@ -297,6 +298,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
             //Utils.DrawBorderString(spriteBatch, BuffType.ToString() + $"\n" + ritualBuffTimer.ToString(), npc.Center - screenPos, Color.AntiqueWhite, anchory:-2);
             if (BuffString != null && hasRitualBuff)
             {
+                Texture2D distortion = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Extra/detail6").Value;
                 Texture2D a = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
                 Texture2D Glow = GennedAssets.Textures.GreyscaleTextures.BloomLine2;
                 float theMagicFactorThatMakesEveryElectricShineEffectSoMuchBetter = MathF.Sin(Main.GlobalTimeWrappedHourly * 7 + npc.whoAmI);
@@ -320,6 +322,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
 
                 RitualBuffNPC Ba = npc.GetGlobalNPC<RitualBuffNPC>();
 
+
+               // spriteBatch.End();
+               // spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicWrap, default, RasterizerState.CullNone, default, Main.GameViewMatrix.ZoomMatrix);
+                //spriteBatch.Draw(distortion, points[points.Count / 2] - screenPos, null, color, 0, distortion.Size() / 2, 1, 0,0);
+                //spriteBatch.ResetToDefault();
                 //String d = "";
                 //d += $"{Ba.BuffType}\n";
                 //d += $"tier: {Ba.ritualBuffTier}\n";

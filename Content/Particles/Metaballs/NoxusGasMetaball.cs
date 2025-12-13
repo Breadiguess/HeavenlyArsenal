@@ -55,7 +55,7 @@ namespace HeavenlyArsenal.Content.Particles.Metaballs.NoxusGasMetaball
         }
 
         
-        public override MetaballDrawLayer DrawContext => MetaballDrawLayer.AfterProjectiles;
+        public override MetaballDrawLayer DrawContext => MetaballDrawLayer.BeforeProjectiles;
 
         public static void CreateParticle(Vector2 spawnPosition, Vector2 velocity, float size)
         {
@@ -87,7 +87,7 @@ namespace HeavenlyArsenal.Content.Particles.Metaballs.NoxusGasMetaball
 
             foreach (Projectile p in Main.projectile.Where(p => p.active))
             {
-                Color c = Color.Purple;
+                Color c = Color.Purple * p.Opacity;
                 if (p.type == ModContent.ProjectileType<EntropicBlast>() && p.hide != true)
                 {
                     c.A = 0;

@@ -31,14 +31,7 @@ public class DevWing : ModItem
 
         WingSlotID = Item.wingSlot;
 
-        // ArmorIDs.Wing.Sets.Stats appears to have an incomplete implementation for hover wings.
-        // In my decompiled TML-altered Terraria source, every single specialized hover behavior is wrapped around in an 'if (player.wingsLogic == magicNumber)' check, as is the entire
-        // if statement that enables hover movement in the first place. Modded wings are not included in player.
-
-        // Evidently, this set allows for the specification of hover stats, but does not enable the hover behaviors.
-        // As a result, I have to insert this IL edit to manually implement such behaviors.
-
-        // that seems quite annoying, you'd think that with all the modded wings with hover behaviors, 
+        
         ArmorIDs.Wing.Sets.Stats[WingSlotID] = new WingStats(100000000, 16.67f, 3.7f, true, 23.5f, 4f);
         new ManagedILEdit("Let Totally not divine wings Hover", Mod, edit =>
         {
@@ -55,31 +48,8 @@ public class DevWing : ModItem
     {
         ILCursor cursor = new ILCursor(context);
 
-        /* This is the general layout of the code, with local variables cleaned up and extraneous comments added:
-         *
-         * bool usingWings = false;
-         * if (((player.velocity.Y == 0f || player.sliding) && player.releaseJump) || (player.autoJump && player.justJumped))
-         * {
-         *     player.mount.ResetFlightTime(player.velocity.X);
-         *     player.wingTime = (float)player.wingTimeMax;
-         * }
-         * 
-         * // Performs the standard wings check.
-         * if (player.wingsLogic > 0 && player.controlJump && player.wingTime > 0f && player.jump == 0 && player.velocity.Y != 0f)
-         * {
-         *     usingWings = true;
-         * }
-         * 
-         * // Determine whether the player the player is using wings for a special hover.
-         * // Notably, this does not include modded wing IDs.
-         * if ((player.wingsLogic == 22 || player.wingsLogic == 28 || player.wingsLogic == 30 || player.wingsLogic == 32 || player.wingsLogic == 29 || player.wingsLogic == 33 || player.wingsLogic == 35 || player.wingsLogic == 37 || player.wingsLogic == 45) && player.controlJump && player.TryingToHoverDown && player.wingTime > 0f)
-         * {
-         *     usingWings = true;
-         * }
-         */
 
-        // Search for the start of the if ((player.wingsLogic == 22 || player.wingsLogic == 28... || player.wingsLogic == 37 statement
-        if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdcI4(37)))
+         if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdcI4(37)))
         {
             edit.LogFailure("The 'if ((player.wingsLogic == 37' check could not be found.");
             return;

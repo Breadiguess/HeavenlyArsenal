@@ -1,14 +1,12 @@
 ﻿using CalamityMod;
 using CalamityMod.NPCs.NormalNPCs;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
-using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 using Luminance.Assets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NoxusBoss;
 using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
 using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.SwagRain;
@@ -17,7 +15,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -31,14 +28,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         public static HashSet<int> BlackListedNPCs = new HashSet<int>();
 
         //todo: create a modsystem that does this for us, and then write it back to this npc upon loading the world or some shit
-        
+
         public override void PostSetupContent()
         {
             //doubtless doesn't work, but you know what who gaf, i'm writing in github i can fix it later.
             //the whole point is to have something in place already to work off of.
             for (int i = 0; i < NPCLoader.NPCCount; i++)
             {
-                
+
                 if (NPCID.Sets.ProjectileNPC[i])
                 {
                     BlackListedNPCs.Add(i);
@@ -53,7 +50,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
 
     public class BloodmoonSpawnControl : GlobalNPC
     {
-        
+        public override void SetDefaults(NPC entity)
+        {
+            base.SetDefaults(entity);
+        }
+
         public override void EditSpawnRange(Player player, ref int spawnRangeX, ref int spawnRangeY, ref int safeRangeX, ref int safeRangeY)
         {
             //spawnRangeY = (int)(Main.worldSurface * 0.2f);
@@ -69,8 +70,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
                     // The float value is the spawn weight relative to others in the pool stupid
                     pool[ModContent.NPCType<ArtilleryCrab>()] = SpawnCondition.OverworldNightMonster.Chance * 0.17f;
                     pool[ModContent.NPCType<newLeech>()] = SpawnCondition.OverworldNightMonster.Chance * 0.074f;
-                    
-                    pool[ModContent.NPCType<RitualAltar>()] = SpawnCondition.OverworldNightMonster.Chance * 0.01f;
+                    if (spawnInfo.SpawnTileY < Main.worldSurface * 0.5f)
+                        pool[ModContent.NPCType<BloodJelly>()] = SpawnCondition.OverworldNightMonster.Chance * 0.04f;
+
+                    pool[ModContent.NPCType<RitualAltar>()] = SpawnCondition.OverworldNightMonster.Chance * 0.035f;
                     pool[ModContent.NPCType<FleshlingCultist.FleshlingCultist>()] = SpawnCondition.OverworldNightMonster.Chance * 0.42f;
 
                 }
@@ -85,7 +88,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
 
             }
         }
-            
+
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {
             if (Main.bloodMoon && !Main.dayTime && RiftEclipseBloodMoonRainSystem.EffectActive)
@@ -135,8 +138,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
                     }
 
                     Main.NewText(sb.ToString());
-                }
-                */
+                }*/
+
                 spawnRate = (int)(spawnRate * 0.5f);  // Half the delay -> roughly double the spawn frequency
                 maxSpawns = (int)(maxSpawns * 1.5f);  // Increase the cap by 50%
 
@@ -166,23 +169,28 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         public virtual bool canBebuffed => true;
         public override void SendExtraAI(BinaryWriter writer)
         {
-            writer.Write(blood);
-            writer.Write(buffPrio);
+            writer.Write((float)blood);
+            writer.Write((float)bloodBankMax);
+            writer.Write((float)buffPrio);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             blood = (int)reader.ReadSingle();
+            blood = (int)reader.ReadSingle();
             buffPrio = reader.ReadSingle();
+
+
         }
 
         public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers)
         {
+            if (ResistantToTrueMelee)
+                if ((modifiers.DamageType == ModContent.GetInstance<TrueMeleeNoSpeedDamageClass>() || modifiers.DamageType == ModContent.GetInstance<TrueMeleeDamageClass>()))
+                {
 
-            if(modifiers.DamageType == ModContent.GetInstance<TrueMeleeDamageClass>() && ResistantToTrueMelee)
-            {
-                modifiers.CritDamage *= 0.75f;
-                modifiers.FinalDamage *= 0.55f;
-            }
+                    modifiers.CritDamage *= 0.75f;
+                    modifiers.FinalDamage *= 0.59f;
+                }
 
         }
         public virtual int Time
@@ -206,7 +214,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         public NPC NPCTarget = null;
 
         public Entity currentTarget = null;
-        
+
         #region Snackrifice:tm:
         /// <summary>
         /// How likely this npc is to recieve a buff compared to it's neighbors when another npc is sacrificed.
@@ -230,12 +238,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         /// </summary>
         public virtual bool canBeSacrificed
         {
-            get; 
-            set; 
+            get;
+            set;
         }
 
-       
-      
+
+
         ///<summary>
         /// calculate the value of the sacrificed npc. we'll later multiply this depending on their value, but im coding blind at the time of writing this, so that should best be left for later.
         ///</summary>
@@ -243,17 +251,21 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
         {
             float bloodPercent = blood / bloodBankMax;
             float lifePercent = npc.life / (float)npc.lifeMax;
-            
+
             float value = Utils.Clamp(bloodPercent + lifePercent, 0, 1);
             return value;
         }
         #endregion
 
-
+        public override void SetDefaults()
+        {
+            NPC.Calamity().VulnerableToHeat = false;
+            SpawnModBiomes = [ModContent.GetInstance<RiftEclipseBloodMoon>().Type];
+        }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             //Utils.DrawBorderString(spriteBatch, Time.ToString(), NPC.Center - screenPos, Color.AntiqueWhite, 1, anchory: 2);
-            //Utils.DrawBorderString(spriteBatch, $"{blood}/{bloodBankMax}%, {blood}/{bloodBankMax}", NPC.Center - screenPos + new Vector2(0, -40), Color.Red);
+            //Utils.DrawBorderString(spriteBatch, $"{NPC.Calamity().VulnerableToHeat}", NPC.Center - screenPos + new Vector2(0, -40), Color.Red);
 
             /*
             string Msg = "";
@@ -265,8 +277,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
                 Utils.DrawBorderString(spriteBatch, Msg, NPC.Center - screenPos, Color.AntiqueWhite, anchory: -2);
             }
             */
+
             return base.PreDraw(spriteBatch, screenPos, drawColor);
         }
-    
+
     }
 }

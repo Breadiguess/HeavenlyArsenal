@@ -1,141 +1,331 @@
-﻿using HeavenlyArsenal.Common.IK;
+﻿using CalamityMod;
 using HeavenlyArsenal.Core.Systems;
 using Microsoft.Xna.Framework;
 using System;
+using System.Linq;
 using Terraria;
+using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
 {
-    internal class DebugNPC : BloodMoonBaseNPC
+
+    partial class DebugNPC : BloodMoonBaseNPC
     {
+        public int LimbCount = 4;
+        public DebugNPCLimb[] _limbs;
+        public Vector2[] _limbBaseOffsets;
 
-        // Configuration constants
-        const float LimbSearchRadius = 100f;       // max distance to search for ground
-        const float FootLerpSpeed = 0.2f;          // how quickly feet move toward targets (0.0 to 1.0)
-        const float AnchorThreshold = 4f;          // how close foot must be to target to count as anchored
-        const float StepThreshold = 80f;           // when to lift foot (distance from base > threshold)
-
-        // Leg structures
-        struct Limb
+        public override void OnSpawn(IEntitySource source)
         {
-            public IKSkeleton Skeleton;    // IK solver for the leg (e.g. 2-joint FABRIK)
-            public Vector2 TargetPosition; // current intended foot target
-            public Vector2 EndPosition;    // current foot position (moves toward target)
-            public bool IsAnchored;
+            CreateLimbs();
         }
-        Limb[] limbs;
-        Vector2[] limbBaseOffsets;  // attachment points relative to NPC center
 
         public override void SetDefaults()
         {
-            // Initialize limbs (example with 2-segment legs)
-            int limbCount = 4;  // say 4 legs
-            limbs = new Limb[limbCount];
-            limbBaseOffsets = new Vector2[limbCount];
-            // Define base offsets around the bottom of the NPC (e.g. spread around center)
-            float width = NPC.width * 0.3f;
-            limbBaseOffsets[0] = new Vector2(-width, NPC.height / 2);   // back-left
-            limbBaseOffsets[1] = new Vector2(width, NPC.height / 2);   // back-right
-            limbBaseOffsets[2] = new Vector2(-width / 2, NPC.height / 2);  // front-left
-            limbBaseOffsets[3] = new Vector2(width / 2, NPC.height / 2);  // front-right
-                                                                          // Create IK skeletons for each limb (each with two segments of specified lengths)
-            for (int i = 0; i < limbCount; i++)
-            {
-                limbs[i].Skeleton = new IKSkeleton(
-                    (36f, new IKSkeleton.Constraints()),            // upper leg bone length 36
-                    (60f, new IKSkeleton.Constraints())             // lower leg bone length 60
-                );
-                limbs[i].EndPosition = NPC.Center + limbBaseOffsets[i] + new Vector2(0, 40);
-                limbs[i].TargetPosition = limbs[i].EndPosition;  // start with foot below body
-                limbs[i].IsAnchored = true;  // start anchored (assuming on ground initially)
-            }
+            NPC.lifeMax = 3;
+            NPC.defense = 999999;
+            NPC.aiStyle = -1;
+            NPC.Size = new Vector2(90, 50);
+            NPC.noGravity = false;
+            NPC.noTileCollide = false;
         }
+        float targetHeightOffset;
+        bool IsFalling => NPC.velocity.Y > 1f;
 
         public override void AI()
         {
-            Vector2 npcVelocity = NPC.velocity;
-            bool anyFootAnchored = false;
-
-            for (int i = 0; i < limbs.Length; i++)
+            NPC.velocity.X = NPC.AngleTo(Main.LocalPlayer.Calamity().mouseWorld).ToRotationVector2().X * 4;//* NPC.Distance(Main.MouseWorld) ;
+            //NPC.velocity.Y = NPC.AngleTo(Main.MouseWorld).ToRotationVector2().Y * NPC.Distance(Main.MouseWorld);
+          
+            
+        }
+        void balanceHead(float interp = 0.2f)
+        {
+            Vector2 d = Vector2.Zero;
+            
+            for (int i = 0; i < _limbs.Count(); i++)
             {
-                Vector2 basePos = NPC.Center + limbBaseOffsets[i];  // current world pos of leg’s base
-                Limb limb = limbs[i];  // copy for ease (if not using ref)
-
-                // Decide if we need a new target for this leg
-                if (limb.IsAnchored)
+                if (_limbs[i].GrabPosition.HasValue)
                 {
-                    // Check if leg stretched too far from base (or NPC changed direction)
-                    float distBaseToFoot = Vector2.Distance(basePos, limb.EndPosition);
-                    if (distBaseToFoot > StepThreshold)
-                    {
-                        // Un-anchor the foot to find a new placement
-                        limb.IsAnchored = false;
-                    }
-                    // Optionally, also unanchor if NPC changed direction rapidly or foot is behind body, etc.
-                }
 
-                if (!limb.IsAnchored)
+                    d += _limbs[i].GrabPosition.Value;
+                    
+                }
+                if (_limbs[i] == default)
                 {
-                    // Perform raycast downward, biased forward by velocity
-                    float forwardBias = 0f;
-                    if (npcVelocity.X != 0f)
-                    {
-                        forwardBias = Math.Sign(npcVelocity.X) * (LimbSearchRadius * 0.5f);
-                    }
-                    Vector2 rayStart = basePos;
-                    rayStart.X += forwardBias;  // shift starting point forward
-                    Vector2 rayEnd = rayStart + new Vector2(0f, LimbSearchRadius);  // straight down
-
-                    // Convert world coordinates to tile coordinates for raycast
-                    Point startTile = rayStart.ToTileCoordinates();
-                    Point endTile = rayEnd.ToTileCoordinates();
-                    Point? hit = LineAlgorithm.RaycastTo(startTile.X, startTile.Y, endTile.X, endTile.Y);
-
-                    if (hit.HasValue)
-                    {
-                        // We hit a solid tile – set target to the top of that tile
-                        int tileX = hit.Value.X;
-                        int tileY = hit.Value.Y;
-                        float worldX = tileX * 16 + 8;    // center of tile
-                        float worldY = tileY * 16;       // top of tile (Tiles origin at top-left)
-                        limb.TargetPosition = new Vector2(worldX, worldY);
-                    }
-                    else
-                    {
-                        // No ground found within radius – extend foot to ray end (dangling)
-                        limb.TargetPosition = rayEnd;
-                    }
+                    CreateLimbs();
                 }
+            }
+            d /= LimbCount;
 
-                // Smoothly move foot towards target
-                limb.EndPosition = Vector2.Lerp(limb.EndPosition, limb.TargetPosition, FootLerpSpeed);
-                // Update IK solver for this leg
-                limb.Skeleton.Update(basePos, limb.EndPosition);
-                // Check if foot reached target
-                if (Vector2.Distance(limb.EndPosition, limb.TargetPosition) < AnchorThreshold)
-                {
-                    limb.IsAnchored = true;
-                }
+            float f = -MathHelper.PiOver2;// + MathHelper.ToRadians(30);
+            NPC.rotation = f;//  Math.Clamp(NPC.rotation.AngleLerp(d.AngleTo(NPC.Center), interp), -MathHelper.PiOver2 + MathHelper.ToRadians(-30), -MathHelper.PiOver2 + MathHelper.ToRadians(30));
 
-                limbs[i] = limb;  // store back the updated limb
-                if (limb.IsAnchored) anyFootAnchored = true;
+            float width = NPC.width * 1.2f;
+            
+            _limbBaseOffsets[0] = new Vector2(-width, NPC.height / 2 - 20).RotatedBy(NPC.rotation + MathHelper.PiOver2);
+            _limbBaseOffsets[1] = new Vector2(width, NPC.height / 2 - 20).RotatedBy(NPC.rotation + MathHelper.PiOver2);
+            _limbBaseOffsets[2] = new Vector2(-width * 0.5f, NPC.height / 2 - 10).RotatedBy(NPC.rotation + MathHelper.PiOver2);
+            _limbBaseOffsets[3] = new Vector2(width * 0.5f, NPC.height / 2 - 10).RotatedBy(NPC.rotation + MathHelper.PiOver2);
+        }
+        void ApplyStanceHeightAdjustment()
+        {
+
+            float totalError = 0f;
+            int groundedCount = 0;
+
+            for (int i = 0; i < LimbCount; i++)
+            {
+
+                var limb = _limbs[i];
+                Vector2 basePos = NPC.Center + _limbBaseOffsets[i];
+
+                if (!IsLimbGrounded(limb))
+                    continue;
+
+                float dist = Vector2.Distance(basePos,  limb.EndPosition);
+
+                float max = limb.skeletonMaxLength;           // You store this somewhere
+                float stance = max * 0.75f;                   // Preferred bend ratio
+
+                totalError += (dist - stance);                // >0 = too high, <0 = too low
+                groundedCount++;
             }
 
-            // Apply vertical support if needed
-            if (anyFootAnchored)
+            if (groundedCount == 0)
             {
-                if (NPC.velocity.Y > 0f)
-                {
-                    // Dampen downward velocity to simulate support from legs
-                    NPC.velocity.Y *= 0.5f;
-                }
-                // Optionally, you could even stop falling completely when multiple legs anchored:
-                //if (NPC.velocity.Y > 0 && enoughFeetAnchored) NPC.velocity.Y = 0;
+                NPC.noGravity = false;
+                return; // falling, do not lift NPC artificially
             }
 
-            // ... (rest of NPC AI such as movement, attacking, etc.)
+            NPC.noGravity = true;
+            float avgError = totalError / groundedCount;
+
+            // Limit how much correction occurs per frame
+            float correction = MathHelper.Clamp(avgError, -10f, 10f);
+
+            // Smoothing factor
+            float strength = 0.15f;
+
+          
+            NPC.position.Y += correction * strength;
+        }
+        Vector2 GetIdleRestPosition(int i, Vector2 basePos)
+        {            
+            return FindNewGrabPoint(basePos, i);
+        }
+        Vector2 FindNewGrabPoint(Vector2 basePos, int index, int retry = 0)
+        {
+            
+
+            float maxDist = _limbs[index].skeletonMaxLength * 0.65f;
+
+            float sideOffset = Math.Clamp(NPC.velocity.X * 40f, -100, 100);
+            //Main.NewText(sideOffset);
+            Point? hit = LineAlgorithm.RaycastTo(
+                basePos + new Vector2(0, -100),
+                new Vector2(basePos.X, NPC.Center.Y) + new Vector2(sideOffset * 1.25f, 115+100), debug: index == 2//.RotatedBy((NPC.rotation + MathHelper.PiOver2)*0.5f)
+            );
+
+            if (!hit.HasValue)
+            {
+                retry++;
+                return FindNewGrabPoint(basePos + new Vector2(Main.rand.Next(-1, 1), 0), index, retry); // fallback
+
+            }
+
+            if (Main.tile[hit.Value].IsTileSolid() )
+
+            return hit.Value.ToWorldCoordinates();
+            else
+            {
+                return basePos;
+            }
+        }
+        Vector2 FindFallingGrabPoint(Vector2 basePos)
+        {
+            // Raycast straight down under the leg's origin
+            Point? hit = LineAlgorithm.RaycastTo(
+                basePos,
+                basePos + new Vector2(0, 300f) // long ray down
+            );
+
+            if (hit.HasValue)
+                return hit.Value.ToWorldCoordinates() + new Vector2(0, -8f);
+
+            // If no ground found, keep leg fully extended downward
+            return basePos + new Vector2(0, 250f);
+        }
+
+        bool ShouldRelease(int limbIndex, DebugNPCLimb limb, Vector2 basePos)
+        {
+
+            //if (limbIndex == 2)
+            //Main.NewText(1);
+            // Never release if stepping
+
+            if (limb.StepProgress > 0f)
+                return false;
+
+            // Must have a foothold to release FROM
+            if (!limb.GrabPosition.HasValue)
+                return true; // needs to find one immediately
+
+            int opposite = GetOppositeLeg(limbIndex);
+            var other = _limbs[opposite];
+
+            // If the paired leg is NOT grounded, this leg must WAIT.
+           // if (IsLimbGrounded(other))
+           // {
+          //      limb.StepCooldown = other.StepCooldown;
+          //      return false;
+          //  }
+            float maxDist = limb.skeletonMaxLength * 0.67f;
+            float dist = Vector2.Distance(basePos, limb.GrabPosition.Value);
+
+
+            if(limb.GrabPosition.Value.Y < basePos.Y)
+            {
+                return true;
+            }
+            
+            float tolerance = 18f;
+            if (dist > maxDist + tolerance)
+                return true;
+
+            if (limb.EndPosition.Distance(basePos) < 40)
+                return true;
+            if (limb.EndPosition.Distance(limb.GrabPosition.HasValue ? limb.GrabPosition.Value : Vector2.Zero) > 50)
+                return true;
+
+            return false;
+        }
+
+        int GetOppositeLeg(int i)
+        {
+            if (i == 0) return 2;
+            if (i == 2) return 0;
+            if (i == 1) return 3;
+            if (i == 3) return 1;
+            return i;
         }
 
 
+        bool IsLimbGrounded(DebugNPCLimb limb)
+        {
+            if (!limb.GrabPosition.HasValue)
+                return false;
+
+            if (limb.StepProgress > 0f)
+                return false; // stepping legs don't support body weight
+
+            Vector2 foot = limb.GrabPosition.Value;
+
+            // Raycast a short distance downward
+            Point? hit = LineAlgorithm.RaycastTo(
+                foot,
+                foot + new Vector2(0, 24f) // 24px downward tolerance
+            );
+
+            if (!hit.HasValue)
+                return false;
+
+            Tile t = Framing.GetTileSafely(hit.Value);
+            return t.HasTile && Main.tileSolid[t.TileType];
+        }
+        public override void PostAI()
+        {
+            bool isIdle = Math.Abs(NPC.velocity.X) < 0.5f;
+
+            for (int i = 0; i < LimbCount; i++)
+            {
+
+                var limb = _limbs[i];
+                if (limb.GrabPosition.HasValue)
+                {
+                    //don't grab above body
+                    if (limb.GrabPosition.Value.Distance(NPC.Top) < 4 && MathF.Round(limb.GrabPosition.Value.Y) >= MathF.Round(NPC.Top.Y))
+                    {
+                        limb.StepCooldown = 0;
+                        limb.StepProgress = 0;
+                        limb.ShouldStep = true;
+                    }
+                    if (limb.GrabPosition.Value.Distance(NPC.Center + _limbBaseOffsets[i]) < 30)
+                    {
+                        //limb.ShouldStep = true;
+                        //limb.StepCooldown = 0;
+                        //limb.StepProgress = 0;
+                    }
+
+                }
+
+                Vector2 basePos = NPC.Center + _limbBaseOffsets[i];
+
+               /* if (isIdle && limb.StepProgress <= 0f)
+                {
+                    Vector2 idlePos = GetIdleRestPosition(i, basePos);
+
+                    // distance from current foothold to ideal idle spot
+                    float idleError = Vector2.Distance(limb.GrabPosition ?? limb.EndPosition, idlePos);
+
+                    // threshold: if leg is too far from where it *should* rest
+                    if (idleError > 50f) // tune this
+                    {
+                        limb.PreviousGrabPosition = limb.GrabPosition ?? limb.EndPosition;
+                        limb.GrabPosition = idlePos;
+                        limb.StepProgress = 1f;
+                        limb.StepCooldown = 10; // small so settling is quick
+
+                        _limbs[i] = limb;
+                        UpdateLimbState(ref _limbs[i], basePos, 0.4f, 15, i);
+                        continue;
+                    }
+                }*/
+
+
+
+                float distToGround = Vector2.Distance(basePos, limb.GrabPosition.HasValue ? limb.GrabPosition.Value : limb.EndPosition);
+                float max = limb.skeletonMaxLength;
+                float stanceLength = max * 0.75f;
+
+                if (limb.StepProgress <= 0f && ShouldRelease(i, limb, basePos))
+                {
+                    limb.PreviousGrabPosition = limb.GrabPosition ?? limb.EndPosition;
+                    limb.GrabPosition = FindNewGrabPoint(basePos, i);
+                    limb.StepProgress = 1f;
+                }
+
+                // 2. Animate step
+                if (limb.StepProgress > 0f)
+                {
+                    //float t = 1f - limb.StepProgress;
+                    //Vector2 start = limb.PreviousGrabPosition ?? limb.EndPosition;
+                    //Vector2 end = limb.GrabPosition ?? start;
+
+                    //float arc = (float)Math.Sin(t * MathHelper.Pi) * 402f;
+                    //limb.TargetPosition = Vector2.Lerp(start, end, t) + new Vector2(0, -arc);
+
+                    limb.StepProgress -= 0.1f;
+                    if (limb.StepProgress <= 0f)
+                    {
+                        limb.StepProgress = 0f;
+                        //limb.EndPosition = end;
+                    }
+                }
+                else
+                {
+                    if (limb.GrabPosition.HasValue)
+                        limb.TargetPosition = limb.GrabPosition.Value;
+                }
+
+                _limbs[i] = limb;
+                UpdateLimbState(ref _limbs[i], basePos, 0.4f, 15, i);
+
+            }
+            balanceHead(0.025f);
+            ApplyStanceHeightAdjustment();
+            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+
+        }
     }
 }

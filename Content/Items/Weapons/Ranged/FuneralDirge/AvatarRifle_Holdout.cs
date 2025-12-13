@@ -187,11 +187,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
                 var sound = baseSound.WithVolumeScale(AmmoCount == 1 ? 2 : 1).WithPitchOffset(AmmoCount == 1 ? 0 : MaxAmmo - AmmoCount / 10);
 
                 SoundEngine.PlaySound(sound, Projectile.position);
-                //var player = Owner.GetModPlayer<AvatarRiflePlayer>();
-                //player.AvatarRifleCounter--;
+                var player = Owner.GetModPlayer<AvatarRiflePlayer>();
+                player.AvatarRifleCounter--;
 
 
-                //AmmoCount--;// = (int)MaxAmmo;
+                AmmoCount--;// = (int)MaxAmmo;
 
                 //Main.NewText(AmmoCount + ", " + player.AvatarRifleCounter);
                 //AmmoCount = (int)Math.Floor(MaxAmmo);
@@ -214,6 +214,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
             CreateMuzzleFlash(MuzzleFlash, Projectile.velocity);
 
             float AmmoDifference = MaxAmmo - AmmoCount;
+            Main.NewText(AmmoCount);
             RecoilRotation += Projectile.spriteDirection * MathHelper.ToRadians(34f);
             Projectile shot = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), tipPosition, Projectile.velocity * 12, bulletAMMO, Projectile.damage + (int)(MathF.Pow(AmmoDifference, MaxAmmo)), Projectile.knockBack, Projectile.owner);
             shot.GetGlobalProjectile<AvatarRifleSuperBullet>().hasEmpowerment = true;
@@ -237,7 +238,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.FuneralDirge
             RecoilRotation = 0f;
             HasShellToEject = true;
             var player = Owner.GetModPlayer<AvatarRiflePlayer>();
-            Main.NewText(AmmoCount + ", " + player.AvatarRifleCounter);
+           
+           // Main.NewText(AmmoCount + ", " + player.AvatarRifleCounter);
             bool hasAmmoLeft = player.AvatarRifleCounter > 0;
             Owner.SetDummyItemTime(hasAmmoLeft ? 12 : 10);
             if (hasAmmoLeft)

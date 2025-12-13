@@ -1,17 +1,12 @@
-﻿using HeavenlyArsenal.Core;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 using NoxusBoss.Assets;
 using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Config;
-using static tModPorter.ProgressUpdate;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
 {
@@ -19,7 +14,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
     {
         public override Color StringColor => Color.Crimson;
         public ref Player Owner => ref Main.player[Projectile.owner];
-        public override SoundStyle? WhipSound =>  GennedAssets.Sounds.Common.Glitch with { Volume = 0.5f, PitchVariance = 0.2f};
+        public override SoundStyle? WhipSound => GennedAssets.Sounds.Common.Glitch with { Volume = 0.5f, PitchVariance = 0.2f };
         private ModularWhipController _controller;
         public override void OnSpawn(IEntitySource source)
         {
@@ -31,29 +26,43 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
 
         public void SetController()
         {
-          //  Vector2 arm = Main.GetPlayerArmPosition(Projectile);
-         //   Vector2 c1 = arm + new Vector2(50 * Projectile.spriteDirection, -80f);
-           // Vector2 c2 = arm + new Vector2(150 * Projectile.spriteDirection, 100f);
-          //  Vector2 end = arm + new Vector2(200 * Projectile.spriteDirection, 0f);
+            //  Vector2 arm = Main.GetPlayerArmPosition(Projectile);
+            //   Vector2 c1 = arm + new Vector2(50 * Projectile.spriteDirection, -80f);
+            // Vector2 c2 = arm + new Vector2(150 * Projectile.spriteDirection, 100f);
+            //  Vector2 end = arm + new Vector2(200 * Projectile.spriteDirection, 0f);
 
             //var curve = new BezierCurve(new Vector2(0, 0), new Vector2(60, 80), new Vector2(160, 90), new Vector2(220, 0));
 
-           
+
             float thing = 1 - Math.Abs(2 * FlyProgress - 1);
-            _controller = new ModularWhipController(new BraidedMotion());
+            ViscousWhip_Item item = Owner.HeldItem.ModItem as ViscousWhip_Item;
+
+            if (item.SwingStage == 0)
+                _controller = new ModularWhipController(new VanillaWhipMotion());
+            else if (item.SwingStage == 1)
+                _controller = new ModularWhipController(new BraidedMotion());
+            else
+                _controller = new ModularWhipController(new VanillaWhipMotion());
             //_controller.AddModifier(new TwirlModifier(0, Segments/2, 0.15f * -Owner.direction));
 
-           // _controller.AddModifier(new SmoothSineModifier(startIndex: 0, endIndex: Segments, amplitude: 10f, frequency: 10f, period: 1f));
-           
-            //_controller.AddModifier(new TwirlModifier(1, 7, -0.12f * Projectile.direction * thing)); 
+             _controller.AddModifier(new SmoothSineModifier(startIndex: 0, endIndex: Segments, amplitude: 1f, frequency: 10f, period: 1f));
+
+            //_controller.AddModifier(new TwirlModifier(4, Segments, -0.12f * Projectile.direction * thing, true));
             //_controller.AddModifier(new TwirlModifier(8, 16, -0.12f* thing * Projectile.direction, false));
             //_controller.AddModifier(new TwirlModifier(17,  Segments, -0.15f * Projectile.direction));
         }
 
-          protected override void ModifyWhipSettings(ref float outFlyTime, ref int outSegments, ref float outRangeMult)
+        protected override void ModifyWhipSettings(ref float outFlyTime, ref int outSegments, ref float outRangeMult)
         {
-            outSegments = 60;
-            outRangeMult = 1.15f;
+            ViscousWhip_Item item = Owner.HeldItem.ModItem as ViscousWhip_Item;
+
+            if (item.SwingStage == 1)
+                outSegments = 70;
+            else
+                outSegments = 120;
+
+            //if (item.SwingStage == 1)
+           //     outRangeMult = 0.8f;
         }
 
         public override void ModifyControlPoints(List<Vector2> controlPoints)
@@ -68,15 +77,16 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             SetController();
             _controller.Apply(controlPoints, Projectile, segments, rangeMultiplier, progress);
         }
-      
+
         public override void SetDefaults()
         {
             base.SetDefaults();
             Projectile.MaxUpdates = 10;
+           // Projectile.localNPCHitCooldown = 20;
 
         }
 
-      
+
         public Vector2 lastTop = Vector2.Zero;
 
         private float Timer
@@ -84,8 +94,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             get => Projectile.ai[0];
             set => Projectile.ai[0] = value;
         }
-       
-      
+
+
         protected override void WhipAI()
         {
             Player owner = Main.player[Projectile.owner];
@@ -94,7 +104,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             if (swingTime <= 0f) swingTime = 20f * Projectile.MaxUpdates;
             float swingProgress = Timer / swingTime;
 
-            
+
             List<Vector2> points = new();
             ModifyControlPoints(points);
             if (points.Count == 0) return;
@@ -116,7 +126,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
         {
 
             target.AddBuff(ModContent.BuffType<BloodwhipBuff>(), 240);
-            
+
             Main.player[Projectile.owner].MinionAttackTargetNPC = target.whoAmI;
 
             Projectile.damage = (int)(Projectile.damage * 0.9f);

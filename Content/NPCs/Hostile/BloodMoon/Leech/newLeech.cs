@@ -1,11 +1,11 @@
 ﻿using CalamityMod;
 using CalamityMod.Items.Materials;
+using HeavenlyArsenal.Common;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NoxusBoss.Content.Biomes;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using ReLogic.Content;
 using System;
@@ -89,27 +89,25 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             bestiaryEntry.Info.AddRange([
 
                 BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
-                
+
             new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.UmbralLeech")
             ]);
         }
         bool hasUsedEmergency;
         public override void SetDefaults()
         {
-            NPC.lifeMax = 50000;
-            NPC.damage = 200;
-            NPC.defense = 230;
+            NPC.lifeMax = 80_000;
+            NPC.damage = 180;
+            NPC.defense = 95;
             NPC.noGravity = true;
             NPC.aiStyle = -1;
-            NPC.npcSlots = 0.2f;
+            NPC.npcSlots = 7f;
             NPC.value = Terraria.Item.buyPrice(0, 1, 32, 6);
             NPC.noTileCollide = true;
 
             NPC.Size = new Vector2(30, 30);
-            NPC.knockBackResist = 0;
-            NPC.Calamity().VulnerableToWater = false;
-            NPC.Calamity().VulnerableToSickness = false;
-            NPC.Calamity().VulnerableToCold = false;
+            NPC.knockBackResist = 0.1f;
+            
 
             NPC.DeathSound = AssetDirectory.Sounds.NPCs.Hostile.BloodMoon.UmbralLeech.DyingNoise;
             NPC.HitSound = SoundID.NPCHit1;
@@ -122,8 +120,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         public override void SendExtraAI(BinaryWriter writer)
         {
             base.SendExtraAI(writer);
-
-            // Write if we have hitboxes
             bool hasHitboxes = AdjHitboxes != null && AdjHitboxes.Length > 0;
             writer.Write(hasHitboxes);
 
@@ -131,11 +127,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             {
                 writer.Write(AdjHitboxes.Length);
                 for (int i = 0; i < AdjHitboxes.Length; i++)
-                {
                     writer.WriteVector2(AdjHitboxes[i].Location.ToVector2());
-                    //writer.Write(AdjHitboxes[i].Width);
-                    //writer.Write(AdjHitboxes[i].Height);
-                }
+
             }
             writer.Write((int)CurrentState);
             writer.Write(variant);
@@ -144,28 +137,23 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             base.ReceiveExtraAI(reader);
-
             bool hasHitboxes = reader.ReadBoolean();
-
             if (hasHitboxes)
             {
                 int length = reader.ReadInt32();
-
                 if (AdjHitboxes == null || AdjHitboxes.Length != length)
                     AdjHitboxes = new Rectangle[length];
-
                 for (int i = 0; i < length; i++)
-                {
                     AdjHitboxes[i].Location = reader.ReadVector2().ToPoint();
-                }
+                
             }
             else
             {
                 AdjHitboxes = null;
             }
 
-            CurrentState = (Behavior)reader.ReadSingle();
-            variant = reader.Read();
+            CurrentState = (Behavior)reader.ReadInt32();
+            variant = reader.ReadInt32();
         }
 
         public override void OnSpawn(IEntitySource source)
@@ -204,15 +192,18 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         }
         public override void AI()
         {
+
            
-            if(CosmeticTime % 100 == 0)
-            NPC.netUpdate = true;
             string debugPlayer = "tester2";
+
             if (Main.LocalPlayer.name.ToLower() == debugPlayer.ToLower() && NPC.ai[1] == 1)
-                NPC.Center = Main.MouseWorld;// + new Vector2(0, MathF.Sin(Time / 10.1f) * 60);// + new Vector2(Math.Clamp(MathF.Tan(Time / 10.1f) * 50, -200, 200), 0);
+            {
 
+                NPC.Center = Main.MouseWorld;
+                NPC.ai[1] = 0;
+                return;
+            }
 
-           // if (Debug != 1)
             StateMachine();
             if (NPC.life < NPC.lifeMax / 3 && !hasUsedEmergency && !NPC.GetGlobalNPC<SacrificeNPC>().isSacrificed)
             {
@@ -248,9 +239,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             if (AdjHitboxes != null)
                 NPC.rotation = AdjHitboxes[1].Center().AngleTo(NPC.Center);
 
-            //debug
-            if (Main.LocalPlayer.HeldItem.type != ModContent.ItemType<DebugLeechSummon>())
-                NPC.ai[1] = 0;
 
             if (CurrentState != Behavior.Lunge)
                 accelerationInterp = float.Lerp(accelerationInterp, 0, 0.2f);
@@ -285,34 +273,25 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     continue;
 
                 Vector2 dir = toPrev / dist;
-
                 //create a offset to attempt to make the npc wiggle
                 //the issue with this is that it makes the npc segments drift towards the top left hand corner instead of based on where the npc first bit.
-                Vector2 WiggleOffset = new Vector2(MathF.Sin(CosmeticTime / 5) * 10, 0);
+                Vector2 WiggleOffset = new Vector2(MathF.Sin(CosmeticTime/10.1f ) * 3, 0).RotatedBy(toPrev.ToRotation() + MathHelper.PiOver2);
                 //disable if not latched onto something, so you don't look stupid
-                WiggleOffset *= CurrentState == Behavior.latch ? 1 : 0;
+                WiggleOffset *= CurrentState == Behavior.latch ? 2 : 0;
                 Vector2 distanceTarget = prevCenter - dir * segmentLength;
-
                 // Ideal position if fully aligned behind NPC’s rotation
                 Vector2 alignTarget = lastCenter - forward * segmentLength;
-
                 // Blend between distance-based following and axis alignment
                 Vector2 blendedTarget = Vector2.Lerp(distanceTarget, alignTarget, AlignmentStrength);
-
                 // stick together even if very fast
                 float t = MathHelper.Clamp((dist - segmentLength) / segmentLength, 0f, 1f);
-                float lerpFactor = MathHelper.Lerp(0.25f, 0.8f, t);
-
+                float lerpFactor = MathHelper.Lerp(0.25f, 0.9f, t);
                 Vector2 finalCenter = Vector2.Lerp(currCenter, blendedTarget + WiggleOffset, lerpFactor);
-
                 AdjHitboxes[i].Location = (finalCenter - half + new Vector2(0.5f)).ToPoint();
-
-
                 lastCenter = finalCenter;
-
             }
 
-            for (int i = 0; i < AdjHitboxes.Length-1; i++)
+            for (int i = 0; i < AdjHitboxes.Length - 1; i++)
             {
                 _ExtraHitBoxes[i].Hitbox = AdjHitboxes[i];
                 if (_ExtraHitBoxes[i].ImmuneTime > 0)
@@ -337,17 +316,17 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     CurrentState = Behavior.DeathAnim;
                 }
                 NPC.damage = -1;
-                
 
-                   
+
+
             }
 
-        
-            
-            
+
+
+
             return false;
         }
-       
+
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
 
@@ -368,11 +347,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                 }
         }
 
-    
+
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<ViscousWhip_Item>(), 1, 5));
-            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<UmbralLeechDrop>(), 30, 25));
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<ViscousWhip_Item>(), 36, 24));
+            npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<UmbralLeechDrop>(), 3, 2));
             npcLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<newLeech>()));
 
             npcLoot.Add(ModContent.ItemType<BloodOrb>(), 1, 40, 48);
@@ -444,6 +423,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
                     float wigglePhase = CosmeticTime * 0.12f + j * 0.5f;
                     float wiggleMag = MathHelper.Lerp(0.3f, 2.0f, (float)j / _tailPosition.Length) * thing;
 
+                  
                     Vector2 wiggle = new Vector2(0, (float)Math.Sin(wigglePhase) * wiggleMag);
                     _tailPosition[j] += wiggle.RotatedBy(headRot) * 0.75f;
                 }

@@ -87,6 +87,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
             NPC.lifeMax = 30000;
             NPC.damage = 160;
             NPC.defense = 201;
+            NPC.npcSlots = 0.1f;
             NPC.knockBackResist = 0f;
             NPC.noGravity = true;
             NPC.noTileCollide = true;

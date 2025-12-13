@@ -35,6 +35,10 @@ public class AntishadowFireParticleSystemManager : ModSystem
 
     private static void PrepareShader()
     {
+
+        if (Main.dedServ)
+            return;
+
         Matrix world = Matrix.CreateTranslation(-Main.screenPosition.X, -Main.screenPosition.Y, 0f);
         Matrix projection = Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -100f, 100f);
 
@@ -69,6 +73,10 @@ public class AntishadowFireParticleSystemManager : ModSystem
 
     public override void PreUpdateEntities()
     {
+        if (Main.dedServ)
+            return;
+
+
         foreach (FireParticleSystem system in BackParticleSystem.Values)
             system.UpdateAll();
         foreach (FireParticleSystem system in ParticleSystem.Values)
@@ -80,6 +88,8 @@ public class AntishadowFireParticleSystemManager : ModSystem
     /// </summary>
     public static void CreateNew(int playerIndex, bool behindProjectiles, Vector2 spawnPosition, Vector2 velocity, Vector2 size, Color color)
     {
+        if (Main.dedServ)
+            return;
         int maxParticles = 1024;
         FireParticleSystem system;
         if (behindProjectiles)

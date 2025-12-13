@@ -105,6 +105,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
                     invalid.Add(kvp.Key);
 
                 kvp.Value.Cultists.RemoveAll(id => !id.active || id == null);
+                
             }
 
             foreach (int id in invalid)

@@ -78,6 +78,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
         }
         public override void OnSpawn(IEntitySource source)
         {
+            Projectile.scale = 0;
             SpiralOffset = Main.rand.Next(20, 100);
 
             DistanceOffset = Main.rand.Next(75, 140);
@@ -88,6 +89,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
 
         public override void AI()
         {
+            if (Projectile.scale < 0.99)
+                Projectile.scale = float.Lerp(Projectile.scale, 1, 0.2f);
             if (ownerIndex != -1)
             {
                 NPC Owner = Main.npc[ownerIndex];
@@ -144,6 +147,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
             }
             Time++;
         }
+
         private void OnRayImpact(Vector2 hitWorld)
         {
 
@@ -282,9 +286,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
             Rectangle Frame = tex.Frame(3, 3, varX, varY);
             Vector2 Squish = new Vector2(1, 1 * (squishFactor));
 
-            Main.EntitySpriteDraw(glow, DrawPos, null, Color.Crimson with { A = 0 } * (squishFactor) * Projectile.Opacity, 0, glow.Size() * 0.5f, 0.05f, 0);
+            Main.EntitySpriteDraw(glow, DrawPos, null, Color.Crimson with { A = 0 } * (squishFactor) * Projectile.Opacity, 0, glow.Size() * 0.5f, 0.05f * Projectile.scale, 0);
 
-            Main.EntitySpriteDraw(tex, DrawPos, Frame, lightColor, Projectile.rotation, Frame.Size() / 2, Squish, 0);
+            Main.EntitySpriteDraw(tex, DrawPos, Frame, lightColor, Projectile.rotation, Frame.Size() / 2, Squish * Projectile.scale, 0);
             //Utils.DrawBorderString(Main.spriteBatch, Projectile.velocity.Length().ToString(), DrawPos, Color.AntiqueWhite);
             return false;// base.PreDraw(ref lightColor);
         }

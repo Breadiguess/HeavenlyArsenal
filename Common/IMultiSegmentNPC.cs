@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 
-namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
+namespace HeavenlyArsenal.Common
 {
     public interface IMultiSegmentNPC
     {
@@ -63,7 +63,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech
         public ExtraNPCSegment(Rectangle hitbox, bool dealsDamage = true, bool itemCollide = true, bool projectileCollide = true, bool uniqueIframes = false, int immunity = 60)
         {
             
-            this.Hitbox = hitbox;
+            Hitbox = hitbox;
             UniqueIframes = uniqueIframes;
             DealsDamage = dealsDamage;
             ItemCollide = itemCollide;

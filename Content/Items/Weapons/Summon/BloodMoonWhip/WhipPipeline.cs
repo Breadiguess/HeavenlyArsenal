@@ -388,7 +388,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip
             // 3) Bell-curve influence: 0 at ends, 1 at mid-swing
             float bell = MathF.Sin(MathHelper.Clamp(progress, 0f, 1f) * MathHelper.Pi);
 
-            // 4) Blend vanilla ↔ Bezier
+            // 4) Blend vanilla <-> Bezier
             controlPoints.Clear();
             for (int i = 0; i < totalPoints; i++)
                 controlPoints.Add(Vector2.Lerp(vanilla[i], bezier[i], bell*0.2f));

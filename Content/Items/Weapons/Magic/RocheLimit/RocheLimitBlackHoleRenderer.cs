@@ -34,7 +34,8 @@ public class RocheLimitBlackHoleRenderer : ModSystem
 
     public override void OnModLoad()
     {
-        ParticleSystem = new FireParticleSystem(GennedAssets.Textures.Particles.FireParticleA, 34, 512, PrepareShader, UpdateParticle);
+        if(Main.netMode != NetmodeID.Server)
+            ParticleSystem = new FireParticleSystem(GennedAssets.Textures.Particles.FireParticleA, 34, 512, PrepareShader, UpdateParticle);
         Main.ContentThatNeedsRenderTargets.Add(blackHoleTarget = new InstancedRequestableTarget());
         On_Main.DrawProjectiles += RenderBlackHolesWrapper;
     }
@@ -62,7 +63,13 @@ public class RocheLimitBlackHoleRenderer : ModSystem
         overlayShader.Apply();
     }
 
-    public override void PostUpdateDusts() => ParticleSystem.UpdateAll();
+    public override void PostUpdateDusts()
+    {
+        if (Main.netMode != NetmodeID.Server)
+        {
+            ParticleSystem.UpdateAll();
+        }
+    }
 
     private static void UpdateParticle(ref FastParticle particle)
     {

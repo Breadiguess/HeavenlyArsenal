@@ -96,7 +96,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
             {
                 if (i < tendrilCount - 1)
                 {
-                    if (i % 2 != 0) Tendrils.Add(i, (new Vector2[23], new Vector2[23]));
+                    if (i % 2 != 0) Tendrils.Add(i, (new Vector2[27], new Vector2[27]));
 
                     else Tendrils.Add(i, (new Vector2[17], new Vector2[17]));
 
@@ -109,48 +109,49 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
             int thing = Main.rand.Next(10, 30);
 
             MaxCapacity = Main.rand.Next(thing, thing + 20);
-            ThreatIndicies = new List<int>(thing);
+            ThreatIndicies = new List<int>(MaxCapacity);
             for (int i = 0; i < thing; i++)
             {
                 Projectile d = Projectile.NewProjectileDirect(source, NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheThreat>(), 150, 10);
                 ThreatIndicies.Add(d.whoAmI);
+                //Main.NewText(d.whoAmI + ", " + i);
                 TheThreat a = d.ModProjectile as TheThreat;
                 a.ownerIndex = NPC.whoAmI;
             }
         }
         public override void SendExtraAI(BinaryWriter writer)
         {
-            writer.Write(MaxCapacity);
-            if (ThreatIndicies != null)
-            {
-                for(int i = 0; i< ThreatCount; i++)
-                {
-                    writer.Write(ThreatIndicies[i]);
-                }
-            }
+            base.SendExtraAI(writer);
+            //writer.Write(MaxCapacity);
+
+            //for(int i = 0; i< ThreatIndicies.Capacity;i++)
+             //   writer.Write(ThreatIndicies[i]);
         }
+
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-            MaxCapacity = reader.Read();
-            if (ThreatIndicies != null)
-            {
-                for (int i = 0; i < ThreatCount; i++)
-                {
-                    ThreatIndicies[i] = reader.Read();
-                }
-            }
+            base.ReceiveExtraAI(reader);
+                //MaxCapacity = reader.ReadInt32();
+
+            //ThreatIndicies.Clear();
+
+            
+           // for (int i = 0; i < ThreatIndicies.Capacity; i++)
+            //{
+            //    Main.NewText(reader.ReadInt32());
+           //     ThreatIndicies.Add(reader.ReadInt32());
+           // }
         }
+
 
         #endregion
         public override void AI()
         {
+          
             if (NPC.ai[2] != 0)
             {
 
                 NPC.Center = Vector2.Lerp(NPC.Center, Main.MouseWorld, 0.2f);
-                //NPC.Center = Main.MouseWorld + new Vector2(300, 0).RotatedBy(MathHelper.ToRadians(CosmeticTime));
-                //NPC.Center = Main.MouseWorld;
-                //NPC.velocity = Vector2.Zero;// NPC.Center.AngleTo(Main.MouseWorld).ToRotationVector2()* 7;
                 NPC.ai[2] = 0;
                 //NPC.GetGlobalNPC<FastUpdateGlobal>().speed
                 return;
@@ -177,9 +178,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
              //NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
             manageTendrils();
             CosmeticTime++;
-            if (CurrentState != Behavior.DiveBomb && CurrentState != Behavior.StickAndExplode)
+
+            if (CurrentState != Behavior.DiveBomb && CurrentState != Behavior.StickAndExplode && Main.netMode != NetmodeID.MultiplayerClient)
             {
-                if (Time % 15 == 0 && Main.rand.NextBool(2) && ThreatIndicies.Count < ThreatIndicies.Capacity)
+                if (Time % 20 == 0 && Main.rand.NextBool(2) && ThreatIndicies.Count < ThreatIndicies.Capacity)
                 {
                     SoundEngine.PlaySound(GennedAssets.Sounds.Environment.DivineStairwayStep with { Pitch = 0.1f, MaxInstances = 0, PitchVariance = 1 }, NPC.Center);
                     Projectile d = Projectile.NewProjectileDirect(NPC.GetSource_FromThis(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheThreat>(), 160, 10);
@@ -193,8 +195,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
         void manageTendrils()
         {
             Vector2 BodyRot = (NPC.rotation + MathHelper.PiOver2).ToRotationVector2();
+            float dampening = 0.5f;
             float waveSpeed = 01f;     // Controls how fast the tendril oscillates
-            float waveStrength = 100f;   // Controls how wide the tendril swings
+            float waveStrength = 270f;   // Controls how wide the tendril swings
             float segmentLength = 3f;
 
             for (int j = 0; j < Tendrils.Count; j++)
@@ -241,7 +244,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish
                         _tendrilVel[i] = Vector2.Lerp(_tendrilVel[i], alignVel, 1f);
                     else
                         _tendrilVel[i] = Vector2.Lerp(_tendrilVel[i], alignVel, 1f);
-                    _tendrilPos[i] += _tendrilVel[i] + NPC.velocity * 0.2f;
+                    _tendrilPos[i] += _tendrilVel[i] ;
 
 
                     if (_tendrilPos[i] == Vector2.Zero)

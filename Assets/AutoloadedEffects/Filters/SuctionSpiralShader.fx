@@ -31,7 +31,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     
     // Use the aforementioned calculations to calculate an angle and coordinates for a dual-sampled noise value,
     // This spiral noise value will be used below to create the suction colors.
-    float spiralAngle = distanceFromSource * 0.007 + globalTime * 7.96;
+    float spiralAngle = distanceFromSource * 0.007 + globalTime * -0.36;
     float2 spiralCoords = RotatedBy(centeredCoords - suctionCenterUV, spiralAngle) + (1 - suctionCenterUV);
     float spiralNoise = (tex2D(spiralTexture, spiralCoords) + tex2D(spiralTexture, spiralCoords * 1.6)) * 0.5;
     

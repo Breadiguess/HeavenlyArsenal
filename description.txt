@@ -1,4 +1,16 @@
 I have long felt that WoTG has been too weaponless, and this is my attempt to fix that.
+currently, the mod includes:
+two armor sets, one post yharon and the other post avatar
+one vanity set
+three magic weapons
+two melee weapons
+two ranged weapons (both still work in progress)
+two summon weapons
+one whip
+three unique accessories, with three more still in development
+six unique enemies, with a few more still in development
+one consumable item
+
 thank you all :3
 
 credit where it's due: 

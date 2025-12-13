@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -18,11 +20,13 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
     {
         public int id;
         public ZooidType type;
-
-        public CryonophoreZooid(int id, ZooidType type)
+        public Vector2 position;
+        public float rotation;
+        public CryonophoreZooid(int id, ZooidType type, Vector2 position)
         {
             this.id = id;
             this.type = type;
+            this.position = position;
         }
     }
     partial class Cryonophore : BloodMoonBaseNPC
@@ -44,6 +48,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
             NPC.aiStyle = -1;
             NPC.Size = new Vector2(30, 30);
             NPC.noGravity = true;
+            NPC.HitSound = SoundID.NPCHit1;
+
+            SpawnModBiomes =
+            [
+                ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ];
         }
         public override void SetStaticDefaults()
         {
@@ -56,14 +66,61 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
             OwnedZooids = new Dictionary<int, (CryonophoreZooid, NPC)>(5);
             for (int i = 0; i < 6; i++)
             {
-                ZooidType a = (ZooidType)Main.rand.Next(0, 4);
-                addZoid(a);
+                ZooidType a = ZooidType.basic;//(ZooidType)Main.rand.Next(0, 4);
+                addZooid(a);
             }
         }
         #endregion
 
         public override void AI()
         {
+            if (Main.LocalPlayer.name.ToLower() == "tester2")
+            {
+                int totalActive = 0;
+                var counts = new Dictionary<int, int>();
+
+                for (int i = 0; i < Main.npc.Length; i++)
+                {
+                    var n = Main.npc[i];
+                    if (n != null && n.active)
+                    {
+                        totalActive++;
+                        if (counts.ContainsKey(n.type))
+                            counts[n.type]++;
+                        else
+                            counts[n.type] = 1;
+                    }
+                }
+
+                int uniqueTypes = counts.Count;
+
+                // Build a compact message showing totals and the top few types
+                var top = counts.OrderByDescending(kv => kv.Value).Take(10).ToList();
+                var sb = new StringBuilder();
+                sb.Append($"Active NPCs: {totalActive}, Unique types: {uniqueTypes}. \nTop= ");
+
+                for (int i = 0; i < top.Count; i++)
+                {
+                    var kv = top[i];
+                    string name;
+                    try
+                    {
+                        name = Lang.GetNPCNameValue(kv.Key);
+                        if (string.IsNullOrEmpty(name)) name = $"NPC#{kv.Key}";
+                    }
+                    catch
+                    {
+                        name = $"NPC#{kv.Key}";
+                    }
+
+                    sb.Append($"{name}({kv.Key}) x{kv.Value}\n");
+                    if (i < top.Count - 1) sb.Append(", ");
+                }
+                sb.Append($"{OwnedZooids.Count}");
+
+                Main.NewText(sb.ToString());
+            }
+
             if (NPC.ai[1] == 1)
             {
                 NPC.Center = Main.MouseWorld;
@@ -71,12 +128,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
                 return;
             }
            
+           
             StateMachine();
+            Time++;
         }
         #region helpers
-        void addZoid(ZooidType type)
+        void addZooid(ZooidType type)
         {
-            CryonophoreZooid a = new CryonophoreZooid(OwnedZooids.Count, type);
+            CryonophoreZooid a = new CryonophoreZooid(OwnedZooids.Count, type, NPC.Center);
             OwnedZooids.Add(a.id, (a, null));
         }
 
@@ -88,10 +147,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
             if (OwnedZooids[id].Item2 != null)
                 return;
 
-            NPC placeholder = NPC.NewNPCDirect(NPC.GetSource_FromThis(), NPC.Center, ModContent.NPCType<CryonophoreLimb>());
+            NPC placeholder = NPC.NewNPCDirect(NPC.GetSource_FromThis(), OwnedZooids[id].Item1.position, ModContent.NPCType<CryonophoreLimb>());
             if (placeholder == null)
                 return;
 
+            placeholder.damage = NPC.defDamage;
             CryonophoreLimb limb = placeholder.ModNPC as CryonophoreLimb;
             if (limb != null)
             {
@@ -99,13 +159,59 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho
                 limb.OwnerIndex = NPC.whoAmI;
             }
 
-            // copy, modify, and reassign the value tuple to avoid CS1612
             var entry = OwnedZooids[id];
             entry.Item2 = placeholder;
             OwnedZooids[id] = entry;
         }
 
-       
+        // Pseudocode:
+        // - Iterate the keys of OwnedZooids to avoid modifying the collection while enumerating.
+        // - For each entry:
+        //   - Read the value tuple (struct + NPC).
+        //   - Update the struct's position (remember structs are copied, so modify the copy then reassign).
+        //   - If the associated NPC exists and is active, set its Center to the new position so the in-world NPC matches.
+        //   - Reassign the modified tuple back into the dictionary.
+        //
+        // This solves the TODO: ensure we properly update the stored struct instance instead of only modifying a copy.
+
+        void updateZooidPosition()
+        {
+            //am i dumb or just dumb
+            var keys = new List<int>(OwnedZooids.Keys);
+            for (int i = 0; i < keys.Count; i++)
+            {
+                int key = keys[i];
+                var entry = OwnedZooids[key];
+                if (OwnedZooids[i].Item2 !=null)
+                    continue;
+                CryonophoreZooid zooid = entry.Item1;
+
+                Vector2 desiredPos = NPC.Center + new Vector2(zooid.id * 10 - 20, 40);
+
+                Vector2 below = NPC.Center - new Vector2(0, 50);
+
+                float rot = below.AngleTo(zooid.position);
+                zooid.rotation = rot;
+                
+                zooid.position = desiredPos;
+
+                // Put the modified struct back into the tuple and write the tuple back to the dictionary.
+                entry.Item1 = zooid;
+                OwnedZooids[key] = entry;
+
+                // If the associated NPC exists and is active, update its world position to match.
+                if (entry.Item2 != null && entry.Item2.active)
+                {
+                    
+                    entry.Item2.Center = desiredPos;
+                    OwnedZooids[key] = entry;
+                }
+            }
+        }
         #endregion
+        public override void PostAI()
+        {
+            updateZooidPosition();
+        }
     }
 }

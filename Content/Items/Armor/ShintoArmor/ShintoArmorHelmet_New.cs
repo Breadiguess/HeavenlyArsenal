@@ -1,8 +1,14 @@
 ﻿using CalamityEntropy.Common;
+using CalamityMod.Items.Accessories;
+using CalamityMod.Items.Armor.Demonshade;
+using CalamityMod.Items.Armor.Statigel;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.Common.Utilities;
+using HeavenlyArsenal.Content.Items.Materials;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.Rarities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +17,7 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
@@ -21,13 +28,51 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         public override void SetStaticDefaults()
         {
             ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false;
-            ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] =false ;
+            ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] =true ;
             ArmorIDs.Head.Sets.IsTallHat[Item.headSlot] = true;
             ArmorIDs.Head.Sets.PreventBeardDraw[Item.headSlot] = true;
         }
         public override void SetDefaults()
         {
+            Item.width = 30; // Width of the item
+            Item.height = 32; // Height of the item
+            Item.value = Item.sellPrice(platinum: 2, gold: 60, silver: 40); // How many coins the item is worth
+            Item.rare = ModContent.RarityType<AvatarRarity>();  // The rarity of the item
+            Item.defense = 60;
+        }
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
+                .AddIngredient<DemonshadeHelm>()
+                .AddIngredient(ItemID.NinjaHood)
+                .AddIngredient(ItemID.CrystalNinjaHelmet)
+                .AddIngredient<StatigelHeadMelee>()
+                .AddIngredient<OccultSkullCrown>()
+                .AddTile<DraedonsForge>();
+            HeavenlyArsenal.TryAddModIngredient(recipe, "CalamityHunt", "ShogunHelm");
            
+
+            recipe.Register();
+        }
+        public override bool IsArmorSet(Item head, Item body, Item legs)
+        {
+            return body.type == ModContent.ItemType<ShintoArmorBreastplate>() && legs.type == ModContent.ItemType<ShintoArmorLeggings>();
+        }
+        public override void UpdateArmorSet(Player player)
+        {
+            player.GetModPlayer<ShintoWingManager>().Active = true;
+            player.GetModPlayer<ShintoArmorBarrier>().BarrierActive = true;
+            player.setBonus = Language.GetOrRegister(("Items.Armor.ShintoArmorHelmetAll.SetBonus")).Value;
+            player.setBonus = this.GetLocalizedValue("SetBonus");
+            player.jumpSpeedBoost += 2f;
+            //player.GetModPlayer<ShintoArmorPlayer>().SetActive = true;
+            player.GetDamage(DamageClass.Generic) += 0.18f;
+            player.maxMinions += 10;
+        }
+        public override void UpdateEquip(Player player)
+        {
+          
         }
     }
     public class ShintoArmorHelmet_NewDraw : PlayerDrawLayer

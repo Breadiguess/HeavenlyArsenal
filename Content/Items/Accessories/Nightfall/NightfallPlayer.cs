@@ -75,7 +75,11 @@ namespace HeavenlyArsenal.Content.Items.Accessories.Nightfall
 
             foreach (NPC npc in Main.ActiveNPCs)
             {
-                NightfallNPC a = npc.GetGlobalNPC<NightfallNPC>();
+                if(npc.friendly)
+                    continue;
+                NightfallNPC a;
+                npc.TryGetGlobalNPC<NightfallNPC>(out a);
+                if(npc != null && a != null)
                 if (npc.active)
                 {
                     if (a.DamageBucketNPC != 0 && a.Stack > 0 && a.StackOwner == Player)

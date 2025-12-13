@@ -1,14 +1,17 @@
 ﻿using CalamityMod;
 using CalamityMod.Items;
 using CalamityMod.Rarities;
+using HeavenlyArsenal.Core.Globals;
 using Microsoft.Xna.Framework;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
+using NoxusBoss.Core.GlobalInstances;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using static NoxusBoss.Assets.GennedAssets.Sounds;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Melee.AvatarSpear;
 
@@ -20,7 +23,25 @@ public class AvatarLonginus : ModItem
         ItemID.Sets.Spears[Type] = true;
         ItemID.Sets.gunProj[Type] = true;
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
+
+        GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>
+        {
+            if (npc.type == ModContent.NPCType<AvatarOfEmptiness>())
+            {
+                LeadingConditionRule normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+                {
+                    normalOnly.OnSuccess(ItemDropRule.Common(Type));
+                }
+                npcLoot.Add(normalOnly);
+            }
+        };
+        ArsenalGlobalItem.ModifyItemLootEvent += (Item item, ItemLoot loot) =>
+        {
+            if (item.type == AvatarOfEmptiness.TreasureBagID)
+                loot.Add(ItemDropRule.Common(Type));
+        };
     }
+    
 
     public override void SetDefaults()
     {

@@ -1,4 +1,5 @@
 ﻿
+using CalamityMod;
 using CalamityMod.NPCs.TownNPCs;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.Players;
@@ -43,7 +44,7 @@ public class AvatarLonginusHeld : ModProjectile
         Projectile.timeLeft = 2;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
-        Projectile.DamageType = DamageClass.Melee;
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Projectile.friendly = true;
         Projectile.hostile = false;
         Projectile.hide = true;
@@ -95,7 +96,7 @@ public class AvatarLonginusHeld : ModProjectile
 
     public const float RuptureCost = 0.2f;
     public const float CastigationCost = 0.55f;
-
+   
     public override void AI()
     {
         Projectile.extraUpdates = 3;
@@ -962,9 +963,9 @@ public class AvatarLonginusHeld : ModProjectile
     {
         canHit = reader.ReadBoolean();
         IsEmpowered = reader.ReadBoolean();
-        HitTimer = reader.Read();
+        HitTimer = reader.ReadInt32();
         JavelinOffset = reader.ReadVector2();
-        CurrentFrame = (int)reader.ReadSingle();
+        CurrentFrame = reader.ReadInt32();
     }
 
     private bool useSlash;

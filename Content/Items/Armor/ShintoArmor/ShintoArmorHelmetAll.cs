@@ -5,6 +5,7 @@ using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Common.Players;
 using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Content.Items.Materials;
 using Microsoft.Xna.Framework;
@@ -12,10 +13,13 @@ using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.Graphics;
+using NoxusBoss.Core.Graphics.RenderTargets;
+using NoxusBoss.Core.Utilities;
 using rail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -26,59 +30,63 @@ using Player = Terraria.Player;
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 {
-    // The AutoloadEquip attribute automatically attaches an equip texture to this item.
-    // Providing the EquipType.Head value here will result in TML expecting a X_Head.png file to be placed next to the item's main texture.
-    [AutoloadEquip(EquipType.Head)]
+     [AutoloadEquip(EquipType.Head)]
     public class ShintoArmorHelmetAll : ModItem
     {
         public static readonly int AdditiveGenericDamageBonus = 20;
         public const float TeleportRange = 2000f;
 
+        private static readonly int MaxMinionIncrease = 10;
         // Boosted by Cross Necklace.
         internal static readonly int ShadowVeilIFrames = 80;
 
         public override string LocalizationCategory => "Items.Armor.ShintoArmor";
-       
+
         public override void SetStaticDefaults()
         {
-            // If your head equipment should draw hair while drawn, use one of the following:
-            ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = true; // Don't draw the head at all. Used by Space Creature Mask
-                                                               // ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = true; // Draw hair as if a hat was covering the top. Used by Wizards Hat
-                                                               // ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = true; // Draw all hair as normal. Used by Mime Mask, Sunglasses
-                                                               // ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
-
-            //SetBonusText = this.GetLocalization("SetBonus").WithFormatArgs(AdditiveGenericDamageBonus);
             ArmorIDs.Head.Sets.IsTallHat[Item.headSlot] = true;
+            ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = true;
+            ArmorIDs.Head.Sets.PreventBeardDraw[Item.headSlot] = true;
         }
-
         public override void SetDefaults()
         {
-            Item.width = 30; // Width of the item
-            Item.height = 32; // Height of the item
-            Item.value = Item.sellPrice(platinum: 2, gold: 60, silver: 40); // How many coins the item is worth
-            Item.rare = ModContent.RarityType<AvatarRarity>();  // The rarity of the item
+            Item.width = 30; 
+            Item.height = 32; 
+            Item.value = Item.sellPrice(platinum: 7, gold: 60, silver: 40); 
+            Item.rare = ModContent.RarityType<AvatarRarity>();
             Item.defense = 60;
         }
+        public override void AddRecipes()
+        {
+            Recipe recipe = CreateRecipe()
+                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
+                .AddIngredient<DemonshadeHelm>()
+                .AddIngredient(ItemID.NinjaHood)
+                .AddIngredient(ItemID.CrystalNinjaHelmet)
+                .AddIngredient<StatigelHeadMelee>()
+                .AddIngredient<OccultSkullCrown>()
+                .AddTile<DraedonsForge>();
+            HeavenlyArsenal.TryAddModIngredient(recipe, "CalamityHunt", "ShogunHelm");
 
-        // IsArmorSet determines what armor pieces are needed for the setbonus to take effect
+
+            recipe.Register();
+        }
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
             return body.type == ModContent.ItemType<ShintoArmorBreastplate>() && legs.type == ModContent.ItemType<ShintoArmorLeggings>();
         }
-
-
         public override void UpdateArmorSet(Player player)
         {
-
+            player.GetModPlayer<ShintoArmorIKArms>().Active = true;
+            player.GetModPlayer<ShintoWingManager>().Active = true;
+            player.GetModPlayer<ShintoArmorBarrier>().BarrierActive = true;
+            player.GetModPlayer<ShintoArmorAvatarFall>().Active = true;
             player.setBonus = Language.GetOrRegister(("Items.Armor.ShintoArmorHelmetAll.SetBonus")).Value;
             player.setBonus = this.GetLocalizedValue("SetBonus");
             player.jumpSpeedBoost += 2f;
-            player.GetModPlayer<ShintoArmorPlayer>().SetActive = true;
+            //player.GetModPlayer<ShintoArmorPlayer>().SetActive = true;
             player.GetDamage(DamageClass.Generic) += 0.18f;
-            player.maxMinions += 10;
-
-
-            //modPlayer.GemTechSet = true;
+            player.maxMinions += MaxMinionIncrease;
         }
 
 
@@ -95,99 +103,53 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             player.GetAttackSpeed(DamageClass.Generic) += 0.15f;
             //player.GetModPlayer<ShintoArmorPlayer>().ShadowVeil = true;
         }
-        //public override void ModifyTooltips(List<TooltipLine> list) => list.IntegrateHotkey(CalamityKeybinds.SpectralVeilHotKey);
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
-            if (Main.keyState.PressingShift())
+            Texture2D facePixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+            Texture2D Glow = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
+
+
+            Color EyeColor = Color.Crimson with { A = 0 }; //* MathF.Sin(Main.GlobalTimeWrappedHourly);
+            Vector2[] offsets = new Vector2[]
             {
-                string specialTooltip = Main.specialSeedWorld
-                    ? this.GetLocalizedValue("LoreTipGFB")
-                    : this.GetLocalizedValue("LoreTip");
-
-                // Which word to animate
-                string targetWord = "Antishadow"; // Change to whatever you want
-                Color animatedColor = GetAnimatedColor();
-
-                // Process each line of the tooltip
-                foreach (string line in specialTooltip.Split('\n'))
-                {
-                    if (line.Contains(targetWord, StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Find where the target word is in the line
-                        int index = line.IndexOf(targetWord, StringComparison.OrdinalIgnoreCase);
-
-                        string before = line.Substring(0, index);
-                        string word = line.Substring(index, targetWord.Length);
-                        string after = line.Substring(index + targetWord.Length);
-
-                        // Add before part (if any)
-                        if (!string.IsNullOrWhiteSpace(before))
-                            tooltips.Add(new TooltipLine(Mod, "LoreTipPartBefore", before));
-
-                        // Add the animated word
-                        TooltipLine wordLine = new TooltipLine(Mod, "LoreTipWord", word)
-                        {
-                            OverrideColor = animatedColor
-                        };
-                        tooltips.Add(wordLine);
-
-                        // Add after part (if any)
-                        if (!string.IsNullOrWhiteSpace(after))
-                            tooltips.Add(new TooltipLine(Mod, "LoreTipPartAfter", after));
+                    new Vector2((2.5f), 4f),
+                    new Vector2((2.5f), 8f),
+                    new Vector2((-0.75f), 6f),
+                    new Vector2((5.75f ), 6f),
+            };
+            foreach(Vector2 vect in offsets)
+            {
+                
+                Vector2 DrawPos = position + vect*scale;
+                Main.EntitySpriteDraw(facePixel, DrawPos, null, EyeColor, 0, facePixel.Size() / 2, scale, 0);
+                Main.EntitySpriteDraw(Glow, DrawPos, null, EyeColor, 0, Glow.Size() / 2, scale * 0.05f, 0);
+            }
+        }
+        public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
+        {
+            base.PostDrawInWorld(spriteBatch, lightColor, alphaColor, rotation, scale, whoAmI);
+            Texture2D facePixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+            Texture2D Glow = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
 
 
-                    }
-                    else
-                    {
-                        // Normal line, no special word
-                        if (!string.IsNullOrWhiteSpace(line))
-                            tooltips.Add(new TooltipLine(Mod, "LoreTip", line));
-                    }
-                }
-
-                return;
+            Color EyeColor = Color.Crimson with { A = 0 } * MathF.Sin(Main.GlobalTimeWrappedHourly);
+            Vector2[] offsets = new Vector2[]
+            {
+                    new Vector2((2.5f), 3.5f),
+                    new Vector2((2.5f), 7.5f),
+                    new Vector2((-0.75f), 5.5f),
+                    new Vector2((5.75f ), 5.5f),
+            };
+            foreach (Vector2 vect in offsets)
+            {
+                Vector2 Adjust = Item.position + new Vector2(Item.width / 2, Item.height / 2) + new Vector2(0, 2.5f);
+                Vector2 DrawPos = Adjust+ vect - Main.screenPosition;
+                Main.EntitySpriteDraw(facePixel, DrawPos, null, EyeColor, 0, facePixel.Size() / 2, 1, 0);
+                Main.EntitySpriteDraw(Glow, DrawPos, null, EyeColor, 0, Glow.Size() / 2, 0.05f, 0);
             }
         }
 
-        private Color GetAnimatedColor()
-        {
-            // Example rainbow cycle
-            float hue = (Main.GameUpdateCount % 360) / 360f;
-            return Main.hslToRgb(hue, 1f, 0.5f);
-        }
-
-        // Please see Content/ExampleRecipes.cs for a detailed explanation of recipe creation.
-        public override void AddRecipes()
-        {
-
-
-            if (ModLoader.TryGetMod("CalamityHunt", out Mod CalamityHunt))
-            {
-                CreateRecipe()
-                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
-                .AddIngredient<DemonshadeHelm>()
-                .AddIngredient(ItemID.NinjaHood)
-                .AddIngredient(ItemID.CrystalNinjaHelmet)
-                .AddIngredient<StatigelHeadMelee>()
-                .AddIngredient(CalamityHunt.Find<ModItem>("ShogunHelm").Type)
-                .AddIngredient<OccultSkullCrown>()
-                .AddTile<DraedonsForge>()
-                .Register();
-            }
-            else
-            {
-                CreateRecipe()
-                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
-               .AddIngredient<DemonshadeHelm>()
-               .AddIngredient(ItemID.NinjaHood)
-               .AddIngredient(ItemID.CrystalNinjaHelmet)
-               .AddIngredient<StatigelHeadMelee>()
-               .AddIngredient<OccultSkullCrown>()
-               .AddTile<DraedonsForge>()
-               .Register();
-            }
-
-        }
+      
     }
 
     public class HelmetFauld : PlayerDrawLayer
@@ -199,8 +161,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
         public override bool GetDefaultVisibility(PlayerDrawSet drawInfo) => drawInfo.drawPlayer.head == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorHelmetAll), EquipType.Head);
 
         public override bool IsHeadLayer => true;
-
-
         /// <summary>
         /// Renders the AoE Void Eyes onto the helmet.
         /// </summary>
@@ -217,10 +177,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
             Vector2[] offsets = new Vector2[]
             {
-                    new Vector2(2.5f * player.direction, 0),
-                    new Vector2(2.5f * player.direction, -5),
-                    new Vector2(-0.75f * player.direction, -2.5f),
-                    new Vector2(5.75f * player.direction, -2.5f),
+                    new Vector2((2.5f) * player.direction, 0),
+                    new Vector2((2.5f) * player.direction, -5),
+                    new Vector2((-0.75f) * player.direction, -2.5f),
+                    new Vector2((5.75f ) * player.direction, -2.5f),
             };
             
             //Utils.DrawBorderString(Main.spriteBatch, $"Frame: {frameIndex},  WalkOffset: {walkOffset}", drawInfo.HeadPosition() + new Vector2(0, 60), Color.LightGreen);
@@ -228,12 +188,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
             Color BaseheadColor = Color.Red;
             if (drawInfo.cHead != 0)
             {
-                BaseheadColor = drawInfo.colorArmorHead;
+                BaseheadColor = drawInfo.colorArmorHead.MultiplyRGB(Color.WhiteSmoke);
             }
             Vector2 GravOffset = new Vector2(0, player.gravDir == 1 ? 0 : 16.5f);
             foreach (var offset in offsets)
             {
-                Vector2 drawPos = baseHeadPos + offset + walkOffset + GravOffset;
+                Vector2 drawPos = baseHeadPos + offset.RotatedBy(player.headRotation) + walkOffset.RotatedBy(player.headRotation) + GravOffset;
                 DrawData dots = new DrawData(
                     facePixel, drawPos, null, BaseheadColor * (1 - modPlayer.EnrageInterp), 0f, facePixel.Size() * 0.5f, 0.9f, SpriteEffects.None, 0);
                 dots.shader = drawInfo.cHead;
@@ -241,11 +201,9 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
                
                 drawInfo.DrawDataCache.Add(dots);
 
-
+                if (player.Calamity().adrenalineModeActive)
+                    continue;
                 DrawData GlowingEyes = new DrawData(Glow, drawPos, null, BaseheadColor with { A = 0 } * (1 - modPlayer.EnrageInterp), 0f, Glow.Size() * 0.5f, 0.05f, SpriteEffects.None, 0);
-
-
-               
                 GlowingEyes.shader = drawInfo.cHead;
                 drawInfo.DrawDataCache.Add(GlowingEyes);
 
@@ -352,11 +310,11 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 
             Texture2D DEBUG = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
             //drawInfo.drawPlayer.legFrame.Y = 12 * drawInfo.drawPlayer.legFrame.Height;
-           
-           
-            DrawFaulds(ref drawInfo, sPlayer);
+
+           // drawInfo.drawPlayer.GetModPlayer<HidePlayer>().ShouldHide = true;
+            //DrawFaulds(ref drawInfo, sPlayer);
             DrawVoidEyes(ref drawInfo, sPlayer);
-            DrawDeathMask(ref drawInfo, sPlayer);
+            //DrawDeathMask(ref drawInfo, sPlayer);
         }
     }
     public class Helmetwings : PlayerDrawLayer
