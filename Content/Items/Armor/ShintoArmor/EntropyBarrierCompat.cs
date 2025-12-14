@@ -17,8 +17,9 @@ internal class EntropyBarrierCompat : ModPlayer
     {
         if (ModLoader.HasMod("CalamityEntropy"))
         {
-            Player.Entropy().MagiShield = 0;
-            Player.Entropy().visualMagiShield = false;
+            // TODO: Fix missing references:
+            // Player.Entropy().MagiShield = 0;
+            // Player.Entropy().visualMagiShield = false;
         }
     }
 }

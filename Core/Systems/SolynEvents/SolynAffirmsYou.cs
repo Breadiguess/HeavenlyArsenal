@@ -1,4 +1,5 @@
-﻿using NoxusBoss.Core.DialogueSystem;
+﻿using HeavenlyArsenal.Common.Players;
+using NoxusBoss.Core.DialogueSystem;
 using NoxusBoss.Core.SolynEvents;
 
 namespace HeavenlyArsenal.Core.Systems.SolynEvents;
@@ -7,7 +8,7 @@ internal class SolynAffirmsYou : SolynEvent
 {
     public override int TotalStages => 1;
 
-    public static bool CanStart => Main.LocalPlayer.GetModPlayer<TransgenderPlayer>().IsTrans;
+    public static bool CanStart => Main.LocalPlayer.GetModPlayer<TransgenderPlayer>().Enabled;
 
     private static string Prefix => "SolynGenderChangePotionUsed";
 
