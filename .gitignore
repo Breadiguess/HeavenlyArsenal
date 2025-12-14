@@ -361,30 +361,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Content/NPCs/Hostile/BloodMoon/NobleWorm.cs
-/Common/utils/Debug.cs
-/Content/Buffs/ShintoArmorEnrage.cs
-/Content/Items/Consumables/spinel_tonic.cs
-/Content/Items/Consumables/spinel_tonic.png
-/Content/Items/Debug.cs
-/Content/Items/YangSoul(2).cs
-/Content/Items/YangSoul.png
-/.idea/.idea.HeavenlyArsenal.dir/.idea
-/Content/NPCs/Hostile/BloodMoon/Jellyfish/FileName.cs
-/Content/NPCs/Hostile/BloodMoon/sipho/Cryonophore.cs
-/Content/NPCs/Hostile/BloodMoon/sipho/CryonophoreAttacks.cs
-/Content/NPCs/Hostile/BloodMoon/sipho/CryonophoreLimb.cs
-/Content/NPCs/Hostile/BloodMoon/sipho/CryonophoreRenderer.cs
-/Content/NPCs/Hostile/BloodMoon/sipho/Cryonophore_Core.png
-/Content/NPCs/Hostile/BloodMoon/sipho/DebugCryonophoreSummon.cs
-/Assets/AutoloadedEffects/Shaders/inversion.fx
-/Assets/AutoloadedEffects/Shaders/inversion.fxc
-/Assets/AutoloadedEffects/Shaders/SphericalNoise.fx
-/Assets/AutoloadedEffects/Shaders/SphericalNoise.fxc
-/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech.cs
-/Content/NPCs/Hostile/BloodMoon/Goreca/BloodSplash.png
-/Content/NPCs/Hostile/BloodMoon/Goreca/Chum.png
-/Content/NPCs/Hostile/BloodMoon/Goreca/Goreca.cs
-/Content/NPCs/Hostile/BloodMoon/Goreca/Goreca.png
-/Content/NPCs/Hostile/BloodMoon/Goreca/GorecaBody.png
-/Content/NPCs/Hostile/BloodMoon/Goreca/ShadowHand.png
