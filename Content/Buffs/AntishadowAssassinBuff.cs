@@ -1,14 +1,9 @@
 ﻿using HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
 using Luminance.Common.Utilities;
-using Microsoft.Xna.Framework;
 using NoxusBoss.Assets.Fonts;
-using NoxusBoss.Core.DataStructures;
 using NoxusBoss.Core.GlobalInstances;
 using NoxusBoss.Core.Utilities;
-using ReLogic.Graphics;
-using Terraria;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace HeavenlyArsenal.Content.Buffs;
@@ -27,15 +22,18 @@ public class AntishadowAssassinBuff : ModBuff
     private void RenderNameWithSpecialFont(On_Main.orig_MouseText_DrawBuffTooltip orig, Main self, string buffString, ref int X, ref int Y, int buffNameHeight)
     {
         orig(self, buffString, ref X, ref Y, buffNameHeight);
+
         if (buffString == this.GetLocalizedValue("Description"))
         {
-            DynamicSpriteFont vanillaFont = FontAssets.MouseText.Value;
-            Vector2 vanillaTextSize = vanillaFont.MeasureString(buffString);
+            var vanillaFont = FontAssets.MouseText.Value;
+            var vanillaTextSize = vanillaFont.MeasureString(buffString);
 
-            DynamicSpriteFont font = FontRegistry.Instance.AvatarPoemText;
-            string text = this.GetLocalizedValue("NameText");
-            Vector2 drawPosition = new Vector2(X + (int)vanillaTextSize.X + 6f, Y + 42f);
-            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, drawPosition, new Color(252, 37, 74), 0f, font.MeasureString(text) * Vector2.UnitY * 0.5f, Vector2.One * 0.5f, -1f, 1f);
+            var font = FontRegistry.Instance.AvatarPoemText;
+            var text = this.GetLocalizedValue("NameText");
+            var drawPosition = new Vector2(X + (int)vanillaTextSize.X + 6f, Y + 42f);
+
+            ChatManager.DrawColorCodedStringWithShadow
+                (Main.spriteBatch, font, text, drawPosition, new Color(252, 37, 74), 0f, font.MeasureString(text) * Vector2.UnitY * 0.5f, Vector2.One * 0.5f, -1f, 1f);
         }
     }
 
@@ -46,13 +44,15 @@ public class AntishadowAssassinBuff : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        int assassinID = ModContent.ProjectileType<AntishadowAssassin>();
-        Referenced<bool> hasMinion = player.GetValueRef<bool>("HasAntishadowAssassin");
-        foreach (Projectile projectile in Main.ActiveProjectiles)
+        var assassinID = ModContent.ProjectileType<AntishadowAssassin>();
+        var hasMinion = player.GetValueRef<bool>("HasAntishadowAssassin");
+
+        foreach (var projectile in Main.ActiveProjectiles)
         {
             if (projectile.type == assassinID && projectile.owner == player.whoAmI && projectile.As<AntishadowAssassin>().State != AntishadowAssassin.AssassinState.Leave)
             {
                 hasMinion.Value = true;
+
                 break;
             }
         }

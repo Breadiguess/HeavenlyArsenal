@@ -1,104 +1,110 @@
 ﻿using HeavenlyArsenal.Core;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
-using System;
-using Terraria;
 using Terraria.Graphics.Renderers;
 
-namespace HeavenlyArsenal.Content.Particles
+namespace HeavenlyArsenal.Content.Particles;
+
+internal class LightFlash : BaseParticle
 {
-    internal class LightFlash : BaseParticle
+    public static ParticlePool<LightFlash> pool = new(500, GetNewParticle<LightFlash>);
+
+    public bool AltTexture;
+
+    public int altTexFrame;
+
+    public Vector2 position;
+
+    public Vector2 Velocity;
+
+    public float Rotation;
+
+    public float progress;
+
+    public int MaxTime;
+
+    public int TimeLeft;
+
+    public float Scale;
+
+    public Color GlowColor;
+
+    public void Prepare(Vector2 position, Vector2 velocity, float rotation, int lifeTime, float scale, Color glowColor, bool CollapseExplosion = false)
     {
-        public static ParticlePool<LightFlash> pool = new ParticlePool<LightFlash>(500, GetNewParticle<LightFlash>);
+        this.position = position;
+        Velocity = velocity;
+        Rotation = velocity.ToRotation() + rotation;
+        MaxTime = lifeTime;
+        Scale = scale;
+        GlowColor = glowColor;
+        progress = 0;
+        AltTexture = CollapseExplosion;
+    }
 
-        public bool AltTexture;
-        public int altTexFrame;
+    public override void FetchFromPool()
+    {
+        base.FetchFromPool();
+        Velocity = Vector2.Zero;
+        MaxTime = 40;
+        TimeLeft = 0;
+        altTexFrame = -1;
+    }
 
-        public Vector2 position;
-        public Vector2 Velocity;
-        public float Rotation;
-        public float progress;
-        public int MaxTime;
-        public int TimeLeft;
-        public float Scale;
-        public Color GlowColor;
-        public void Prepare(Vector2 position, Vector2 velocity, float rotation, int lifeTime, float scale, Color glowColor, bool CollapseExplosion = false)
+    public override void Update(ref ParticleRendererSettings settings)
+    {
+        if (altTexFrame == -1)
         {
-            this.position = position;
-            Velocity = velocity;
-            Rotation = velocity.ToRotation() + rotation;
-            MaxTime = lifeTime;
-            Scale = scale;
-            GlowColor = glowColor;
-            progress = 0;
-            AltTexture = CollapseExplosion;
+            altTexFrame = Main.rand.Next(0, 2);
         }
 
-        public override void FetchFromPool()
+        position += Velocity;
+        Velocity *= 0.8f;
+        progress = float.Lerp(progress, 20, 0.2f);
+
+        GlowColor *= 1.1f;
+        TimeLeft++;
+
+        if (TimeLeft > MaxTime)
         {
-            base.FetchFromPool();
-            Velocity = Vector2.Zero;
-            MaxTime = 40;
-            TimeLeft = 0;
-            altTexFrame = -1;
+            ShouldBeRemovedFromRenderer = true;
         }
+    }
 
-        public override void Update(ref ParticleRendererSettings settings)
-        {
-            if (altTexFrame == -1)
-            {
-                altTexFrame = Main.rand.Next(0, 2);
-            }
-            position += Velocity;
-            Velocity *= 0.8f;
-            progress = float.Lerp(progress, 20, 0.2f);
+    public override void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch)
+    {
+        Texture2D Spire = GennedAssets.Textures.GreyscaleTextures.ChromaticSpires;
 
-            GlowColor *= 1.1f;
-            TimeLeft++;
-            if (TimeLeft > MaxTime)
-                ShouldBeRemovedFromRenderer = true;
-        }
+        Texture2D Star = !AltTexture ? GennedAssets.Textures.GreyscaleTextures.FourPointedStar : GennedAssets.Textures.GreyscaleTextures.RadialFlare;
 
-        public override void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch)
-        {
-            Texture2D Spire = GennedAssets.Textures.GreyscaleTextures.ChromaticSpires;
+        Texture2D texture = GennedAssets.Textures.GreyscaleTextures.ChromaticBurst;
 
-            Texture2D Star = !AltTexture ? GennedAssets.Textures.GreyscaleTextures.FourPointedStar : GennedAssets.Textures.GreyscaleTextures.RadialFlare;
+        Texture2D Glowtex = GennedAssets.Textures.GreyscaleTextures.BloomFlare;
 
-            Texture2D texture = GennedAssets.Textures.GreyscaleTextures.ChromaticBurst;
+        var DrawPos = position - Main.screenPosition;
+        var flip = SpriteEffects.None;
+        var GlowSize = new Vector2(0.05f, 0.05f) * Scale * (float)Math.Abs(1 + Math.Cos(TimeLeft / 60)); // * (1f + progress * 0.5f) * 0.05f;
 
-            Texture2D Glowtex = GennedAssets.Textures.GreyscaleTextures.BloomFlare;
+        var Size = new Vector2(0.055f) * progress * Scale;
 
+        var GlowOrigin = Spire.Size() * 0.5f;
+        var TexOrigin = texture.Size() * 0.5f;
 
-            Vector2 DrawPos = position - Main.screenPosition;
-            SpriteEffects flip = SpriteEffects.None;
-            Vector2 GlowSize = new Vector2(0.05f, 0.05f) * Scale * (float)Math.Abs(1 + Math.Cos(TimeLeft / 60));// * (1f + progress * 0.5f) * 0.05f;
+        var StarRect = !AltTexture ? Star.Frame() : Star.Frame(1, 2, 0, altTexFrame);
 
-            Vector2 Size = new Vector2(0.055f) * progress * Scale;
+        var starOrigin = !AltTexture ? Star.Size() * 0.5f : new Vector2(Star.Width / 2, StarRect.Height / 2);
 
-            Vector2 GlowOrigin = Spire.Size() * 0.5f;
-            Vector2 TexOrigin = texture.Size() * 0.5f;
+        var Adjusted = GlowColor with
+                       {
+                           A = 0
+                       } *
+                       (20 - progress);
 
-            Rectangle StarRect = !AltTexture ? Star.Frame() : Star.Frame(1, 2, 0, altTexFrame);
+        Main.spriteBatch.Draw(Glowtex, DrawPos, Glowtex.Frame(), Adjusted, Rotation, Glowtex.Size() * 0.5f, Size * 0.6f, flip, 0);
+        var StarSize = !AltTexture ? Size : Size * 0.6f;
 
-            Vector2 starOrigin = !AltTexture ? Star.Size() * 0.5f : new Vector2(Star.Width / 2, StarRect.Height / 2);
+        Main.spriteBatch.Draw(Spire, DrawPos, Spire.Frame(), Adjusted, Rotation, GlowOrigin, Size, flip, 0);
 
-            Color Adjusted = GlowColor with { A = 0 } * (20 - progress);
+        Main.spriteBatch.Draw(texture, DrawPos, texture.Frame(), Adjusted, Rotation, TexOrigin, Size * 0.5f, flip, 0);
 
-
-            Main.spriteBatch.Draw(Glowtex, DrawPos, Glowtex.Frame(), Adjusted, Rotation, Glowtex.Size() * 0.5f, Size*0.6f, flip, 0);
-            Vector2 StarSize = !AltTexture ? Size : Size*0.6f;
-
-            Main.spriteBatch.Draw(Spire, DrawPos, Spire.Frame(), Adjusted, Rotation, GlowOrigin, Size, flip, 0);
-
-            Main.spriteBatch.Draw(texture, DrawPos, texture.Frame(), Adjusted, Rotation, TexOrigin, Size * 0.5f, flip, 0);
-
-            Main.spriteBatch.Draw(Star, DrawPos, StarRect, Adjusted, Rotation + MathHelper.ToRadians(90), starOrigin, StarSize, flip, 0);
-
-            
-        }
-
-
+        Main.spriteBatch.Draw(Star, DrawPos, StarRect, Adjusted, Rotation + MathHelper.ToRadians(90), starOrigin, StarSize, flip, 0);
     }
 }

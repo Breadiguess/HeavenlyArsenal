@@ -1,44 +1,39 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.ModLoader;
+﻿using Terraria.DataStructures;
 
-namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy
+namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy;
+
+internal partial class PerversionOfFaith : BloodMoonBaseNPC
 {
-    partial class PerversionOfFaith : BloodMoonBaseNPC
+    public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/ShieldGuy/PerversionOfFaith";
+
+    public override bool canBeSacrificed => false;
+
+    public override int bloodBankMax => 100;
+
+    public override void SetDefaults()
     {
-        public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/ShieldGuy/PerversionOfFaith";
-        
-        public override bool canBeSacrificed => false;
-        public override int bloodBankMax => 100;
-        public override void SetDefaults()
-        {
-            NPC.aiStyle = -1;
-            NPC.noTileCollide = true;
-            NPC.noGravity = true;
-            NPC.Size = new Vector2(30, 30);
-            NPC.defense = 400;
-            NPC.damage = 300;
-            NPC.lifeMax = 400;
-            SpawnModBiomes =
-            [
-                ModContent.GetInstance<RiftEclipseBloodMoon>().Type
-            ];
-        }
-        public override void OnSpawn(IEntitySource source)
-        {
+        NPC.aiStyle = -1;
+        NPC.noTileCollide = true;
+        NPC.noGravity = true;
+        NPC.Size = new Vector2(30, 30);
+        NPC.defense = 400;
+        NPC.damage = 300;
+        NPC.lifeMax = 400;
 
-        }
-        public override void AI()
-        {
-            playerTarget = Main.player[NPC.FindClosestPlayer()];
-            NPC.velocity = NPC.Center.AngleTo(playerTarget.Center).ToRotationVector2();
-            //NPC.velocity += new Vector2(0, MathF.Sin(Time));
+        SpawnModBiomes =
+        [
+            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+        ];
+    }
 
-            Time++;
-        }
-        
+    public override void OnSpawn(IEntitySource source) { }
+
+    public override void AI()
+    {
+        playerTarget = Main.player[NPC.FindClosestPlayer()];
+        NPC.velocity = NPC.Center.AngleTo(playerTarget.Center).ToRotationVector2();
+        //NPC.velocity += new Vector2(0, MathF.Sin(Time));
+
+        Time++;
     }
 }

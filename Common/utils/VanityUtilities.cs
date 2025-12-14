@@ -1,26 +1,63 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria;
-using Terraria.DataStructures;
+﻿using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Common.Utilities;
 
 public static class VanityUtilities
 {
-    public static Vector2 HeadPosition(this PlayerDrawSet drawInfo) => drawInfo.drawPlayer.GetHelmetDrawOffset() + new Vector2((int)(drawInfo.Position.X - Main.screenPosition.X - drawInfo.drawPlayer.bodyFrame.Width / 2 + drawInfo.drawPlayer.width / 2), (int)(drawInfo.Position.Y - Main.screenPosition.Y + drawInfo.drawPlayer.height - drawInfo.drawPlayer.bodyFrame.Height + 4f)) + drawInfo.drawPlayer.headPosition + drawInfo.headVect + drawInfo.helmetOffset;
+    public static Vector2 HeadPosition(this PlayerDrawSet drawInfo)
+    {
+        return drawInfo.drawPlayer.GetHelmetDrawOffset() +
+               new Vector2
+               (
+                   (int)(drawInfo.Position.X - Main.screenPosition.X - drawInfo.drawPlayer.bodyFrame.Width / 2 + drawInfo.drawPlayer.width / 2),
+                   (int)(drawInfo.Position.Y - Main.screenPosition.Y + drawInfo.drawPlayer.height - drawInfo.drawPlayer.bodyFrame.Height + 4f)
+               ) +
+               drawInfo.drawPlayer.headPosition +
+               drawInfo.headVect +
+               drawInfo.helmetOffset;
+    }
 
-    public static Vector2 BodyPosition(this PlayerDrawSet drawInfo) => new Vector2((int)(drawInfo.Position.X - Main.screenPosition.X - drawInfo.drawPlayer.bodyFrame.Width / 2 + drawInfo.drawPlayer.width / 2), (int)(drawInfo.Position.Y - Main.screenPosition.Y + drawInfo.drawPlayer.height - drawInfo.drawPlayer.bodyFrame.Height + 4f)) + drawInfo.drawPlayer.bodyPosition + new Vector2(drawInfo.drawPlayer.bodyFrame.Width / 2, drawInfo.drawPlayer.bodyFrame.Height / 2);
+    public static Vector2 BodyPosition(this PlayerDrawSet drawInfo)
+    {
+        return new Vector2
+               (
+                   (int)(drawInfo.Position.X - Main.screenPosition.X - drawInfo.drawPlayer.bodyFrame.Width / 2 + drawInfo.drawPlayer.width / 2),
+                   (int)(drawInfo.Position.Y - Main.screenPosition.Y + drawInfo.drawPlayer.height - drawInfo.drawPlayer.bodyFrame.Height + 4f)
+               ) +
+               drawInfo.drawPlayer.bodyPosition +
+               new Vector2(drawInfo.drawPlayer.bodyFrame.Width / 2, drawInfo.drawPlayer.bodyFrame.Height / 2);
+    }
 
-    public static Vector2 LegsPosition(this PlayerDrawSet drawInfo) => new Vector2((int)(drawInfo.Position.X - Main.screenPosition.X - drawInfo.drawPlayer.legFrame.Width / 2 + drawInfo.drawPlayer.width / 2), (int)(drawInfo.Position.Y - Main.screenPosition.Y + drawInfo.drawPlayer.height - drawInfo.drawPlayer.legFrame.Height + 4f)) + drawInfo.drawPlayer.legPosition + drawInfo.legVect;
+    public static Vector2 LegsPosition(this PlayerDrawSet drawInfo)
+    {
+        return new Vector2
+               (
+                   (int)(drawInfo.Position.X - Main.screenPosition.X - drawInfo.drawPlayer.legFrame.Width / 2 + drawInfo.drawPlayer.width / 2),
+                   (int)(drawInfo.Position.Y - Main.screenPosition.Y + drawInfo.drawPlayer.height - drawInfo.drawPlayer.legFrame.Height + 4f)
+               ) +
+               drawInfo.drawPlayer.legPosition +
+               drawInfo.legVect;
+    }
+
     public static void ApplyVerticalOffset(ref this Vector2 drawPos, PlayerDrawSet drawInfo)
     {
-        Vector2 value = Main.OffsetsPlayerHeadgear[drawInfo.drawPlayer.bodyFrame.Y / drawInfo.drawPlayer.bodyFrame.Height];
+        var value = Main.OffsetsPlayerHeadgear[drawInfo.drawPlayer.bodyFrame.Y / drawInfo.drawPlayer.bodyFrame.Height];
         value.Y -= 2f;
         drawPos += value * -drawInfo.playerEffect.HasFlag(SpriteEffects.FlipVertically).ToDirectionInt();
     }
 
-    public static Vector2 GetCompositeOffset_BackArm(ref PlayerDrawSet drawinfo) => new Vector2(6 * (!drawinfo.playerEffect.HasFlag(SpriteEffects.FlipHorizontally) ? 1 : -1), 2 * (!drawinfo.playerEffect.HasFlag(SpriteEffects.FlipVertically) ? 1 : -1));
-    public static Vector2 GetCompositeOffset_FrontArm(ref PlayerDrawSet drawinfo) => new Vector2(-5 * (!drawinfo.playerEffect.HasFlag(SpriteEffects.FlipHorizontally) ? 1 : -1), 0f);
+    public static Vector2 GetCompositeOffset_BackArm(ref PlayerDrawSet drawinfo)
+    {
+        return new Vector2(6 * (!drawinfo.playerEffect.HasFlag(SpriteEffects.FlipHorizontally) ? 1 : -1), 2 * (!drawinfo.playerEffect.HasFlag(SpriteEffects.FlipVertically) ? 1 : -1));
+    }
 
-    public static bool NoBackpackOn(ref PlayerDrawSet drawinfo) => !drawinfo.drawPlayer.turtleArmor && drawinfo.drawPlayer.body != 106 && drawinfo.drawPlayer.body != 170 && drawinfo.drawPlayer.backpack <= 0 && !drawinfo.drawPlayer.mount.Active;
+    public static Vector2 GetCompositeOffset_FrontArm(ref PlayerDrawSet drawinfo)
+    {
+        return new Vector2(-5 * (!drawinfo.playerEffect.HasFlag(SpriteEffects.FlipHorizontally) ? 1 : -1), 0f);
+    }
+
+    public static bool NoBackpackOn(ref PlayerDrawSet drawinfo)
+    {
+        return !drawinfo.drawPlayer.turtleArmor && drawinfo.drawPlayer.body != 106 && drawinfo.drawPlayer.body != 170 && drawinfo.drawPlayer.backpack <= 0 && !drawinfo.drawPlayer.mount.Active;
+    }
 }

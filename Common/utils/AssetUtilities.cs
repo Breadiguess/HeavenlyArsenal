@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using ReLogic.Content;
-using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Common.utils;
 
@@ -20,12 +19,16 @@ public static class AssetUtilities
     /// <param name="path">The path to the asset.</param>
     /// <typeparam name="T">The asset type.</typeparam>
     /// <returns>The cached asset pointer.</returns>
-    public static Asset<T> RequestImmediate<T>(string path) where T : class => Request<T>(path, AssetRequestMode.ImmediateLoad);
+    public static Asset<T> RequestImmediate<T>(string path) where T : class
+    {
+        return Request<T>(path, AssetRequestMode.ImmediateLoad);
+    }
 
     public static Asset<T>[] RequestArrayImmediate<T>(string path, int count, int start = 0) where T : class
     {
-        Asset<T>[] assets = new Asset<T>[count];
-        for (int i = 0; i < assets.Length; i++)
+        var assets = new Asset<T>[count];
+
+        for (var i = 0; i < assets.Length; i++)
         {
             assets[i] = RequestImmediate<T>(path + (i + start));
         }
@@ -35,9 +38,10 @@ public static class AssetUtilities
 
     public static Asset<T>[] RequestArrayTotalImmediate<T>(string name) where T : class
     {
-        List<Asset<T>> assets = new List<Asset<T>>();
+        var assets = new List<Asset<T>>();
 
-        int i = 0;
+        var i = 0;
+
         while (ModContent.RequestIfExists(name + i, out Asset<T> asset, AssetRequestMode.ImmediateLoad))
         {
             assets.Add(asset);
@@ -54,6 +58,6 @@ public static class AssetUtilities
         if (ModContent.GetInstance<AssetUtilitiesSystem>() is { } system)
             return system.GetAssetManager<T>().GetOrRequestAsset(path, requestMode);*/
 
-         return ModContent.Request<T>(path, requestMode);
+        return ModContent.Request<T>(path, requestMode);
     }
 }

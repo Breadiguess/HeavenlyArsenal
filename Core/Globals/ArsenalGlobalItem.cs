@@ -1,9 +1,4 @@
-using CalamityMod.UI.CalamitasEnchants;
 using NoxusBoss.Content.Items;
-using System.Collections.Generic;
-using Terraria;
-using Terraria.ModLoader;
-
 
 namespace HeavenlyArsenal.Core.Globals;
 
@@ -15,7 +10,7 @@ public class ArsenalGlobalItem : GlobalItem
 
     public override void SetDefaults(Item entity)
     {
-        if(entity.type == ModContent.ItemType<MetallicChunk>())
+        if (entity.type == ModContent.ItemType<MetallicChunk>())
         {
             entity.value = 0_000_030;
         }
@@ -26,13 +21,11 @@ public class ArsenalGlobalItem : GlobalItem
         ModifyItemLootEvent?.Invoke(item, loot);
     }
 
-    
-
     // TODO: try to mess around with the Items name while empowered
     /*
     public override void SetDefaults(Item item)
     {
-          
+
         if (item.netID == ModContent.ItemType<AvatarLonginus>())
         {
             foreach (Player.GetModPlayer<AvatarSpearHeatPlayer>().Active in )
@@ -40,7 +33,7 @@ public class ArsenalGlobalItem : GlobalItem
                 if (Player.GetModPlayer<AvatarSpearHeatPlayer>().Active)
                     item.SetNameOverride("");
             }
-            
+
         }
     }
     */

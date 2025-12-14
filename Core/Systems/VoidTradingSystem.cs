@@ -1,6 +1,5 @@
-﻿using CalamityMod.Items;
+﻿using System.Collections.Generic;
 using CalamityMod.Items.Accessories;
-using CalamityMod.Items.Accessories.Wings;
 using CalamityMod.Items.Weapons.Melee;
 using CalamityMod.Items.Weapons.Rogue;
 using HeavenlyArsenal.Content.Items.Accessories.Cosmetic;
@@ -10,248 +9,287 @@ using HeavenlyArsenal.Content.Items.Weapons.Magic;
 using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 using HeavenlyArsenal.Content.Items.Weapons.Melee.AvatarSpear;
 using Luminance.Core.Graphics;
-using Microsoft.Xna.Framework;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Items.Accessories.Wings;
 using NoxusBoss.Content.Items.Fishing;
 using NoxusBoss.Core.Autoloaders.SolynBooks;
 using NoxusBoss.Core.World.GameScenes.AvatarUniverseExploration;
-using System;
-using System.Collections.Generic;
-using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.ID;
-using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Core.Systems
+namespace HeavenlyArsenal.Core.Systems;
+
+// Define an enum to specify where the output items should appear.
+public enum ItemReturnType
 {
-    // Define an enum to specify where the output items should appear.
-    public enum ItemReturnType
+    None, // Spawned on top of (at) the player.
+
+    ShadowHand, // Delivered to the player's Shadow Hand (not implemented).
+
+    SpatOut // Spawned from below the bottom of the screen.
+}
+
+// Data structure that defines a trade.
+public class TradeDefinition
+{
+    public int InputItemType { get; set; }
+
+    public float MinDistance { get; set; }
+
+    public List<(int itemType, int quantity)> OutputItems { get; set; }
+
+    public List<(bool Condition, bool Condition2)> TradeCondition { get; set; } //TODO: add conditions to the trade, such as if the player has defeated a boss.
+
+    public ItemReturnType ReturnType { get; set; }
+
+    //todo: add conditions to the trade, such as if the player has defeated a boss.
+    public TradeDefinition(int inputItemType, float minDistance, ItemReturnType returnType, params int[] outputItemPairs)
     {
-        None,       // Spawned on top of (at) the player.
-        ShadowHand, // Delivered to the player's Shadow Hand (not implemented).
-        SpatOut     // Spawned from below the bottom of the screen.
-    }
+        InputItemType = inputItemType;
+        MinDistance = minDistance;
+        ReturnType = returnType;
+        OutputItems = new List<(int, int)>();
+        TradeCondition = new List<(bool, bool)>();
 
-    // Data structure that defines a trade.
-    public class TradeDefinition
-    {
-        public int InputItemType { get; set; }
-        public float MinDistance { get; set; }
-        public List<(int itemType, int quantity)> OutputItems { get; set; }
-
-        public List<(bool Condition, bool Condition2)> TradeCondition { get; set; } //TODO: add conditions to the trade, such as if the player has defeated a boss.
-        public ItemReturnType ReturnType { get; set; }
-
-
-        //todo: add conditions to the trade, such as if the player has defeated a boss.
-        public TradeDefinition(int inputItemType, float minDistance, ItemReturnType returnType, params int[] outputItemPairs)
+        if (outputItemPairs.Length % 2 != 0)
         {
-            InputItemType = inputItemType;
-            MinDistance = minDistance;
-            ReturnType = returnType;
-            OutputItems = new List<(int, int)>();
-            TradeCondition = new List<(bool, bool)>();
-            if (outputItemPairs.Length % 2 != 0)
-            {
-                throw new ArgumentException("Output item pairs must be in itemType, quantity format.");
-            }
+            throw new ArgumentException("Output item pairs must be in itemType, quantity format.");
+        }
 
-            for (int i = 0; i < outputItemPairs.Length; i += 2)
-            {
-                OutputItems.Add((outputItemPairs[i], outputItemPairs[i + 1]));
-            }
+        for (var i = 0; i < outputItemPairs.Length; i += 2)
+        {
+            OutputItems.Add((outputItemPairs[i], outputItemPairs[i + 1]));
         }
     }
+}
 
-
-    // The main ModSystem that processes trades.
-    class VoidTradingSystem : ModSystem
+// The main ModSystem that processes trades.
+internal class VoidTradingSystem : ModSystem
+{
+    public static class TradeInputRegistry
     {
-        // A list of all possible trade definitions.
-        private List<TradeDefinition> tradeDefinitions = new List<TradeDefinition>();
+        // The list of all input item types used in trades.
+        public static List<int> InputItemTypes { get; } = new();
 
         /// <summary>
-        /// This waits until all items are loaded, as to prevent air from being given instead of items
+        ///     Registers the input item types from the provided list of trade definitions.
         /// </summary>
-        /// //TODO: Conditions such as bosses defeated
-       
-        public override void OnWorldLoad()
+        /// <param name="trades">A list of trade definitions to register.</param>
+        public static void RegisterTrades(List<TradeDefinition> trades)
         {
-            //drew wings to dev wings
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-            ModContent.ItemType<DivineWings>(),
-            1000f,
-            ItemReturnType.None,
-               //Items to get back
-               
-            ModContent.ItemType<DevWing>(), 1
-              
-            ));
-           
-            //coin for coin
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<CoinofDeceit>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
+            InputItemTypes.Clear();
 
-               ModContent.ItemType<AncientCoin>(), 1
-                ));
-
-        
-            //nadir to nadir2
-            tradeDefinitions.Add(new TradeDefinition(
-              //item to trade
-              ModContent.ItemType<Nadir>(),
-              1000f,
-              ItemReturnType.None,
-              //Items to get back
-
-              ModContent.ItemType<AvatarLonginus>(), 1
-               ));
-
-            
-            //Rod to Flyrift
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<Dreamcatcher>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<avatar_FishingRod>(), 1
-                ));
-            //FlyRift to Dreamcatcher
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<avatar_FishingRod>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<Dreamcatcher>(), 1
-                ));
-            //Warbanner to VoidCrest
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<WarbanneroftheSun>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<VoidCrestOath>(), 1
-                ));
-            
-            //Book to Taxidermy
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ItemID.Book,
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               SolynBookAutoloader.Books["TaxidermyBook"].Type, 1
-                ));
-
-            //Supernova to star
-            tradeDefinitions.Add(new TradeDefinition(
-               //item to trade
-               ModContent.ItemType<Supernova>(),
-               1000f,
-               ItemReturnType.None,
-               //Items to get back
-
-               ModContent.ItemType<RocheLimit>(), 1
-                ));
-            
-
-            TradeInputRegistry.RegisterTrades(tradeDefinitions);
-        }
-        public static class TradeInputRegistry
-        {
-            // The list of all input item types used in trades.
-            public static List<int> InputItemTypes { get; } = new List<int>();
-
-            /// <summary>
-            /// Registers the input item types from the provided list of trade definitions.
-            /// </summary>
-            /// <param name="trades">A list of trade definitions to register.</param>
-            public static void RegisterTrades(List<TradeDefinition> trades)
+            foreach (var trade in trades)
             {
-                InputItemTypes.Clear();
-                foreach (TradeDefinition trade in trades)
+                // Only add each unique input type once.
+                if (!InputItemTypes.Contains(trade.InputItemType))
                 {
-                    // Only add each unique input type once.
-                    if (!InputItemTypes.Contains(trade.InputItemType))
-                    {
-                        InputItemTypes.Add(trade.InputItemType);
-                    }
+                    InputItemTypes.Add(trade.InputItemType);
                 }
             }
         }
-        public override void PostUpdateEverything()
+    }
+
+    // A list of all possible trade definitions.
+    private readonly List<TradeDefinition> tradeDefinitions = new();
+
+    /// <summary>
+    ///     This waits until all items are loaded, as to prevent air from being given instead of items
+    /// </summary>
+    /// //TODO: Conditions such as bosses defeated
+    public override void OnWorldLoad()
+    {
+        //drew wings to dev wings
+        tradeDefinitions.Add
+        (
+            new TradeDefinition
+            (
+                //item to trade
+                ModContent.ItemType<DivineWings>(),
+                1000f,
+                ItemReturnType.None,
+                //Items to get back
+                ModContent.ItemType<DevWing>(),
+                1
+            )
+        );
+
+        //coin for coin
+        tradeDefinitions.Add
+        (
+            new TradeDefinition
+            (
+                //item to trade
+                ModContent.ItemType<CoinofDeceit>(),
+                1000f,
+                ItemReturnType.None,
+                //Items to get back
+                ModContent.ItemType<AncientCoin>(),
+                1
+            )
+        );
+
+        //nadir to nadir2
+        tradeDefinitions.Add
+        (
+            new TradeDefinition
+            (
+                //item to trade
+                ModContent.ItemType<Nadir>(),
+                1000f,
+                ItemReturnType.None,
+                //Items to get back
+                ModContent.ItemType<AvatarLonginus>(),
+                1
+            )
+        );
+
+        //Rod to Flyrift
+        tradeDefinitions.Add
+        (
+            new TradeDefinition
+            (
+                //item to trade
+                ModContent.ItemType<Dreamcatcher>(),
+                1000f,
+                ItemReturnType.None,
+                //Items to get back
+                ModContent.ItemType<avatar_FishingRod>(),
+                1
+            )
+        );
+
+        //FlyRift to Dreamcatcher
+        tradeDefinitions.Add
+        (
+            new TradeDefinition
+            (
+                //item to trade
+                ModContent.ItemType<avatar_FishingRod>(),
+                1000f,
+                ItemReturnType.None,
+                //Items to get back
+                ModContent.ItemType<Dreamcatcher>(),
+                1
+            )
+        );
+
+        //Warbanner to VoidCrest
+        tradeDefinitions.Add
+        (
+            new TradeDefinition
+            (
+                //item to trade
+                ModContent.ItemType<WarbanneroftheSun>(),
+                1000f,
+                ItemReturnType.None,
+                //Items to get back
+                ModContent.ItemType<VoidCrestOath>(),
+                1
+            )
+        );
+
+        //Book to Taxidermy
+        tradeDefinitions.Add
+        (
+            new TradeDefinition
+            (
+                //item to trade
+                ItemID.Book,
+                1000f,
+                ItemReturnType.None,
+                //Items to get back
+                SolynBookAutoloader.Books["TaxidermyBook"].Type,
+                1
+            )
+        );
+
+        //Supernova to star
+        tradeDefinitions.Add
+        (
+            new TradeDefinition
+            (
+                //item to trade
+                ModContent.ItemType<Supernova>(),
+                1000f,
+                ItemReturnType.None,
+                //Items to get back
+                ModContent.ItemType<RocheLimit>(),
+                1
+            )
+        );
+
+        TradeInputRegistry.RegisterTrades(tradeDefinitions);
+    }
+
+    public override void PostUpdateEverything()
+    {
+        // TODO: only run this code when the player has something in their inventory that can be traded
+        // Only process trades when in the Avatar Universe.
+
+        if (AvatarUniverseExplorationSystem.InAvatarUniverse)
         {
-           // TODO: only run this code when the player has something in their inventory that can be traded
-            // Only process trades when in the Avatar Universe.
+            var player = Main.LocalPlayer;
 
-            
-            if (AvatarUniverseExplorationSystem.InAvatarUniverse)
+            //Main.NewText($"Pushout :{AvatarUniverseExplorationSky.PushPlayersOutInterpolant}");
+
+            //Main.NewText($"Time: {player.GetValueRef<int>(AvatarUniverseExplorationSky.TimeInUniverseVariableName).Value}");
+            //Main.NewText(AvatarUniverseExplorationSky.PushPlayersOutInterpolant, Color.AntiqueWhite);
+
+            // Check each trade definition.
+            foreach (var trade in tradeDefinitions)
             {
-
-
-                Player player = Main.LocalPlayer;
-                
-
-                //Main.NewText($"Pushout :{AvatarUniverseExplorationSky.PushPlayersOutInterpolant}");
-
-                //Main.NewText($"Time: {player.GetValueRef<int>(AvatarUniverseExplorationSky.TimeInUniverseVariableName).Value}");
-                //Main.NewText(AvatarUniverseExplorationSky.PushPlayersOutInterpolant, Color.AntiqueWhite);
-
-                // Check each trade definition.
-                foreach (TradeDefinition trade in tradeDefinitions)
+                // For each trade, iterate over all world items to look for the required input item.
+                for (var i = 0; i < Main.maxItems; i++)
                 {
-                    // For each trade, iterate over all world items to look for the required input item.
-                    for (int i = 0; i < Main.maxItems; i++)
+                    var worldItem = Main.item[i];
+
+                    if (worldItem.active && worldItem.type == trade.InputItemType)
                     {
-                        Item worldItem = Main.item[i];
-
-                        if (worldItem.active && worldItem.type == trade.InputItemType)
+                        // Check that the found item meets the minimum distance requirement.
+                        if (Vector2.Distance(worldItem.Center, player.Center) > trade.MinDistance)
                         {
+                            // Log the deletion for debugging.
+                            //Main.NewText($"Deleting trade input item: {worldItem.Name}", Color.AntiqueWhite);
 
-                          
-                            // Check that the found item meets the minimum distance requirement.
-                            if (Vector2.Distance(worldItem.Center, player.Center) > trade.MinDistance)
-                            {
-                                // Log the deletion for debugging.
-                                //Main.NewText($"Deleting trade input item: {worldItem.Name}", Color.AntiqueWhite);
+                            // Remove the input item.
+                            worldItem.TurnToAir();
 
-                                // Remove the input item.
-                                worldItem.TurnToAir();
-
-                                // Play a sound to indicate successful trade execution.
-                                SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Clap with { PitchVariance = 0.2f });
-                                ScreenShakeSystem.SetUniversalRumble(4* 20f, MathHelper.TwoPi, null, 0.45f);
-                                //AvatarUniverseExplorationSystem.
-                                // Process each output item defined in this trade.
-                                foreach ((int outputItemType, int quantity) in trade.OutputItems)
+                            // Play a sound to indicate successful trade execution.
+                            SoundEngine.PlaySound
+                            (
+                                GennedAssets.Sounds.Avatar.Clap with
                                 {
-                                    Main.NewText($"Prepairing to create:{outputItemType}", Color.AntiqueWhite);
-                                    for (int r = 0; r < quantity; r++)
-                                    {
-                                        Vector2 spawnPosition = GetSpawnPosition(player, trade.ReturnType);
+                                    PitchVariance = 0.2f
+                                }
+                            );
 
-                                        int index = Item.NewItem(new EntitySource_Misc("VoidTradingSystem"),
-                                            (int)spawnPosition.X, (int)spawnPosition.Y,
-                                            player.width, player.height, outputItemType); // Ensure outputItemType is correctly used here.
-                                        //Main.NewText($"Created item: {Main.item[index].Name} (Type: {outputItemType}), Index: {index}", Color.AntiqueWhite);
-                                        if (index >= 0 && index < Main.maxItems)
-                                        {
-                                            // Optional: additional properties
-                                        }
+                            ScreenShakeSystem.SetUniversalRumble(4 * 20f, MathHelper.TwoPi, null, 0.45f);
+
+                            //AvatarUniverseExplorationSystem.
+                            // Process each output item defined in this trade.
+                            foreach (var (outputItemType, quantity) in trade.OutputItems)
+                            {
+                                Main.NewText($"Prepairing to create:{outputItemType}", Color.AntiqueWhite);
+
+                                for (var r = 0; r < quantity; r++)
+                                {
+                                    var spawnPosition = GetSpawnPosition(player, trade.ReturnType);
+
+                                    var index = Item.NewItem
+                                    (
+                                        new EntitySource_Misc("VoidTradingSystem"),
+                                        (int)spawnPosition.X,
+                                        (int)spawnPosition.Y,
+                                        player.width,
+                                        player.height,
+                                        outputItemType
+                                    ); // Ensure outputItemType is correctly used here.
+
+                                    //Main.NewText($"Created item: {Main.item[index].Name} (Type: {outputItemType}), Index: {index}", Color.AntiqueWhite);
+                                    if (index >= 0 && index < Main.maxItems)
+                                    {
+                                        // Optional: additional properties
                                     }
                                 }
                             }
@@ -260,33 +298,31 @@ namespace HeavenlyArsenal.Core.Systems
                 }
             }
         }
-       
-
-        /// <summary>
-        /// Determines the spawn position for an output item based on the specified return type.
-        /// </summary>
-        /// <param name="player">Reference to the player.</param>
-        /// <param name="returnType">The chosen return type for the spawn location.</param>
-        /// <returns>A Vector2 representing the position where the item will spawn.</returns>
-        private Vector2 GetSpawnPosition(Player player, ItemReturnType returnType)
-        {
-            switch (returnType)
-            {
-                case ItemReturnType.None:
-                    // Spawn directly at the player's center.
-                    return player.Center;
-                case ItemReturnType.ShadowHand:
-                    // ShadowHand is not implemented; fallback to player's center.
-                    return player.Center;
-                case ItemReturnType.SpatOut:
-                    // Calculate a position below the bottom of the visible screen.
-                    float bottomY = Main.screenPosition.Y + Main.screenHeight;
-                    return new Vector2(player.Center.X, bottomY + 200f);
-                default:
-                    return player.Center;
-            }
-        }
     }
 
+    /// <summary>
+    ///     Determines the spawn position for an output item based on the specified return type.
+    /// </summary>
+    /// <param name="player">Reference to the player.</param>
+    /// <param name="returnType">The chosen return type for the spawn location.</param>
+    /// <returns>A Vector2 representing the position where the item will spawn.</returns>
+    private Vector2 GetSpawnPosition(Player player, ItemReturnType returnType)
+    {
+        switch (returnType)
+        {
+            case ItemReturnType.None:
+                // Spawn directly at the player's center.
+                return player.Center;
+            case ItemReturnType.ShadowHand:
+                // ShadowHand is not implemented; fallback to player's center.
+                return player.Center;
+            case ItemReturnType.SpatOut:
+                // Calculate a position below the bottom of the visible screen.
+                var bottomY = Main.screenPosition.Y + Main.screenHeight;
 
+                return new Vector2(player.Center.X, bottomY + 200f);
+            default:
+                return player.Center;
+        }
+    }
 }

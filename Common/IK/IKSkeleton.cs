@@ -1,155 +1,187 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
+﻿using System.Runtime.CompilerServices;
 
-namespace HeavenlyArsenal.Common.IK
+namespace HeavenlyArsenal.Common.IK;
+
+public struct IKSkeleton
 {
-    public struct IKSkeleton
+    public struct Constraints()
     {
+        public float MinAngle = -MathF.PI;
 
-        public struct Constraints()
+        public float MaxAngle = MathF.PI;
+    }
+
+    [InlineArray(MaxJointCount + 1)]
+    private struct PositionData
+    {
+        private Vector2 _;
+    }
+
+    public bool SolveFailed { get; private set; }
+
+    public float FinalDistance { get; private set; }
+
+    public readonly int JointCount => _options.Length;
+
+    public readonly int PositionCount => JointCount + 1;
+
+    private const int MaxJointCount = 16;
+
+    private readonly (float length, Constraints constraints)[] _options;
+
+    private PositionData _previousPositions;
+
+    private PositionData _positions;
+
+    public float _maxDistance;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly Vector2 Position(int index)
+    {
+        return _positions[index];
+    }
+
+    public IKSkeleton(params (float, Constraints)[] options)
+    {
+        if (options.Length > MaxJointCount)
         {
-            public float MinAngle = -MathF.PI;
-            public float MaxAngle = MathF.PI;
+            throw new Exception($"MaxJointCount is less than provided options ({options.Length}).");
         }
 
-        [InlineArray(MaxJointCount + 1)]
-        struct PositionData { Vector2 _; }
-        public bool SolveFailed { get; private set; }
-        public float FinalDistance { get; private set; }
+        _options = options;
 
-        public readonly int JointCount => _options.Length;
-        public readonly int PositionCount => JointCount + 1;
-
-        const int MaxJointCount = 16;
-
-        readonly (float length, Constraints constraints)[] _options;
-        PositionData _previousPositions;
-        PositionData _positions;
-        public float _maxDistance;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Vector2 Position(int index) => _positions[index];
-
-        public IKSkeleton(params (float, Constraints)[] options)
+        foreach (var (length, _) in options)
         {
-            if (options.Length > MaxJointCount) throw new Exception($"MaxJointCount is less than provided options ({options.Length}).");
-            _options = options;
+            _maxDistance += length;
+        }
+    }
 
-            foreach (var (length, _) in options) _maxDistance += length;
+    // http://www.andreasaristidou.com/FABRIK.html 
+    public void Update(Vector2 startPosition, Vector2 targetEndPosition)
+    {
+        _previousPositions = _positions;
+        SolveFailed = false;
+
+        var dist = UpdateInner(startPosition, targetEndPosition);
+        FinalDistance = MathF.Sqrt(dist);
+
+        var outOfReach = FinalDistance > _maxDistance;
+        var tooFarAfterSolve = FinalDistance > 26f;
+
+        var distance = UpdateInner(startPosition, targetEndPosition);
+
+        if (outOfReach || tooFarAfterSolve)
+        {
+            SolveFailed = true;
+            _positions = _previousPositions;
         }
 
-        // http://www.andreasaristidou.com/FABRIK.html 
-        public void Update(Vector2 startPosition, Vector2 targetEndPosition)
+        if (distance > 26f)
         {
-            _previousPositions = _positions;
-            SolveFailed = false;
+            _positions = _previousPositions;
 
-            float dist = UpdateInner(startPosition, targetEndPosition);
-            FinalDistance = MathF.Sqrt(dist);
+            UpdateInner
+            (
+                startPosition,
+                targetEndPosition + startPosition.DirectionTo(targetEndPosition) * startPosition.Distance(_positions[PositionCount - 1])
+            );
+        }
+    }
 
-            bool outOfReach = FinalDistance > _maxDistance;
-            bool tooFarAfterSolve = FinalDistance > 26f;
+    private float UpdateInner(Vector2 startPosition, Vector2 targetEndPosition)
+    {
+        var lastDistance = float.MaxValue;
 
-            var distance = UpdateInner(startPosition, targetEndPosition);
-            if (outOfReach || tooFarAfterSolve)
+        var iterations = 2 << 4;
+        var distance = startPosition.DistanceSQ(targetEndPosition);
+
+        if (distance > _maxDistance * _maxDistance)
+        {
+            iterations = 1;
+        }
+
+        for (var k = 0; k < iterations; k += 1)
+        {
+            _positions[PositionCount - 1] = targetEndPosition;
+            _positions[0] = startPosition;
+
+            float rootAngle;
+
+            for (var i = JointCount - 1; i > 0; i -= 1)
+            {
+                var nextAngle = (_positions[i + 1] - _positions[i]).ToRotation();
+
+                rootAngle = (_positions[i] - (i > 1 ? _positions[i - 1] : startPosition)).ToRotation();
+
+                var angle = rootAngle +
+                            Math.Clamp
+                            (
+                                MathHelper.WrapAngle(nextAngle - rootAngle),
+                                _options[i].constraints.MinAngle,
+                                _options[i].constraints.MaxAngle
+                            );
+
+                _positions[i] = _positions[i + 1] + (angle + MathF.PI).ToRotationVector2() * _options[i].length;
+            }
+
+            rootAngle = 0f;
+
+            for (var i = 0; i < JointCount; i += 1)
+            {
+                var nextAngle = (_positions[i + 1] - _positions[i]).ToRotation();
+
+                var angle = rootAngle +
+                            Math.Clamp
+                            (
+                                MathHelper.WrapAngle(nextAngle - rootAngle),
+                                _options[i].constraints.MinAngle,
+                                _options[i].constraints.MaxAngle
+                            );
+
+                _positions[i + 1] = _positions[i] + angle.ToRotationVector2() * _options[i].length;
+                rootAngle = angle;
+            }
+
+            distance = _positions[PositionCount - 1].DistanceSQ(targetEndPosition);
+
+            if (distance <= 0.01f)
+            {
+                break;
+            }
+
+            // Check stagnation (solver cannot improve → impossible pose under constraints)
+            if (Math.Abs(lastDistance - distance) < 0.0001f)
             {
                 SolveFailed = true;
-                _positions = _previousPositions;
-            }
-            if (distance > 26f)
-            {
-                _positions = _previousPositions;
-                UpdateInner(
-                    startPosition,
-                    targetEndPosition + startPosition.DirectionTo(targetEndPosition) * startPosition.Distance(_positions[PositionCount - 1])
-                );
-            }
-        }
 
-        float UpdateInner(Vector2 startPosition, Vector2 targetEndPosition)
-        {
-            float lastDistance = float.MaxValue;
-
-            var iterations = 2 << 4;
-            var distance = startPosition.DistanceSQ(targetEndPosition);
-            if (distance > _maxDistance * _maxDistance) iterations = 1;
-
-            for (var k = 0; k < iterations; k += 1)
-            {
-                _positions[PositionCount - 1] = targetEndPosition;
-                _positions[0] = startPosition;
-
-                float rootAngle;
-                for (var i = JointCount - 1; i > 0; i -= 1)
-                {
-                    var nextAngle = (_positions[i + 1] - _positions[i]).ToRotation();
-
-                    rootAngle = (_positions[i] - (i > 1 ? _positions[i - 1] : startPosition)).ToRotation();
-                    var angle = rootAngle + Math.Clamp(
-                        MathHelper.WrapAngle(nextAngle - rootAngle),
-                        _options[i].constraints.MinAngle,
-                        _options[i].constraints.MaxAngle
-                    );
-
-                    _positions[i] = _positions[i + 1] + (angle + MathF.PI).ToRotationVector2() * _options[i].length;
-                }
-
-                rootAngle = 0f;
-                for (var i = 0; i < JointCount; i += 1)
-                {
-                    var nextAngle = (_positions[i + 1] - _positions[i]).ToRotation();
-                    var angle = rootAngle + Math.Clamp(
-                        MathHelper.WrapAngle(nextAngle - rootAngle),
-                        _options[i].constraints.MinAngle,
-                        _options[i].constraints.MaxAngle
-                    );
-
-                    _positions[i + 1] = _positions[i] + angle.ToRotationVector2() * _options[i].length;
-                    rootAngle = angle;
-                }
-
-                distance = _positions[PositionCount - 1].DistanceSQ(targetEndPosition);
-                if (distance <= 0.01f) break;
-                // Check stagnation (solver cannot improve → impossible pose under constraints)
-                if (Math.Abs(lastDistance - distance) < 0.0001f)
-                {
-                    SolveFailed = true;
-                    break;
-                }
-
-                lastDistance = distance;
-
+                break;
             }
 
-            return distance;
+            lastDistance = distance;
         }
 
-        /// <summary>
-        /// attempts to mutate the values stored inside this limb's _options tuple.
-        /// </summary>
-        /// <param name="joint">the index of the bone to adjust parameters for</param>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        public void SetConstraint(int joint, float min, float max)
-        {
-            var (len, c) = _options[joint];
-            c.MinAngle = min;
-            c.MaxAngle = max;
-            _options[joint] = (len, c); // assign tuple back (struct copy)
-        }
+        return distance;
+    }
 
-        public float GetConstraint(int joint)
-        {
-            float max = _options[joint].constraints.MaxAngle;
-            float min = _options[joint].constraints.MinAngle;
+    /// <summary>
+    ///     attempts to mutate the values stored inside this limb's _options tuple.
+    /// </summary>
+    /// <param name="joint">the index of the bone to adjust parameters for</param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    public void SetConstraint(int joint, float min, float max)
+    {
+        var (len, c) = _options[joint];
+        c.MinAngle = min;
+        c.MaxAngle = max;
+        _options[joint] = (len, c); // assign tuple back (struct copy)
+    }
 
-            return MathHelper.ToDegrees(max - min);
-        }
+    public float GetConstraint(int joint)
+    {
+        var max = _options[joint].constraints.MaxAngle;
+        var min = _options[joint].constraints.MinAngle;
+
+        return MathHelper.ToDegrees(max - min);
     }
 }

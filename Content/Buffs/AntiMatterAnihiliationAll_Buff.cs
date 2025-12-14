@@ -1,14 +1,8 @@
-﻿using CalamityMod;
-using Luminance.Core.Hooking;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Luminance.Core.Hooking;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using NoxusBoss.Core.GlobalInstances;
-using NoxusBoss.Core.Utilities;
-using Terraria;
 using Terraria.DataStructures;
 using Terraria.Localization;
-using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Buffs;
 
@@ -17,7 +11,7 @@ public class AntimatterAnnihilationAll_Buff : ModBuff
     public const string DPSVariableName = "AntimatterAnnihilationDPS";
 
     public override string Texture => base.Texture;
-        
+
     public override void SetStaticDefaults()
     {
         Main.debuff[Type] = true;
@@ -25,47 +19,51 @@ public class AntimatterAnnihilationAll_Buff : ModBuff
         Main.buffNoTimeDisplay[Type] = true;
         //PlayerDataManager.UpdateBadLifeRegenEvent += ApplyDPS;
 
-        new ManagedILEdit("Use custom death text for Antimatter Annihilation", Mod, edit =>
-        {
-            IL_Player.KillMe += edit.SubscriptionWrapper;
-        }, edit =>
-        {
-            IL_Player.KillMe -= edit.SubscriptionWrapper;
-        }, UseCustomDeathMessage).Apply();
+        new ManagedILEdit
+        (
+            "Use custom death text for Antimatter Annihilation",
+            Mod,
+            edit => { IL_Player.KillMe += edit.SubscriptionWrapper; },
+            edit => { IL_Player.KillMe -= edit.SubscriptionWrapper; },
+            UseCustomDeathMessage
+        ).Apply();
     }
 
     private static void UseCustomDeathMessage(ILContext context, ManagedILEdit edit)
     {
-        ILCursor cursor = new ILCursor(context);
+        var cursor = new ILCursor(context);
+
         if (!cursor.TryGotoNext(MoveType.After, i => i.MatchStfld<Player>("crystalLeaf")))
         {
             edit.LogFailure("Could not find the crystalLeaf storage");
+
             return;
         }
 
         if (!cursor.TryGotoNext(MoveType.After, i => i.MatchCallOrCallvirt<PlayerDeathReason>("GetDeathText")))
         {
             edit.LogFailure("Could not find the GetDeathText call");
+
             return;
         }
 
         cursor.Emit(OpCodes.Ldarg_0);
-        cursor.EmitDelegate((NetworkText text, Player player) =>
-        {
-            if (player.HasBuff<AntimatterAnnihilationAll_Buff>())
+
+        cursor.EmitDelegate
+        (
+            (NetworkText text, Player player) =>
             {
-                LocalizedText deathText = Language.GetText($"Mods.NoxusBoss.Death.AntimatterAnnihilation{Main.rand.Next(5) + 1}");
-                return PlayerDeathReason.ByCustomReason(deathText.Format(player.name)).GetDeathText(player.name);
+                if (player.HasBuff<AntimatterAnnihilationAll_Buff>())
+                {
+                    var deathText = Language.GetText($"Mods.NoxusBoss.Death.AntimatterAnnihilation{Main.rand.Next(5) + 1}");
+
+                    return PlayerDeathReason.ByCustomReason(deathText.Format(player.name)).GetDeathText(player.name);
+                }
+
+                return text;
             }
-
-            return text;
-        });
+        );
     }
 
-    public override void Update(NPC npc, ref int buffIndex)
-    {
-        
-    }
-   
-    
+    public override void Update(NPC npc, ref int buffIndex) { }
 }

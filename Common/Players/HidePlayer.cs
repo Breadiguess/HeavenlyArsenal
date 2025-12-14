@@ -1,11 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.DataStructures;
-using Terraria.ModLoader;
+﻿using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Common.Players;
 
@@ -15,7 +8,7 @@ public sealed class HidePlayer : ModPlayer
     ///     Gets or sets whether to hide the player.
     /// </summary>
     public bool ShouldHide { get; set; }
-    
+
     /// <summary>
     ///     Gets or sets whether to hide the player's weapon.
     /// </summary>
@@ -24,24 +17,24 @@ public sealed class HidePlayer : ModPlayer
     public override void ResetEffects()
     {
         base.ResetEffects();
-        
+
         ShouldHide = false;
         ShouldHideWeapon = false;
     }
-    
+
     public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
     {
         base.ModifyDrawInfo(ref drawInfo);
-        
+
         if (!ShouldHide)
         {
             return;
         }
 
         drawInfo.hideEntirePlayer = true;
-        
+
         drawInfo.stealth = 1f;
-        
+
         drawInfo.colorDisplayDollSkin = Color.Transparent;
 
         drawInfo.legsGlowColor = Color.Transparent;
@@ -64,12 +57,12 @@ public sealed class HidePlayer : ModPlayer
         drawInfo.colorArmorLegs = Color.Transparent;
         drawInfo.colorArmorBody = Color.Transparent;
         drawInfo.colorArmorHead = Color.Transparent;
-        
+
         if (!ShouldHideWeapon)
         {
             return;
         }
-        
+
         Player.heldProj = -1;
     }
 }

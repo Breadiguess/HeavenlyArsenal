@@ -1,33 +1,26 @@
-﻿using CalamityMod;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CalamityMod;
 using CalamityMod.Items.Weapons.Melee;
 using HeavenlyArsenal.Content.Buffs;
-//using HeavenlyArsenal.Content.NPCs.Friendly.ForgottenShrine;
 using HeavenlyArsenal.Core.Physics.ClothManagement;
 using Luminance.Assets;
 using Luminance.Common.Easings;
 using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using Luminance.Core.Sounds;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Particles;
-using NoxusBoss.Core.DataStructures;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using NoxusBoss.Core.Physics.VerletIntergration;
 using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
 using ReLogic.Utilities;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
-using Terraria.ID;
-using Terraria.ModLoader;
+//using HeavenlyArsenal.Content.NPCs.Friendly.ForgottenShrine;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
 
@@ -36,404 +29,284 @@ public class AntishadowAssassin : ModProjectile
     public enum AssassinState
     {
         StayNearOwner,
+
         DissipateToHuntTarget,
+
         WaitBeforeSlashingTarget,
+
         PerformDirectionalSlices,
+
         SliceTargetRepeatedly,
+
         PostSliceDash,
+
         EmergeNearTarget,
+
         BowAtSpirit,
 
         Leave
     }
 
+    /// <summary>
+    ///     The chime sound played by this assassin at random.
+    /// </summary>
+    public static readonly SoundStyle ChimeSound = new("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowBreatheChime", 2);
+
+    /// <summary>
+    ///     The sound used when this assassin unsheathes its katana.
+    /// </summary>
+    public static readonly SoundStyle UnsheatheSound = new("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowAssassinKatanaUnsheathe");
+
+    /// <summary>
+    ///     The sound used when this assassin begins to leave due to being desummoned.
+    /// </summary>
+    public static readonly SoundStyle LeaveSound = new("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowAssassinLeave");
+
+    /// <summary>
+    ///     The looped sound used in an ambient context.
+    /// </summary>
+    public static readonly SoundStyle AntishadowAmbientLoopSound = new("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowAmbientLoop");
+
+    /// <summary>
+    ///     The looped sound used when attacking.
+    /// </summary>
+    public static readonly SoundStyle AntishadowAttackLoopSound = new("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowAttackLoop");
+
     private readonly List<SlotId> attachedSounds = [];
 
     /// <summary>
-    /// How long this assassin has existed for, in frames.
+    ///     How long this assassin has existed for, in frames.
     /// </summary>
-    public int ExistenceTimer
-    {
-        get;
-        set;
-    }
+    public int ExistenceTimer { get; set; }
 
     /// <summary>
-    /// Whether this assassin can do damage.
+    ///     Whether this assassin can do damage.
     /// </summary>
-    public bool DoesDamage
-    {
-        get;
-        set;
-    }
+    public bool DoesDamage { get; set; }
 
     /// <summary>
-    /// The state of this assassin.
+    ///     The state of this assassin.
     /// </summary>
-    public AssassinState State
-    {
-        get;
-        set;
-    }
+    public AssassinState State { get; set; }
 
     /// <summary>
-    /// The type of mask used by this assassin.
+    ///     The type of mask used by this assassin.
     /// </summary>
-    public int MaskVariant
-    {
-        get;
-        set;
-    }
+    public int MaskVariant { get; set; }
 
     /// <summary>
-    /// A general-purpose cooldown that prevents this assassin from bowing repeatedly at targets.
+    ///     A general-purpose cooldown that prevents this assassin from bowing repeatedly at targets.
     /// </summary>
-    public int SpiritBowCooldown
-    {
-        get;
-        set;
-    }
+    public int SpiritBowCooldown { get; set; }
 
     /// <summary>
-    /// The index of the target of this assassin.
+    ///     The index of the target of this assassin.
     /// </summary>
-    public int TargetIndex
-    {
-        get;
-        set;
-    } = -1;
+    public int TargetIndex { get; set; } = -1;
 
     /// <summary>
-    /// The intensity of blur effects on this assassin.
+    ///     The intensity of blur effects on this assassin.
     /// </summary>
-    public float BlurIntensity
-    {
-        get;
-        set;
-    }
+    public float BlurIntensity { get; set; }
 
     /// <summary>
-    /// The amount by which the assassin is rotating forward for a bow.
+    ///     The amount by which the assassin is rotating forward for a bow.
     /// </summary>
-    public float BowRotation
-    {
-        get;
-        set;
-    }
+    public float BowRotation { get; set; }
 
     /// <summary>
-    /// The opacity of the arm outline.
+    ///     The opacity of the arm outline.
     /// </summary>
-    public float ArmOutlineOpacity
-    {
-        get;
-        set;
-    }
+    public float ArmOutlineOpacity { get; set; }
 
     /// <summary>
-    /// The amount by which this assassin has begun to disappear.
+    ///     The amount by which this assassin has begun to disappear.
     /// </summary>
-    public float DisappearanceInterpolant
-    {
-        get;
-        set;
-    }
+    public float DisappearanceInterpolant { get; set; }
 
     /// <summary>
-    /// The amount by which the katana is unsheathed.
+    ///     The amount by which the katana is unsheathed.
     /// </summary>
-    public float KatanaUnsheathInterpolant
-    {
-        get;
-        set;
-    }
+    public float KatanaUnsheathInterpolant { get; set; }
 
     /// <summary>
-    /// The amount by which this assassin's <see cref="AttackLoop"/> sound should be activated and noticeable.
+    ///     The amount by which this assassin's <see cref="AttackLoop" /> sound should be activated and
+    ///     noticeable.
     /// </summary>
-    public float AttackLoopActivationInterpolant
-    {
-        get;
-        set;
-    }
+    public float AttackLoopActivationInterpolant { get; set; }
 
     /// <summary>
-    /// The starting position of this assassin during their dash.
+    ///     The starting position of this assassin during their dash.
     /// </summary>
-    public Vector2 DashStart
-    {
-        get;
-        set;
-    }
+    public Vector2 DashStart { get; set; }
 
     /// <summary>
-    /// The cloth simulation that composes this assassin's robe.
+    ///     The cloth simulation that composes this assassin's robe.
     /// </summary>
-    public ClothSimulation Robe
-    {
-        get;
-        set;
-    } = new ClothSimulation(Vector3.Zero, 22, 21, 4.4f, 60f, 0.019f);
+    public ClothSimulation Robe { get; set; } = new(Vector3.Zero, 22, 21, 4.4f, 60f, 0.019f);
 
     /// <summary>
-    /// The ambient loop sound instance.
+    ///     The ambient loop sound instance.
     /// </summary>
-    public LoopedSoundInstance AmbientLoop
-    {
-        get;
-        set;
-    }
+    public LoopedSoundInstance AmbientLoop { get; set; }
 
     /// <summary>
-    /// The attacking loop sound instance.
+    ///     The attacking loop sound instance.
     /// </summary>
-    public LoopedSoundInstance AttackLoop
-    {
-        get;
-        set;
-    }
+    public LoopedSoundInstance AttackLoop { get; set; }
 
     /// <summary>
-    /// The position of this assassin's mask.
+    ///     The position of this assassin's mask.
     /// </summary>
     public Vector2 MaskPosition => Projectile.Center + new Vector2(Projectile.spriteDirection * -1f, -73f).RotatedBy(BowRotation * Projectile.spriteDirection) * Projectile.scale;
 
     /// <summary>
-    /// The owner of this assassin.
+    ///     The owner of this assassin.
     /// </summary>
     public Player Owner => Main.player[Projectile.owner];
 
     /// <summary>
-    /// The rope for the assassin's first bead.
+    ///     The rope for the assassin's first bead.
     /// </summary>
-    public VerletSimulatedRope BeadRopeA
-    {
-        get;
-        set;
-    }
+    public VerletSimulatedRope BeadRopeA { get; set; }
 
     /// <summary>
-    /// The rope for the assassin's second bead.
+    ///     The rope for the assassin's second bead.
     /// </summary>
-    public VerletSimulatedRope BeadRopeB
-    {
-        get;
-        set;
-    }
+    public VerletSimulatedRope BeadRopeB { get; set; }
 
     /// <summary>
-    /// The rope for the assassin's third bead.
+    ///     The rope for the assassin's third bead.
     /// </summary>
-    public VerletSimulatedRope BeadRopeC
-    {
-        get;
-        set;
-    }
+    public VerletSimulatedRope BeadRopeC { get; set; }
 
     /// <summary>
-    /// The rope for the assassin's fourth bead.
+    ///     The rope for the assassin's fourth bead.
     /// </summary>
-    public VerletSimulatedRope BeadRopeD
-    {
-        get;
-        set;
-    }
+    public VerletSimulatedRope BeadRopeD { get; set; }
 
     /// <summary>
-    /// The rotation of the assassin's left arm.
+    ///     The rotation of the assassin's left arm.
     /// </summary>
     public ref float LeftArmRotation => ref Projectile.localAI[0];
 
     /// <summary>
-    /// The rotation of the assassin's right arm.
+    ///     The rotation of the assassin's right arm.
     /// </summary>
     public ref float RightArmRotation => ref Projectile.localAI[1];
 
     /// <summary>
-    /// The rotation of the assassin's katanas.
+    ///     The rotation of the assassin's katanas.
     /// </summary>
     public ref float KatanaRotation => ref Projectile.localAI[2];
 
     /// <summary>
-    /// The movement interpolant of this assassin during its stay near owner state.
+    ///     The movement interpolant of this assassin during its stay near owner state.
     /// </summary>
     public ref float MovementInterpolant => ref Projectile.ai[0];
 
     /// <summary>
-    /// How long this assassin has existed for, in frames.
+    ///     How long this assassin has existed for, in frames.
     /// </summary>
     public ref float Time => ref Projectile.ai[1];
 
     /// <summary>
-    /// An optional number used for the purposes of per-state memorization. Usage varies based on time.
+    ///     An optional number used for the purposes of per-state memorization. Usage varies based on time.
     /// </summary>
     public ref float AIData => ref Projectile.ai[2];
 
     /// <summary>
-    /// The amount of mask variants that exist for this assassin.
+    ///     The amount of mask variants that exist for this assassin.
     /// </summary>
     public static int TotalMasks => 6;
 
     /// <summary>
-    /// The maximum search range this assassin can examine for targets.
+    ///     The maximum search range this assassin can examine for targets.
     /// </summary>
     public static float TargetingRange => 756f;
 
     /// <summary>
-    /// The maximum search range this assassin can examine for spirits to bow towards.
+    ///     The maximum search range this assassin can examine for spirits to bow towards.
     /// </summary>
     public static float SpiritBowingRange => 267f;
 
     /// <summary>
-    /// The scale of this assassin's arms.
+    ///     The scale of this assassin's arms.
     /// </summary>
     public static float ArmScale => 0.76f;
 
     /// <summary>
-    /// The render target that holds the contents of this assassin's body and arms.
+    ///     The render target that holds the contents of this assassin's body and arms.
     /// </summary>
-    public static InstancedRequestableTarget BodyTarget
-    {
-        get;
-        private set;
-    }
+    public static InstancedRequestableTarget BodyTarget { get; private set; }
 
     /// <summary>
-    /// The render target that holds the contents of this assassin's arm outlines.
+    ///     The render target that holds the contents of this assassin's arm outlines.
     /// </summary>
-    public static InstancedRequestableTarget ArmOutlineTarget
-    {
-        get;
-        private set;
-    }
+    public static InstancedRequestableTarget ArmOutlineTarget { get; private set; }
 
     /// <summary>
-    /// The render target that holds the contents of the entire assassin.
+    ///     The render target that holds the contents of the entire assassin.
     /// </summary>
-    public static InstancedRequestableTarget ResultsTarget
-    {
-        get;
-        private set;
-    }
+    public static InstancedRequestableTarget ResultsTarget { get; private set; }
 
     /// <summary>
-    /// The body texture asset wrapper.
+    ///     The body texture asset wrapper.
     /// </summary>
-    public static Asset<Texture2D> BodyTexture
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D> BodyTexture { get; private set; }
 
     /// <summary>
-    /// The arm texture asset wrapper.
+    ///     The arm texture asset wrapper.
     /// </summary>
-    public static Asset<Texture2D> ArmTexture
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D> ArmTexture { get; private set; }
 
     /// <summary>
-    /// The arm outline texture asset wrapper.
+    ///     The arm outline texture asset wrapper.
     /// </summary>
-    public static Asset<Texture2D> ArmOutlineTexture
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D> ArmOutlineTexture { get; private set; }
 
     /// <summary>
-    /// The arm texture asset wrapper used when bowing.
+    ///     The arm texture asset wrapper used when bowing.
     /// </summary>
-    public static Asset<Texture2D> ArmBowTexture
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D> ArmBowTexture { get; private set; }
 
     /// <summary>
-    /// The arm outline texture asset wrapper used when bowing.
+    ///     The arm outline texture asset wrapper used when bowing.
     /// </summary>
-    public static Asset<Texture2D> ArmBowOutlineTexture
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D> ArmBowOutlineTexture { get; private set; }
 
     /// <summary>
-    /// The kasa texture asset wrapper.
+    ///     The kasa texture asset wrapper.
     /// </summary>
-    public static Asset<Texture2D> KasaTexture
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D> KasaTexture { get; private set; }
 
-    public static Asset<Texture2D> AhogeTexture
-    {
-        get;
-        private set;
-    }
-    /// <summary>
-    /// The legs texture asset wrapper.
-    /// </summary>
-    public static Asset<Texture2D> LegsTexture
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D> AhogeTexture { get; private set; }
 
     /// <summary>
-    /// The mask texture asset wrappers.
+    ///     The legs texture asset wrapper.
     /// </summary>
-    public static Asset<Texture2D>[] AntishadowAssassinMasks
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D> LegsTexture { get; private set; }
 
     /// <summary>
-    /// The fifth assassin mask texture asset wrapper.
+    ///     The mask texture asset wrappers.
     /// </summary>
-    public static Asset<Texture2D> AntishadowAssassinMask5
-    {
-        get;
-        private set;
-    }
+    public static Asset<Texture2D>[] AntishadowAssassinMasks { get; private set; }
 
     /// <summary>
-    /// The chime sound played by this assassin at random.
+    ///     The fifth assassin mask texture asset wrapper.
     /// </summary>
-    public static readonly SoundStyle ChimeSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowBreatheChime", 2);
-
-    /// <summary>
-    /// The sound used when this assassin unsheathes its katana.
-    /// </summary>
-    public static readonly SoundStyle UnsheatheSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowAssassinKatanaUnsheathe");
-
-    /// <summary>
-    /// The sound used when this assassin begins to leave due to being desummoned.
-    /// </summary>
-    public static readonly SoundStyle LeaveSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowAssassinLeave");
-
-    /// <summary>
-    /// The looped sound used in an ambient context.
-    /// </summary>
-    public static readonly SoundStyle AntishadowAmbientLoopSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowAmbientLoop");
-
-    /// <summary>
-    /// The looped sound used when attacking.
-    /// </summary>
-    public static readonly SoundStyle AntishadowAttackLoopSound = new SoundStyle("HeavenlyArsenal/Assets/Sounds/Items/Summoner/AntishadowAttackLoop");
+    public static Asset<Texture2D> AntishadowAssassinMask5 { get; private set; }
 
     private void PerformStupidAssetBoilerplateLoading()
     {
         AntishadowAssassinMasks = new Asset<Texture2D>[TotalMasks];
-        for (int i = 1; i <= TotalMasks; i++)
-            AntishadowAssassinMasks[i - 1] = ModContent.Request<Texture2D>($"HeavenlyArsenal/Content/Gores/AntishadowAssassinMask{i}");
 
-        string texturePrefix = $"{Mod.Name}/Content/Items/Weapons/Summon/AntishadowAssassin";
+        for (var i = 1; i <= TotalMasks; i++)
+        {
+            AntishadowAssassinMasks[i - 1] = ModContent.Request<Texture2D>($"HeavenlyArsenal/Content/Gores/AntishadowAssassinMask{i}");
+        }
+
+        var texturePrefix = $"{Mod.Name}/Content/Items/Weapons/Summon/AntishadowAssassin";
         BodyTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassin");
         ArmTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArm");
         ArmOutlineTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArm_Outline");
@@ -459,9 +332,8 @@ public class AntishadowAssassin : ModProjectile
             ProjectileID.Sets.TrailCacheLength[Type] = 12;
             ProjectileID.Sets.MinionSacrificable[Projectile.type] = true;
             ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true;
-
-           
         }
+
         PerformStupidAssetBoilerplateLoading();
     }
 
@@ -503,21 +375,28 @@ public class AntishadowAssassin : ModProjectile
     {
         // Initialize beads if necessary.
         if (BeadRopeA is null || BeadRopeB is null || BeadRopeC is null || BeadRopeD is null)
+        {
             InitializeBeads();
+        }
 
         AmbientLoop ??= LoopedSoundManager.CreateNew(AntishadowAmbientLoopSound, () => !Projectile.active);
         AttackLoop ??= LoopedSoundManager.CreateNew(AntishadowAttackLoopSound, () => !Projectile.active);
 
         PreUpdateResets();
+
         if (State != AssassinState.Leave)
+        {
             HandleMinionBuffs();
+        }
 
         //Main.NewText($"State: {State}");
         //Main.NewText($"Particle count: {AntishadowFireParticleSystemManager.BackParticleSystem.Keys.Count.ToString()}");
         ExecuteState();
 
         if (Owner.MinionAttackTargetNPC != -1 && Main.npc[Owner.MinionAttackTargetNPC].active)
+        {
             TargetIndex = Owner.MinionAttackTargetNPC;
+        }
 
         ResetVisuals();
         MoveBeadRopes();
@@ -526,17 +405,23 @@ public class AntishadowAssassin : ModProjectile
         UpdateLoopedSounds();
         KeepSoundsAttached();
         DisturbLiquids();
+
         if (!Main.dedServ)
+        {
             UpdateCloth();
+        }
 
         Time++;
         ExistenceTimer++;
+
         if (SpiritBowCooldown >= 1)
+        {
             SpiritBowCooldown--;
+        }
     }
 
     /// <summary>
-    /// Executes the state of this assassin.
+    ///     Executes the state of this assassin.
     /// </summary>
     private void ExecuteState()
     {
@@ -544,46 +429,57 @@ public class AntishadowAssassin : ModProjectile
         {
             case AssassinState.StayNearOwner:
                 DoBehavior_StayNearOwner();
+
                 break;
             case AssassinState.DissipateToHuntTarget:
                 DoBehavior_DissipateToHuntTarget();
+
                 break;
             case AssassinState.WaitBeforeSlashingTarget:
                 DoBehavior_WaitBeforeSlashingTarget();
+
                 break;
             case AssassinState.PerformDirectionalSlices:
                 DoBehavior_PerformDirectionalSlices();
+
                 break;
             case AssassinState.SliceTargetRepeatedly:
                 DoBehavior_SliceTargetRepeatedly();
+
                 break;
             case AssassinState.PostSliceDash:
                 DoBehavior_PostSliceDash();
+
                 break;
             case AssassinState.BowAtSpirit:
                 DoBehavior_BowAtSpirit();
+
                 break;
             case AssassinState.Leave:
                 DoBehavior_Leave();
+
                 break;
         }
     }
 
     /// <summary>
-    /// Updates the rope of this assassin, making it sway in the wind and stay attached to its back.
+    ///     Updates the rope of this assassin, making it sway in the wind and stay attached to its back.
     /// </summary>
     private void UpdateCloth()
     {
-        int steps = 25;
-        float windSpeed = Math.Clamp(Main.WindForVisuals * Projectile.spriteDirection * 8f, -1.3f, 0f);
-        Vector2 robePosition = Projectile.Center + new Vector2(14f, -50f).RotatedBy(BowRotation);
-        Vector3 wind = Vector3.UnitX * (LumUtils.AperiodicSin(ExistenceTimer * 0.029f) * 0.67f + windSpeed) * 1.74f;
-        for (int i = 0; i < steps; i++)
+        var steps = 25;
+        var windSpeed = Math.Clamp(Main.WindForVisuals * Projectile.spriteDirection * 8f, -1.3f, 0f);
+        var robePosition = Projectile.Center + new Vector2(14f, -50f).RotatedBy(BowRotation);
+        var wind = Vector3.UnitX * (LumUtils.AperiodicSin(ExistenceTimer * 0.029f) * 0.67f + windSpeed) * 1.74f;
+
+        for (var i = 0; i < steps; i++)
         {
-            for (int x = 0; x < Robe.Width; x += 2)
+            for (var x = 0; x < Robe.Width; x += 2)
             {
-                for (int y = 0; y < 2; y++)
+                for (var y = 0; y < 2; y++)
+                {
                     ConstrainParticle(robePosition, Robe.particleGrid[x, y], 0f);
+                }
             }
 
             Robe.Simulate(0.051f, false, Vector3.UnitY * 3.2f + wind);
@@ -591,17 +487,19 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Constrains a given cloth point, keeping it locked in place.
+    ///     Constrains a given cloth point, keeping it locked in place.
     /// </summary>
     private void ConstrainParticle(Vector2 anchor, ClothPoint? point, float angleOffset)
     {
         if (point is null)
+        {
             return;
+        }
 
-        float xInterpolant = point.X / (float)Robe.Width;
-        float angle = MathHelper.Lerp(MathHelper.PiOver2, MathHelper.TwoPi - MathHelper.PiOver2, xInterpolant);
+        var xInterpolant = point.X / (float)Robe.Width;
+        var angle = MathHelper.Lerp(MathHelper.PiOver2, MathHelper.TwoPi - MathHelper.PiOver2, xInterpolant);
 
-        Vector3 ring = new Vector3(MathF.Cos(angle + angleOffset) * 50f, 0f, -MathF.Cos(angle) * 10f);
+        var ring = new Vector3(MathF.Cos(angle + angleOffset) * 50f, 0f, -MathF.Cos(angle) * 10f);
         ring.Y += point.Y * 6f;
 
         point.Position = new Vector3(anchor, 0f) + ring;
@@ -609,11 +507,11 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Initializes beads atop the kasa of this assassin.
+    ///     Initializes beads atop the kasa of this assassin.
     /// </summary>
     private void InitializeBeads()
     {
-        int ropePoints = 6;
+        var ropePoints = 6;
         BeadRopeA = new VerletSimulatedRope(Projectile.Center, Vector2.Zero, ropePoints, 12.5f);
         BeadRopeB = new VerletSimulatedRope(Projectile.Center, Vector2.Zero, ropePoints, 18.5f);
         BeadRopeC = new VerletSimulatedRope(Projectile.Center, Vector2.Zero, ropePoints, 11.1f);
@@ -626,13 +524,14 @@ public class AntishadowAssassin : ModProjectile
 
         // Fly up and down by default.
         // This gets functionally nullified if a reposition is ongoing.
-        float sinusoidalSpeed = MathF.Cos(MathHelper.TwoPi * Time / 150f) * 0.33f;
+        var sinusoidalSpeed = MathF.Cos(MathHelper.TwoPi * Time / 150f) * 0.33f;
         Projectile.velocity = Vector2.Lerp(Projectile.velocity, Vector2.UnitY * sinusoidalSpeed, 0.1f);
         Projectile.Opacity = Projectile.Opacity.StepTowards(1f, 0.2f);
         Projectile.spriteDirection = (int)Projectile.HorizontalDirectionTo(Owner.Center);
 
         // Search for targets.
-        int targetIndex = FindPotentialTarget();
+        var targetIndex = FindPotentialTarget();
+
         if (targetIndex >= 0)
         {
             TargetIndex = targetIndex;
@@ -642,7 +541,8 @@ public class AntishadowAssassin : ModProjectile
         // Search for a spirit to bow towards.
         else if (SpiritBowCooldown <= 0 && Main.rand.NextBool(75))
         {
-            int spiritIndex = FindPotentialSpirit();
+            var spiritIndex = FindPotentialSpirit();
+
             if (spiritIndex >= 0)
             {
                 SpiritBowCooldown = LumUtils.SecondsToFrames(12f);
@@ -655,13 +555,18 @@ public class AntishadowAssassin : ModProjectile
     private void DoBehavior_DissipateToHuntTarget()
     {
         if (!EnsureTargetIsAlive())
+        {
             return;
+        }
 
-        NPC target = Main.npc[TargetIndex];
+        var target = Main.npc[TargetIndex];
+
         if (Time == 1f)
         {
             if (Projectile.WithinRange(target.Center, 300f))
+            {
                 SwitchState(AssassinState.WaitBeforeSlashingTarget);
+            }
 
             DashStart = Projectile.Center;
             MovementInterpolant = 1f;
@@ -670,7 +575,7 @@ public class AntishadowAssassin : ModProjectile
 
         HandleRepositionMotion(target.Center + target.SafeDirectionTo(Projectile.Center) * 75f);
 
-        float armRotation = 0.99f;
+        var armRotation = 0.99f;
         LeftArmRotation = LeftArmRotation.AngleLerp(armRotation, 0.3f);
         RightArmRotation = RightArmRotation.AngleLerp(-armRotation, 0.3f);
         KatanaRotation = KatanaRotation.AngleLerp(1.3f, 0.56f);
@@ -679,18 +584,24 @@ public class AntishadowAssassin : ModProjectile
         Projectile.spriteDirection = (int)Projectile.HorizontalDirectionTo(target.Center);
 
         if (Time >= 1f && MovementInterpolant <= 0.01f)
+        {
             SwitchState(AssassinState.WaitBeforeSlashingTarget);
+        }
     }
 
     private void DoBehavior_WaitBeforeSlashingTarget()
     {
         if (!EnsureTargetIsAlive())
+        {
             return;
+        }
 
         if (Time == 1f)
+        {
             attachedSounds.Add(SoundEngine.PlaySound(UnsheatheSound, Projectile.Center).WithVolumeBoost(1.2f));
+        }
 
-        float armRotation = 0.99f;
+        var armRotation = 0.99f;
         LeftArmRotation = LeftArmRotation.AngleLerp(armRotation, 0.3f);
         RightArmRotation = RightArmRotation.AngleLerp(-armRotation, 0.3f);
         KatanaRotation = KatanaRotation.AngleLerp(0.6f, 0.56f);
@@ -698,15 +609,18 @@ public class AntishadowAssassin : ModProjectile
         // Vanish.
         //Projectile.Opacity = MathHelper.SmoothStep(0f, 1f, LumUtils.InverseLerp(18f, 7f, Time).Squared());
         KatanaUnsheathInterpolant = EasingCurves.Quadratic.Evaluate(EasingType.InOut, LumUtils.InverseLerp(0f, 11f, Time));
+
         if (Time >= 18f)
+        {
             SwitchState(AssassinState.PerformDirectionalSlices);
+        }
 
-        NPC target = Main.npc[TargetIndex];
+        var target = Main.npc[TargetIndex];
 
-        float reelBackSpeed = MathF.Pow((1f - KatanaUnsheathInterpolant), 5f) * 35f;
+        var reelBackSpeed = MathF.Pow(1f - KatanaUnsheathInterpolant, 5f) * 35f;
         Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * -reelBackSpeed, 0.46f);
 
-        float idealRotation = MathHelper.PiOver4 * Projectile.spriteDirection * (target.Center.Y - Projectile.Center.Y).NonZeroSign() * Time / 18f;
+        var idealRotation = MathHelper.PiOver4 * Projectile.spriteDirection * (target.Center.Y - Projectile.Center.Y).NonZeroSign() * Time / 18f;
         Projectile.rotation = Projectile.rotation.AngleLerp(idealRotation, 0.6f);
     }
 
@@ -716,6 +630,7 @@ public class AntishadowAssassin : ModProjectile
         {
             TransitionToPostDashSlash();
             Projectile.velocity = (Projectile.position - Projectile.oldPosition).SafeNormalize(Vector2.Zero) * 180f;
+
             return;
         }
 
@@ -725,28 +640,45 @@ public class AntishadowAssassin : ModProjectile
         KatanaUnsheathInterpolant = 1f;
         DoesDamage = true;
 
-        int dashCount = 32;
-        NPC target = Main.npc[TargetIndex];
-        ref float dashCounter = ref AIData;
-        int dashDuration = Utils.Clamp(15 - (int)dashCounter * 3, 5, 1000);
-        int dashCycleHit = dashCounter == 0f ? 1 : (int)(dashDuration * 0.5f); // Done to ensure that the slash sound always plays even if the target dies before the dash duration midway point is reached.
+        var dashCount = 32;
+        var target = Main.npc[TargetIndex];
+        ref var dashCounter = ref AIData;
+        var dashDuration = Utils.Clamp(15 - (int)dashCounter * 3, 5, 1000);
+
+        var dashCycleHit = dashCounter == 0f
+            ? 1
+            : (int)(dashDuration * 0.5f); // Done to ensure that the slash sound always plays even if the target dies before the dash duration midway point is reached.
+
         if (Time == dashCycleHit)
         {
             //todo: come back to me and give it new sfx
-            SoundEngine.PlaySound((target.Organic() ? Murasama.OrganicHit : Murasama.InorganicHit) with { MaxInstances = 9, Volume = 0.4f, PitchVariance = 0.4f, Pitch = 0.4f});
+            SoundEngine.PlaySound
+            (
+                (target.Organic() ? Murasama.OrganicHit : Murasama.InorganicHit) with
+                {
+                    MaxInstances = 9,
+                    Volume = 0.4f,
+                    PitchVariance = 0.4f,
+                    Pitch = 0.4f
+                }
+            );
+
             ScreenShakeSystem.StartShakeAtPoint(target.Center, 3.6f);
         }
 
-        float dashRadius = MathHelper.Lerp(401f, 200f, dashCounter / (dashCount - 1f));
+        var dashRadius = MathHelper.Lerp(401f, 200f, dashCounter / (dashCount - 1f));
 
         if (Time == 2f)
         {
             //Projectile.Opacity = Projectile.Opacity.StepTowards(1f, 0.3f);
 
-            float teleportOffset = Main.rand.NextFloat(300f, 500f);
-            Vector2 teleportDirection = Main.rand.NextVector2Unit();
+            var teleportOffset = Main.rand.NextFloat(300f, 500f);
+            var teleportDirection = Main.rand.NextVector2Unit();
+
             if (dashCounter == 0f)
+            {
                 teleportDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
+            }
 
             Projectile.Center = target.Center + teleportDirection * teleportOffset;
             DashStart = Projectile.Center;
@@ -755,47 +687,64 @@ public class AntishadowAssassin : ModProjectile
         }
 
         // Dash through the target.
-        float dashCompletion = LumUtils.InverseLerp(0.1f, 0.9f, Time / dashDuration);
-        float easedDashInterpolant = EasingCurves.Quadratic.Evaluate(EasingType.InOut, dashCompletion);
-        Vector2 dashDirection = Projectile.velocity.SafeNormalize(Vector2.UnitY);
-        Vector2 start = target.Center - dashDirection * dashRadius;
-        Vector2 end = target.Center + dashDirection * dashRadius;
+        var dashCompletion = LumUtils.InverseLerp(0.1f, 0.9f, Time / dashDuration);
+        var easedDashInterpolant = EasingCurves.Quadratic.Evaluate(EasingType.InOut, dashCompletion);
+        var dashDirection = Projectile.velocity.SafeNormalize(Vector2.UnitY);
+        var start = target.Center - dashDirection * dashRadius;
+        var end = target.Center + dashDirection * dashRadius;
         Projectile.Center = Vector2.Lerp(start, end, easedDashInterpolant);
 
-        int slashID = ModContent.ProjectileType<AntishadowUnidirectionalAssassinSlash>();
+        var slashID = ModContent.ProjectileType<AntishadowUnidirectionalAssassinSlash>();
+
         if (Main.myPlayer == Projectile.owner)
         {
-            float slashMaxOffset = 100f;
-            Vector2 slashOffset = Main.rand.NextVector2Circular(slashMaxOffset, slashMaxOffset);
-            Vector2 slashSpawnPosition = target.Center + slashOffset;
+            var slashMaxOffset = 100f;
+            var slashOffset = Main.rand.NextVector2Circular(slashMaxOffset, slashMaxOffset);
+            var slashSpawnPosition = target.Center + slashOffset;
 
-            int slash = Projectile.NewProjectile(Projectile.GetSource_FromThis(), slashSpawnPosition, Vector2.Zero, slashID, Projectile.damage, Projectile.knockBack, Projectile.owner, dashCounter, slashOffset.Length(), slashOffset.ToRotation());
+            var slash = Projectile.NewProjectile
+            (
+                Projectile.GetSource_FromThis(),
+                slashSpawnPosition,
+                Vector2.Zero,
+                slashID,
+                Projectile.damage,
+                Projectile.knockBack,
+                Projectile.owner,
+                dashCounter,
+                slashOffset.Length(),
+                slashOffset.ToRotation()
+            );
+
             Main.projectile[slash].originalDamage = Projectile.originalDamage;
             Main.projectile[slash].netUpdate = true;
-            
 
             slashMaxOffset = 50f;
             slashID = ModContent.ProjectileType<AntishadowAssassinSlash>();
-            float angleX = Main.rand.NextFloatDirection() * 1.1f;
-            float angleY = Main.rand.NextFloatDirection() * 1.1f;
+            var angleX = Main.rand.NextFloatDirection() * 1.1f;
+            var angleY = Main.rand.NextFloatDirection() * 1.1f;
             slashSpawnPosition = Vector2.Lerp(Projectile.Center, target.Center, 0.8f) + Main.rand.NextVector2Circular(slashMaxOffset, slashMaxOffset);
 
-            slash = Projectile.NewProjectile(Projectile.GetSource_FromThis(), slashSpawnPosition, Vector2.Zero, slashID, Projectile.damage, Projectile.knockBack, Projectile.owner, angleX, angleY, 0.67f);
+            slash = Projectile.NewProjectile
+                (Projectile.GetSource_FromThis(), slashSpawnPosition, Vector2.Zero, slashID, Projectile.damage, Projectile.knockBack, Projectile.owner, angleX, angleY, 0.67f);
+
             Main.projectile[slash].originalDamage = Projectile.originalDamage;
             Main.projectile[slash].netUpdate = true;
         }
 
         // Keep all relevant slashes attached to the assassin.
-        foreach (Projectile slash in Main.ActiveProjectiles)
+        foreach (var slash in Main.ActiveProjectiles)
         {
-            Vector2 bend = Projectile.velocity.RotatedBy(MathHelper.PiOver2) * LumUtils.Convert01To010(dashCompletion) * 100f;
+            var bend = Projectile.velocity.RotatedBy(MathHelper.PiOver2) * LumUtils.Convert01To010(dashCompletion) * 100f;
+
             if (slash.owner == Projectile.owner && slash.ai[0] == dashCounter && slash.type == slashID && dashCompletion < 0.9f)
             {
                 float bendDirection = (slash.identity % 2 == 0).ToDirectionInt();
-                Vector2 slashOffset = slash.ai[1] * slash.ai[2].ToRotationVector2() + bend * bendDirection;
+                var slashOffset = slash.ai[1] * slash.ai[2].ToRotationVector2() + bend * bendDirection;
                 slash.Center = Projectile.Center + slashOffset;
             }
         }
+
         CreateMotionVisuals();
 
         AttackLoopActivationInterpolant = MathHelper.Lerp(AttackLoopActivationInterpolant, 1f, 0.3f);
@@ -806,12 +755,12 @@ public class AntishadowAssassin : ModProjectile
             Projectile.netUpdate = true;
 
             dashCounter++;
+
             if (dashCounter >= dashCount)
             {
-               SwitchState(AssassinState.SliceTargetRepeatedly);
+                SwitchState(AssassinState.SliceTargetRepeatedly);
                 RerollMask(false);
             }
-               
         }
     }
 
@@ -820,18 +769,30 @@ public class AntishadowAssassin : ModProjectile
         if (!EnsureTargetIsAlive())
         {
             TransitionToPostDashSlash();
+
             return;
         }
 
         KatanaUnsheathInterpolant = 1f;
         DoesDamage = true;
 
-        int slashTime = 120;
-        NPC target = Main.npc[TargetIndex];
+        var slashTime = 120;
+        var target = Main.npc[TargetIndex];
+
         if (Time <= slashTime)
         {
             if (Time % 4f == 0f)
-                SoundEngine.PlaySound((target.Organic() ? Murasama.OrganicHit : Murasama.InorganicHit) with { MaxInstances = 16, Volume = 0.5f, PitchVariance = 0.2f });
+            {
+                SoundEngine.PlaySound
+                (
+                    (target.Organic() ? Murasama.OrganicHit : Murasama.InorganicHit) with
+                    {
+                        MaxInstances = 16,
+                        Volume = 0.5f,
+                        PitchVariance = 0.2f
+                    }
+                );
+            }
 
             Projectile.Center = target.Center;
             Projectile.velocity = target.velocity.SafeNormalize((target.position - target.oldPosition).SafeNormalize(Vector2.UnitX * Projectile.spriteDirection));
@@ -841,15 +802,19 @@ public class AntishadowAssassin : ModProjectile
 
             if (Main.myPlayer == Projectile.owner)
             {
-                float slashMaxOffset = 50f;
-                for (int i = 0; i < 5; i++)
-                {
-                    float angleX = Main.rand.NextFloatDirection() * 1.2f;
-                    float angleY = Main.rand.NextFloatDirection() * 1.2f;
-                    Vector2 slashSpawnPosition = target.Center + Main.rand.NextVector2Circular(slashMaxOffset, slashMaxOffset);
+                var slashMaxOffset = 50f;
 
-                    int slashID = ModContent.ProjectileType<AntishadowAssassinSlash>();
-                    int slash = Projectile.NewProjectile(Projectile.GetSource_FromThis(), slashSpawnPosition, Vector2.Zero, slashID, Projectile.damage, Projectile.knockBack, Projectile.owner, angleX, angleY, 1.15f);
+                for (var i = 0; i < 5; i++)
+                {
+                    var angleX = Main.rand.NextFloatDirection() * 1.2f;
+                    var angleY = Main.rand.NextFloatDirection() * 1.2f;
+                    var slashSpawnPosition = target.Center + Main.rand.NextVector2Circular(slashMaxOffset, slashMaxOffset);
+
+                    var slashID = ModContent.ProjectileType<AntishadowAssassinSlash>();
+
+                    var slash = Projectile.NewProjectile
+                        (Projectile.GetSource_FromThis(), slashSpawnPosition, Vector2.Zero, slashID, Projectile.damage, Projectile.knockBack, Projectile.owner, angleX, angleY, 1.15f);
+
                     Main.projectile[slash].originalDamage = Projectile.originalDamage;
                     Main.projectile[slash].netUpdate = true;
                 }
@@ -858,39 +823,47 @@ public class AntishadowAssassin : ModProjectile
 
         AttackLoopActivationInterpolant = MathHelper.Lerp(AttackLoopActivationInterpolant, 1f, 0.3f);
         Projectile.Opacity = LumUtils.InverseLerp(slashTime, slashTime + 15f, Time);
+
         if (Time >= slashTime + 15f)
+        {
             SwitchState(AssassinState.PerformDirectionalSlices);
+        }
     }
 
     private void DoBehavior_PostSliceDash()
     {
-        int dashDuration = 32;
+        var dashDuration = 32;
 
         Projectile.scale = Projectile.scale.StepTowards(1f, 0.3f);
         Projectile.velocity *= 0.685f;
         Projectile.Opacity = Projectile.Opacity.StepTowards(1f, 0.3f);
 
-        float armRepositionInterpolant = LumUtils.Saturate(Time / dashDuration);
-        float armRotation = MathHelper.SmoothStep(0.99f, 0.15f, MathF.Pow(armRepositionInterpolant, 0.4f));
+        var armRepositionInterpolant = LumUtils.Saturate(Time / dashDuration);
+        var armRotation = MathHelper.SmoothStep(0.99f, 0.15f, MathF.Pow(armRepositionInterpolant, 0.4f));
+
         if (Projectile.spriteDirection == 1)
+        {
             armRotation *= -1f;
+        }
 
         LeftArmRotation = LeftArmRotation.AngleLerp(-armRotation, 0.3f);
         RightArmRotation = RightArmRotation.AngleLerp(armRotation, 0.3f);
         KatanaRotation = 0f;
 
         if (Time >= dashDuration)
+        {
             SwitchState(AssassinState.StayNearOwner);
+        }
     }
 
     private void DoBehavior_BowAtSpirit()
     {
-        int bowDelay = 14;
-        int bowTime = 56;
-        int bowHoldTime = 40;
+        var bowDelay = 14;
+        var bowTime = 56;
+        var bowHoldTime = 40;
 
-        float bowInterpolant = LumUtils.InverseLerpBump(0f, bowTime, bowTime + bowHoldTime, bowTime * 2 + bowHoldTime, Time - bowDelay);
-        float angleReorientInterpolant = LumUtils.InverseLerp(0f, 0.2f, bowInterpolant) * 0.8f;
+        var bowInterpolant = LumUtils.InverseLerpBump(0f, bowTime, bowTime + bowHoldTime, bowTime * 2 + bowHoldTime, Time - bowDelay);
+        var angleReorientInterpolant = LumUtils.InverseLerp(0f, 0.2f, bowInterpolant) * 0.8f;
         BowRotation = MathHelper.SmoothStep(0f, MathHelper.PiOver4, EasingCurves.Quadratic.Evaluate(EasingType.InOut, bowInterpolant));
 
         LeftArmRotation = 0.15f.AngleLerp(BowRotation * 0.6f, angleReorientInterpolant);
@@ -900,21 +873,25 @@ public class AntishadowAssassin : ModProjectile
         Projectile.velocity.Y *= 0.9f;
 
         if (Time >= bowDelay + bowTime * 2 + bowHoldTime)
+        {
             SwitchState(AssassinState.StayNearOwner);
+        }
     }
 
     private void DoBehavior_Leave()
     {
-        int bowDelay = 14;
-        int bowTime = 56;
-        int disappearDelay = 60;
-        int disappearTime = 15;
+        var bowDelay = 14;
+        var bowTime = 56;
+        var disappearDelay = 60;
+        var disappearTime = 15;
 
         if (Time == 1f)
+        {
             SoundEngine.PlaySound(LeaveSound, Projectile.Center).WithVolumeBoost(0.45f);
+        }
 
-        float bowInterpolant = LumUtils.InverseLerp(0f, bowTime, Time - bowDelay);
-        float angleReorientInterpolant = LumUtils.InverseLerp(0f, 0.2f, bowInterpolant) * 0.8f;
+        var bowInterpolant = LumUtils.InverseLerp(0f, bowTime, Time - bowDelay);
+        var angleReorientInterpolant = LumUtils.InverseLerp(0f, 0.2f, bowInterpolant) * 0.8f;
         BowRotation = MathHelper.SmoothStep(0f, MathHelper.PiOver4, EasingCurves.Quadratic.Evaluate(EasingType.InOut, bowInterpolant));
 
         LeftArmRotation = 0.15f.AngleLerp(BowRotation * 0.6f, angleReorientInterpolant);
@@ -929,16 +906,19 @@ public class AntishadowAssassin : ModProjectile
         Projectile.scale = 1f;
 
         // Create fire particles when disappearing.
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
             if (Main.rand.NextBool(DisappearanceInterpolant))
             {
-                int fireBrightness = Main.rand.Next(20);
-                Color fireColor = new Color(fireBrightness, fireBrightness, fireBrightness);
-                if (i % 6 == 0)
-                    fireColor = new Color(174, 0, Main.rand.Next(16), 0);
+                var fireBrightness = Main.rand.Next(20);
+                var fireColor = new Color(fireBrightness, fireBrightness, fireBrightness);
 
-                Vector2 position = Projectile.Center + Main.rand.NextVector2Circular(60f, 60f);
+                if (i % 6 == 0)
+                {
+                    fireColor = new Color(174, 0, Main.rand.Next(16), 0);
+                }
+
+                var position = Projectile.Center + Main.rand.NextVector2Circular(60f, 60f);
                 AntishadowFireParticleSystemManager.CreateNew(Projectile.owner, false, position, Main.rand.NextVector2Circular(17f, 17f), Vector2.One * Main.rand.NextFloat(30f, 125f), fireColor);
             }
         }
@@ -948,17 +928,23 @@ public class AntishadowAssassin : ModProjectile
         Projectile.timeLeft = 2;
 
         if (DisappearanceInterpolant >= 1f)
+        {
             Projectile.Kill();
+        }
     }
 
     private int FindPotentialTarget()
     {
-        List<NPC> potentialTargets = new List<NPC>(Main.maxNPCs);
-        foreach (NPC target in Main.ActiveNPCs)
+        var potentialTargets = new List<NPC>(Main.maxNPCs);
+
+        foreach (var target in Main.ActiveNPCs)
         {
-            bool inRange = Projectile.WithinRange(target.Center, TargetingRange) || Owner.WithinRange(target.Center, TargetingRange);
+            var inRange = Projectile.WithinRange(target.Center, TargetingRange) || Owner.WithinRange(target.Center, TargetingRange);
+
             if (!inRange || !target.CanBeChasedBy())
+            {
                 continue;
+            }
 
             potentialTargets.Add(target);
         }
@@ -966,7 +952,9 @@ public class AntishadowAssassin : ModProjectile
         // Pick the closest valid target to the owner, so that the assassin doesn't go flying off hunting enemies offscreen since they're within its
         // detection zone.
         if (potentialTargets.Count >= 1)
+        {
             return potentialTargets.OrderBy(p => p.DistanceSQ(Owner.Center)).First().whoAmI;
+        }
 
         return -1;
     }
@@ -1009,15 +997,18 @@ public class AntishadowAssassin : ModProjectile
         {
             // There is currently no valid target.
             // Check for a new one. If no new one can be found, then this returns false and targeting ceases.
-            int targetIndex = FindPotentialTarget();
+            var targetIndex = FindPotentialTarget();
+
             if (targetIndex <= -1 || !Main.npc[targetIndex].active)
             {
                 SwitchState(AssassinState.StayNearOwner);
                 TargetIndex = -1;
+
                 return false;
             }
 
             TargetIndex = targetIndex;
+
             return true;
         }
 
@@ -1025,7 +1016,7 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Switches this assassin's state to a different state of choice.
+    ///     Switches this assassin's state to a different state of choice.
     /// </summary>
     private void SwitchState(AssassinState state)
     {
@@ -1036,7 +1027,7 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Handles pre-update reset effects, such as resetting MaxUpdates.
+    ///     Handles pre-update reset effects, such as resetting MaxUpdates.
     /// </summary>
     private void PreUpdateResets()
     {
@@ -1044,39 +1035,41 @@ public class AntishadowAssassin : ModProjectile
         Projectile.MaxUpdates = 1;
         ArmOutlineOpacity = 0f;
         AttackLoopActivationInterpolant = AttackLoopActivationInterpolant.StepTowards(0f, 0.02f);
+
         if (BlurIntensity <= 0.2f)
+        {
             KatanaUnsheathInterpolant = KatanaUnsheathInterpolant.StepTowards(0f, 0.02f);
+        }
     }
 
     /// <summary>
-    /// Resets visuals for this assassin, such rotations.
+    ///     Resets visuals for this assassin, such rotations.
     /// </summary>
     private void ResetVisuals()
     {
-        float idealArmRotation = 0.15f;
+        var idealArmRotation = 0.15f;
 
         LeftArmRotation = LeftArmRotation.AngleLerp(idealArmRotation, 0.09f);
         RightArmRotation = RightArmRotation.AngleLerp(-idealArmRotation, 0.09f);
         KatanaRotation = KatanaRotation.AngleLerp(0f, 0.08f);
 
         // Rotate based on current horizontal speed.
-        float idealRotation = Math.Clamp((Projectile.position - Projectile.oldPosition).X * 0.004f, -0.5f, 0.5f);
+        var idealRotation = Math.Clamp((Projectile.position - Projectile.oldPosition).X * 0.004f, -0.5f, 0.5f);
         Projectile.rotation = Projectile.rotation.AngleLerp(idealRotation, 0.3f);
 
         Projectile.scale = Projectile.scale.StepTowards(1f, 0.01f);
 
-        float idealBlur = LumUtils.InverseLerp(18f, 75f, (Projectile.position - Projectile.oldPosition).Length());
+        var idealBlur = LumUtils.InverseLerp(18f, 75f, (Projectile.position - Projectile.oldPosition).Length());
         BlurIntensity = MathHelper.Lerp(BlurIntensity, idealBlur, 0.16f);
     }
 
     /// <summary>
-    /// Handles repositioning motion for this assassin.
+    ///     Handles repositioning motion for this assassin.
     /// </summary>
     private void HandleRepositionMotion(Vector2 destination)
     {
-
-        float minMovementInterpolant = 0.02f;
-        bool doneMoving = MovementInterpolant <= minMovementInterpolant;
+        var minMovementInterpolant = 0.02f;
+        var doneMoving = MovementInterpolant <= minMovementInterpolant;
 
         // Dash if sufficiently far from the desired position and not already dashing.
         if (doneMoving && !Projectile.WithinRange(destination, 540f))
@@ -1090,15 +1083,18 @@ public class AntishadowAssassin : ModProjectile
         // Handle motion.
         Projectile.Center = Vector2.SmoothStep(Projectile.Center, destination, MathF.Pow(LumUtils.Convert01To010(MovementInterpolant), 4f) * 0.8f);
         MovementInterpolant *= 0.9f;
+
         if (MovementInterpolant < 0.6f)
+        {
             MovementInterpolant *= 0.8f;
+        }
 
         // Scale down when moving.
         Projectile.scale = LumUtils.InverseLerp(0.05f, minMovementInterpolant, MovementInterpolant) + LumUtils.InverseLerp(0.65f, 1f, MovementInterpolant);
 
         if (MovementInterpolant >= 0.2f)
         {
-            float armRotation = 0.99f;
+            var armRotation = 0.99f;
             LeftArmRotation = LeftArmRotation.AngleLerp(armRotation, 0.56f);
             RightArmRotation = RightArmRotation.AngleLerp(-armRotation, 0.56f);
 
@@ -1106,7 +1102,9 @@ public class AntishadowAssassin : ModProjectile
             // Due to how oldPosition works (Seemingly having a zeroed position at initialization time), this waits a few frames
             // after being summoned before beginning.
             if (ExistenceTimer >= 10)
+            {
                 CreateMotionVisuals();
+            }
         }
     }
 
@@ -1114,6 +1112,7 @@ public class AntishadowAssassin : ModProjectile
     {
         texture = null;
         goreID = 0;
+
         if (Main.netMode != NetmodeID.Server)
         {
             texture = AntishadowAssassinMasks[MaskVariant].Value;
@@ -1122,14 +1121,17 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Rerolls the mask variant for this assassin.
+    ///     Rerolls the mask variant for this assassin.
     /// </summary>
     private void RerollMask(bool CreateGore = true)
     {
-        if(CreateGore)
+        if (CreateGore)
+        {
             CreateMaskGore();
+        }
 
-        int oldMaskVariant = MaskVariant;
+        var oldMaskVariant = MaskVariant;
+
         do
         {
             MaskVariant = Main.rand.Next(TotalMasks);
@@ -1138,32 +1140,37 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Drops this assassin's mask as a gore.
+    ///     Drops this assassin's mask as a gore.
     /// </summary>
     private void CreateMaskGore()
     {
         if (Main.netMode == NetmodeID.Server)
+        {
             return;
+        }
 
-        GetMaskInfo(out _, out int goreID);
+        GetMaskInfo(out _, out var goreID);
 
         Gore.NewGore(Projectile.GetSource_FromThis(), MaskPosition, Vector2.Zero, goreID, Projectile.scale);
     }
 
     /// <summary>
-    /// Ensures that all motion visuals for when this assassin is dashing to its destination.
+    ///     Ensures that all motion visuals for when this assassin is dashing to its destination.
     /// </summary>
     private void CreateMotionVisuals()
     {
         if (Main.dedServ)
+        {
             return;
-        Vector2 previous = DashStart;
-        Vector2 current = Projectile.Center;
-        Vector2 directionalForce = (current - previous).RotatedByRandom(0.4f) * 0.1f;
-        float scaleFactor = Utils.Remap(current.Distance(previous), 30f, 125f, 1f, 0.5f) * 0.6f;
-        int fireBrightness = Main.rand.Next(20);
-        Color fireColor = new Color(fireBrightness, fireBrightness, fireBrightness);
-        Color bigColorColor = fireColor;
+        }
+
+        var previous = DashStart;
+        var current = Projectile.Center;
+        var directionalForce = (current - previous).RotatedByRandom(0.4f) * 0.1f;
+        var scaleFactor = Utils.Remap(current.Distance(previous), 30f, 125f, 1f, 0.5f) * 0.6f;
+        var fireBrightness = Main.rand.Next(20);
+        var fireColor = new Color(fireBrightness, fireBrightness, fireBrightness);
+        var bigColorColor = fireColor;
 
         if (MovementInterpolant <= 0.35f)
         {
@@ -1172,23 +1179,40 @@ public class AntishadowAssassin : ModProjectile
         }
 
         // Create fire.
-        AntishadowFireParticleSystemManager.CreateNew(Projectile.owner, false, current, Main.rand.NextVector2Circular(7f, 7f) + directionalForce, Vector2.One * Main.rand.NextFloat(100f, 175f) * scaleFactor, bigColorColor);
+        AntishadowFireParticleSystemManager.CreateNew
+            (Projectile.owner, false, current, Main.rand.NextVector2Circular(7f, 7f) + directionalForce, Vector2.One * Main.rand.NextFloat(100f, 175f) * scaleFactor, bigColorColor);
+
         if (!current.WithinRange(previous, 40f))
         {
-            int steps = (int)(current.Distance(previous) / 21f);
+            var steps = (int)(current.Distance(previous) / 21f);
+
             for (float i = 0; i < steps; i++)
             {
-                Color loopFireColor = fireColor;
-                if (i % 6 == 0)
-                    loopFireColor = new Color(174, 0, Main.rand.Next(16), 0);
+                var loopFireColor = fireColor;
 
-                Vector2 position = Vector2.Lerp(previous, current, i / steps);
-                if(Main.rand.NextBool(3))
-                    AntishadowFireParticleSystemManager.CreateNew(Projectile.owner, false, position, Main.rand.NextVector2Circular(27f, 27f) + directionalForce * 0.45f, Vector2.One * Main.rand.NextFloat(30f, 175f) * scaleFactor, loopFireColor);
+                if (i % 6 == 0)
+                {
+                    loopFireColor = new Color(174, 0, Main.rand.Next(16), 0);
+                }
+
+                var position = Vector2.Lerp(previous, current, i / steps);
+
+                if (Main.rand.NextBool(3))
+                {
+                    AntishadowFireParticleSystemManager.CreateNew
+                    (
+                        Projectile.owner,
+                        false,
+                        position,
+                        Main.rand.NextVector2Circular(27f, 27f) + directionalForce * 0.45f,
+                        Vector2.One * Main.rand.NextFloat(30f, 175f) * scaleFactor,
+                        loopFireColor
+                    );
+                }
 
                 if (Main.rand.NextBool(8) && Main.GetProjectileDesiredShader(Projectile) == 0)
                 {
-                    Dust fire = Dust.NewDustPerfect(position, 261);
+                    var fire = Dust.NewDustPerfect(position, 261);
                     fire.velocity = Main.rand.NextVector2Circular(30f, 30f) - directionalForce * 0.4f;
                     fire.color = Color.Red;
                     fire.noGravity = true;
@@ -1199,14 +1223,14 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Moves the ropes responsible for the motion of this assassin's kasa hat beads.
+    ///     Moves the ropes responsible for the motion of this assassin's kasa hat beads.
     /// </summary>
     private void MoveBeadRopes()
     {
-        float ropeGravity = 0.5f;
-        float windSpeed = Math.Clamp(Main.WindForVisuals, -0.6f, 0.6f);
-        float angularOffset = BowRotation * Projectile.spriteDirection;
-        Vector2 force = Vector2.UnitX * (LumUtils.AperiodicSin(Time * 0.024f) * 0.4f + windSpeed);
+        var ropeGravity = 0.5f;
+        var windSpeed = Math.Clamp(Main.WindForVisuals, -0.6f, 0.6f);
+        var angularOffset = BowRotation * Projectile.spriteDirection;
+        var force = Vector2.UnitX * (LumUtils.AperiodicSin(Time * 0.024f) * 0.4f + windSpeed);
         BeadRopeA.Update(Projectile.Center + new Vector2(Projectile.spriteDirection * -36f, -114f).RotatedBy(angularOffset) * Projectile.scale, ropeGravity, force);
 
         force = Vector2.UnitX * (LumUtils.AperiodicSin(Time * 0.024f + 5.1f) * 0.4f + windSpeed);
@@ -1220,79 +1244,116 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Creates smoke around the feet of this assassin.
+    ///     Creates smoke around the feet of this assassin.
     /// </summary>
     private void CreateFootSmoke()
     {
         if (Main.dedServ)
+        {
             return;
-        // Create idle smoke.
-        int fireBrightness = Main.rand.Next(26);
-        float fireSpeed = -2.67f;
-        Color fireColor = new Color(fireBrightness, fireBrightness, fireBrightness) * 0.3f;
-        if (Main.rand.NextBool(12))
-            fireColor = new Color(175, 0, Main.rand.Next(16), 0);
+        }
 
-        Vector2 fireSpawnPosition = Projectile.Bottom + new Vector2(Main.rand.NextFloatDirection() * 36f, Main.rand.NextFloatDirection() * 2f - 28f).RotatedBy(Projectile.rotation) * Projectile.scale;
-        Vector2 fireVelocity = fireSpawnPosition.SafeDirectionTo(Projectile.Bottom) * fireSpeed - Vector2.UnitY * 3f;
-        if(Main.rand.NextBool(2))
-            for(int i = 0; i < 2; i++)
-                AntishadowFireParticleSystemManager.CreateNew(Projectile.owner, true, fireSpawnPosition, fireVelocity, new Vector2(0.81f, 1f) * Main.rand.NextFloat(20f, 65f), fireColor * Projectile.Opacity);
+        // Create idle smoke.
+        var fireBrightness = Main.rand.Next(26);
+        var fireSpeed = -2.67f;
+        var fireColor = new Color(fireBrightness, fireBrightness, fireBrightness) * 0.3f;
+
+        if (Main.rand.NextBool(12))
+        {
+            fireColor = new Color(175, 0, Main.rand.Next(16), 0);
+        }
+
+        var fireSpawnPosition = Projectile.Bottom + new Vector2(Main.rand.NextFloatDirection() * 36f, Main.rand.NextFloatDirection() * 2f - 28f).RotatedBy(Projectile.rotation) * Projectile.scale;
+        var fireVelocity = fireSpawnPosition.SafeDirectionTo(Projectile.Bottom) * fireSpeed - Vector2.UnitY * 3f;
+
+        if (Main.rand.NextBool(2))
+        {
+            for (var i = 0; i < 2; i++)
+            {
+                AntishadowFireParticleSystemManager.CreateNew
+                    (Projectile.owner, true, fireSpawnPosition, fireVelocity, new Vector2(0.81f, 1f) * Main.rand.NextFloat(20f, 65f), fireColor * Projectile.Opacity);
+            }
+        }
 
         if (Main.rand.NextBool(48))
         {
-            EmberParticle ember = new EmberParticle(fireSpawnPosition, Main.rand.NextVector2Circular(4f, 1f) - Vector2.UnitY * Main.rand.NextFloat(10f), Color.Crimson * Projectile.Opacity, 2f, 120);
+            var ember = new EmberParticle(fireSpawnPosition, Main.rand.NextVector2Circular(4f, 1f) - Vector2.UnitY * Main.rand.NextFloat(10f), Color.Crimson * Projectile.Opacity, 2f, 120);
             ember.Spawn();
         }
     }
 
     /// <summary>
-    /// Randomly creates idle sounds, such as wind chimes.
+    ///     Randomly creates idle sounds, such as wind chimes.
     /// </summary>
     private void CreateIdleSounds()
     {
         // Don't play idle sounds if moving fast.
         if (!Projectile.position.WithinRange(Projectile.oldPosition, 10f))
+        {
             return;
+        }
 
-        float windSpeed = Math.Clamp(Main.WindForVisuals, -1f, 1f);
-        float windChimeCreationProbability = MathHelper.Lerp(0.0016f, 0.005f, MathF.Abs(windSpeed));
+        var windSpeed = Math.Clamp(Main.WindForVisuals, -1f, 1f);
+        var windChimeCreationProbability = MathHelper.Lerp(0.0016f, 0.005f, MathF.Abs(windSpeed));
+
         if (Projectile.soundDelay <= 0 && Main.rand.NextBool(windChimeCreationProbability) && State != AssassinState.Leave)
         {
-            attachedSounds.Add(SoundEngine.PlaySound(ChimeSound with { MaxInstances = 3 }, Projectile.Center).WithVolumeBoost(0.1f));
+            attachedSounds.Add
+            (
+                SoundEngine.PlaySound
+                    (
+                        ChimeSound with
+                        {
+                            MaxInstances = 3
+                        },
+                        Projectile.Center
+                    )
+                    .WithVolumeBoost(0.1f)
+            );
+
             Projectile.soundDelay = 300;
         }
     }
 
     /// <summary>
-    /// Updates looped sounds for this assassin.
+    ///     Updates looped sounds for this assassin.
     /// </summary>
     private void UpdateLoopedSounds()
     {
-        AmbientLoop.Update(Projectile.Center, sound =>
-        {
-            float idealPitch = LumUtils.InverseLerp(6f, 30f, Projectile.position.Distance(Projectile.oldPosition)) * 0.8f;
-            sound.Volume = 3f;
-            sound.Pitch = MathHelper.Lerp(sound.Pitch, idealPitch, 0.6f);
-        });
-        AttackLoop.Update(Projectile.Center, sound =>
-        {
-            sound.Volume = AttackLoopActivationInterpolant * 2f;
-            sound.Pitch = MathHelper.SmoothStep(0f, 0.8f, AttackLoopActivationInterpolant);
-        });
+        AmbientLoop.Update
+        (
+            Projectile.Center,
+            sound =>
+            {
+                var idealPitch = LumUtils.InverseLerp(6f, 30f, Projectile.position.Distance(Projectile.oldPosition)) * 0.8f;
+                sound.Volume = 3f;
+                sound.Pitch = MathHelper.Lerp(sound.Pitch, idealPitch, 0.6f);
+            }
+        );
+
+        AttackLoop.Update
+        (
+            Projectile.Center,
+            sound =>
+            {
+                sound.Volume = AttackLoopActivationInterpolant * 2f;
+                sound.Pitch = MathHelper.SmoothStep(0f, 0.8f, AttackLoopActivationInterpolant);
+            }
+        );
     }
 
     /// <summary>
-    /// Ensures that all idle sounds generated by this assassin stay attached to it as it moves.
+    ///     Ensures that all idle sounds generated by this assassin stay attached to it as it moves.
     /// </summary>
     private void KeepSoundsAttached()
     {
-        for (int i = 0; i < attachedSounds.Count; i++)
+        for (var i = 0; i < attachedSounds.Count; i++)
         {
-            if (!SoundEngine.TryGetActiveSound(attachedSounds[i], out ActiveSound sound) || sound is null)
+            if (!SoundEngine.TryGetActiveSound(attachedSounds[i], out var sound) || sound is null)
             {
                 attachedSounds.RemoveAt(i);
                 i--;
+
                 continue;
             }
 
@@ -1301,69 +1362,102 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Makes this assassin disturb liquids as it moves.
+    ///     Makes this assassin disturb liquids as it moves.
     /// </summary>
     private void DisturbLiquids()
     {
-        WaterShaderData wsd = (WaterShaderData)Filters.Scene["WaterDistortion"].GetShader();
+        var wsd = (WaterShaderData)Filters.Scene["WaterDistortion"].GetShader();
 
-        float disruptionAreaInterpolant = LumUtils.InverseLerp(6f, 54f, Projectile.position.Distance(Projectile.oldPosition));
+        var disruptionAreaInterpolant = LumUtils.InverseLerp(6f, 54f, Projectile.position.Distance(Projectile.oldPosition));
+
         if (State == AssassinState.SliceTargetRepeatedly)
+        {
             disruptionAreaInterpolant = 1f;
+        }
 
         wsd.QueueRipple(Projectile.Center, Color.White, Projectile.Size * disruptionAreaInterpolant * 2f, RippleShape.Circle, Projectile.rotation);
     }
 
     /// <summary>
-    /// Handles the application of minion buffs for this assassin, making it vanish if the buffs are not present or the owner player has died.
+    ///     Handles the application of minion buffs for this assassin, making it vanish if the buffs are
+    ///     not present or the owner player has died.
     /// </summary>
     private void HandleMinionBuffs()
     {
         Owner.AddBuff(ModContent.BuffType<AntishadowAssassinBuff>(), 3);
-        Referenced<bool> hasMinion = Owner.GetValueRef<bool>("HasAntishadowAssassin");
+        var hasMinion = Owner.GetValueRef<bool>("HasAntishadowAssassin");
+
         if (Owner.dead)
+        {
             hasMinion.Value = false;
+        }
+
         if (hasMinion.Value)
+        {
             Projectile.timeLeft = 2;
+        }
         else if (ExistenceTimer >= 5)
+        {
             SwitchState(AssassinState.Leave);
+        }
 
         if (State == AssassinState.Leave)
+        {
             hasMinion.Value = false;
+        }
     }
 
     /// <summary>
-    /// Draws a katana for this assassin.
+    ///     Draws a katana for this assassin.
     /// </summary>
     private void DrawKatana(Vector2 bladeDrawStartingPosition, bool flip, float angle)
     {
         if (Main.dedServ)
+        {
             return;
+        }
+
         float katanaWidthFunction(float completionRatio)
         {
-            float baseWidth = 4f;
+            var baseWidth = 4f;
+
             if (completionRatio <= (Projectile.spriteDirection == 1 ? 0.13f : 0.19f))
+            {
                 baseWidth = 6.7f;
+            }
 
             return LumUtils.InverseLerp(0f, 0.6f, Projectile.Opacity) * Projectile.scale * baseWidth;
         }
-        Color katanaColorFunction(float completionRatio) => Color.Red * Projectile.Opacity.Squared();
 
-        float appearanceInterpolant = KatanaUnsheathInterpolant;
-        ManagedShader katanaShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowKatanaShader");
+        Color katanaColorFunction(float completionRatio)
+        {
+            return Color.Red * Projectile.Opacity.Squared();
+        }
+
+        var appearanceInterpolant = KatanaUnsheathInterpolant;
+        var katanaShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowKatanaShader");
         katanaShader.TrySetParameter("flip", flip);
         katanaShader.TrySetParameter("appearanceInterpolant", appearanceInterpolant);
         katanaShader.SetTexture(MiscTexturesRegistry.TurbulentNoise.Value, 1, SamplerState.PointWrap);
 
-        PrimitiveSettings katanaPrimitiveSettings = new(katanaWidthFunction, katanaColorFunction, Shader: katanaShader, ProjectionAreaWidth: (int)WotGUtils.ViewportSize.X, ProjectionAreaHeight: (int)WotGUtils.ViewportSize.Y, UseUnscaledMatrix: true);
+        PrimitiveSettings katanaPrimitiveSettings = new
+        (
+            katanaWidthFunction,
+            katanaColorFunction,
+            Shader: katanaShader,
+            ProjectionAreaWidth: (int)WotGUtils.ViewportSize.X,
+            ProjectionAreaHeight: (int)WotGUtils.ViewportSize.Y,
+            UseUnscaledMatrix: true
+        );
 
-        Vector2 katanaReach = angle.ToRotationVector2() * appearanceInterpolant * Projectile.spriteDirection * MathF.Sqrt(Projectile.scale) * -138f;
-        Vector2 orthogonalOffset = (angle + flip.ToDirectionInt() * -MathHelper.PiOver2).ToRotationVector2() * appearanceInterpolant * 30f;
+        var katanaReach = angle.ToRotationVector2() * appearanceInterpolant * Projectile.spriteDirection * MathF.Sqrt(Projectile.scale) * -138f;
+        var orthogonalOffset = (angle + flip.ToDirectionInt() * -MathHelper.PiOver2).ToRotationVector2() * appearanceInterpolant * 30f;
 
-        Vector2[] katanaPositions = new Vector2[8];
-        for (int i = 0; i < katanaPositions.Length; i++)
+        var katanaPositions = new Vector2[8];
+
+        for (var i = 0; i < katanaPositions.Length; i++)
         {
-            float completionRatio = i / (float)(katanaPositions.Length - 1f);
+            var completionRatio = i / (katanaPositions.Length - 1f);
             katanaPositions[i] = bladeDrawStartingPosition + katanaReach * completionRatio + Main.screenPosition;
             katanaPositions[i] += orthogonalOffset * completionRatio.Squared();
         }
@@ -1372,20 +1466,23 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Draws the main body for the purpose of rendering into the RT responsible for this assassin's body.
+    ///     Draws the main body for the purpose of rendering into the RT responsible for this assassin's
+    ///     body.
     /// </summary>
     private void DrawIntoBodyTarget()
     {
-        if(!Main.dedServ)
-        DrawRobe();
+        if (!Main.dedServ)
+        {
+            DrawRobe();
+        }
 
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, LumUtils.CullOnlyScreen);
 
-        Texture2D body = BodyTexture.Value;
-        Texture2D legs = LegsTexture.Value;
-        Texture2D arm = ArmTexture.Value;
-        int armXOrigin = 32;
-        Vector2 drawPosition = WotGUtils.ViewportSize * 0.5f;
+        var body = BodyTexture.Value;
+        var legs = LegsTexture.Value;
+        var arm = ArmTexture.Value;
+        var armXOrigin = 32;
+        var drawPosition = WotGUtils.ViewportSize * 0.5f;
 
         if (MathF.Abs(BowRotation) >= 0.01f)
         {
@@ -1394,7 +1491,7 @@ public class AntishadowAssassin : ModProjectile
         }
 
         // Draw the right arm behind the body.
-        Vector2 rightArmDrawPosition = drawPosition + new Vector2(6f, -80f).RotatedBy(BowRotation);
+        var rightArmDrawPosition = drawPosition + new Vector2(6f, -80f).RotatedBy(BowRotation);
         Main.spriteBatch.Draw(arm, rightArmDrawPosition, null, Color.White, RightArmRotation, new Vector2(arm.Width - armXOrigin, 10f), ArmScale, SpriteEffects.FlipHorizontally, 0f);
 
         // Draw the body.
@@ -1404,22 +1501,22 @@ public class AntishadowAssassin : ModProjectile
         Main.spriteBatch.Draw(legs, drawPosition, null, Color.White, 0f, new Vector2(32f, 16f), 1f, 0, 0f);
 
         // Draw the left arm.
-        Vector2 leftArmDrawPosition = drawPosition + new Vector2(-14f, -80f).RotatedBy(BowRotation);
+        var leftArmDrawPosition = drawPosition + new Vector2(-14f, -80f).RotatedBy(BowRotation);
         Main.spriteBatch.Draw(arm, leftArmDrawPosition, null, Color.White, LeftArmRotation, new Vector2(armXOrigin, 10f), ArmScale, 0, 0f);
 
         Main.spriteBatch.End();
     }
 
     /// <summary>
-    /// Draws the arm outlines into their designated RT.
+    ///     Draws the arm outlines into their designated RT.
     /// </summary>
     private void DrawIntoArmOutlineTarget()
     {
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, LumUtils.CullOnlyScreen);
 
-        Texture2D arm = ArmOutlineTexture.Value;
-        int armXOrigin = 32;
-        Vector2 drawPosition = WotGUtils.ViewportSize * 0.5f;
+        var arm = ArmOutlineTexture.Value;
+        var armXOrigin = 32;
+        var drawPosition = WotGUtils.ViewportSize * 0.5f;
 
         if (MathF.Abs(BowRotation) >= 0.01f)
         {
@@ -1428,18 +1525,18 @@ public class AntishadowAssassin : ModProjectile
         }
 
         // Draw the right arm behind the body.
-        Vector2 rightArmDrawPosition = drawPosition + new Vector2(6f, -80f).RotatedBy(BowRotation);
+        var rightArmDrawPosition = drawPosition + new Vector2(6f, -80f).RotatedBy(BowRotation);
         Main.spriteBatch.Draw(arm, rightArmDrawPosition, null, Color.White, RightArmRotation, new Vector2(arm.Width - armXOrigin, 10f), ArmScale, SpriteEffects.FlipHorizontally, 0f);
 
         // Draw the left arm.
-        Vector2 leftArmDrawPosition = drawPosition + new Vector2(-14f, -80f).RotatedBy(BowRotation);
+        var leftArmDrawPosition = drawPosition + new Vector2(-14f, -80f).RotatedBy(BowRotation);
         Main.spriteBatch.Draw(arm, leftArmDrawPosition, null, Color.White, LeftArmRotation, new Vector2(armXOrigin, 10f), ArmScale, 0, 0f);
 
         Main.spriteBatch.End();
     }
 
     /// <summary>
-    /// Draws beads and rope attached to the kasa hat for this assassin.
+    ///     Draws beads and rope attached to the kasa hat for this assassin.
     /// </summary>
     private void DrawBeads(Vector2 center)
     {
@@ -1448,45 +1545,92 @@ public class AntishadowAssassin : ModProjectile
         Texture2D beadTextureB = GennedAssets.Textures.SecondPhaseForm.Beads2;
         Texture2D beadTextureC = GennedAssets.Textures.SecondPhaseForm.Bell;
         Texture2D beadTextureD = GennedAssets.Textures.SecondPhaseForm.Beads1;
-        Color ropeColor = new Color(210, 13, 16) * Projectile.Opacity;
-        Vector2 drawOffset = center - Projectile.Center;
-        BeadRopeA?.DrawProjection(whitePixel, drawOffset, false, _ => ropeColor, widthFactor: Projectile.scale, projectionWidth: (int)WotGUtils.ViewportSize.X, projectionHeight: (int)WotGUtils.ViewportSize.Y, unscaledMatrix: true);
-        BeadRopeB?.DrawProjection(whitePixel, drawOffset, false, _ => ropeColor, widthFactor: Projectile.scale, projectionWidth: (int)WotGUtils.ViewportSize.X, projectionHeight: (int)WotGUtils.ViewportSize.Y, unscaledMatrix: true);
-        BeadRopeC?.DrawProjection(whitePixel, drawOffset, false, _ => ropeColor, widthFactor: Projectile.scale, projectionWidth: (int)WotGUtils.ViewportSize.X, projectionHeight: (int)WotGUtils.ViewportSize.Y, unscaledMatrix: true);
-        BeadRopeD?.DrawProjection(whitePixel, drawOffset, false, _ => ropeColor, widthFactor: Projectile.scale, projectionWidth: (int)WotGUtils.ViewportSize.X, projectionHeight: (int)WotGUtils.ViewportSize.Y, unscaledMatrix: true);
+        var ropeColor = new Color(210, 13, 16) * Projectile.Opacity;
+        var drawOffset = center - Projectile.Center;
+
+        BeadRopeA?.DrawProjection
+        (
+            whitePixel,
+            drawOffset,
+            false,
+            _ => ropeColor,
+            widthFactor: Projectile.scale,
+            projectionWidth: (int)WotGUtils.ViewportSize.X,
+            projectionHeight: (int)WotGUtils.ViewportSize.Y,
+            unscaledMatrix: true
+        );
+
+        BeadRopeB?.DrawProjection
+        (
+            whitePixel,
+            drawOffset,
+            false,
+            _ => ropeColor,
+            widthFactor: Projectile.scale,
+            projectionWidth: (int)WotGUtils.ViewportSize.X,
+            projectionHeight: (int)WotGUtils.ViewportSize.Y,
+            unscaledMatrix: true
+        );
+
+        BeadRopeC?.DrawProjection
+        (
+            whitePixel,
+            drawOffset,
+            false,
+            _ => ropeColor,
+            widthFactor: Projectile.scale,
+            projectionWidth: (int)WotGUtils.ViewportSize.X,
+            projectionHeight: (int)WotGUtils.ViewportSize.Y,
+            unscaledMatrix: true
+        );
+
+        BeadRopeD?.DrawProjection
+        (
+            whitePixel,
+            drawOffset,
+            false,
+            _ => ropeColor,
+            widthFactor: Projectile.scale,
+            projectionWidth: (int)WotGUtils.ViewportSize.X,
+            projectionHeight: (int)WotGUtils.ViewportSize.Y,
+            unscaledMatrix: true
+        );
 
         if (BeadRopeA is not null)
         {
-            float beadRotation = (BeadRopeA.Rope[^2].Position - BeadRopeA.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
+            var beadRotation = (BeadRopeA.Rope[^2].Position - BeadRopeA.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
             Main.spriteBatch.Draw(beadTextureA, BeadRopeA.Rope[^5].Position + drawOffset, null, Color.White * Projectile.Opacity, beadRotation, new Vector2(24f, 6f), Projectile.scale * 0.08f, 0, 0f);
         }
+
         if (BeadRopeB is not null)
         {
-            float beadRotation = (BeadRopeB.Rope[^2].Position - BeadRopeB.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
+            var beadRotation = (BeadRopeB.Rope[^2].Position - BeadRopeB.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
             Main.spriteBatch.Draw(beadTextureB, BeadRopeB.Rope[^4].Position + drawOffset, null, Color.White * Projectile.Opacity, beadRotation, new Vector2(30f, 243f), Projectile.scale * 0.1f, 0, 0f);
         }
+
         if (BeadRopeC is not null)
         {
-            float beadRotation = (BeadRopeC.Rope[^2].Position - BeadRopeC.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
+            var beadRotation = (BeadRopeC.Rope[^2].Position - BeadRopeC.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
             Main.spriteBatch.Draw(beadTextureC, BeadRopeC.Rope[^4].Position + drawOffset, null, Color.White * Projectile.Opacity, beadRotation, new Vector2(45f, 41f), Projectile.scale * 0.1f, 0, 0f);
         }
+
         if (BeadRopeD is not null)
         {
-            float beadRotation = (BeadRopeD.Rope[^2].Position - BeadRopeD.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
+            var beadRotation = (BeadRopeD.Rope[^2].Position - BeadRopeD.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
             Main.spriteBatch.Draw(beadTextureD, BeadRopeD.Rope[^4].Position + drawOffset, null, Color.White * Projectile.Opacity, beadRotation, new Vector2(17f, 46f), Projectile.scale * 0.1f, 0, 0f);
         }
     }
 
     /// <summary>
-    /// Renders this assassin's robe.
+    ///     Renders this assassin's robe.
     /// </summary>
     private void DrawRobe()
     {
-        Matrix world = Matrix.CreateTranslation(-Projectile.Center.X + WotGUtils.ViewportSize.X * 0.5f, -Projectile.Center.Y + WotGUtils.ViewportSize.Y * 0.5f, 0f);
-        Matrix projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -1000f, 1000f);
-        Matrix matrix = world * projection;
+        var world = Matrix.CreateTranslation(-Projectile.Center.X + WotGUtils.ViewportSize.X * 0.5f, -Projectile.Center.Y + WotGUtils.ViewportSize.Y * 0.5f, 0f);
+        var projection = Matrix.CreateOrthographicOffCenter(0f, WotGUtils.ViewportSize.X, WotGUtils.ViewportSize.Y, 0f, -1000f, 1000f);
+        var matrix = world * projection;
 
-        ManagedShader clothShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssasinRobeShader");
+        var clothShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssasinRobeShader");
         clothShader.TrySetParameter("opacity", LumUtils.InverseLerp(60f, 120f, ExistenceTimer));
         clothShader.TrySetParameter("transform", matrix);
         clothShader.Apply();
@@ -1495,75 +1639,105 @@ public class AntishadowAssassin : ModProjectile
     }
 
     /// <summary>
-    /// Draws the mask for this assassin.
+    ///     Draws the mask for this assassin.
     /// </summary>
     private void DrawMask(Vector2 center)
     {
-        GetMaskInfo(out Texture2D mask, out _);
-        if (mask is null)
-            return;
+        GetMaskInfo(out var mask, out _);
 
-        Vector2 faceDrawPosition = MaskPosition - Projectile.Center + center - Vector2.UnitY.RotatedBy(BowRotation * Projectile.spriteDirection) * 30f;
-        Main.spriteBatch.Draw(mask, faceDrawPosition, null, Color.White * Projectile.Opacity, BowRotation * Projectile.spriteDirection, mask.Size() * 0.5f, Projectile.scale, Projectile.spriteDirection.ToSpriteDirection(), 0f);
+        if (mask is null)
+        {
+            return;
+        }
+
+        var faceDrawPosition = MaskPosition - Projectile.Center + center - Vector2.UnitY.RotatedBy(BowRotation * Projectile.spriteDirection) * 30f;
+
+        Main.spriteBatch.Draw
+        (
+            mask,
+            faceDrawPosition,
+            null,
+            Color.White * Projectile.Opacity,
+            BowRotation * Projectile.spriteDirection,
+            mask.Size() * 0.5f,
+            Projectile.scale,
+            Projectile.spriteDirection.ToSpriteDirection(),
+            0f
+        );
     }
 
     /// <summary>
-    /// Draws the kasa hat for this assassin.
+    ///     Draws the kasa hat for this assassin.
     /// </summary>
     private void DrawHat(Vector2 center)
     {
-        if (Main.specialSeedWorld)
-        {
+        if (Main.specialSeedWorld) { }
 
-        }
-        Texture2D hat = KasaTexture.Value;
-        Vector2 hatDrawPosition = center + new Vector2(Projectile.spriteDirection * -4f, -128f).RotatedBy(BowRotation * Projectile.spriteDirection) * Projectile.scale;
-        Main.spriteBatch.Draw(hat, hatDrawPosition, null, Color.White * Projectile.Opacity, BowRotation * Projectile.spriteDirection, hat.Size() * 0.5f, Projectile.scale, Projectile.spriteDirection.ToSpriteDirection(), 0f);
+        var hat = KasaTexture.Value;
+        var hatDrawPosition = center + new Vector2(Projectile.spriteDirection * -4f, -128f).RotatedBy(BowRotation * Projectile.spriteDirection) * Projectile.scale;
+
+        Main.spriteBatch.Draw
+        (
+            hat,
+            hatDrawPosition,
+            null,
+            Color.White * Projectile.Opacity,
+            BowRotation * Projectile.spriteDirection,
+            hat.Size() * 0.5f,
+            Projectile.scale,
+            Projectile.spriteDirection.ToSpriteDirection(),
+            0f
+        );
     }
 
     /// <summary>
-    /// Renders this assassin's contents into the final target.
+    ///     Renders this assassin's contents into the final target.
     /// </summary>
     private void RenderIntoResultsTarget()
     {
         if (Main.dedServ)
+        {
             return;
+        }
 
         ArmOutlineTarget.Request(400, 400, Projectile.identity, DrawIntoArmOutlineTarget);
         BodyTarget.Request(400, 400, Projectile.identity, DrawIntoBodyTarget);
-        if (BodyTarget.TryGetTarget(Projectile.identity, out RenderTarget2D bodyTarget) && bodyTarget is not null &&
-            ArmOutlineTarget.TryGetTarget(Projectile.identity, out RenderTarget2D outlineTarget) && outlineTarget is not null)
+
+        if (BodyTarget.TryGetTarget(Projectile.identity, out var bodyTarget) &&
+            bodyTarget is not null &&
+            ArmOutlineTarget.TryGetTarget(Projectile.identity, out var outlineTarget) &&
+            outlineTarget is not null)
         {
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
-            Vector2 center = WotGUtils.ViewportSize * 0.5f;
+            var center = WotGUtils.ViewportSize * 0.5f;
 
-            float baseRotation = 0f;
-            float leftKatanaAngle = 0.15f;
-            float rightKatanaAngle = Projectile.spriteDirection * 0.3f + 0.15f;
+            var baseRotation = 0f;
+            var leftKatanaAngle = 0.15f;
+            var rightKatanaAngle = Projectile.spriteDirection * 0.3f + 0.15f;
 
-            Vector2 rightShoulderPosition = center + new Vector2(6f, -80f).RotatedBy(baseRotation + BowRotation * Projectile.spriteDirection) * Projectile.scale;
-            Vector2 rightHandEnd = rightShoulderPosition + new Vector2(16f, 110f).RotatedBy(baseRotation + RightArmRotation) * Projectile.scale * ArmScale;
-            Vector2 leftShoulderPosition = center + new Vector2(-14f, -80f).RotatedBy(baseRotation + BowRotation * Projectile.spriteDirection) * Projectile.scale;
-            Vector2 leftHandEnd = leftShoulderPosition + new Vector2(-5f, 110f).RotatedBy(baseRotation + LeftArmRotation) * Projectile.scale * ArmScale;
+            var rightShoulderPosition = center + new Vector2(6f, -80f).RotatedBy(baseRotation + BowRotation * Projectile.spriteDirection) * Projectile.scale;
+            var rightHandEnd = rightShoulderPosition + new Vector2(16f, 110f).RotatedBy(baseRotation + RightArmRotation) * Projectile.scale * ArmScale;
+            var leftShoulderPosition = center + new Vector2(-14f, -80f).RotatedBy(baseRotation + BowRotation * Projectile.spriteDirection) * Projectile.scale;
+            var leftHandEnd = leftShoulderPosition + new Vector2(-5f, 110f).RotatedBy(baseRotation + LeftArmRotation) * Projectile.scale * ArmScale;
 
-            float katanaRotationOffset = Projectile.spriteDirection * KatanaRotation;
+            var katanaRotationOffset = Projectile.spriteDirection * KatanaRotation;
             DrawKatana(rightHandEnd, true, rightKatanaAngle + katanaRotationOffset);
             DrawKatana(leftHandEnd, true, leftKatanaAngle + katanaRotationOffset);
 
             Vector3[] palette =
             [
-                new Vector3(1.5f),
-                new Vector3(0f, 1f, 1.2f),
-                new Vector3(1f, 0f, 0f),
+                new(1.5f),
+                new(0f, 1f, 1.2f),
+                new(1f, 0f, 0f)
             ];
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-            Color edgeColor = new Color(255, 0, 0);
+            var edgeColor = new Color(255, 0, 0);
 
-            ManagedShader overlayShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssassinColorProcessingShader");
+            var overlayShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssassinColorProcessingShader");
             overlayShader.TrySetParameter("eyeScale", LumUtils.Cos01(Main.GlobalTimeWrappedHourly * 7.5f + Projectile.identity) * 0.2f + 1f);
             overlayShader.TrySetParameter("gradient", palette);
             overlayShader.TrySetParameter("gradientCount", palette.Length);
@@ -1576,7 +1750,9 @@ public class AntishadowAssassin : ModProjectile
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-            Main.spriteBatch.Draw(outlineTarget, center, null, edgeColor * Projectile.Opacity * ArmOutlineOpacity, 0f, outlineTarget.Size() * 0.5f, Projectile.scale, Projectile.spriteDirection.ToSpriteDirection(), 0);
+
+            Main.spriteBatch.Draw
+                (outlineTarget, center, null, edgeColor * Projectile.Opacity * ArmOutlineOpacity, 0f, outlineTarget.Size() * 0.5f, Projectile.scale, Projectile.spriteDirection.ToSpriteDirection(), 0);
 
             DrawMask(center);
             DrawBeads(center);
@@ -1589,11 +1765,15 @@ public class AntishadowAssassin : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         if (Main.netMode == NetmodeID.Server)
-            return false;
-        ResultsTarget.Request(600, 600, Projectile.identity, RenderIntoResultsTarget);
-        if (ResultsTarget.TryGetTarget(Projectile.identity, out RenderTarget2D target) && target is not null)
         {
-            ManagedShader postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssassinPostProcessingShader");
+            return false;
+        }
+
+        ResultsTarget.Request(600, 600, Projectile.identity, RenderIntoResultsTarget);
+
+        if (ResultsTarget.TryGetTarget(Projectile.identity, out var target) && target is not null)
+        {
+            var postProcessingShader = ShaderManager.GetShader("HeavenlyArsenal.AntishadowAssassinPostProcessingShader");
             postProcessingShader.TrySetParameter("blurOffset", BlurIntensity * 0.2f);
             postProcessingShader.TrySetParameter("blurDirection", Projectile.velocity.SafeNormalize(Vector2.UnitX));
             postProcessingShader.TrySetParameter("disappearanceInterpolant", DisappearanceInterpolant);
@@ -1609,14 +1789,19 @@ public class AntishadowAssassin : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        for (int i = 0; i < attachedSounds.Count; i++)
+        for (var i = 0; i < attachedSounds.Count; i++)
         {
-            if (!SoundEngine.TryGetActiveSound(attachedSounds[i], out ActiveSound sound) || sound is null)
+            if (!SoundEngine.TryGetActiveSound(attachedSounds[i], out var sound) || sound is null)
+            {
                 continue;
+            }
 
             sound.Stop();
         }
     }
 
-    public override bool? CanDamage() => Projectile.scale >= 0.56f && DoesDamage;
+    public override bool? CanDamage()
+    {
+        return Projectile.scale >= 0.56f && DoesDamage;
+    }
 }

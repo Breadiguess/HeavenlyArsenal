@@ -1,37 +1,27 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
-using Terraria.ModLoader;
+﻿namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy;
 
-namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy
+internal partial class PerversionOfFaith
 {
-    partial class PerversionOfFaith
+    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
-        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
-        {
-            Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
+        var tex = ModContent.Request<Texture2D>(Texture).Value;
 
-            Vector2 DrawPos = NPC.Center - Main.screenPosition;
-            Vector2 origin = tex.Size() * 0.5f;
+        var DrawPos = NPC.Center - Main.screenPosition;
+        var origin = tex.Size() * 0.5f;
 
-            SpriteEffects effects = NPC.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, 0, origin, 1, effects);
+        var effects = NPC.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+        Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, 0, origin, 1, effects);
 
-            return false;//base.PreDraw(spriteBatch, screenPos, drawColor);
-        }
-        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
-        {
-            Texture2D tex = ModContent.Request<Texture2D>(Texture+"_Shield").Value;
+        return false; //base.PreDraw(spriteBatch, screenPos, drawColor);
+    }
 
-            Vector2 DrawPos = NPC.Center - Main.screenPosition;
+    public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+    {
+        var tex = ModContent.Request<Texture2D>(Texture + "_Shield").Value;
 
-            float Rot = MathHelper.ToRadians(Time);
-            Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, Rot, tex.Size() * 0.5f, 1, SpriteEffects.None);
-        }
+        var DrawPos = NPC.Center - Main.screenPosition;
+
+        var Rot = MathHelper.ToRadians(Time);
+        Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, Rot, tex.Size() * 0.5f, 1, SpriteEffects.None);
     }
 }

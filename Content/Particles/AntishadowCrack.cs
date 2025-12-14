@@ -1,31 +1,31 @@
-﻿
-using HeavenlyArsenal.Core;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-
-using Terraria;
+﻿using HeavenlyArsenal.Core;
 using Terraria.Graphics.Renderers;
-using Terraria.Map;
-using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Particles;
 
 public class AntishadowCrack : BaseParticle
 {
-    public static ParticlePool<AntishadowCrack> pool = new ParticlePool<AntishadowCrack>(500, GetNewParticle<AntishadowCrack>);
+    public static ParticlePool<AntishadowCrack> pool = new(500, GetNewParticle<AntishadowCrack>);
 
     public Vector2 position;
+
     public Vector2 Velocity;
+
     public float Rotation;
+
     public int MaxTime;
+
     public int TimeLeft;
+
     public Color ColorTint;
+
     public Color ColorGlow;
+
     public float Scale;
+
     private int Style;
+
     private int SpriteEffect;
-   
 
     public float direction { get; private set; }
 
@@ -40,7 +40,6 @@ public class AntishadowCrack : BaseParticle
         Scale = scale;
         Style = Main.rand.Next(3);
         SpriteEffect = Main.rand.Next(2);
-      
     }
 
     public override void FetchFromPool()
@@ -58,23 +57,25 @@ public class AntishadowCrack : BaseParticle
         Velocity *= 1.1f;
 
         TimeLeft++;
+
         if (TimeLeft > MaxTime)
+        {
             ShouldBeRemovedFromRenderer = true;
+        }
     }
 
-   
     public override void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch)
     {
-        Texture2D texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Particles/LightningParticle").Value;
-        Texture2D texture2 = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Extra/VoidLake").Value;
+        var texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Particles/LightningParticle").Value;
+        var texture2 = ModContent.Request<Texture2D>("HeavenlyArsenal/Assets/Textures/Extra/VoidLake").Value;
 
-        Rectangle frame = texture.Frame(1, 10, 0, Style);
-        SpriteEffects flip = direction > 0 ? SpriteEffects.None : SpriteEffects.FlipVertically;
-        int flickerSpeed = 1;
-        Microsoft.Xna.Framework.Color drawColor = ColorTint * (0.8f + MathF.Sin(TimeLeft * flickerSpeed) * 0.2f);
+        var frame = texture.Frame(1, 10, 0, Style);
+        var flip = direction > 0 ? SpriteEffects.None : SpriteEffects.FlipVertically;
+        var flickerSpeed = 1;
+        var drawColor = ColorTint * (0.8f + MathF.Sin(TimeLeft * flickerSpeed) * 0.2f);
         Vector2 position = default;
 
-        Effect dissolveEffect = AssetDirectory.Effects.FlameDissolve.Value;
+        var dissolveEffect = AssetDirectory.Effects.FlameDissolve.Value;
         dissolveEffect.Parameters["uTexture0"].SetValue(texture);
         dissolveEffect.Parameters["uTextureScale"].SetValue(new Vector2(0.7f + 1 * 0.05f));
         dissolveEffect.Parameters["uFrameCount"].SetValue(10);
@@ -83,13 +84,12 @@ public class AntishadowCrack : BaseParticle
         dissolveEffect.Parameters["uNoiseStrength"].SetValue(1f);
         dissolveEffect.CurrentTechnique.Passes[0].Apply();
 
+        var rotation = 0;
 
-        int rotation = 0;
-        Main.spriteBatch.Draw(texture, position - Main.screenPosition, frame, drawColor, rotation + MathHelper.Pi / 3f * direction, frame.Size() * 0.5f, Scale * new Vector2(1f, 1f + TimeLeft * 0.05f) * 0.5f, flip, 0);
-       
+        Main.spriteBatch.Draw
+            (texture, position - Main.screenPosition, frame, drawColor, rotation + MathHelper.Pi / 3f * direction, frame.Size() * 0.5f, Scale * new Vector2(1f, 1f + TimeLeft * 0.05f) * 0.5f, flip, 0);
 
         Main.pixelShader.CurrentTechnique.Passes[0].Apply();
-
 
         //float alpha = 1f - progress;
 
@@ -106,5 +106,4 @@ public class AntishadowCrack : BaseParticle
         //spritebatch.Draw(texture, position + settings.AnchorPosition, texture.Frame(), drawColor, Rotation, texture.Size() * 0.5f, new Vector2(widthScale, heightScale), (SpriteEffects)SpriteEffect, 0);
         // spritebatch.Draw(texture, position + settings.AnchorPosition, glowFrame, glowColor, Rotation + MathHelper.PiOver2, glowFrame.Size() * 0.5f, Scale, (SpriteEffects)SpriteEffect, 0);
     }
-
 }

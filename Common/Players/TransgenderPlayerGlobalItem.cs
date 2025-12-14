@@ -1,8 +1,4 @@
-﻿using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-
-namespace HeavenlyArsenal.Common.Players;
+﻿namespace HeavenlyArsenal.Common.Players;
 
 public sealed class TransgenderPlayerGlobalItem : GlobalItem
 {

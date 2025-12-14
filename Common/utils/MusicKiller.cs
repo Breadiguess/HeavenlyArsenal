@@ -1,30 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using ReLogic.Utilities;
-using Terraria;
-using Terraria.Audio;
-using Terraria.ModLoader;
-using Terraria.ID;
-
-namespace HeavenlyArsenal.common.utils;
+﻿namespace HeavenlyArsenal.common.utils;
 
 [Autoload(Side = ModSide.Client)]
 public class MusicKiller : ModSystem
 {
-    public static float MuffleFactor
-    {
-        get;
-        set;
-    } = 1f;
+    public static float MuffleFactor { get; set; } = 1f;
+
     public override void PostUpdateEverything()
     {
         MuffleFactor = MathHelper.Clamp(MuffleFactor + 0.03f, 0f, 1f);
 
-         if (Main.musicFade[Main.curMusic] != MuffleFactor && MuffleFactor < 1)
+        if (Main.musicFade[Main.curMusic] != MuffleFactor && MuffleFactor < 1)
+        {
             Main.musicFade[Main.curMusic] = MuffleFactor;
-
+        }
 
         //                                                 ..............:::::::...............               
         //                                                .......-*##################*=:.......               

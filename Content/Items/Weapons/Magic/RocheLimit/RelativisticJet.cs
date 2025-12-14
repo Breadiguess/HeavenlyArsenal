@@ -1,12 +1,6 @@
 ﻿using Luminance.Assets;
 using Luminance.Core.Graphics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
 using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 
@@ -15,11 +9,24 @@ public class RelativisticJet : ModProjectile, IDrawsOverRocheLimitDistortion
     public float Layer => 2f;
 
     /// <summary>
-    /// How long this jet can exist for.
+    ///     How long this jet can exist for.
     /// </summary>
     public static int Lifetime => LumUtils.SecondsToFrames(0.25f);
 
     public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
+
+    public void RenderOverDistortion()
+    {
+        if (Main.netMode == NetmodeID.Server)
+        {
+            return;
+        }
+
+        var jetShader = ShaderManager.GetShader("HeavenlyArsenal.RelativisticJetShader");
+        jetShader.SetTexture(TextureAssets.Extra[ExtrasID.FlameLashTrailShape], 1, SamplerState.LinearWrap);
+
+        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(JetWidthFunction, JetColorFunction, Shader: jetShader), 46);
+    }
 
     public override void SetStaticDefaults()
     {
@@ -29,7 +36,7 @@ public class RelativisticJet : ModProjectile, IDrawsOverRocheLimitDistortion
 
     public override void SetDefaults()
     {
-        int jetSize = Main.rand?.Next(80, 105) ?? 80;
+        var jetSize = Main.rand?.Next(80, 105) ?? 80;
         Projectile.width = jetSize;
         Projectile.height = jetSize;
         Projectile.friendly = true;
@@ -46,27 +53,21 @@ public class RelativisticJet : ModProjectile, IDrawsOverRocheLimitDistortion
 
     public override void AI()
     {
-        float lifetimeRatio = 1f - Projectile.timeLeft / (float)Lifetime / Projectile.MaxUpdates;
+        var lifetimeRatio = 1f - Projectile.timeLeft / (float)Lifetime / Projectile.MaxUpdates;
         Projectile.scale = LumUtils.InverseLerpBump(0f, 0.2f, 0.45f, 1f, lifetimeRatio);
     }
 
     private float JetWidthFunction(float completionRatio)
     {
-        float lifetimeRatio = 1f - Projectile.timeLeft / (float)Lifetime / Projectile.MaxUpdates;
-        float widening = MathHelper.Lerp(0.9f, 1f, MathF.Sqrt(LumUtils.InverseLerp(1f, 0.05f, completionRatio)));
-        float curve = MathHelper.Lerp(0.6f, 1f, LumUtils.Convert01To010(completionRatio));
+        var lifetimeRatio = 1f - Projectile.timeLeft / (float)Lifetime / Projectile.MaxUpdates;
+        var widening = MathHelper.Lerp(0.9f, 1f, MathF.Sqrt(LumUtils.InverseLerp(1f, 0.05f, completionRatio)));
+        var curve = MathHelper.Lerp(0.6f, 1f, LumUtils.Convert01To010(completionRatio));
+
         return (Projectile.width * widening * curve + Projectile.width * (1f - completionRatio) * lifetimeRatio * 4f) * Projectile.scale;
     }
 
-    public Color JetColorFunction(float completionRatio) => Projectile.GetAlpha(new Color(11, 75, 255)) * LumUtils.InverseLerp(1f, 0.87f, completionRatio) * LumUtils.InverseLerp(0.05f, 0.2f, completionRatio);
-
-    public void RenderOverDistortion()
+    public Color JetColorFunction(float completionRatio)
     {
-        if (Main.netMode == NetmodeID.Server)
-            return;
-        ManagedShader jetShader = ShaderManager.GetShader("HeavenlyArsenal.RelativisticJetShader");
-        jetShader.SetTexture(TextureAssets.Extra[ExtrasID.FlameLashTrailShape], 1, SamplerState.LinearWrap);
-
-        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(JetWidthFunction, JetColorFunction, Shader: jetShader), 46);
+        return Projectile.GetAlpha(new Color(11, 75, 255)) * LumUtils.InverseLerp(1f, 0.87f, completionRatio) * LumUtils.InverseLerp(0.05f, 0.2f, completionRatio);
     }
 }

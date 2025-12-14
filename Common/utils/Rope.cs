@@ -1,7 +1,4 @@
 ﻿using Luminance.Common.Utilities;
-using Microsoft.Xna.Framework;
-using System;
-using Terraria;
 
 namespace HeavenlyArsenal.Common.utils;
 
@@ -9,26 +6,49 @@ public class Rope
 {
     public class RopeSegment
     {
+        public Vector2 position;
+
+        public Vector2 oldPosition;
+
+        public Vector2 velocity;
+
+        public bool pinned;
+
         public RopeSegment(Vector2 position)
         {
             this.position = position;
-            this.oldPosition = position;
+            oldPosition = position;
         }
-
-        public Vector2 position;
-        public Vector2 oldPosition;
-        public Vector2 velocity;
-        public bool pinned;
     }
+
+    public RopeSegment[] segments;
+
+    public float segmentLength;
+
+    public Vector2 gravity;
+
+    public bool tileCollide;
+
+    public Vector2 colliderOrigin;
+
+    public int colliderWidth;
+
+    public int colliderHeight;
+
+    public float damping;
+
+    private readonly int accuracy;
 
     public Rope(Vector2 startPos, Vector2 endPos, int segmentCount, float segmentLength, Vector2 gravity, int accuracy = 10)
     {
         segments = new RopeSegment[segmentCount];
-        for (int i = 0; i < segmentCount; i++)
+
+        for (var i = 0; i < segmentCount; i++)
         {
-            Vector2 segmentPos = Vector2.Lerp(startPos, endPos, i / (segmentCount - 1f));
+            var segmentPos = Vector2.Lerp(startPos, endPos, i / (segmentCount - 1f));
             segments[i] = new RopeSegment(segmentPos);
         }
+
         segments[0].pinned = true;
         segments[^1].pinned = true;
 
@@ -39,28 +59,20 @@ public class Rope
 
     public void Settle()
     {
-        float oldDamp = damping;
+        var oldDamp = damping;
         damping = 0.67f;
-        for (int a = 0; a < segments.Length; a++)
+
+        for (var a = 0; a < segments.Length; a++)
+        {
             Update();
+        }
 
         damping = oldDamp;
     }
 
-    public RopeSegment[] segments;
-    public float segmentLength;
-    public Vector2 gravity;
-
-    public bool tileCollide;
-    public Vector2 colliderOrigin;
-    public int colliderWidth;
-    public int colliderHeight;
-    public float damping;
-
-    private int accuracy;
-
     /// <summary>
-    /// Calculates the overall segment length of a rope based on the horizontal span between its two end points and a desired sag distance.
+    ///     Calculates the overall segment length of a rope based on the horizontal span between its two
+    ///     end points and a desired sag distance.
     /// </summary>
     public static float CalculateSegmentLength(float ropeSpan, float sag)
     {
@@ -80,22 +92,22 @@ public class Rope
         // h = a(cosh(w / 2a) - 1)
         // a(cosh(w / 2a) - 1) - h = 0
         // This can be used to numerically find a.
-        float initialGuessA = sag;
-        float a = (float)IterativelySearchForRoot(x =>
-        {
-            return x * (Math.Cosh(ropeSpan / x * 0.5) - 1D) - sag;
-        }, initialGuessA, 9);
+        var initialGuessA = sag;
+        var a = (float)IterativelySearchForRoot(x => { return x * (Math.Cosh(ropeSpan / x * 0.5) - 1D) - sag; }, initialGuessA, 9);
 
         // Now that a is known, it's just a matter of plugging it back into the original equation to find L.
         return MathF.Sinh(ropeSpan / a * 0.5f) * a * 2f;
     }
 
     /// <summary>
-    /// Searches for an approximate for a root of a given function.
+    ///     Searches for an approximate for a root of a given function.
     /// </summary>
     /// <param name="fx">The function to find the root for.</param>
     /// <param name="initialGuess">The initial guess for what the root could be.</param>
-    /// <param name="iterations">The amount of iterations to perform. The higher this is, the more generally accurate the result will be.</param>
+    /// <param name="iterations">
+    ///     The amount of iterations to perform. The higher this is, the more
+    ///     generally accurate the result will be.
+    /// </param>
     private static double IterativelySearchForRoot(Func<double, double> fx, double initialGuess, int iterations)
     {
         // This uses the Newton-Raphson method to iteratively get closer and closer to roots of a given function.
@@ -104,10 +116,11 @@ public class Rope
         // In most circumstances repeating the above equation will result in closer and closer approximations to a root.
         // The exact reason as to why this intuitively works can be found at the following video:
         // https://www.youtube.com/watch?v=-RdOwhmqP5s
-        double result = initialGuess;
-        for (int i = 0; i < iterations; i++)
+        var result = initialGuess;
+
+        for (var i = 0; i < iterations; i++)
         {
-            double derivative = fx.ApproximateDerivative(result);
+            var derivative = fx.ApproximateDerivative(result);
             result -= fx(result) / derivative;
         }
 
@@ -116,65 +129,91 @@ public class Rope
 
     public void Update()
     {
-        for (int i = 0; i < segments.Length; i++)
+        for (var i = 0; i < segments.Length; i++)
         {
             segments[i].velocity = (segments[i].position - segments[i].oldPosition) * (1f - damping);
+
             if (segments[i].velocity.Length() < 0.015f)
+            {
                 segments[i].velocity = Vector2.Zero;
+            }
 
             segments[i].oldPosition = segments[i].position;
 
             if (!segments[i].pinned)
+            {
                 segments[i].position += TileCollision(segments[i].position, segments[i].velocity + gravity);
+            }
         }
 
-        for (int a = 0; a < accuracy; a++)
+        for (var a = 0; a < accuracy; a++)
+        {
             Constrain();
+        }
     }
 
     public void Constrain()
     {
-        for (int i = 0; i < segments.Length - 1; i++)
+        for (var i = 0; i < segments.Length - 1; i++)
         {
-            float dist = segments[i].position.Distance(segments[i + 1].position);
-            float error = dist - segmentLength;
-            Vector2 correction = segments[i].position.DirectionFrom(segments[i + 1].position) * error;
+            var dist = segments[i].position.Distance(segments[i + 1].position);
+            var error = dist - segmentLength;
+            var correction = segments[i].position.DirectionFrom(segments[i + 1].position) * error;
 
-            bool pinned = segments[i].pinned;
-            bool nextPinned = segments[i + 1].pinned;
-            float multiplier = pinned || nextPinned ? 1f : 0.5f;
+            var pinned = segments[i].pinned;
+            var nextPinned = segments[i + 1].pinned;
+            var multiplier = pinned || nextPinned ? 1f : 0.5f;
 
             if (!pinned)
+            {
                 segments[i].position -= TileCollision(segments[i].position, correction * multiplier);
+            }
+
             if (!nextPinned)
+            {
                 segments[i + 1].position += TileCollision(segments[i + 1].position, correction * multiplier);
+            }
         }
     }
 
     private Vector2 TileCollision(Vector2 position, Vector2 velocity)
     {
         if (!tileCollide)
+        {
             return velocity;
+        }
 
-        Vector2 newVelocity = Collision.noSlopeCollision(position + colliderOrigin, velocity, colliderWidth, colliderHeight + 2, true, true);
+        var newVelocity = Collision.noSlopeCollision(position + colliderOrigin, velocity, colliderWidth, colliderHeight + 2, true, true);
         newVelocity = Collision.noSlopeCollision(position + colliderOrigin, newVelocity, colliderWidth, colliderHeight, true, true);
-        Vector2 result = velocity;
+        var result = velocity;
+
         if (Math.Abs(velocity.X) > Math.Abs(newVelocity.X))
+        {
             result.X = 0;
+        }
+
         if (Math.Abs(velocity.Y) > Math.Abs(newVelocity.Y))
+        {
             result.Y = 0;
+        }
 
         return result;
     }
 
     public Vector2[] GetPoints()
     {
-        Vector2[] points = new Vector2[segments.Length];
-        for (int i = 0; i < segments.Length; i++)
+        var points = new Vector2[segments.Length];
+
+        for (var i = 0; i < segments.Length; i++)
+        {
             points[i] = segments[i].position;
+        }
 
         return points;
     }
 
-    public Rectangle GetCollisionRect(int i) => new Rectangle((int)(segments[i].position.Floor().X + colliderOrigin.X), (int)(segments[i].position.Floor().Y + colliderOrigin.Y), colliderWidth, colliderHeight);
+    public Rectangle GetCollisionRect(int i)
+    {
+        return new Rectangle((int)(segments[i].position.Floor().X + colliderOrigin.X), (int)(segments[i].position.Floor().Y + colliderOrigin.Y), colliderWidth, colliderHeight);
+    }
 }
