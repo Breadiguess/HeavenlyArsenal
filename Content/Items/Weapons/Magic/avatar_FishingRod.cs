@@ -1,18 +1,11 @@
-﻿using System.Linq;
-using CalamityMod.Projectiles.Summon;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
+using System.Linq;
+using HeavenlyArsenal.Content.Projectiles.Weapons.Magic;
+using HeavenlyArsenal.Core.Globals;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Content.Tiles;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
-using CalamityMod.Items.Weapons.Summon;
-using HeavenlyArsenal.Content.Projectiles.Weapons.Magic;
-using System.Collections.Generic;
-using HeavenlyArsenal.Core.Globals;
 using NoxusBoss.Core.GlobalInstances;
-using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using Terraria.GameContent.ItemDropRules;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic;
@@ -20,7 +13,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Magic;
 public class avatar_FishingRod : ModItem
 {
     public override string Texture => "HeavenlyArsenal/Content/Items/Weapons/Magic/avatar_FishingRod";
+
     public override string LocalizationCategory => "Items.Weapons.Magic";
+
     public override void SetDefaults()
     {
         Item.width = 30;
@@ -46,9 +41,15 @@ public class avatar_FishingRod : ModItem
         Item.value = Item.buyPrice(gold: 2);
     }
 
-    public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+    public override bool CanUseItem(Player player)
+    {
+        return player.ownedProjectileCounts[Item.shoot] <= 0;
+    }
 
-    public override Color? GetAlpha(Color lightColor) => Color.White;
+    public override Color? GetAlpha(Color lightColor)
+    {
+        return Color.White;
+    }
 
     public override void AddRecipes()
     {
@@ -61,10 +62,10 @@ public class avatar_FishingRod : ModItem
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         // Find the fishing power tooltip from localization
-        TooltipLine fishingPowerTooltip = tooltips.FirstOrDefault(t => t.Mod == Mod.Name && t.Name == "FishingPower");
+        var fishingPowerTooltip = tooltips.FirstOrDefault(t => t.Mod == Mod.Name && t.Name == "FishingPower");
 
         // Find the main tooltip
-        TooltipLine mainTooltip = tooltips.FirstOrDefault(t => t.Mod == "Terraria" && t.Name == "Tooltip0");
+        var mainTooltip = tooltips.FirstOrDefault(t => t.Mod == "Terraria" && t.Name == "Tooltip0");
 
         if (fishingPowerTooltip != null)
         {
@@ -85,21 +86,26 @@ public class avatar_FishingRod : ModItem
 
     public override void SetStaticDefaults()
     {
-        GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>
+        GlobalNPCEventHandlers.ModifyNPCLootEvent += (npc, npcLoot) =>
         {
             if (npc.type == ModContent.NPCType<AvatarOfEmptiness>())
             {
-                LeadingConditionRule normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+                var normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+
                 {
                     normalOnly.OnSuccess(ItemDropRule.Common(Type));
-                }   
+                }
+
                 npcLoot.Add(normalOnly);
             }
         };
-        ArsenalGlobalItem.ModifyItemLootEvent += (Item item, ItemLoot loot) =>
+
+        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
         {
             if (item.type == AvatarOfEmptiness.TreasureBagID)
+            {
                 loot.Add(ItemDropRule.Common(Type));
+            }
         };
     }
 
@@ -113,7 +119,9 @@ public class avatar_FishingRod : ModItem
     private bool DoNotPayMana(On_Player.orig_ItemCheck_PayMana orig, Player self, Item sItem, bool canUse)
     {
         if (sItem.type == ModContent.ItemType<avatar_FishingRod>())
-            return self.CheckMana(sItem.mana, false);
+        {
+            return self.CheckMana(sItem.mana);
+        }
 
         return orig(self, sItem, canUse);
     }

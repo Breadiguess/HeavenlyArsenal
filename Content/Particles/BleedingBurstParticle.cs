@@ -1,31 +1,30 @@
 ﻿using HeavenlyArsenal.Core;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.Graphics.Renderers;
-using Terraria;
-using Microsoft.Xna.Framework;
-using Terraria.GameContent;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
+using Terraria.Graphics.Renderers;
 
 namespace HeavenlyArsenal.Content.Particles;
 
 public class BleedingBurstParticle : BaseParticle
 {
-    public static ParticlePool<BleedingBurstParticle> pool = new ParticlePool<BleedingBurstParticle>(500, GetNewParticle<BleedingBurstParticle>);
+    public static ParticlePool<BleedingBurstParticle> pool = new(500, GetNewParticle<BleedingBurstParticle>);
 
     public Vector2 Position;
+
     public Vector2 Velocity;
+
     public float Rotation;
+
     public Color ColorTint;
+
     public int MaxTime;
+
     public int TimeLeft;
+
     public float Scale;
+
     private int Style;
+
     private Vector2 Offset;
 
     public void Prepare(Vector2 position, Vector2 velocity, float rotation, Color color, float scale)
@@ -48,15 +47,18 @@ public class BleedingBurstParticle : BaseParticle
     public override void Update(ref ParticleRendererSettings settings)
     {
         Position += Velocity * (1f - MathF.Cbrt((float)TimeLeft / MaxTime)) * 0.5f;
+
         if (++TimeLeft > MaxTime)
+        {
             ShouldBeRemovedFromRenderer = true;
+        }
     }
 
     public override void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch)
     {
-        Texture2D texture = GennedAssets.Textures.Noise.FireNoiseA.Value;
-        float progress = (float)TimeLeft / MaxTime;
-        ManagedShader shader = ShaderManager.GetShader("HeavenlyArsenal.RadialBlastEffect");
+        var texture = GennedAssets.Textures.Noise.FireNoiseA.Value;
+        var progress = (float)TimeLeft / MaxTime;
+        var shader = ShaderManager.GetShader("HeavenlyArsenal.RadialBlastEffect");
         shader.TrySetParameter("uProgress", progress);
         shader.TrySetParameter("uProgressInside", Utils.GetLerpValue(0.4f, 1f, progress, true));
         shader.TrySetParameter("uNoiseOffset", Offset / 24f);
@@ -67,11 +69,27 @@ public class BleedingBurstParticle : BaseParticle
         shader.SetTexture(GennedAssets.Textures.Noise.FireNoiseA, 1, SamplerState.PointWrap);
         shader.Apply();
 
-        Vector2 stretch = Scale * MathF.Cbrt(progress) * new Vector2(300f) / texture.Size();
+        var stretch = Scale * MathF.Cbrt(progress) * new Vector2(300f) / texture.Size();
         Main.spriteBatch.Draw(texture, Position + settings.AnchorPosition, texture.Frame(), ColorTint, Rotation, texture.Size() * 0.5f, stretch, 0, 0);
         Main.pixelShader.CurrentTechnique.Passes[0].Apply();
 
-        Texture2D glow = AssetDirectory.Textures.BigGlowball.Value;
-        Main.spriteBatch.Draw(glow, Position + settings.AnchorPosition, glow.Frame(), ColorTint with { A = 0 } * 0.33f, Rotation, glow.Size() * 0.5f, Scale * MathF.Cbrt(progress) * 0.5f, 0, 0);
+        var glow = AssetDirectory.Textures.BigGlowball.Value;
+
+        Main.spriteBatch.Draw
+        (
+            glow,
+            Position + settings.AnchorPosition,
+            glow.Frame(),
+            ColorTint with
+            {
+                A = 0
+            } *
+            0.33f,
+            Rotation,
+            glow.Size() * 0.5f,
+            Scale * MathF.Cbrt(progress) * 0.5f,
+            0,
+            0
+        );
     }
 }

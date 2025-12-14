@@ -1,12 +1,8 @@
-﻿using Luminance.Assets;
-using static Luminance.Common.Utilities.Utilities;
+﻿using System.Collections.Generic;
+using Luminance.Assets;
 using Luminance.Core.Graphics;
-using Microsoft.Xna.Framework;
 using NoxusBoss.Assets;
-using Terraria;
-using Terraria.ModLoader;
-using System;
-using System.Collections.Generic;
+using static Luminance.Common.Utilities.Utilities;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.WeeabouScythe;
 
@@ -26,7 +22,7 @@ public class LightSlash : ModProjectile
     {
         Projectile.width = 1600;
         Projectile.height = 56;
-        Projectile.hostile =false;
+        Projectile.hostile = false;
         Projectile.friendly = true;
         Projectile.penetrate = -1;
         Projectile.localNPCHitCooldown = 4;
@@ -45,22 +41,29 @@ public class LightSlash : ModProjectile
         Time++;
     }
 
-    public override Color? GetAlpha(Color lightColor) => Color.White * Projectile.Opacity * 1.4f;
+    public override Color? GetAlpha(Color lightColor)
+    {
+        return Color.White * Projectile.Opacity * 1.4f;
+    }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         if (Time < 8f)
+        {
             return false;
+        }
 
-        float _ = 0f;
-        Vector2 start = Projectile.Center - Direction.ToRotationVector2() * Projectile.width * Projectile.scale * 0.5f;
-        Vector2 end = Projectile.Center + Direction.ToRotationVector2() * Projectile.width * Projectile.scale * 0.5f;
+        var _ = 0f;
+        var start = Projectile.Center - Direction.ToRotationVector2() * Projectile.width * Projectile.scale * 0.5f;
+        var end = Projectile.Center + Direction.ToRotationVector2() * Projectile.width * Projectile.scale * 0.5f;
+
         return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, Projectile.height * 0.5f, ref _);
     }
 
     public float PrimitiveWidthFunction(float completionRatio)
     {
-        float baseWidth = InverseLerp(0f, 6f, Projectile.timeLeft) * Projectile.height * 0.5f;
+        var baseWidth = InverseLerp(0f, 6f, Projectile.timeLeft) * Projectile.height * 0.5f;
+
         return InverseLerp(0f, 0.45f, completionRatio) * InverseLerp(1f, 0.55f, completionRatio) * baseWidth;
     }
 
@@ -75,38 +78,45 @@ public class LightSlash : ModProjectile
 
         // Furthermore, the arc made by the Bezier uses an offset factor of 1 - x^2.
         // This information can be used to calculate the offset angle for a given interpolant.
-        float bendFactor = 1f - (float)Math.Pow(1f - completionRatio * 2f, 2f);
+        var bendFactor = 1f - (float)Math.Pow(1f - completionRatio * 2f, 2f);
 
-        float distortionStrength = Utils.Remap(Time, 0f, 11f, 1f, 0.1f);
-        Vector2 distortionDirection = (Direction + (float)Math.Atan(BendInterpolant) * bendFactor + float.Pi).ToRotationVector2();
+        var distortionStrength = Utils.Remap(Time, 0f, 11f, 1f, 0.1f);
+        var distortionDirection = (Direction + (float)Math.Atan(BendInterpolant) * bendFactor + float.Pi).ToRotationVector2();
+
         return new Color(Projectile.Opacity, distortionDirection.X * 0.5f + 0.5f, distortionDirection.Y * 0.5f + 0.5f, distortionStrength);
     }
 
     // This projectile is not drawn by default. It is only drawn to the target in the LightSlashDrawer class.
-    public override bool PreDraw(ref Color lightColor) => false;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        return false;
+    }
 
     public void DrawToTarget()
     {
         if (Time <= 1f)
+        {
             return;
+        }
 
-        ManagedShader slashShader = ShaderManager.GetShader("NoxusBoss.GenericTrailStreak");
+        var slashShader = ShaderManager.GetShader("NoxusBoss.GenericTrailStreak");
         slashShader.SetTexture(GennedAssets.Textures.TrailStreaks.StreakBloomLine, 1);
 
         // Calculate the three points that define the overall shape of the slash.
-        Vector2 start = Projectile.Center - Direction.ToRotationVector2() * Projectile.width * Projectile.scale * 0.5f;
-        Vector2 end = Projectile.Center + Direction.ToRotationVector2() * Projectile.width * Projectile.scale * 0.5f;
-        Vector2 middle = (start + end) * 0.5f + (Direction + MathHelper.PiOver2).ToRotationVector2() * Projectile.width * Projectile.scale * BendInterpolant;
+        var start = Projectile.Center - Direction.ToRotationVector2() * Projectile.width * Projectile.scale * 0.5f;
+        var end = Projectile.Center + Direction.ToRotationVector2() * Projectile.width * Projectile.scale * 0.5f;
+        var middle = (start + end) * 0.5f + (Direction + MathHelper.PiOver2).ToRotationVector2() * Projectile.width * Projectile.scale * BendInterpolant;
 
         // Create a bunch of points that slash across the Bezier curve created from the above three points.
         List<Vector2> slashPoints = [];
-        for (int i = 0; i < 7; i++)
+
+        for (var i = 0; i < 7; i++)
         {
-            float interpolant = i / 6f * Utils.Remap(Time, 0f, 8f, 0.1f, 1f);
+            var interpolant = i / 6f * Utils.Remap(Time, 0f, 8f, 0.1f, 1f);
             slashPoints.Add(QuadraticBezier(start, middle, end, interpolant));
         }
 
-        PrimitiveSettings settings = new PrimitiveSettings(PrimitiveWidthFunction, PrimitiveColorFunction, Shader: slashShader);
+        var settings = new PrimitiveSettings(PrimitiveWidthFunction, PrimitiveColorFunction, Shader: slashShader);
         PrimitiveRenderer.RenderTrail(slashPoints, settings, 14);
     }
 }

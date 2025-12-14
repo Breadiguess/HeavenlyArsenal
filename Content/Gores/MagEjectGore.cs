@@ -1,23 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
-using Terraria.ModLoader;
+﻿namespace HeavenlyArsenal.Content.Gores;
 
-namespace HeavenlyArsenal.Content.Gores
+internal class MagEjectGore : ModGore
 {
-    class MagEjectGore : ModGore
+    public override string Texture => base.Texture;
+
+    public override void SetStaticDefaults()
     {
-        
-        public override string Texture => base.Texture;
-
-
-        public override void SetStaticDefaults()
-        {
-            Gore.goreTime = 40;
-
-        }
+        Gore.goreTime = 40;
     }
 }

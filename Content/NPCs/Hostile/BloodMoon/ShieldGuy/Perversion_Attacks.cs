@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy;
 
-namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy
+internal partial class PerversionOfFaith
 {
-    partial class PerversionOfFaith
+    public enum Behavior
     {
-        public enum Behavior
-        {
-            debug,
-            FindShieldTarget,
-            ProtectTarget,
+        debug,
 
-        }
+        FindShieldTarget,
 
-        public Behavior CurrentState;
-
-        
+        ProtectTarget
     }
+
+    public Behavior CurrentState;
 }

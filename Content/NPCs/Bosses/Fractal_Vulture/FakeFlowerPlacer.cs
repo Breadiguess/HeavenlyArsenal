@@ -1,50 +1,44 @@
 ﻿using System.Collections.Generic;
+using HeavenlyArsenal.Content.NPCs.Bosses.FractalVulture;
+using Luminance.Assets;
+using NoxusBoss.Content.Tiles.GenesisComponents;
+using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
 {
-    using CalamityMod;
-    using global::HeavenlyArsenal.Content.NPCs.Bosses.FractalVulture;
-    using Luminance.Assets;
-    using Microsoft.Xna.Framework;
-    using NoxusBoss.Content.Tiles.GenesisComponents;
-    using System;
-    using Terraria;
-    using Terraria.DataStructures;
-    using Terraria.ID;
-    using Terraria.ModLoader;
-
     namespace HeavenlyArsenal.Systems
     {
         public class FakeFlowerPlacementSystem : ModSystem
         {
-
+            private const int SearchRadius = 80;
 
             public static void TryPlaceFlowerAroundGenesis()
             {
-                int genesisType = ModContent.TileType<GenesisTile>();
-                int fakeFlowerType = ModContent.TileType<FakeFlowerTile>();
-
+                var genesisType = ModContent.TileType<GenesisTile>();
+                var fakeFlowerType = ModContent.TileType<FakeFlowerTile>();
 
                 // Convert top-left to origin, matching TileObjectData.Origin
 
                 // STEP 1 — Find every Genesis origin tile
-                List<Point16> genesisOrigins = FindGenesisOrigins(genesisType);
+                var genesisOrigins = FindGenesisOrigins(genesisType);
 
                 if (genesisOrigins.Count == 0)
                 {
                     Main.NewText("No Genesis tiles found.");
+
                     return;
                 }
 
-                foreach (Point16 genesis in genesisOrigins)
+                foreach (var genesis in genesisOrigins)
                 {
                     Main.NewText($"Scanning around Genesis at {genesis.X}, {genesis.Y}...");
 
-                    List<Point16> spots = FindAllValidPlacementsAround(genesis);
+                    var spots = FindAllValidPlacementsAround(genesis);
 
                     if (spots.Count == 0)
                     {
                         Main.NewText("→ No suitable placement locations found.");
+
                         continue;
                     }
 
@@ -60,12 +54,16 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                     foreach (var spot in spots)
                     {
                         // Check distance between *origins*
-                        int dist = ManhattanDistance(spot, genesis);
+                        var dist = ManhattanDistance(spot, genesis);
 
                         if (dist >= MinPreferredDistance)
+                        {
                             preferred.Add(spot);
+                        }
                         else
+                        {
                             tooClose.Add(spot);
+                        }
                     }
 
                     Point16 chosen;
@@ -83,14 +81,14 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                         Main.NewText($"→ Only close placements available ({tooClose.Count}). Using fallback.");
                     }
 
-
                     Main.NewText($"→ Chosen placement: {chosen.X}, {chosen.Y}");
 
                     TryPlaceFakeFlower(chosen);
-                    
+
                     return; // stop after one genesis
                 }
             }
+
             private static int ManhattanDistance(Point16 a, Point16 b)
             {
                 return Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
@@ -98,65 +96,75 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
 
             private static void TryPlaceFakeFlower(Point16 topLeft)
             {
-                int fakeFlowerType = ModContent.TileType<FakeFlowerTile>();
+                var fakeFlowerType = ModContent.TileType<FakeFlowerTile>();
 
                 // Convert top-left to origin, matching TileObjectData.Origin
-                int originX = topLeft.X + FakeFlowerTile.Width / 2;
-                int originY = topLeft.Y + FakeFlowerTile.Height - 1;
+                var originX = topLeft.X + FakeFlowerTile.Width / 2;
+                var originY = topLeft.Y + FakeFlowerTile.Height - 1;
 
                 // Debug
-                Vector2 worldPos = new Vector2(originX, originY).ToWorldCoordinates();
+                var worldPos = new Vector2(originX, originY).ToWorldCoordinates();
                 Main.NewText($"Placing Fake Flower at origin (tiles): {originX}, {originY}  (world: {worldPos})");
 
-                bool success = WorldGen.PlaceObject(originX, originY, fakeFlowerType, style: 0, mute: true);
+                var success = WorldGen.PlaceObject(originX, originY, fakeFlowerType, style: 0, mute: true);
 
                 if (success)
+                {
                     Main.NewText("Fake Flower successfully placed!");
+                }
                 else
+                {
                     Main.NewText("Fake Flower FAILED to place.");
+                }
             }
 
             private static List<Point16> FindGenesisOrigins(int genesisType)
             {
                 List<Point16> list = new();
 
-                for (int x = 0; x < Main.maxTilesX; x++)
+                for (var x = 0; x < Main.maxTilesX; x++)
                 {
-                    for (int y = 0; y < Main.maxTilesY; y++)
+                    for (var y = 0; y < Main.maxTilesY; y++)
                     {
-                        Tile t = Main.tile[x, y];
+                        var t = Main.tile[x, y];
+
                         if (!t.HasTile || t.TileType != genesisType)
+                        {
                             continue;
+                        }
 
                         // Check if this is the ORIGIN tile
                         if (t.TileFrameX == 0 && t.TileFrameY == 0)
+                        {
                             list.Add(new Point16(x, y));
+                        }
                     }
                 }
 
                 return list;
             }
 
-
-            private const int SearchRadius = 80;
-
             private static Point16? FindPlacementAround(Point16 genesis)
             {
-                int fw = FakeFlowerTile.Width;
-                int fh = FakeFlowerTile.Height;
+                var fw = FakeFlowerTile.Width;
+                var fh = FakeFlowerTile.Height;
 
-                for (int dx = -SearchRadius; dx <= SearchRadius; dx++)
+                for (var dx = -SearchRadius; dx <= SearchRadius; dx++)
                 {
-                    for (int dy = -SearchRadius; dy <= SearchRadius; dy++)
+                    for (var dy = -SearchRadius; dy <= SearchRadius; dy++)
                     {
                         if (dx * dx + dy * dy > SearchRadius * SearchRadius)
+                        {
                             continue;
+                        }
 
-                        int topLeftX = genesis.X + dx;
-                        int topLeftY = genesis.Y + dy;
+                        var topLeftX = genesis.X + dx;
+                        var topLeftY = genesis.Y + dy;
 
                         if (IsRegionSuitableForFakeFlower(topLeftX, topLeftY))
+                        {
                             return new Point16(topLeftX, topLeftY);
+                        }
                     }
                 }
 
@@ -166,18 +174,20 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             private static List<Point16> FindAllValidPlacementsAround(Point16 genesis)
             {
                 List<Point16> results = new();
-                int w = FakeFlowerTile.Width;
-                int h = FakeFlowerTile.Height;
+                var w = FakeFlowerTile.Width;
+                var h = FakeFlowerTile.Height;
 
-                for (int dx = -SearchRadius; dx <= SearchRadius; dx++)
+                for (var dx = -SearchRadius; dx <= SearchRadius; dx++)
                 {
-                    for (int dy = -SearchRadius; dy <= SearchRadius; dy++)
+                    for (var dy = -SearchRadius; dy <= SearchRadius; dy++)
                     {
                         if (dx * dx + dy * dy > SearchRadius * SearchRadius)
+                        {
                             continue; // circle mask
+                        }
 
-                        int topLeftX = genesis.X + dx;
-                        int topLeftY = genesis.Y + dy;
+                        var topLeftX = genesis.X + dx;
+                        var topLeftY = genesis.Y + dy;
 
                         if (IsRegionSuitableForFakeFlower(topLeftX, topLeftY))
                         {
@@ -189,30 +199,33 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 return results;
             }
 
-
             private static bool IsRegionSuitableForFakeFlower(int x, int y)
             {
-                int w = FakeFlowerTile.Width;
-                int h = FakeFlowerTile.Height;
+                var w = FakeFlowerTile.Width;
+                var h = FakeFlowerTile.Height;
 
                 // 1. Check footprint is clear OR cuttable (grass, plants, vines, etc)
-                for (int i = 0; i < w; i++)
+                for (var i = 0; i < w; i++)
                 {
-                    for (int j = 0; j < h; j++)
+                    for (var j = 0; j < h; j++)
                     {
-                        int tx = x + i;
-                        int ty = y + j;
+                        var tx = x + i;
+                        var ty = y + j;
 
                         if (!WorldGen.InWorld(tx, ty))
+                        {
                             return false;
+                        }
 
-                        Tile t = Main.tile[tx, ty];
+                        var t = Main.tile[tx, ty];
 
                         if (t.HasTile)
                         {
                             // Allow cuttable tiles (grass, plants, vines)
                             if (Main.tileCut[t.TileType])
+                            {
                                 continue;
+                            }
 
                             // ALSO allow:
                             // - Moss
@@ -228,24 +241,27 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 }
 
                 // 2. Check bottom row is SOLID (anchor requirement)
-                int bottomY = y + h; // the row of tiles directly below footprint
+                var bottomY = y + h; // the row of tiles directly below footprint
 
-                for (int i = 0; i < w; i++)
+                for (var i = 0; i < w; i++)
                 {
-                    int tx = x + i;
-                    if (!WorldGen.InWorld(tx, bottomY))
-                        return false;
+                    var tx = x + i;
 
-                    Tile below = Main.tile[tx, bottomY];
+                    if (!WorldGen.InWorld(tx, bottomY))
+                    {
+                        return false;
+                    }
+
+                    var below = Main.tile[tx, bottomY];
 
                     if (!below.HasTile || !Main.tileSolid[below.TileType])
+                    {
                         return false;
+                    }
                 }
 
                 return true;
             }
-
-
         }
 
         public class GenesisFlowerSeeder : ModItem
@@ -253,8 +269,6 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             public override string Texture => MiscTexturesRegistry.PixelPath;
             // ^ Placeholder texture (Gold Coin). 
             // Replace with: $"{Mod.Name}/Content/Items/GenesisFlowerSeeder"
-
-
 
             public override void SetDefaults()
             {
@@ -280,16 +294,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 {
                     FakeFlowerPlacementSystem.TryPlaceFlowerAroundGenesis();
                 }
-                else
-                {
-
-                }
 
                 return true;
             }
         }
-
-
     }
-
 }

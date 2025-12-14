@@ -1,120 +1,112 @@
 ﻿using CalamityMod;
-using CalamityMod.CalPlayer;
 using CalamityMod.Items;
 using CalamityMod.Items.Accessories;
 using CalamityMod.Rarities;
-using Luminance.Assets;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
 using Terraria.DataStructures;
-using Terraria.ID;
-using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.Items.Accessories.RadiantRampart
+namespace HeavenlyArsenal.Content.Items.Accessories.RadiantRampart;
+
+[LegacyName("Acessory_Thing")]
+public class RadiantRampartItem : ModItem
 {
-    [LegacyName("Acessory_Thing")]
-    public class RadiantRampartItem : ModItem
+    public override string LocalizationCategory => "Items.Accessories";
+
+    public override void SetStaticDefaults()
     {
-        public override string LocalizationCategory => "Items.Accessories";
-       
-        public override void SetStaticDefaults()
+        Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(6, 6));
+        ItemID.Sets.AnimatesAsSoul[Type] = true;
+    }
+
+    public override void SetDefaults()
+    {
+        Item.width = 64;
+        Item.height = 62;
+        Item.value = CalamityGlobalItem.RarityVioletBuyPrice;
+        Item.defense = 12;
+        Item.defense += 8;
+        Item.accessory = true;
+        Item.rare = ModContent.RarityType<Violet>();
+    }
+
+    public override void AddRecipes()
+    {
+        var recipe = CreateRecipe()
+            .AddIngredient(ModContent.ItemType<RampartofDeities>())
+            .AddIngredient(ModContent.ItemType<Radiance>())
+            .AddTile(TileID.MythrilAnvil);
+
+        recipe.Register();
+    }
+
+    public override void UpdateAccessory(Player player, bool hideVisual)
+    {
+        player.GetModPlayer<RampartPlayer>().Equipped = true;
+        var modPlayer = player.Calamity();
+
+        // Directly inherits both Cross Necklace and Deific Amulet iframe boosts
+        player.longInvince = true;
+        modPlayer.dAmulet = true;
+
+        // Large hit iframe effect taken from Seraph Tracers
+        modPlayer.rampartOfDeities = true;
+
+        // Ice Barrier buff inherited from Frozen Turtle Shell
+        if (player.statLife <= player.statLifeMax2 * 0.5)
         {
-            Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(6, 6));
-            ItemID.Sets.AnimatesAsSoul[Type] = true;
+            player.AddBuff(BuffID.IceBarrier, 5);
         }
 
-        public override void SetDefaults()
+        // Knockback immunity inherited from Paladin's Shield
+        player.noKnockback = true;
+
+        // Paladin's Shield application
+        if (player.statLife > player.statLifeMax2 * 0.25f)
         {
-            Item.width = 64;
-            Item.height = 62;
-            Item.value = CalamityGlobalItem.RarityVioletBuyPrice;
-            Item.defense = 12;
-            Item.defense += 8;
-            Item.accessory = true;
-            Item.rare = ModContent.RarityType<Violet>();
+            player.hasPaladinShield = true;
 
-        }
-
-        public override void AddRecipes()
-        {
-            
-            Recipe recipe = CreateRecipe()
-                .AddIngredient(ModContent.ItemType<RampartofDeities>())
-                .AddIngredient(ModContent.ItemType<Radiance>())
-                .AddTile(TileID.MythrilAnvil);
-          
-            recipe.Register();
-        }
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-
-            player.GetModPlayer<RampartPlayer>().Equipped = true;
-            CalamityPlayer modPlayer = player.Calamity();
-
-            // Directly inherits both Cross Necklace and Deific Amulet iframe boosts
-            player.longInvince = true;
-            modPlayer.dAmulet = true;
-
-            // Large hit iframe effect taken from Seraph Tracers
-            modPlayer.rampartOfDeities = true;
-
-            // Ice Barrier buff inherited from Frozen Turtle Shell
-            if (player.statLife <= player.statLifeMax2 * 0.5)
-                player.AddBuff(BuffID.IceBarrier, 5);
-
-            // Knockback immunity inherited from Paladin's Shield
-            player.noKnockback = true;
-
-            // Paladin's Shield application
-            if (player.statLife > player.statLifeMax2 * 0.25f)
+            if (player.whoAmI != Main.myPlayer && player.miscCounter % 10 == 0)
             {
-                player.hasPaladinShield = true;
-                if (player.whoAmI != Main.myPlayer && player.miscCounter % 10 == 0)
+                var myPlayer = Main.myPlayer;
+
+                if (Main.player[myPlayer].team == player.team && player.team != 0)
                 {
-                    int myPlayer = Main.myPlayer;
-                    if (Main.player[myPlayer].team == player.team && player.team != 0)
+                    var teamPlayerXDist = player.position.X - Main.player[myPlayer].position.X;
+                    var teamPlayerYDist = player.position.Y - Main.player[myPlayer].position.Y;
+
+                    if ((float)Math.Sqrt(teamPlayerXDist * teamPlayerXDist + teamPlayerYDist * teamPlayerYDist) < 800f)
                     {
-                        float teamPlayerXDist = player.position.X - Main.player[myPlayer].position.X;
-                        float teamPlayerYDist = player.position.Y - Main.player[myPlayer].position.Y;
-                        if ((float)Math.Sqrt(teamPlayerXDist * teamPlayerXDist + teamPlayerYDist * teamPlayerYDist) < 800f)
-                            Main.player[myPlayer].AddBuff(BuffID.PaladinsShield, 20);
+                        Main.player[myPlayer].AddBuff(BuffID.PaladinsShield, 20);
                     }
                 }
             }
+        }
 
-           
-            player.statLifeMax2 += 70;
+        player.statLifeMax2 += 70;
 
-            // Abyss light, debuff near-immunity, life regen effects, and massively enhances debuff halving
-            modPlayer.purity = true;
+        // Abyss light, debuff near-immunity, life regen effects, and massively enhances debuff halving
+        modPlayer.purity = true;
 
-            // Inherits effects from Honey Dew and Living Dew
-            modPlayer.alwaysHoneyRegen = true;
-            modPlayer.honeyDewHalveDebuffs = true;
-            modPlayer.livingDewHalveDebuffs = true;
+        // Inherits effects from Honey Dew and Living Dew
+        modPlayer.alwaysHoneyRegen = true;
+        modPlayer.honeyDewHalveDebuffs = true;
+        modPlayer.livingDewHalveDebuffs = true;
 
-            // Add light if the other accessories aren't equipped and visibility is turned on
-            if (!(modPlayer.rOoze || modPlayer.aAmpoule) && !hideVisual)
-                Lighting.AddLight(player.Center, new Vector3(1.32f, 1.32f, 1.82f));
+        // Add light if the other accessories aren't equipped and visibility is turned on
+        if (!(modPlayer.rOoze || modPlayer.aAmpoule) && !hideVisual)
+        {
+            Lighting.AddLight(player.Center, new Vector3(1.32f, 1.32f, 1.82f));
         }
     }
+}
 
-    public class RampartPlayer : ModPlayer
+public class RampartPlayer : ModPlayer
+{
+    public bool Equipped;
+
+    public override void ResetEffects()
     {
-        public bool Equipped;
-        public override void ResetEffects()
-        {
-            Equipped = false;
-        }
-        
-        public override void PostUpdateMiscEffects()
-        {
-
-        }
+        Equipped = false;
     }
+
+    public override void PostUpdateMiscEffects() { }
 }

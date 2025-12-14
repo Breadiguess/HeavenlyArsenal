@@ -2,18 +2,10 @@
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Items.Weapons.Magic.RocheLimit;
 using HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture.Projectiles;
-using Luminance.Assets;
 using Luminance.Common.Utilities;
-using Luminance.Core.Graphics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Items.MiscOPTools;
-using NoxusBoss.Content.NPCs.Bosses.Avatar.SpecificEffectManagers;
-using NoxusBoss.Core.Graphics.GeneralScreenEffects;
 using NoxusBoss.Core.Graphics.SpecificEffectManagers;
-using NoxusBoss.Core.Netcode;
-using NoxusBoss.Core.Netcode.Packets;
 using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
 using ReLogic.Graphics;
@@ -23,16 +15,12 @@ using System.Runtime.Intrinsics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.ID;
-using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
+namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture;
+
+internal class OtherworldlyCore : ModNPC
 {
-    internal class OtherworldlyCore : ModNPC
-    {
-        //AAAAAAAAAAAAAAAAAAAAAA
-        public override bool CheckActive() => false;
-        public Rope Cord;
+    public Rope Cord;
 
         public voidVulture Body;
        
@@ -45,28 +33,27 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             this.HideFromBestiary();
             NPCID.Sets.MPAllowedEnemies[Type] = true;
 
-            EmptinessSprayer.NPCsToNotDelete[Type] = true;
-            RocheLimitGlobalNPC.ImmuneToLobotomy[Type] = true;
-            NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
-        }
-        public override void OnSpawn(IEntitySource source)
+        EmptinessSprayer.NPCsToNotDelete[Type] = true;
+        RocheLimitGlobalNPC.ImmuneToLobotomy[Type] = true;
+        NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
+    }
+
+    public override void OnSpawn(IEntitySource source) { }
+
+    public override void SetDefaults()
+    {
+        NPC.noGravity = true;
+        NPC.lifeMax = 30;
+        NPC.defense = 199;
+        NPC.damage = 0;
+        NPC.Size = new Vector2(100, 100);
+        NPC.noTileCollide = true;
+
+        if (Main.netMode != NetmodeID.Server)
         {
-
+            NPCNameFontSystem.RegisterFontForNPCID(Type, DisplayName.Value, Mod.Assets.Request<DynamicSpriteFont>("Assets/Fonts/WINDLISTENERGRAPHIC", AssetRequestMode.ImmediateLoad).Value);
         }
-
-        public override void SetDefaults()
-        {
-
-            NPC.noGravity = true;
-            NPC.lifeMax = 30;
-            NPC.defense = 199;
-            NPC.damage = 0;
-            NPC.Size = new Vector2(100, 100);
-            NPC.noTileCollide = true;
-            if (Main.netMode != NetmodeID.Server)
-                NPCNameFontSystem.RegisterFontForNPCID(Type, DisplayName.Value, Mod.Assets.Request<DynamicSpriteFont>("Assets/Fonts/WINDLISTENERGRAPHIC", AssetRequestMode.ImmediateLoad).Value);
-
-        }
+    }
 
         public override void ModifyHitByProjectile(Projectile projectile, ref NPC.HitModifiers modifiers)
         {
@@ -268,24 +255,30 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         {
             Vector2 center = NPC.Center;
 
-            for (int i = 0; i < Main.maxPlayers; i++)
+        for (var i = 0; i < Main.maxPlayers; i++)
+        {
+            var p = Main.player[i];
+
+            if (!p.active || p.dead)
             {
-                Player p = Main.player[i];
-                if (!p.active || p.dead)
-                    continue;
+                continue;
+            }
 
-                float dist = Vector2.Distance(p.Center, center);
-                if (dist > radius)
-                    continue;
+            var dist = Vector2.Distance(p.Center, center);
 
-               
-                if (p.grappling[0] != -1)
-                    continue;
+            if (dist > radius)
+            {
+                continue;
+            }
 
+            if (p.grappling[0] != -1)
+            {
+                continue;
+            }
 
-                Vector2 dir = (center - p.Center).SafeNormalize(Vector2.Zero);
+            var dir = (center - p.Center).SafeNormalize(Vector2.Zero);
 
-                float closeness = Utils.GetLerpValue(radius, 0f, dist, true);
+            var closeness = Utils.GetLerpValue(radius, 0f, dist, true);
 
                 p.velocity += dir * pullStrength * closeness;
                 p.mount?.Dismount(p);
@@ -316,29 +309,29 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 Color a = Color.White.MultiplyRGB(Color.Lerp(Color.White, Color.Transparent, i / (float)Cord.segments.Length));
                 Texture2D debug = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
 
-                // Horizontal thickness (X) tapers from baseWidth to tipWidth
-                float width = 0.5f;
+            // Horizontal thickness (X) tapers from baseWidth to tipWidth
+            var width = 0.5f;
 
-                // Vertical stretch based on actual distance to next segment and texture height
-                float segmentDistance = Cord.segments[i].position.Distance(Cord.segments[i + 1].position);
-                float rot = Cord.segments[i].position.AngleTo(Cord.segments[i + 1].position);
-                float lengthFactor = 1.4f;
-                lengthFactor = (segmentDistance / 1);
+            // Vertical stretch based on actual distance to next segment and texture height
+            var segmentDistance = Cord.segments[i].position.Distance(Cord.segments[i + 1].position);
+            var rot = Cord.segments[i].position.AngleTo(Cord.segments[i + 1].position);
+            var lengthFactor = 1.4f;
+            lengthFactor = segmentDistance / 1;
 
-                Vector2 stretch = new Vector2(width, lengthFactor) * 1.6f;
-                Vector2 DrawPos = Cord.segments[i].position - Main.screenPosition;
+            var stretch = new Vector2(width, lengthFactor) * 1.6f;
+            var DrawPos = Cord.segments[i].position - Main.screenPosition;
 
-                Main.EntitySpriteDraw(debug, DrawPos, null, a * NPC.Opacity, rot + MathHelper.PiOver2, debug.Size() / 2, stretch, 0);
-            }
-           
+            Main.EntitySpriteDraw(debug, DrawPos, null, a * NPC.Opacity, rot + MathHelper.PiOver2, debug.Size() / 2, stretch, 0);
         }
-        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+    }
+
+    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+    {
+        renderUmbilical();
+
+        if (PreparingToShoot || TelegraphInterp > 0)
         {
-
-            renderUmbilical();
-
-            if (PreparingToShoot || TelegraphInterp > 0)
-            {
+            var coreblastCount = !Body.HasSecondPhaseTriggered ? 3 : 4;
 
                 int coreblastCount = !Body.HasSecondPhaseTriggered ? 3 : 4;
                 for (int i = 0; i < coreblastCount; i++)
@@ -351,21 +344,51 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             float thing = Math.Abs(MathF.Sin(Main.GlobalTimeWrappedHourly * 3f)) + 1.3f;
             Main.EntitySpriteDraw(debug, NPC.Center - screenPos, null, Color.AntiqueWhite with { A = 0 }, 0, debug.Size() / 2, 0.1f * NPC.scale * thing, 0);
 
-            Texture2D white = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
-          
-            Texture2D outline = GennedAssets.Textures.GreyscaleTextures.HollowCircleSoftEdge;
-            Texture2D Glow = GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall;
-            Texture2D core = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Bosses/Fractal_Vulture/OtherworldlyCore_Anim").Value;
-            Vector2 Offset = new Vector2(0, 0);
+        Texture2D white = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
 
-            Rectangle frame = core.Frame(1, 4, 0, (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 4);
-            Vector2 DrawPos = NPC.Center - screenPos + Offset;
+        Texture2D outline = GennedAssets.Textures.GreyscaleTextures.HollowCircleSoftEdge;
+        Texture2D Glow = GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall;
+        var core = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Bosses/Fractal_Vulture/OtherworldlyCore_Anim").Value;
+        var Offset = new Vector2(0, 0);
 
-            Color GlowFlip = Color.Lerp(Color.Blue, Color.WhiteSmoke, Math.Abs(MathF.Sin(Main.GlobalTimeWrappedHourly))) * 0.1f * NPC.Opacity;
-            Main.EntitySpriteDraw(outline, DrawPos, null, Color.White with { A = 0 } * NPC.Opacity, 0, outline.Size() / 2, 0.1f, 0);
-            Main.EntitySpriteDraw(core, DrawPos, frame, Color.White * NPC.Opacity, 0, frame.Size() / 2, 1, 0);
-            Main.EntitySpriteDraw(Glow, DrawPos, null, GlowFlip with { A = 0 }, 0, Glow.Size() / 2, 1, 0);
-            return false; 
-        }
+        var frame = core.Frame(1, 4, 0, (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 4);
+        var DrawPos = NPC.Center - screenPos + Offset;
+
+        var GlowFlip = Color.Lerp(Color.Blue, Color.WhiteSmoke, Math.Abs(MathF.Sin(Main.GlobalTimeWrappedHourly))) * 0.1f * NPC.Opacity;
+
+        Main.EntitySpriteDraw
+        (
+            outline,
+            DrawPos,
+            null,
+            Color.White with
+            {
+                A = 0
+            } *
+            NPC.Opacity,
+            0,
+            outline.Size() / 2,
+            0.1f,
+            0
+        );
+
+        Main.EntitySpriteDraw(core, DrawPos, frame, Color.White * NPC.Opacity, 0, frame.Size() / 2, 1, 0);
+
+        Main.EntitySpriteDraw
+        (
+            Glow,
+            DrawPos,
+            null,
+            GlowFlip with
+            {
+                A = 0
+            },
+            0,
+            Glow.Size() / 2,
+            1,
+            0
+        );
+
+        return false;
     }
 }

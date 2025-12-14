@@ -1,31 +1,30 @@
 ﻿using HeavenlyArsenal.Core;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.Graphics.Renderers;
-using Terraria;
-using Microsoft.Xna.Framework;
-using Terraria.GameContent;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
+using Terraria.Graphics.Renderers;
 
 namespace HeavenlyArsenal.Content.Particles;
 
 public class SoundBarrierParticle : BaseParticle
 {
-    public static ParticlePool<SoundBarrierParticle> pool = new ParticlePool<SoundBarrierParticle>(500, GetNewParticle<SoundBarrierParticle>);
+    public static ParticlePool<SoundBarrierParticle> pool = new(500, GetNewParticle<SoundBarrierParticle>);
 
     public Vector2 Position;
+
     public Vector2 Velocity;
+
     public float Rotation;
+
     public Color ColorTint;
+
     public int MaxTime;
+
     public int TimeLeft;
+
     public float Scale;
+
     private int Style;
+
     private Vector2 Offset;
 
     public void Prepare(Vector2 position, Vector2 velocity, float rotation, Color color, float scale)
@@ -51,14 +50,16 @@ public class SoundBarrierParticle : BaseParticle
         Velocity *= 0.55f;
 
         if (++TimeLeft > MaxTime)
+        {
             ShouldBeRemovedFromRenderer = true;
+        }
     }
 
     public override void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch)
     {
-        Texture2D texture = GennedAssets.Textures.Noise.FireNoiseA.Value;
-        float progress = (float)TimeLeft / MaxTime;
-        ManagedShader shader = ShaderManager.GetShader("HeavenlyArsenal.RadialBlastEffect");
+        var texture = GennedAssets.Textures.Noise.FireNoiseA.Value;
+        var progress = (float)TimeLeft / MaxTime;
+        var shader = ShaderManager.GetShader("HeavenlyArsenal.RadialBlastEffect");
         shader.TrySetParameter("uProgress", progress);
         shader.TrySetParameter("uProgressInside", progress);
         shader.TrySetParameter("uNoiseOffset", Offset / 24f);
@@ -69,7 +70,7 @@ public class SoundBarrierParticle : BaseParticle
         shader.SetTexture(GennedAssets.Textures.Noise.WatercolorNoiseA, 1, SamplerState.PointWrap);
         shader.Apply();
 
-        Vector2 stretch = Scale * MathF.Cbrt(progress) * new Vector2(70f, 360f) / texture.Size();
+        var stretch = Scale * MathF.Cbrt(progress) * new Vector2(70f, 360f) / texture.Size();
         Main.spriteBatch.Draw(texture, Position + settings.AnchorPosition, texture.Frame(), ColorTint, Rotation, texture.Size() * 0.5f, stretch, 0, 0);
     }
 }

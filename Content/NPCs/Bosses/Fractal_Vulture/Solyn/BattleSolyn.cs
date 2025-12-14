@@ -1,7 +1,5 @@
-﻿using Luminance.Core.Graphics;
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
+using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Items.MiscOPTools;
 using NoxusBoss.Content.NPCs.Bosses.Avatar;
@@ -11,18 +9,11 @@ using NoxusBoss.Content.NPCs.Bosses.Avatar.SpecificEffectManagers.ParadiseReclai
 using NoxusBoss.Content.NPCs.Bosses.Draedon.SpecificEffectManagers;
 using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.Graphics.RenderTargets;
-using NoxusBoss.Core.Netcode;
-using NoxusBoss.Core.Netcode.Packets;
 using NoxusBoss.Core.Utilities;
 using NoxusBoss.Core.World.WorldSaving;
-using System;
-using System.Collections.Generic;
-using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.ID;
-using Terraria.ModLoader;
 using static Luminance.Common.Utilities.Utilities;
 
 namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture.Solyn;
@@ -36,41 +27,38 @@ public partial class BattleSolynBird : ModNPC
         FightBird
     }
 
+    #region I love automatic despawning
+
+    public override bool CheckActive()
+    {
+        return false;
+    }
+
+    #endregion I love automatic despawning
+
     #region Fields and Properties
 
-    internal static readonly Dictionary<int, NPC> solynMappingsCacheByIndex = new Dictionary<int, NPC>(Main.maxNPCs);
+    internal static readonly Dictionary<int, NPC> solynMappingsCacheByIndex = new(Main.maxNPCs);
 
     internal static InstancedRequestableTarget BaseSolynTarget;
 
     /// <summary>
-    /// Solyn's immunity frame countdown value.
+    ///     Solyn's immunity frame countdown value.
     /// </summary>
-    public int ImmunityFrameCounter
-    {
-        get;
-        set;
-    }
+    public int ImmunityFrameCounter { get; set; }
 
     /// <summary>
-    /// Whether Solyn should be rendered as a fake ghost for her given battle due to being dead.
+    ///     Whether Solyn should be rendered as a fake ghost for her given battle due to being dead.
     /// </summary>
-    public bool FakeGhostForm
-    {
-        get;
-        set;
-    }
+    public bool FakeGhostForm { get; set; }
 
     /// <summary>
-    /// Whether this Solyn instance is invisible or not.
+    ///     Whether this Solyn instance is invisible or not.
     /// </summary>
-    public bool Invisible
-    {
-        get;
-        set;
-    }
+    public bool Invisible { get; set; }
 
     /// <summary>
-    /// Solyn's general-purpose AI timer, for use with her current state.
+    ///     Solyn's general-purpose AI timer, for use with her current state.
     /// </summary>
     public int AITimer
     {
@@ -79,88 +67,54 @@ public partial class BattleSolynBird : ModNPC
     }
 
     /// <summary>
-    /// The amount of afterimages Solyn should draw.
+    ///     The amount of afterimages Solyn should draw.
     /// </summary>
-    public int AfterimageCount
-    {
-        get;
-        set;
-    } = 8;
+    public int AfterimageCount { get; set; } = 8;
 
     /// <summary>
-    /// How much Solyn's afterimages clump together.
+    ///     How much Solyn's afterimages clump together.
     /// </summary>
-    public float AfterimageClumpInterpolant
-    {
-        get;
-        set;
-    }
+    public float AfterimageClumpInterpolant { get; set; }
 
     /// <summary>
-    /// How much Solyn's afterimages glow.
+    ///     How much Solyn's afterimages glow.
     /// </summary>
-    public float AfterimageGlowInterpolant
-    {
-        get;
-        set;
-    }
+    public float AfterimageGlowInterpolant { get; set; }
 
     /// <summary>
-    /// The scale factor of Solyn's backglow.
+    ///     The scale factor of Solyn's backglow.
     /// </summary>
-    public float BackglowScale
-    {
-        get;
-        set;
-    }
+    public float BackglowScale { get; set; }
 
     /// <summary>
-    /// The scale of Solyn's map icon in the world.
+    ///     The scale of Solyn's map icon in the world.
     /// </summary>
-    public float WorldMapIconScale
-    {
-        get;
-        set;
-    }
+    public float WorldMapIconScale { get; set; }
 
     /// <summary>
-    /// The intensity of the paradise reclaimed static effect over Solyn.
+    ///     The intensity of the paradise reclaimed static effect over Solyn.
     /// </summary>
-    public float StaticOverlayInterpolant
-    {
-        get;
-        set;
-    }
+    public float StaticOverlayInterpolant { get; set; }
 
     /// <summary>
-    /// The intensity of the paradise reclaimed static dissolve effect over Solyn.
+    ///     The intensity of the paradise reclaimed static dissolve effect over Solyn.
     /// </summary>
-    public float StaticDissolveInterpolant
-    {
-        get;
-        set;
-    }
+    public float StaticDissolveInterpolant { get; set; }
 
     /// <summary>
-    /// An optional action that can be used to specify an effect that renders before all of Solyn's render actions.
+    ///     An optional action that can be used to specify an effect that renders before all of Solyn's
+    ///     render actions.
     /// </summary>
-    public Action<Vector2>? OptionalPreDrawRenderAction
-    {
-        get;
-        set;
-    }
+    public Action<Vector2>? OptionalPreDrawRenderAction { get; set; }
 
     /// <summary>
-    /// An optional action that can be used to specify an effect that renders after the rest of Solyn's render actions.
+    ///     An optional action that can be used to specify an effect that renders after the rest of Solyn's
+    ///     render actions.
     /// </summary>
-    public Action<Vector2>? OptionalPostDrawRenderAction
-    {
-        get;
-        set;
-    }
+    public Action<Vector2>? OptionalPostDrawRenderAction { get; set; }
 
     /// <summary>
-    /// Solyn's current AI state.
+    ///     Solyn's current AI state.
     /// </summary>
     public SolynAIType CurrentState
     {
@@ -169,7 +123,7 @@ public partial class BattleSolynBird : ModNPC
     }
 
     /// <summary>
-    /// The index of this Solyn instance in multiplayer.
+    ///     The index of this Solyn instance in multiplayer.
     /// </summary>
     public int MultiplayerIndex
     {
@@ -178,32 +132,39 @@ public partial class BattleSolynBird : ModNPC
     }
 
     /// <summary>
-    /// Player related to this instance of Solyn
+    ///     Player related to this instance of Solyn
     /// </summary>
     public Player Player => Main.player[MultiplayerIndex];
 
     /// <summary>
-    /// Whether the client associated with this Solyn instance is invalid in some way. This only applies to multiplayer clones.
+    ///     Whether the client associated with this Solyn instance is invalid in some way. This only
+    ///     applies to multiplayer clones.
     /// </summary>
     public bool AssociatedClientIsInvalid
     {
         get
         {
             if (!IsMultiplayerClone)
+            {
                 return false;
+            }
 
-            bool mappedToInvalidIndex = MultiplayerIndex <= -1 || MultiplayerIndex >= Main.maxPlayers;
+            var mappedToInvalidIndex = MultiplayerIndex <= -1 || MultiplayerIndex >= Main.maxPlayers;
+
             if (mappedToInvalidIndex)
             {
                 NPC.active = false;
+
                 return true;
             }
 
-            Player player = Main.player[MultiplayerIndex];
-            bool associatedClientIsGone = !player.active || player.dead;
+            var player = Main.player[MultiplayerIndex];
+            var associatedClientIsGone = !player.active || player.dead;
+
             if (associatedClientIsGone)
             {
                 NPC.active = false;
+
                 return true;
             }
 
@@ -212,17 +173,17 @@ public partial class BattleSolynBird : ModNPC
     }
 
     /// <summary>
-    /// Whether this Solyn instance is a clone created for multiplayer purposes.
+    ///     Whether this Solyn instance is a clone created for multiplayer purposes.
     /// </summary>
     public bool IsMultiplayerClone => NPC.ai[3] == 1;
 
     /// <summary>
-    /// The currently frame Solyn should use on her sprite sheet.
+    ///     The currently frame Solyn should use on her sprite sheet.
     /// </summary>
     public ref float Frame => ref NPC.localAI[0];
 
     /// <summary>
-    /// How many frames of immunity Solyn receives upon taking damage.
+    ///     How many frames of immunity Solyn receives upon taking damage.
     /// </summary>
     public static int ImmunityFramesGrantedOnHit => SecondsToFrames(0.67f);
 
@@ -231,6 +192,7 @@ public partial class BattleSolynBird : ModNPC
     #endregion Fields and Properties
 
     #region Initialization
+
     public override void SetStaticDefaults()
     {
         Main.npcFrameCount[Type] = 26;
@@ -298,6 +260,7 @@ public partial class BattleSolynBird : ModNPC
     #endregion Initialization
 
     #region AI
+
     public override void AI()
     {
         NPC.noGravity = false;
@@ -326,11 +289,14 @@ public partial class BattleSolynBird : ModNPC
         if (AssociatedClientIsInvalid)
         {
             NPC.active = false;
+
             return;
         }
 
         if (Invisible)
+        {
             NPC.ShowNameOnHover = false;
+        }
 
         // Emit a tiny bit of light.
         DelegateMethods.v3_1 = new Vector3(0.3f, 0.367f, 0.45f) * 0.8f;
@@ -349,25 +315,27 @@ public partial class BattleSolynBird : ModNPC
     public void UseStarFlyEffects()
     {
         // Release star particles.
-        int starPoints = Main.rand.Next(3, 9);
-        float starScaleInterpolant = Main.rand.NextFloat();
-        int starLifetime = (int)float.Lerp(11f, 30f, starScaleInterpolant);
-        float starScale = float.Lerp(0.2f, 0.4f, starScaleInterpolant) * NPC.scale;
-        Color starColor = Color.Lerp(new(1f, 0.41f, 0.51f), new(1f, 0.85f, 0.37f), Main.rand.NextFloat());
+        var starPoints = Main.rand.Next(3, 9);
+        var starScaleInterpolant = Main.rand.NextFloat();
+        var starLifetime = (int)float.Lerp(11f, 30f, starScaleInterpolant);
+        var starScale = float.Lerp(0.2f, 0.4f, starScaleInterpolant) * NPC.scale;
+        var starColor = Color.Lerp(new Color(1f, 0.41f, 0.51f), new Color(1f, 0.85f, 0.37f), Main.rand.NextFloat());
 
         if (FakeGhostForm)
+        {
             starColor = Color.White;
+        }
 
-        Vector2 starSpawnPosition = NPC.Center + new Vector2(NPC.spriteDirection * 10f, 8f) + Main.rand.NextVector2Circular(16f, 16f);
-        Vector2 starVelocity = Main.rand.NextVector2Circular(3f, 3f) + NPC.velocity * (1f - GameSceneSlowdownSystem.SlowdownInterpolant);
-        TwinkleParticle star = new TwinkleParticle(starSpawnPosition, starVelocity, starColor, starLifetime, starPoints, new Vector2(Main.rand.NextFloat(0.4f, 1.6f), 1f) * starScale, starColor * 0.5f);
+        var starSpawnPosition = NPC.Center + new Vector2(NPC.spriteDirection * 10f, 8f) + Main.rand.NextVector2Circular(16f, 16f);
+        var starVelocity = Main.rand.NextVector2Circular(3f, 3f) + NPC.velocity * (1f - GameSceneSlowdownSystem.SlowdownInterpolant);
+        var star = new TwinkleParticle(starSpawnPosition, starVelocity, starColor, starLifetime, starPoints, new Vector2(Main.rand.NextFloat(0.4f, 1.6f), 1f) * starScale, starColor * 0.5f);
         star.Spawn();
 
         Frame = 25f;
     }
 
     /// <summary>
-    /// Executes Solyn's current behavior state.
+    ///     Executes Solyn's current behavior state.
     /// </summary>
     public void ExecuteCurrentBehavior()
     {
@@ -375,27 +343,32 @@ public partial class BattleSolynBird : ModNPC
         {
             case SolynAIType.FightBird:
                 DoBehavior_FightBird();
+
                 break;
-           
         }
     }
 
     /// <summary>
-    /// Changed player related to Solyn and teleports her to him
+    ///     Changed player related to Solyn and teleports her to him
     /// </summary>
     public void SwitchTo(Player player, bool playTeleportEffect = true)
     {
         // For some reason things are bad when client tries to execute this code, so better not to do it
         if (Main.netMode == NetmodeID.MultiplayerClient)
+        {
             return;
+        }
 
         if (!player.active || player.whoAmI == MultiplayerIndex || IsMultiplayerClone)
+        {
             return;
+        }
 
-        Vector2 oldPosition = NPC.position;
+        var oldPosition = NPC.position;
         Vector2 newPosition;
 
-        BattleSolynBird targetSolyn = GetSolynRelatedTo(player);
+        var targetSolyn = GetSolynRelatedTo(player);
+
         if (targetSolyn is null)
         {
             newPosition = player.position;
@@ -429,26 +402,46 @@ public partial class BattleSolynBird : ModNPC
         }
 
         // Create teleport particles at the starting position.
-        ExpandingGreyscaleCircleParticle circle = new ExpandingGreyscaleCircleParticle(from, Vector2.Zero, Color.IndianRed, 8, 0.1f);
+        var circle = new ExpandingGreyscaleCircleParticle(from, Vector2.Zero, Color.IndianRed, 8, 0.1f);
         circle.Spawn();
-        MagicBurstParticle burst = new MagicBurstParticle(from, Vector2.Zero, Color.Wheat, 20, 1.04f);
+        var burst = new MagicBurstParticle(from, Vector2.Zero, Color.Wheat, 20, 1.04f);
         burst.Spawn();
 
         // Play a teleport out sound.
-        SoundEngine.PlaySound(GennedAssets.Sounds.Common.TeleportOut with { Volume = 0.5f, Pitch = 0.3f, MaxInstances = 5, PitchVariance = 0.16f }, from);
+        SoundEngine.PlaySound
+        (
+            GennedAssets.Sounds.Common.TeleportOut with
+            {
+                Volume = 0.5f,
+                Pitch = 0.3f,
+                MaxInstances = 5,
+                PitchVariance = 0.16f
+            },
+            from
+        );
 
         // Create teleport particles at the ending position.
-        circle = new(to, Vector2.Zero, Color.IndianRed, 8, 0.1f);
+        circle = new ExpandingGreyscaleCircleParticle(to, Vector2.Zero, Color.IndianRed, 8, 0.1f);
         circle.Spawn();
-        burst = new(to, Vector2.Zero, Color.Wheat, 20, 1.04f);
+        burst = new MagicBurstParticle(to, Vector2.Zero, Color.Wheat, 20, 1.04f);
         burst.Spawn();
 
         // Play a teleport in sound.
-        SoundEngine.PlaySound(GennedAssets.Sounds.Common.TeleportIn with { Volume = 0.5f, Pitch = 0.3f, MaxInstances = 5, PitchVariance = 0.16f }, from);
+        SoundEngine.PlaySound
+        (
+            GennedAssets.Sounds.Common.TeleportIn with
+            {
+                Volume = 0.5f,
+                Pitch = 0.3f,
+                MaxInstances = 5,
+                PitchVariance = 0.16f
+            },
+            from
+        );
     }
 
     /// <summary>
-    /// Attempts to summon Solyn for a given battle.
+    ///     Attempts to summon Solyn for a given battle.
     /// </summary>
     /// <param name="spawnSource">The spawn source for Solyn.</param>
     /// <param name="spawnPosition">The position at which Solyn should be summoned.</param>
@@ -456,12 +449,15 @@ public partial class BattleSolynBird : ModNPC
     public static void SummonSolynForBattle(IEntitySource spawnSource, Vector2 spawnPosition, SolynAIType state)
     {
         if (Main.netMode == NetmodeID.MultiplayerClient)
+        {
             return;
+        }
 
-        bool combatSolynExists = false;
-        int normalSolynID = ModContent.NPCType<NoxusBoss.Content.NPCs.Friendly.Solyn>();
-        int combatSolynID = ModContent.NPCType<BattleSolynBird>();
-        foreach (NPC npc in Main.ActiveNPCs)
+        var combatSolynExists = false;
+        var normalSolynID = ModContent.NPCType<NoxusBoss.Content.NPCs.Friendly.Solyn>();
+        var combatSolynID = ModContent.NPCType<BattleSolynBird>();
+
+        foreach (var npc in Main.ActiveNPCs)
         {
             if (npc.type == normalSolynID)
             {
@@ -472,11 +468,15 @@ public partial class BattleSolynBird : ModNPC
             }
 
             if (npc.type == combatSolynID)
+            {
                 combatSolynExists = true;
+            }
         }
 
         if (!combatSolynExists)
+        {
             NPC.NewNPC(spawnSource, (int)spawnPosition.X, (int)spawnPosition.Y, ModContent.NPCType<BattleSolynBird>(), 1, (int)state);
+        }
 
         SummonSolynForBattle_CreateMPClones(spawnSource, spawnPosition, state);
     }
@@ -485,29 +485,38 @@ public partial class BattleSolynBird : ModNPC
     {
         solynMappingsCacheByIndex.Clear();
 
-        foreach (NPC npc in Main.ActiveNPCs)
+        foreach (var npc in Main.ActiveNPCs)
         {
             if (npc.ModNPC is not BattleSolynBird solyn)
+            {
                 continue;
+            }
 
             solynMappingsCacheByIndex[solyn.MultiplayerIndex] = npc;
         }
 
-        foreach (Player player in Main.ActivePlayers)
+        foreach (var player in Main.ActivePlayers)
         {
             if (player.dead)
+            {
                 continue;
+            }
 
             if (!solynMappingsCacheByIndex.ContainsKey(player.whoAmI))
+            {
                 NPC.NewNPC(spawnSource, (int)spawnPosition.X, (int)spawnPosition.Y, ModContent.NPCType<BattleSolynBird>(), 1, (int)state, 0f, player.whoAmI, 1);
+            }
         }
     }
 
     public static BattleSolynBird GetOriginalSolyn()
     {
-        foreach (NPC npc in Main.ActiveNPCs)
+        foreach (var npc in Main.ActiveNPCs)
         {
-            if (npc.ModNPC is BattleSolynBird solyn && !solyn.IsMultiplayerClone) return solyn;
+            if (npc.ModNPC is BattleSolynBird solyn && !solyn.IsMultiplayerClone)
+            {
+                return solyn;
+            }
         }
 
         return null;
@@ -515,9 +524,12 @@ public partial class BattleSolynBird : ModNPC
 
     public static BattleSolynBird GetSolynRelatedTo(Player player)
     {
-        foreach (NPC npc in Main.ActiveNPCs)
+        foreach (var npc in Main.ActiveNPCs)
         {
-            if (npc.ModNPC is BattleSolynBird solyn && solyn.Player == player) return solyn;
+            if (npc.ModNPC is BattleSolynBird solyn && solyn.Player == player)
+            {
+                return solyn;
+            }
         }
 
         return null;
@@ -530,7 +542,10 @@ public partial class BattleSolynBird : ModNPC
     public override bool? CanBeHitByProjectile(Projectile projectile)
     {
         if (projectile.hostile && ImmunityFrameCounter <= 0)
+        {
             return true;
+        }
+
         return null;
     }
 
@@ -545,28 +560,33 @@ public partial class BattleSolynBird : ModNPC
 
     // This is a bit clunky but it's necessary for Solyn to be interactable as a town NPC.
     // Her actual UI is drawn separately.
-    public override string GetChat() => string.Empty;
+    public override string GetChat()
+    {
+        return string.Empty;
+    }
 
     public void PerformStandardFraming()
     {
         if (Math.Abs(NPC.velocity.X) <= 0.1f)
         {
-            int defaultFrame = 0;
-            int blinkFrame = 20;
+            var defaultFrame = 0;
+            var blinkFrame = 20;
             Frame = AITimer % 150 >= 147 ? blinkFrame : defaultFrame;
         }
         else
         {
             NPC.frameCounter++;
+
             if (NPC.frameCounter >= 5)
             {
                 Frame++;
                 NPC.frameCounter = 0;
             }
 
-            int minFrame = 3;
-            int maxFrame = 15;
-            bool running = Math.Abs(NPC.velocity.X) >= 9f;
+            var minFrame = 3;
+            var maxFrame = 15;
+            var running = Math.Abs(NPC.velocity.X) >= 9f;
+
             if (running)
             {
                 minFrame = 26;
@@ -577,12 +597,19 @@ public partial class BattleSolynBird : ModNPC
             {
                 // Ensure that running frames are seamlessly moved into instead of resetting the entire animation.
                 if (running)
+                {
                     Frame += minFrame;
+                }
                 else
+                {
                     Frame = minFrame;
+                }
             }
+
             if (Frame >= maxFrame)
+            {
                 Frame = minFrame;
+            }
         }
     }
 
@@ -604,19 +631,24 @@ public partial class BattleSolynBird : ModNPC
     public override Color? GetAlpha(Color drawColor)
     {
         if (FakeGhostForm)
+        {
             return drawColor * NPC.Opacity;
+        }
 
-        float immunityPulse = 1f - Cos01(MathHelper.TwoPi * ImmunityFrameCounter / ImmunityFramesGrantedOnHit * 2f);
-        Color baseColor = Color.Lerp(drawColor, Color.White, 0.2f);
-        Color immunityColor = Color.Lerp(drawColor, new(255, 0, 50), 0.9f);
-        Color color = Color.Lerp(baseColor, immunityColor, immunityPulse) * float.Lerp(1f, 0.3f, immunityPulse);
+        var immunityPulse = 1f - Cos01(MathHelper.TwoPi * ImmunityFrameCounter / ImmunityFramesGrantedOnHit * 2f);
+        var baseColor = Color.Lerp(drawColor, Color.White, 0.2f);
+        var immunityColor = Color.Lerp(drawColor, new Color(255, 0, 50), 0.9f);
+        var color = Color.Lerp(baseColor, immunityColor, immunityPulse) * float.Lerp(1f, 0.3f, immunityPulse);
+
         return color * NPC.Opacity * (1f - NPC.shimmerTransparency);
     }
 
     public override void ModifyTypeName(ref string typeName)
     {
         if (Main.gameMenu)
+        {
             return;
+        }
 
         // Choose Solyn's name.
         NPC.GivenName = string.Empty;
@@ -634,16 +666,42 @@ public partial class BattleSolynBird : ModNPC
 
     public void DrawBackglow(Vector2 drawPosition)
     {
-        Matrix matrix = NPC.IsABestiaryIconDummy ? Main.UIScaleMatrix : Main.GameViewMatrix.TransformationMatrix;
+        var matrix = NPC.IsABestiaryIconDummy ? Main.UIScaleMatrix : Main.GameViewMatrix.TransformationMatrix;
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, DefaultRasterizerScreenCull, null, matrix);
 
         if (Frame >= 22)
+        {
             drawPosition.Y += 20f;
+        }
 
-        float backglowOpacityFactor = (BackglowScale - 1f) * 0.7f + 1f;
-        Main.spriteBatch.Draw(GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall, drawPosition, null, NPC.GetAlpha(new(0.8f, 1f, 0.7f)) * (backglowOpacityFactor * 0.4f), 0f, GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall.Size() * 0.5f, NPC.scale * BackglowScale * 0.38f, 0, 0f);
-        Main.spriteBatch.Draw(GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall, drawPosition, null, NPC.GetAlpha(new(0.05f, 0.3f, 1f)) * (backglowOpacityFactor * 0.25f), 0f, GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall.Size() * 0.5f, NPC.scale * BackglowScale * 0.7f, 0, 0f);
+        var backglowOpacityFactor = (BackglowScale - 1f) * 0.7f + 1f;
+
+        Main.spriteBatch.Draw
+        (
+            GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall,
+            drawPosition,
+            null,
+            NPC.GetAlpha(new Color(0.8f, 1f, 0.7f)) * (backglowOpacityFactor * 0.4f),
+            0f,
+            GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall.Size() * 0.5f,
+            NPC.scale * BackglowScale * 0.38f,
+            0,
+            0f
+        );
+
+        Main.spriteBatch.Draw
+        (
+            GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall,
+            drawPosition,
+            null,
+            NPC.GetAlpha(new Color(0.05f, 0.3f, 1f)) * (backglowOpacityFactor * 0.25f),
+            0f,
+            GennedAssets.Textures.GreyscaleTextures.BloomCircleSmall.Size() * 0.5f,
+            NPC.scale * BackglowScale * 0.7f,
+            0,
+            0f
+        );
 
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, DefaultRasterizerScreenCull, null, matrix);
@@ -651,79 +709,106 @@ public partial class BattleSolynBird : ModNPC
 
     private void PrepareBaseTarget(Color lightColor)
     {
-        int identifier = NPC.IsABestiaryIconDummy ? -1 : NPC.whoAmI;
-        Vector2 targetSize = new Vector2(384f);
-        BaseSolynTarget.Request((int)targetSize.X, (int)targetSize.Y, identifier, () =>
-        {
-            Main.spriteBatch.Begin(FakeGhostForm ? SpriteSortMode.Immediate : SpriteSortMode.Deferred, BlendState.AlphaBlend);
+        var identifier = NPC.IsABestiaryIconDummy ? -1 : NPC.whoAmI;
+        var targetSize = new Vector2(384f);
 
-            Vector2 drawPosition = targetSize * 0.5f;
-
-            // Draw Solyn.
-            Color afterimageColor = new Color(0f, 0.25f, 1f, 0f);
-            Color glowmaskColor = Color.White;
-            Rectangle frame = NPC.frame;
-            Texture2D texture = TextureAssets.Npc[Type].Value;
-            SpriteEffects direction = NPC.spriteDirection.ToSpriteDirection() ^ SpriteEffects.FlipHorizontally;
-
-            if (FakeGhostForm)
+        BaseSolynTarget.Request
+        (
+            (int)targetSize.X,
+            (int)targetSize.Y,
+            identifier,
+            () =>
             {
-                lightColor = Color.White * 0.6f;
-                glowmaskColor = Color.Transparent;
-                afterimageColor = lightColor;
-                afterimageColor.A = 0;
+                Main.spriteBatch.Begin(FakeGhostForm ? SpriteSortMode.Immediate : SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
-                ManagedShader soulShader = ShaderManager.GetShader("NoxusBoss.FakeSolynShader");
-                soulShader.TrySetParameter("imageSize", texture.Size());
-                soulShader.TrySetParameter("sourceRectangle", new Vector4(NPC.frame.X, NPC.frame.Y, NPC.frame.Width, NPC.frame.Height));
-                soulShader.Apply();
-            }
+                var drawPosition = targetSize * 0.5f;
 
-            if (StaticOverlayInterpolant <= 0f && AvatarOfEmptinessSky.Dimension != AvatarDimensionVariants.AntishadowDimension)
-            {
-                for (int i = AfterimageCount; i >= 0; i--)
+                // Draw Solyn.
+                var afterimageColor = new Color(0f, 0.25f, 1f, 0f);
+                var glowmaskColor = Color.White;
+                var frame = NPC.frame;
+                var texture = TextureAssets.Npc[Type].Value;
+                var direction = NPC.spriteDirection.ToSpriteDirection() ^ SpriteEffects.FlipHorizontally;
+
+                if (FakeGhostForm)
                 {
-                    float afterimageInterpolant = i / (float)AfterimageCount;
-                    Vector2 afterimageDrawPosition = drawPosition + NPC.oldPos[i] - NPC.position;
-                    afterimageDrawPosition = Vector2.Lerp(afterimageDrawPosition, drawPosition, AfterimageClumpInterpolant);
-                    float afterimageOpacity = MathF.Exp(afterimageInterpolant * -3.4f);
+                    lightColor = Color.White * 0.6f;
+                    glowmaskColor = Color.Transparent;
+                    afterimageColor = lightColor;
+                    afterimageColor.A = 0;
 
-                    Main.EntitySpriteDraw(texture, afterimageDrawPosition, frame, NPC.GetAlpha(afterimageColor) * afterimageOpacity * AfterimageGlowInterpolant, NPC.rotation, frame.Size() * 0.5f, NPC.scale, direction);
+                    var soulShader = ShaderManager.GetShader("NoxusBoss.FakeSolynShader");
+                    soulShader.TrySetParameter("imageSize", texture.Size());
+                    soulShader.TrySetParameter("sourceRectangle", new Vector4(NPC.frame.X, NPC.frame.Y, NPC.frame.Width, NPC.frame.Height));
+                    soulShader.Apply();
                 }
-            }
 
-            Texture2D glowmask = GennedAssets.Textures.Friendly.SolynGlow.Value;
-            Main.EntitySpriteDraw(texture, drawPosition, frame, NPC.GetAlpha(lightColor), NPC.rotation, frame.Size() * 0.5f, NPC.scale, direction);
-            Main.EntitySpriteDraw(glowmask, drawPosition, frame, NPC.GetAlpha(glowmaskColor) * 0.26f, NPC.rotation, frame.Size() * 0.5f, NPC.scale, direction);
-            Main.spriteBatch.End();
-        });
+                if (StaticOverlayInterpolant <= 0f && AvatarOfEmptinessSky.Dimension != AvatarDimensionVariants.AntishadowDimension)
+                {
+                    for (var i = AfterimageCount; i >= 0; i--)
+                    {
+                        var afterimageInterpolant = i / (float)AfterimageCount;
+                        var afterimageDrawPosition = drawPosition + NPC.oldPos[i] - NPC.position;
+                        afterimageDrawPosition = Vector2.Lerp(afterimageDrawPosition, drawPosition, AfterimageClumpInterpolant);
+                        var afterimageOpacity = MathF.Exp(afterimageInterpolant * -3.4f);
+
+                        Main.EntitySpriteDraw
+                        (
+                            texture,
+                            afterimageDrawPosition,
+                            frame,
+                            NPC.GetAlpha(afterimageColor) * afterimageOpacity * AfterimageGlowInterpolant,
+                            NPC.rotation,
+                            frame.Size() * 0.5f,
+                            NPC.scale,
+                            direction
+                        );
+                    }
+                }
+
+                var glowmask = GennedAssets.Textures.Friendly.SolynGlow.Value;
+                Main.EntitySpriteDraw(texture, drawPosition, frame, NPC.GetAlpha(lightColor), NPC.rotation, frame.Size() * 0.5f, NPC.scale, direction);
+                Main.EntitySpriteDraw(glowmask, drawPosition, frame, NPC.GetAlpha(glowmaskColor) * 0.26f, NPC.rotation, frame.Size() * 0.5f, NPC.scale, direction);
+                Main.spriteBatch.End();
+            }
+        );
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (Invisible)
+        {
             return false;
+        }
 
         if (Main.instance.currentNPCShowingChatBubble == NPC.whoAmI)
+        {
             Main.instance.currentNPCShowingChatBubble = -1;
+        }
 
-        Vector2 drawPosition = NPC.Center - screenPos + Vector2.UnitY * (NPC.gfxOffY - 6f);
+        var drawPosition = NPC.Center - screenPos + Vector2.UnitY * (NPC.gfxOffY - 6f);
         OptionalPreDrawRenderAction?.Invoke(drawPosition);
         PrepareBaseTarget(drawColor);
 
-        int identifier = NPC.IsABestiaryIconDummy ? -1 : NPC.whoAmI;
-        if (!BaseSolynTarget.TryGetTarget(identifier, out RenderTarget2D target) || target is null)
+        var identifier = NPC.IsABestiaryIconDummy ? -1 : NPC.whoAmI;
+
+        if (!BaseSolynTarget.TryGetTarget(identifier, out var target) || target is null)
+        {
             return false;
+        }
 
         // Draw a mild backglow.
         if (StaticOverlayInterpolant <= 0f && AvatarOfEmptinessSky.Dimension != AvatarDimensionVariants.AntishadowDimension)
+        {
             DrawBackglow(drawPosition);
+        }
 
-        bool useStaticShader = StaticOverlayInterpolant > 0f || StaticDissolveInterpolant > 0f;
+        var useStaticShader = StaticOverlayInterpolant > 0f || StaticDissolveInterpolant > 0f;
+
         if (useStaticShader)
         {
             Main.spriteBatch.PrepareForShaders();
-            ManagedShader staticShader = ShaderManager.GetShader("NoxusBoss.SolynStaticOverlayShader");
+            var staticShader = ShaderManager.GetShader("NoxusBoss.SolynStaticOverlayShader");
             staticShader.TrySetParameter("dissolveInterpolant", StaticDissolveInterpolant);
             staticShader.TrySetParameter("imageSize", target.Size());
             staticShader.TrySetParameter("sourceRectangle", new Vector4(NPC.frame.X, NPC.frame.Y, NPC.frame.Width, NPC.frame.Height));
@@ -735,7 +820,9 @@ public partial class BattleSolynBird : ModNPC
         Main.spriteBatch.Draw(target, drawPosition, null, Color.White, 0f, target.Size() * 0.5f, NPC.scale, 0, 0f);
 
         if (useStaticShader)
+        {
             Main.spriteBatch.ResetToDefault();
+        }
 
         OptionalPostDrawRenderAction?.Invoke(drawPosition);
 
@@ -743,10 +830,4 @@ public partial class BattleSolynBird : ModNPC
     }
 
     #endregion Drawing
-
-    #region I love automatic despawning
-
-    public override bool CheckActive() => false;
-
-    #endregion I love automatic despawning
 }

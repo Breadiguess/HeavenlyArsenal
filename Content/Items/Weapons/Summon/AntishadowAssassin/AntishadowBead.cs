@@ -1,47 +1,53 @@
 ﻿using HeavenlyArsenal.Core.Globals;
-using Microsoft.Xna.Framework;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.GlobalInstances;
-using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.ItemDropRules;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
 
 public class AntishadowBead : ModItem
 {
     /// <summary>
-    /// The amount of minion slots needed to summon the assassin.
+    ///     The amount of minion slots needed to summon the assassin.
     /// </summary>
     public static int MinionSlotRequirement => 5;
-    /// <summary>
-    /// Return a shorthand path for a given texture content prefix and name.
-    /// </summary>
-    public static string GetAssetPath(string prefix, string name) =>
-        $"HeavenlyArsenal/{prefix}/{name}";
 
     public override string Texture => GetAssetPath("Content/Items/Weapons/Summon/AntishadowAssassin", Name);
+
     public override string LocalizationCategory => "Items.Weapons.Summon";
+
+    /// <summary>
+    ///     Return a shorthand path for a given texture content prefix and name.
+    /// </summary>
+    public static string GetAssetPath(string prefix, string name)
+    {
+        return $"HeavenlyArsenal/{prefix}/{name}";
+    }
+
     public override void SetStaticDefaults()
     {
-        GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>
+        GlobalNPCEventHandlers.ModifyNPCLootEvent += (npc, npcLoot) =>
         {
             if (npc.type == ModContent.NPCType<AvatarOfEmptiness>())
             {
-                LeadingConditionRule normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+                var normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+
                 {
                     normalOnly.OnSuccess(ItemDropRule.Common(Type));
                 }
+
                 npcLoot.Add(normalOnly);
             }
         };
-        ArsenalGlobalItem.ModifyItemLootEvent += (Item item, ItemLoot loot) =>
+
+        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
         {
             if (item.type == AvatarOfEmptiness.TreasureBagID)
+            {
                 loot.Add(ItemDropRule.Common(Type));
+            }
         };
     }
 
@@ -65,16 +71,23 @@ public class AntishadowBead : ModItem
     }
 
     // Ensure that the player can only summon one assassin.
-    public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+    public override bool CanUseItem(Player player)
+    {
+        return player.ownedProjectileCounts[Item.shoot] <= 0;
+    }
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         if (player.altFunctionUse != 2)
         {
-            int p = Projectile.NewProjectile(source, Main.MouseWorld, Vector2.Zero, type, damage, knockback, player.whoAmI);
+            var p = Projectile.NewProjectile(source, Main.MouseWorld, Vector2.Zero, type, damage, knockback, player.whoAmI);
+
             if (Main.projectile.IndexInRange(p))
+            {
                 Main.projectile[p].originalDamage = Item.damage;
+            }
         }
+
         return false;
     }
 }

@@ -1,181 +1,178 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<!-- Import tModLoader mod properties -->
-	<Import Project="..\tModLoader.targets" />
+    <!-- Import tModLoader mod properties -->
+    <Import Project="..\tModLoader.targets"/>
 
-	<!-- General -->
-	<PropertyGroup>
+    <!-- General -->
+    <PropertyGroup>
 
-	</PropertyGroup>
-	<ItemGroup>
-	  <AdditionalFiles Remove="Content\Items\Accessories\ManaTransfusion\**" />
-	  <AdditionalFiles Remove="Content\Items\Weapons\Ranged\ColdFusion\**" />
-	  <AdditionalFiles Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
-	  <AdditionalFiles Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
-	  <AdditionalFiles Remove="Content\Items\Weapons\Summon\BadSun\**" />
-	  <AdditionalFiles Remove="Content\NPCs\Bosses\**" />
-	  <AdditionalFiles Remove="Content\NPCs\Friendly\**" />
-	  <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
-	  <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
-	  <AdditionalFiles Remove="Content\Subworlds\**" />
-	  <AdditionalFiles Remove="Content\Tiles\**" />
-	  <AdditionalFiles Remove="Content\Waters\**" />
-	  <AdditionalFiles Remove="Core\Fixes\**" />
-	  <Compile Remove="Content\Items\Accessories\ManaTransfusion\**" />
-	  <Compile Remove="Content\Items\Weapons\Ranged\ColdFusion\**" />
-	  <Compile Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
-	  <Compile Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
-	  <Compile Remove="Content\Items\Weapons\Summon\BadSun\**" />
-	  <Compile Remove="Content\NPCs\Bosses\**" />
-	  <Compile Remove="Content\NPCs\Friendly\**" />
-	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
-	  <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
-	  <Compile Remove="Content\Subworlds\**" />
-	  <Compile Remove="Content\Tiles\**" />
-	  <Compile Remove="Content\Waters\**" />
-	  <Compile Remove="Core\Fixes\**" />
-	  <EmbeddedResource Remove="Content\Items\Accessories\ManaTransfusion\**" />
-	  <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ColdFusion\**" />
-	  <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
-	  <EmbeddedResource Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
-	  <EmbeddedResource Remove="Content\Items\Weapons\Summon\BadSun\**" />
-	  <EmbeddedResource Remove="Content\NPCs\Bosses\**" />
-	  <EmbeddedResource Remove="Content\NPCs\Friendly\**" />
-	  <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
-	  <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
-	  <EmbeddedResource Remove="Content\Subworlds\**" />
-	  <EmbeddedResource Remove="Content\Tiles\**" />
-	  <EmbeddedResource Remove="Content\Waters\**" />
-	  <EmbeddedResource Remove="Core\Fixes\**" />
-	  <None Remove="Content\Items\Accessories\ManaTransfusion\**" />
-	  <None Remove="Content\Items\Weapons\Ranged\ColdFusion\**" />
-	  <None Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
-	  <None Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
-	  <None Remove="Content\Items\Weapons\Summon\BadSun\**" />
-	  <None Remove="Content\NPCs\Bosses\**" />
-	  <None Remove="Content\NPCs\Friendly\**" />
-	  <None Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
-	  <None Remove="Content\Projectiles\Weapons\Rogue\**" />
-	  <None Remove="Content\Subworlds\**" />
-	  <None Remove="Content\Tiles\**" />
-	  <None Remove="Content\Waters\**" />
-	  <None Remove="Core\Fixes\**" />
-	</ItemGroup>
-	<ItemGroup>
-	  <AdditionalFiles Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.png" />
-	  <AdditionalFiles Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New_Head.png" />
-	  <AdditionalFiles Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New_Head_Real.png" />
-	  <AdditionalFiles Remove="Content\Items\Misc\ForgottenShrineTeleporter.png" />
-	  <AdditionalFiles Remove="Content\NPCs\AnAffrontToGod.png" />
-	  <AdditionalFiles Remove="Content\Particles\CartoonWave.png" />
-	  <AdditionalFiles Remove="Content\Particles\SpiritCandle.png" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Remove="Content\Items\Armor\ShintoArmor\CloakWingSystem.cs" />
-	  <Compile Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.cs" />
-	  <Compile Remove="Content\Items\Misc\ForgottenShrineTeleporter.cs" />
-	  <Compile Remove="Content\Items\Misc\IdolSummoner.cs" />
-	  <Compile Remove="Content\Items\Weapons\Melee\StupidFuckYouSword.cs" />
-	  <Compile Remove="Content\NPCs\AnAffrontToGod.cs" />
-	  <Compile Remove="Content\NPCs\FileName.cs" />
-	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\BigCrab\NewCrab.cs" />
-	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech.cs" />
-	  <Compile Remove="Content\NPCs\Hostile\BloodMoon\RitualAltarNPC\TemporaryCrabLeg.cs" />
-	  <Compile Remove="Content\Particles\CartoonWaveParticle.cs" />
-	  <Compile Remove="Content\Particles\SpiritCandleParticle.cs" />
-	  <Compile Remove="Core\Globals\TradeGlobalItem.cs" />
-	  <Compile Remove="Core\Systems\SolynEvents\TestSolynEvent.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.png" />
-	  <None Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New_Head.png" />
-	  <None Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New_Head_Real.png" />
-	  <None Remove="Content\Items\Misc\ForgottenShrineTeleporter.png" />
-	  <None Remove="Content\NPCs\AnAffrontToGod.png" />
-	  <None Remove="Content\Particles\CartoonWave.png" />
-	  <None Remove="Content\Particles\Metaballs\NoxusGasLayer1.png" />
-	  <None Remove="Content\Particles\SpiritCandle.png" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\SeekingThorn.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\ThornBomb_Seed.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\SolynIntegration.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.FightBird.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerPlacer.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerRender.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\MedusaPlayer.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\OtherworldlyCore.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\CometBackBlast.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\ConeVomit.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerDebugItem.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerTile.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerTileRender.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\CoreBlast.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\EnergyAbsorption.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\IntersectingComet.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\NowhereGoop.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\SeekingEnergy.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\DirectionalSolynForcefield.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\SolynBarrier.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVultreWing.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VoidVultureBar.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VoidVulture_Leg.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_AI.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Neck.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_State.cs" />
-	  <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VultureRenderer.cs" />
-	  <Compile Include="Content\Tiles\Banners\EnemyBanner.cs" />
-	  <Compile Include="Content\Tiles\Banners\UmbralLeechBanner.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\kneckAndFace.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\OtherworldlyCore.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\OtherworldlyCore_Anim.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\PlantForm.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\NowhereGoop.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\PlaceholderBlast.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn_Head.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Body.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Body_Behind.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Face.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Head.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Leg.png" />
-	  <Content Include="Content\NPCs\Bosses\Fractal_Vulture\WingTexture.png" />
-	  <Content Include="Content\Tiles\Banners\EnemyBanner.png" />
-	  <Content Include="Content\Tiles\Banners\UmbralLeechBanner.png" />
-	  <Content Include="Content\Tiles\Banners\UmbralLeechBannerTile.png" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="HeavenlyArsenal.sln" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Reference Include="CalamityEntropy">
-	    <HintPath>..\..\ModReader\CalamityEntropy\CalamityEntropy.dll</HintPath>
-	  </Reference>
-	  <Reference Include="CalamityMod">
-	    <HintPath>ModReferences\CalamityMod.dll</HintPath>
-	  </Reference>
-	  <Reference Include="Luminance">
-	    <HintPath>ModReferences\Luminance.dll</HintPath>
-	  </Reference>
-	  <Reference Include="NoxusBoss">
-	    <HintPath>ModReferences\NoxusBoss.dll</HintPath>
-	  </Reference>
-	  <Reference Include="SubworldLibrary">
-	    <HintPath>ModReferences\SubworldLibrary.dll</HintPath>
-	  </Reference>
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Folder Include="Content\Items\Armor\Vanity\ScavSona\" />
-	  <Folder Include="Content\Items\Weapons\Rogue\Boquet\" />
-	  <Folder Include="Content\NPCs\Hostile\BloodCult\FleshkinAcolyte\" />
-	</ItemGroup>
+    </PropertyGroup>
+    <ItemGroup>
+        <AdditionalFiles Remove="Content\Items\Accessories\ManaTransfusion\**"/>
+        <AdditionalFiles Remove="Content\Items\Weapons\Ranged\ColdFusion\**"/>
+        <AdditionalFiles Remove="Content\Items\Weapons\Ranged\ZealotsReward\**"/>
+        <AdditionalFiles Remove="Content\Items\Weapons\Rogue\AvatarRogue\**"/>
+        <AdditionalFiles Remove="Content\Items\Weapons\Summon\BadSun\**"/>
+        <AdditionalFiles Remove="Content\NPCs\Bosses\**"/>
+        <AdditionalFiles Remove="Content\NPCs\Friendly\**"/>
+        <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**"/>
+        <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**"/>
+        <AdditionalFiles Remove="Content\Subworlds\**"/>
+        <AdditionalFiles Remove="Content\Tiles\**"/>
+        <AdditionalFiles Remove="Content\Waters\**"/>
+        <AdditionalFiles Remove="Core\Fixes\**"/>
+        <Compile Remove="Content\Items\Accessories\ManaTransfusion\**"/>
+        <Compile Remove="Content\Items\Weapons\Ranged\ColdFusion\**"/>
+        <Compile Remove="Content\Items\Weapons\Ranged\ZealotsReward\**"/>
+        <Compile Remove="Content\Items\Weapons\Rogue\AvatarRogue\**"/>
+        <Compile Remove="Content\Items\Weapons\Summon\BadSun\**"/>
+        <Compile Remove="Content\NPCs\Bosses\**"/>
+        <Compile Remove="Content\NPCs\Friendly\**"/>
+        <Compile Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**"/>
+        <Compile Remove="Content\Projectiles\Weapons\Rogue\**"/>
+        <Compile Remove="Content\Subworlds\**"/>
+        <Compile Remove="Content\Tiles\**"/>
+        <Compile Remove="Content\Waters\**"/>
+        <Compile Remove="Core\Fixes\**"/>
+        <EmbeddedResource Remove="Content\Items\Accessories\ManaTransfusion\**"/>
+        <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ColdFusion\**"/>
+        <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ZealotsReward\**"/>
+        <EmbeddedResource Remove="Content\Items\Weapons\Rogue\AvatarRogue\**"/>
+        <EmbeddedResource Remove="Content\Items\Weapons\Summon\BadSun\**"/>
+        <EmbeddedResource Remove="Content\NPCs\Bosses\**"/>
+        <EmbeddedResource Remove="Content\NPCs\Friendly\**"/>
+        <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**"/>
+        <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**"/>
+        <EmbeddedResource Remove="Content\Subworlds\**"/>
+        <EmbeddedResource Remove="Content\Tiles\**"/>
+        <EmbeddedResource Remove="Content\Waters\**"/>
+        <EmbeddedResource Remove="Core\Fixes\**"/>
+        <None Remove="Content\Items\Accessories\ManaTransfusion\**"/>
+        <None Remove="Content\Items\Weapons\Ranged\ColdFusion\**"/>
+        <None Remove="Content\Items\Weapons\Ranged\ZealotsReward\**"/>
+        <None Remove="Content\Items\Weapons\Rogue\AvatarRogue\**"/>
+        <None Remove="Content\Items\Weapons\Summon\BadSun\**"/>
+        <None Remove="Content\NPCs\Bosses\**"/>
+        <None Remove="Content\NPCs\Friendly\**"/>
+        <None Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**"/>
+        <None Remove="Content\Projectiles\Weapons\Rogue\**"/>
+        <None Remove="Content\Subworlds\**"/>
+        <None Remove="Content\Tiles\**"/>
+        <None Remove="Content\Waters\**"/>
+        <None Remove="Core\Fixes\**"/>
+    </ItemGroup>
+    <ItemGroup>
+        <AdditionalFiles Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.png"/>
+        <AdditionalFiles Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New_Head.png"/>
+        <AdditionalFiles Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New_Head_Real.png"/>
+        <AdditionalFiles Remove="Content\Items\Misc\ForgottenShrineTeleporter.png"/>
+        <AdditionalFiles Remove="Content\NPCs\AnAffrontToGod.png"/>
+        <AdditionalFiles Remove="Content\Particles\CartoonWave.png"/>
+        <AdditionalFiles Remove="Content\Particles\SpiritCandle.png"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Content\Items\Armor\ShintoArmor\CloakWingSystem.cs"/>
+        <Compile Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.cs"/>
+        <Compile Remove="Content\Items\Misc\ForgottenShrineTeleporter.cs"/>
+        <Compile Remove="Content\Items\Misc\IdolSummoner.cs"/>
+        <Compile Remove="Content\Items\Weapons\Melee\StupidFuckYouSword.cs"/>
+        <Compile Remove="Content\NPCs\AnAffrontToGod.cs"/>
+        <Compile Remove="Content\NPCs\FileName.cs"/>
+        <Compile Remove="Content\NPCs\Hostile\BloodMoon\BigCrab\NewCrab.cs"/>
+        <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech.cs"/>
+        <Compile Remove="Content\NPCs\Hostile\BloodMoon\RitualAltarNPC\TemporaryCrabLeg.cs"/>
+        <Compile Remove="Content\Particles\CartoonWaveParticle.cs"/>
+        <Compile Remove="Content\Particles\SpiritCandleParticle.cs"/>
+        <Compile Remove="Core\Globals\TradeGlobalItem.cs"/>
+        <Compile Remove="Core\Systems\SolynEvents\TestSolynEvent.cs"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.png"/>
+        <None Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New_Head.png"/>
+        <None Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New_Head_Real.png"/>
+        <None Remove="Content\Items\Misc\ForgottenShrineTeleporter.png"/>
+        <None Remove="Content\NPCs\AnAffrontToGod.png"/>
+        <None Remove="Content\Particles\CartoonWave.png"/>
+        <None Remove="Content\Particles\Metaballs\NoxusGasLayer1.png"/>
+        <None Remove="Content\Particles\SpiritCandle.png"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\SeekingThorn.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\ThornBomb_Seed.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\SolynIntegration.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.FightBird.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerPlacer.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerRender.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\MedusaPlayer.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\OtherworldlyCore.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\CometBackBlast.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\ConeVomit.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerDebugItem.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerTile.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerTileRender.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\CoreBlast.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\EnergyAbsorption.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\IntersectingComet.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\NowhereGoop.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\SeekingEnergy.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\DirectionalSolynForcefield.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\SolynBarrier.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVultreWing.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VoidVultureBar.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VoidVulture_Leg.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_AI.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Neck.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_State.cs"/>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VultureRenderer.cs"/>
+        <Compile Include="Content\Tiles\Banners\EnemyBannerTile.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\kneckAndFace.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\OtherworldlyCore.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\OtherworldlyCore_Anim.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\PlantForm.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\NowhereGoop.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\PlaceholderBlast.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn_Head.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Body.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Body_Behind.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Face.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Head.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Leg.png"/>
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\WingTexture.png"/>
+        <Content Include="Content\Tiles\Banners\EnemyBannerTile.png" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="HeavenlyArsenal.sln"/>
+    </ItemGroup>
 
-	<!-- References -->
+    <ItemGroup>
+        <Reference Include="CalamityEntropy">
+            <HintPath>..\..\ModReader\CalamityEntropy\CalamityEntropy.dll</HintPath>
+        </Reference>
+        <Reference Include="CalamityMod">
+            <HintPath>ModReferences\CalamityMod.dll</HintPath>
+        </Reference>
+        <Reference Include="Luminance">
+            <HintPath>ModReferences\Luminance.dll</HintPath>
+        </Reference>
+        <Reference Include="NoxusBoss">
+            <HintPath>ModReferences\NoxusBoss.dll</HintPath>
+        </Reference>
+        <Reference Include="SubworldLibrary">
+            <HintPath>ModReferences\SubworldLibrary.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Content\Items\Armor\Vanity\ScavSona\"/>
+        <Folder Include="Content\Items\Weapons\Rogue\Boquet\"/>
+        <Folder Include="Content\NPCs\Hostile\BloodCult\FleshkinAcolyte\"/>
+    </ItemGroup>
+
+    <!-- References -->
 
 </Project>

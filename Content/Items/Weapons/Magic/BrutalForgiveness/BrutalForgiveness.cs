@@ -2,33 +2,36 @@
 using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.GlobalInstances;
-using Terraria;
 using Terraria.GameContent.ItemDropRules;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Magic.BrutalForgiveness;
 
 public class BrutalForgiveness : ModItem
 {
     public override string LocalizationCategory => "Items.Weapons.Magic";
+
     public override void SetStaticDefaults()
     {
-        GlobalNPCEventHandlers.ModifyNPCLootEvent += (NPC npc, NPCLoot npcLoot) =>
+        GlobalNPCEventHandlers.ModifyNPCLootEvent += (npc, npcLoot) =>
         {
             if (npc.type == ModContent.NPCType<NamelessDeityBoss>())
             {
-                LeadingConditionRule normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+                var normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+
                 {
                     normalOnly.OnSuccess(ItemDropRule.Common(Type));
                 }
+
                 npcLoot.Add(normalOnly);
             }
         };
-        ArsenalGlobalItem.ModifyItemLootEvent += (Item item, ItemLoot loot) =>
+
+        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
         {
             if (item.type == NamelessDeityBoss.TreasureBagID)
+            {
                 loot.Add(ItemDropRule.Common(Type));
+            }
         };
     }
 
@@ -55,5 +58,8 @@ public class BrutalForgiveness : ModItem
         Item.value = Item.buyPrice(gold: 2);
     }
 
-    public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+    public override bool CanUseItem(Player player)
+    {
+        return player.ownedProjectileCounts[Item.shoot] <= 0;
+    }
 }

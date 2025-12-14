@@ -1,12 +1,5 @@
 ﻿using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Content.Particles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
-using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Melee.AvatarSpear;
 
@@ -14,14 +7,10 @@ public class AvatarSpearHeatPlayer : ModPlayer
 {
     public float HeatAcculumationTimer { get; private set; }
 
+    public bool Empowered { get; set; }
 
-    public bool Empowered 
-    { 
-        get;
-        set;
-    }
     /// <summary>
-    /// Max is 1f
+    ///     Max is 1f
     /// </summary>
     public float Heat { get; private set; }
 
@@ -32,7 +21,9 @@ public class AvatarSpearHeatPlayer : ModPlayer
         if (Heat - heat > 0f)
         {
             if (pay)
+            {
                 Heat -= heat;
+            }
 
             return true;
         }
@@ -58,21 +49,27 @@ public class AvatarSpearHeatPlayer : ModPlayer
         const float SevenSeconds = 1f / (7 * 60f);
 
         if (!Active && HeatAcculumationTimer > 0)
+        {
             HeatAcculumationTimer--;
+        }
 
         if (Heat > 0f && (Active || HeatAcculumationTimer <= 0))
+        {
             Heat = Math.Max(Heat - SevenSeconds, 0f);
+        }
         else
+        {
             Active = false;
+        }
     }
 
     public override void PostUpdateMiscEffects()
     {
         if (Active && Main.rand.NextBool(13))
         {
-            HeatLightning particle = HeatLightning.pool.RequestParticle();
+            var particle = HeatLightning.pool.RequestParticle();
             particle.Prepare(Player.MountedCenter, Player.velocity * 2f + Main.rand.NextVector2Circular(10, 10), Main.rand.NextFloat(-2f, 2f), Main.rand.Next(5, 15), Main.rand.NextFloat(0.3f, 1.5f));
             ParticleEngine.Particles.Add(particle);
         }
-	}
+    }
 }

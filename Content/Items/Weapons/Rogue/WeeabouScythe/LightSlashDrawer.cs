@@ -1,67 +1,64 @@
 ﻿using Luminance.Core.Graphics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Assets;
 using static Luminance.Common.Utilities.Utilities;
-using NoxusBoss.Content.NPCs.Bosses.NamelessDeity.Projectiles;
-using Terraria;
-using Terraria.ModLoader;
 
-namespace  HeavenlyArsenal.Content.Items.Weapons.Rogue.WeeabouScythe;
+namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.WeeabouScythe;
+
 // this sucks. i wish i could do this shit on my own :(
 public class LightSlashDrawer : ModSystem
 {
     /// <summary>
-    /// A general-purpose countdown used to ensure that the light slashes can continue renderinging and vanish shortly after the projectiles are gone.
+    ///     A general-purpose countdown used to ensure that the light slashes can continue renderinging and
+    ///     vanish shortly after the projectiles are gone.
     /// </summary>
-    public static int ContinueRenderingCountdown
-    {
-        get;
-        private set;
-    }
+    public static int ContinueRenderingCountdown { get; private set; }
 
     /// <summary>
-    /// The render target that contains all current slash vfx data.
+    ///     The render target that contains all current slash vfx data.
     /// </summary>
-    public static ManagedRenderTarget SlashTarget
-    {
-        get;
-        private set;
-    }
+    public static ManagedRenderTarget SlashTarget { get; private set; }
 
     /// <summary>
-    /// The render target that contains all previous slash vfx data. Used for the purposes of blurring the overall effect.
+    ///     The render target that contains all previous slash vfx data. Used for the purposes of blurring
+    ///     the overall effect.
     /// </summary>
-    public static ManagedRenderTarget SlashTargetPrevious
-    {
-        get;
-        private set;
-    }
+    public static ManagedRenderTarget SlashTargetPrevious { get; private set; }
 
     public override void OnModLoad()
     {
         RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
-        Main.QueueMainThreadAction(() =>
-        {
-            SlashTarget = new(true, ManagedRenderTarget.CreateScreenSizedTarget);
-            SlashTargetPrevious = new(true, ManagedRenderTarget.CreateScreenSizedTarget);
-        });
+
+        Main.QueueMainThreadAction
+        (
+            () =>
+            {
+                SlashTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget);
+                SlashTargetPrevious = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget);
+            }
+        );
     }
 
     private void PrepareAfterimageTarget()
     {
         if (ContinueRenderingCountdown >= 1)
+        {
             ContinueRenderingCountdown--;
+        }
 
         // Don't waste resources if there are no slashes.
-        bool anySlashes = AnyProjectiles(ModContent.ProjectileType<LightSlash>());
+        var anySlashes = AnyProjectiles(ModContent.ProjectileType<LightSlash>());
+
         if (!anySlashes && ContinueRenderingCountdown <= 0)
+        {
             return;
+        }
 
         if (anySlashes)
+        {
             ContinueRenderingCountdown = 30;
+        }
 
-        GraphicsDevice gd = Main.instance.GraphicsDevice;
+        var gd = Main.instance.GraphicsDevice;
 
         // Prepare the render target for drawing.
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Identity);
@@ -87,11 +84,14 @@ public class LightSlashDrawer : ModSystem
 
     private static void DrawAllSlashes()
     {
-        int slashID = ModContent.ProjectileType<LightSlash>();
-        foreach (Projectile p in Main.ActiveProjectiles)
+        var slashID = ModContent.ProjectileType<LightSlash>();
+
+        foreach (var p in Main.ActiveProjectiles)
         {
             if (p.type != slashID)
+            {
                 continue;
+            }
 
             p.As<LightSlash>().DrawToTarget();
         }
@@ -99,12 +99,12 @@ public class LightSlashDrawer : ModSystem
 
     private static void ApplyBlurEffects()
     {
-        GraphicsDevice gd = Main.instance.GraphicsDevice;
+        var gd = Main.instance.GraphicsDevice;
         gd.SetRenderTarget(SlashTarget);
         gd.Clear(Color.Transparent);
 
         // Prepare the blur shader.
-        ManagedShader blurShader = ShaderManager.GetShader("NoxusBoss.GaussianBlurShader");
+        var blurShader = ShaderManager.GetShader("NoxusBoss.GaussianBlurShader");
         blurShader.TrySetParameter("blurOffset", 0.0032f);
         blurShader.TrySetParameter("colorMask", Vector4.One);
         blurShader.TrySetParameter("invert", false);
@@ -115,10 +115,9 @@ public class LightSlashDrawer : ModSystem
 
     private static void PrepareScreenShader()
     {
-        float vignetteInterpolant = 0f;
-       
+        var vignetteInterpolant = 0f;
 
-        ManagedScreenFilter slashShader = ShaderManager.GetFilter("NoxusBoss.LightSlashesOverlayShader");
+        var slashShader = ShaderManager.GetFilter("NoxusBoss.LightSlashesOverlayShader");
         slashShader.TrySetParameter("splitBrightnessFactor", 3.2f);
         slashShader.TrySetParameter("splitTextureZoomFactor", 0.75f);
         slashShader.TrySetParameter("backgroundOffset", (Main.screenPosition - Main.screenLastPosition) / Main.ScreenSize.ToVector2());
