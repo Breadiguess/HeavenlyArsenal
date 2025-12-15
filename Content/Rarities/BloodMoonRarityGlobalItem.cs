@@ -1,15 +1,50 @@
 ﻿using System.Collections.Generic;
+using HeavenlyArsenal.Core.Graphics;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
-using ReLogic.Graphics;
+using NoxusBoss.Core.Utilities;
 using Terraria.GameContent;
 
 namespace HeavenlyArsenal.Content.Rarities;
 
+[Autoload(Side = ModSide.Client)]
 public sealed class BloodMoonRarityGlobalItem : GlobalItem
 {
-    public float Time => Main.GlobalTimeWrappedHourly;
-    
+    private sealed class BloodMoonDroplet
+    {
+        /// <summary>
+        ///     Gets or sets the position of the droplet, in screen coordinates.
+        /// </summary>
+        public Vector2 Position;
+
+        /// <summary>
+        ///     Gets or sets the velocity of the droplet, in pixels per update.
+        /// </summary>
+        public Vector2 Velocity;
+
+        private float opacity = 1f;
+
+        /// <summary>
+        ///     Gets or sets the opacity of the droplet.
+        /// </summary>
+        /// <value>
+        ///     A value between <c>0f</c> and <c>1f</c>, where <c>0f</c> represents fully transparent and
+        ///     <c>1f</c> represents fully opaque.
+        /// </value>
+        public float Opacity
+        {
+            get => opacity;
+            set => opacity = MathHelper.Clamp(value, 0f, 1f);
+        }
+    }
+
+    /// <summary>
+    ///     The name of the rift shader.
+    /// </summary>
+    private const string RIFT_SHADER_NAME = "NoxusBoss.DarkPortalShader";
+
+    private static readonly List<BloodMoonDroplet> Droplets = [];
+
     public override bool AppliesToEntity(Item entity, bool lateInstantiation)
     {
         return entity.rare == ModContent.RarityType<BloodMoonRarity>();
@@ -21,119 +56,217 @@ public sealed class BloodMoonRarityGlobalItem : GlobalItem
         {
             return true;
         }
-        
+
         var text = item.AffixName();
+        var position = new Vector2(line.X, line.Y);
+
+        SpawnDroplets(in position, text);
+        UpdateDroplets();
+        DrawDroplets();
+
         var font = FontAssets.MouseText.Value;
+        var size = font.MeasureString(text);
 
-        var basePos = new Vector2(line.X, line.Y);
-        var time = Main.GlobalTimeWrappedHourly;
+        var offset = size / 2f;
 
-        Texture2D dropletTex = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+        var center = position + offset;
 
-        var measured = font.MeasureString(text);
-        var nameOrigin = measured * 0.5f;
-        var namePos = basePos;
-
-        // Draw the name with a simple border for legibility (colors are example)
-        //Utils.DrawBorderStringFourWay(Main.spriteBatch, font, text, namePos, Color.Red, Color.Black, Vector2.Zero, 1f);
-        Utils.DrawBorderString(Main.spriteBatch, text, namePos, Color.Red);
-
-        DrawEclipse(namePos + nameOrigin);
-
-        Texture2D glow = GennedAssets.Textures.GreyscaleTextures.BloomLine;
-
-        var e = Color.Red with
-        {
-            A = 0
-        };
-
-        float Value = 1; // (float)Math.Abs(Math.Sin(Main.GlobalTimeWrappedHourly)/5);
-
-        var Scale = new Vector2(0.4f, 0.009f * text.Length);
-        var BarOrigin = new Vector2(glow.Width / 2, glow.Width / 2);
-        //new Vector2(0, 0);
-        var BarDrawPos = namePos + new Vector2(1, 10);
-
-        var rot = MathHelper.ToRadians(-90);
-        Main.EntitySpriteDraw(glow, BarDrawPos, null, e, rot, BarOrigin, Scale, SpriteEffects.None);
-
-        float textScaleInterp = 0; //(float)Math.Abs(Math.Sin(time));
-
-        var A = Color.Lerp(new Color(220, 20, 70), Color.Red, (float)Math.Sin(Main.GlobalTimeWrappedHourly));
-
-        Utils.DrawBorderString(Main.spriteBatch, text, namePos, A);
+        DrawEclipse(in center);
+        DrawText(in position, text);
 
         return false;
     }
-    
-    private static void DrawEclipse(Vector2 NamePos)
+
+    private static void SpawnDroplets(in Vector2 position, string text)
     {
-        Texture2D placeholder = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
-        var ModifiedPos = NamePos + new Vector2(0, 0);
-        var EclipseOrigin = placeholder.Size() * 0.5f;
+        if (!Main.rand.NextBool(2))
+        {
+            return;
+        }
 
-        var t = new Vector2(1, 0.9f);
+        var font = FontAssets.MouseText.Value;
 
-        Main.EntitySpriteDraw
+        var offset = new Vector2(Main.rand.NextFloat(font.MeasureString(text).X), 0f);
+        var velocity = new Vector2(-1f, 4f);
+
+        var droplet = new BloodMoonDroplet
+        {
+            Position = position + offset,
+            Velocity = velocity
+        };
+
+        Droplets.Add(droplet);
+    }
+
+    private static void UpdateDroplets()
+    {
+        for (var i = 0; i < Droplets.Count; i++)
+        {
+            var droplet = Droplets[i];
+
+            droplet.Position += droplet.Velocity;
+
+            droplet.Opacity -= 0.1f;
+
+            if (droplet.Opacity > 0f)
+            {
+                continue;
+            }
+
+            Droplets.RemoveAt(i);
+
+            i--;
+        }
+    }
+
+    private static void DrawDroplets()
+    {
+        var bloom = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint.Value;
+        var texture = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+
+        var batch = Main.spriteBatch;
+
+        foreach (var droplet in Droplets)
+        {
+            var color = Color.Crimson * 0.5f * droplet.Opacity;
+
+            color.A = 0;
+
+            batch.Draw
+            (
+                bloom,
+                droplet.Position,
+                null,
+                color,
+                MathHelper.ToRadians(15f),
+                bloom.Size() / 2f,
+                0.25f,
+                SpriteEffects.None,
+                0f
+            );
+
+            color = Color.Crimson * droplet.Opacity;
+
+            batch.Draw
+            (
+                texture,
+                droplet.Position,
+                null,
+                color,
+                MathHelper.ToRadians(15f),
+                texture.Size() / 2f,
+                new Vector2(2f, 20f),
+                SpriteEffects.None,
+                0f
+            );
+        }
+    }
+
+    private static void DrawText(in Vector2 position, string text)
+    {
+        var font = FontAssets.MouseText.Value;
+        var cursor = position;
+
+        var bloom = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint.Value;
+
+        var batch = Main.spriteBatch;
+
+        for (var i = 0; i < text.Length; i++)
+        {
+            var letter = text[i].ToString();
+
+            var color = Color.Crimson * 0.5f;
+
+            color.A = 0;
+
+            var offset = font.MeasureString(letter) / 2f;
+
+            var empty = string.IsNullOrEmpty(letter) || string.IsNullOrWhiteSpace(letter);
+
+            if (!empty)
+            {
+                batch.Draw
+                (
+                    bloom,
+                    cursor + offset,
+                    null,
+                    color,
+                    0f,
+                    bloom.Size() / 2f,
+                    0.25f,
+                    SpriteEffects.None,
+                    0f
+                );
+            }
+
+            var wave = MathF.Sin(Main.GameUpdateCount * 0.05f + i);
+
+            offset = new Vector2(0f, wave);
+
+            color = Color.Crimson;
+            color.A = 200;
+
+            var scale = 1f + wave * 0.01f;
+
+            Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, color, scale);
+
+            cursor.X += font.MeasureString(letter).X * scale;
+        }
+    }
+
+    private static void DrawEclipse(in Vector2 position)
+    {
+        var batch = Main.spriteBatch;
+
+        var bloom = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint.Value;
+        var origin = bloom.Size() / 2f;
+
+        var color = Color.Crimson * 0.5f;
+
+        color.A = 0;
+
+        batch.Draw
         (
-            placeholder,
-            ModifiedPos,
+            bloom,
+            position,
             null,
-            Color.Crimson with
-            {
-                A = 0
-            },
-            0,
-            EclipseOrigin,
-            t,
-            SpriteEffects.None
+            color,
+            0f,
+            origin,
+            1f,
+            SpriteEffects.None,
+            0f
         );
 
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+        var parameters = batch.Capture();
 
-        var particleDrawCenter = ModifiedPos + new Vector2(0f, 0f);
-        var glow = AssetDirectory.Textures.BigGlowball.Value;
+        batch.End();
+        batch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
 
-        var Scale = new Vector2(0.1f);
+        var shader = ShaderManager.GetShader(RIFT_SHADER_NAME);
 
-        Main.EntitySpriteDraw
-        (
-            glow,
-            particleDrawCenter - Main.screenPosition,
-            glow.Frame(),
-            Color.Red with
-            {
-                A = 200
-            },
-            0,
-            glow.Size() * 0.5f,
-            new Vector2(0.12f, 0.25f),
-            0
-        );
+        color = new Color(1f, 0.06f, 0.06f);
 
-        var innerRiftTexture = AssetDirectory.Textures.VoidLake.Value;
-        var edgeColor = new Color(1f, 0.06f, 0.06f);
-
-        var shader = ShaderManager.GetShader("NoxusBoss.DarkPortalShader");
-        
         shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 0.1f);
         shader.TrySetParameter("baseCutoffRadius", 0.24f);
         shader.TrySetParameter("swirlOutwardnessExponent", 0.2f);
         shader.TrySetParameter("swirlOutwardnessFactor", 3f);
         shader.TrySetParameter("vanishInterpolant", 0.01f);
-        shader.TrySetParameter("edgeColor", edgeColor.ToVector4());
+        shader.TrySetParameter("edgeColor", color.ToVector4());
         shader.TrySetParameter("edgeColorBias", 0.1f);
-        
+
         shader.SetTexture(GennedAssets.Textures.Noise.WavyBlotchNoise, 1, SamplerState.AnisotropicWrap);
         shader.SetTexture(GennedAssets.Textures.Noise.BurnNoise, 2, SamplerState.AnisotropicWrap);
-        
+
         shader.Apply();
 
-        Main.spriteBatch.Draw(innerRiftTexture, particleDrawCenter, null, Color.White, 0 + MathHelper.Pi, innerRiftTexture.Size() * 0.5f, Scale, 0, 0);
+        var rift = AssetDirectory.Textures.VoidLake.Value;
 
-        Main.spriteBatch.End();
+        origin = rift.Size() / 2f;
 
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+        batch.Draw(rift, position, null, Color.White, MathHelper.Pi, origin, 0.1f, SpriteEffects.None, 0f);
+
+        batch.End();
+        batch.Begin(in parameters);
     }
 }
