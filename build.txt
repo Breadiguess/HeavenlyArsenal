@@ -8,5 +8,7 @@ includeSource = false
 hideCode = true
 hideResources = true
 
+sortAfter = CalamityMod
+
 weakReferences = CalamityEntropy
-modReferences = NoxusBoss, SubworldLibrary
+modReferences = CalamityMod, Luminance, NoxusBoss, SubworldLibrary
