@@ -1,4 +1,4 @@
-﻿namespace HeavenlyArsenal.Content.Tiles.Banners;
+﻿namespace HeavenlyArsenal.Content.Tiles;
 
 public sealed class EnemyBannerTile : ModBannerTile
 {

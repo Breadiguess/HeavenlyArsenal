@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Content.Tiles.Banners;
+﻿using HeavenlyArsenal.Content.Tiles;
 using Terraria.Enums;
 
 namespace HeavenlyArsenal.Content.Items.Banners;

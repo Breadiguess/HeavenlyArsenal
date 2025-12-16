@@ -1,12 +1,8 @@
-﻿using HeavenlyArsenal.Core.Globals;
-using HeavenlyArsenal.Core.Graphics;
+﻿using HeavenlyArsenal.Core.Graphics;
 using Luminance.Assets;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
-using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Rarities;
-using NoxusBoss.Core.GlobalInstances;
-using Terraria.GameContent.ItemDropRules;
 
 namespace HeavenlyArsenal.Content.Items.Materials;
 
@@ -19,7 +15,7 @@ public class AvatarMaterial : ModItem, ILocalizedModType
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
-        
+
         ItemID.Sets.ItemNoGravity[Type] = true;
     }
 
@@ -28,12 +24,12 @@ public class AvatarMaterial : ModItem, ILocalizedModType
         base.SetDefaults();
 
         Item.maxStack = Item.CommonMaxStack;
-        
+
         Item.width = 32;
         Item.height = 32;
-        
+
         Item.value = Item.buyPrice(0, 0, 0, 3);
-        
+
         Item.rare = ModContent.RarityType<AvatarRarity>();
     }
 
@@ -41,7 +37,7 @@ public class AvatarMaterial : ModItem, ILocalizedModType
     {
         var batch = Main.spriteBatch;
         var parameters = batch.Capture();
-        
+
         batch.End();
         batch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
 
@@ -51,19 +47,19 @@ public class AvatarMaterial : ModItem, ILocalizedModType
 
         shader.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
         shader.TrySetParameter("Color", Color.Red.ToVector4());
-        
+
         // Try between 0.15f and 0.5f
         shader.TrySetParameter("MorphSpeed", 0.5f);
         shader.TrySetParameter("Threshold", 0.20f);
-        
+
         // Try between 0.06f and 0.12f for smoother edges
         shader.TrySetParameter("EdgeWidth", 0.08f);
         shader.TrySetParameter("NoiseScale", new Vector2(2f, 2f));
-        
+
         // Keep small to avoid clamping
         shader.TrySetParameter("WarpStrength", 0.05f);
         shader.TrySetParameter("NoiseSpeed", 0.15f);
-        
+
         shader.SetTexture(GennedAssets.Textures.FirstPhaseForm.AvatarRift, 0);
         shader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 1, SamplerState.AnisotropicWrap);
         shader.SetTexture(GennedAssets.Textures.GoodAppleHearts.BarsLifeOverlay_Fill, 2);

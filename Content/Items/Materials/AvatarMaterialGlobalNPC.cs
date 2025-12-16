@@ -13,9 +13,9 @@ public sealed class AvatarMaterialGlobalNPC : GlobalNPC
     public override void ModifyNPCLoot(NPC npc, NPCLoot npcLoot)
     {
         base.ModifyNPCLoot(npc, npcLoot);
-        
+
         var rule = new LeadingConditionRule(new Conditions.NotExpert());
-        
+
         rule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<AvatarMaterial>(), 3, 3));
 
         npcLoot.Add(rule);

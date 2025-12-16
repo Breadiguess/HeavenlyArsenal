@@ -9,11 +9,11 @@ public sealed class AvatarMaterialGlobalItem : GlobalItem
     {
         return entity.type == AvatarOfEmptiness.TreasureBagID;
     }
-    
+
     public override void ModifyItemLoot(Item item, ItemLoot itemLoot)
     {
         base.ModifyItemLoot(item, itemLoot);
-        
+
         itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<AvatarMaterial>(), 3, 3));
     }
 }

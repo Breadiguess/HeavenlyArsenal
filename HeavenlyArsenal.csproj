@@ -34,6 +34,7 @@
         <Compile Remove="Content\Tiles\**"/>
         <Compile Remove="Content\Waters\**"/>
         <Compile Remove="Core\Fixes\**"/>
+        <Compile Include="Content\Tiles\EnemyBannerTile.cs" />
         <EmbeddedResource Remove="Content\Items\Accessories\ManaTransfusion\**"/>
         <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ColdFusion\**"/>
         <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ZealotsReward\**"/>
@@ -126,7 +127,6 @@
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Neck.cs"/>
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_State.cs"/>
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VultureRenderer.cs"/>
-        <Compile Include="Content\Tiles\Banners\EnemyBannerTile.cs" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\kneckAndFace.png"/>
@@ -143,7 +143,7 @@
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Head.png"/>
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Leg.png"/>
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\WingTexture.png"/>
-        <Content Include="Content\Tiles\Banners\EnemyBannerTile.png" />
+        <Content Include="Content\Tiles\EnemyBannerTile.png" />
     </ItemGroup>
     <ItemGroup>
         <None Include="HeavenlyArsenal.sln"/>
