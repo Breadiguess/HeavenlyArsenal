@@ -1,5 +1,6 @@
 ﻿using CalamityMod;
 using CalamityMod.Items.Materials;
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using Luminance.Common.Utilities;
 using ReLogic.Content;
@@ -96,7 +97,7 @@ internal class ArtilleryCrab : BloodMoonBaseNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 

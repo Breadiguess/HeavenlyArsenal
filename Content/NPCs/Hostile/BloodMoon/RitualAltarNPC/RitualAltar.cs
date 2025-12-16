@@ -2,6 +2,7 @@
 using System.Linq;
 using CalamityMod;
 using CalamityMod.Items.Materials;
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using Luminance.Common.Utilities;
 using NoxusBoss.Content.Biomes;
@@ -120,7 +121,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
                 // so we use this line to tell the game to prioritize a specific InfoElement for sourcing the background image.
                 //new BestiaryPortraitBackgroundProviderPreferenceInfoElement(ModContent.GetInstance<ExampleSurfaceBiome>().ModBiomeBestiaryInfoElement),
                 new NPCPortraitInfoElement(0),
-                new RiftBloodMoonBackground()
+                new RiftEclipseBestiaryBackgroundProvider()
             ]
         );
     }
@@ -148,7 +149,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type, ModContent.GetInstance<DeadUniverseBiome>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type, ModContent.GetInstance<DeadUniverseBiome>().Type
         ];
     }
 

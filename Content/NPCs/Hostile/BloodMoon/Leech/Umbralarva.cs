@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using HeavenlyArsenal.Content.Biomes;
 using Luminance.Assets;
 using NoxusBoss.Assets;
 using Terraria.Audio;
@@ -452,7 +453,7 @@ public class Umbralarva : BloodMoonBaseNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 

@@ -2,6 +2,7 @@
 using System.IO;
 using CalamityMod;
 using CalamityMod.NPCs.NormalNPCs;
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
@@ -16,27 +17,21 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon;
 
 public class BlackListProjectileNPCs : ModSystem
 {
-    //blacklisted NPCs are to be ignored as potential targets.
-    public static HashSet<int> BlackListedNPCs = new();
-
-    //todo: create a modsystem that does this for us, and then write it back to this npc upon loading the world or some shit
+    public static bool[] Blacklisted = NPCID.Sets.Factory.CreateBoolSet();
 
     public override void PostSetupContent()
     {
-        //doubtless doesn't work, but you know what who gaf, i'm writing in github i can fix it later.
-        //the whole point is to have something in place already to work off of.
+        base.PostSetupContent();
+        
         for (var i = 0; i < NPCLoader.NPCCount; i++)
         {
-            if (NPCID.Sets.ProjectileNPC[i])
+            if (!NPCID.Sets.ProjectileNPC[i])
             {
-                BlackListedNPCs.Add(i);
+                continue;
             }
+            
+            Blacklisted[i] = true;
         }
-
-        BlackListedNPCs.Add(ModContent.NPCType<Solyn>());
-        BlackListedNPCs.Add(ModContent.NPCType<CeaselessVoidRift>());
-
-        BlackListedNPCs.Add(ModContent.NPCType<SuperDummyNPC>());
     }
 }
 
@@ -215,7 +210,7 @@ public abstract class BloodMoonBaseNPC : ModNPC
     public override void SetDefaults()
     {
         NPC.Calamity().VulnerableToHeat = false;
-        SpawnModBiomes = [ModContent.GetInstance<RiftEclipseBloodMoon>().Type];
+        SpawnModBiomes = [ModContent.GetInstance<RiftEclipseBiome>().Type];
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

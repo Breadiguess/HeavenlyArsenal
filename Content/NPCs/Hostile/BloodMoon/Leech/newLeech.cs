@@ -3,6 +3,7 @@ using System.IO;
 using CalamityMod;
 using CalamityMod.Items.Materials;
 using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
@@ -123,7 +124,7 @@ partial class newLeech : BloodMoonBaseNPC, IMultiSegmentNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 

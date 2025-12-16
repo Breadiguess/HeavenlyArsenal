@@ -17,7 +17,7 @@ internal partial class RitualAltar
 
     private bool CheckCandidates(NPC npc)
     {
-        if (BlackListProjectileNPCs.BlackListedNPCs.Contains(npc.type))
+        if (BlackListProjectileNPCs.Blacklisted[npc.type])
         {
             return false;
         }
@@ -255,7 +255,7 @@ internal partial class RitualAltar
                 continue;
             }
 
-            if (BlackListProjectileNPCs.BlackListedNPCs.Contains(npc.type))
+            if (BlackListProjectileNPCs.Blacklisted[npc.type])
             {
                 continue;
             }

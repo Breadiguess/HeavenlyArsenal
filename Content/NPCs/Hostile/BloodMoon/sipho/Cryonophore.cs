@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using HeavenlyArsenal.Content.Biomes;
 using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.sipho;
@@ -146,7 +147,7 @@ internal partial class Cryonophore : BloodMoonBaseNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 

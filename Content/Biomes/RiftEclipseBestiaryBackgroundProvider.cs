@@ -10,13 +10,7 @@ public sealed class RiftEclipseBestiaryBackgroundProvider : IBestiaryInfoElement
 {
     Asset<Texture2D> IBestiaryBackgroundImagePathAndColorProvider.GetBackgroundImage()
     {
-        var asset = Main.Assets.CreateUntracked<Texture2D>
-        (
-            new MemoryStream(),
-            $"{nameof(RiftEclipseBestiaryBackgroundSystem)}.BestiaryBackground"
-        );
-
-        return RiftEclipseBestiaryBackgroundSystem.BestiaryBackground != null ? asset : Main.Assets.Request<Texture2D>("Images/MapBG1");
+        return Main.Assets.Request<Texture2D>("Images/MapBG1");
     }
 
     Color? IBestiaryBackgroundImagePathAndColorProvider.GetBackgroundColor()
