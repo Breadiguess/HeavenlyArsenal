@@ -242,7 +242,7 @@ internal partial class DebugNPC
         var CrabFrame = texture.Frame(1, 13);
         var origin = new Vector2(texture.Width / 2f, frameHeight - 30);
         //Main.EntitySpriteDraw(texture, NPC.Center - screenPos, CrabFrame, drawColor, NPC.rotation+MathHelper.PiOver2, origin, 1, Direction, 0);
-        Main.LocalPlayer.GetModPlayer<HidePlayer>().ShouldHide = true;
+        Main.LocalPlayer.GetModPlayer<HidePlayer>().Enabled = true;
         prepCone();
 
         return base.PreDraw(spriteBatch, screenPos, drawColor);

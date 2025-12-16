@@ -7,26 +7,20 @@ public sealed class HidePlayer : ModPlayer
     /// <summary>
     ///     Gets or sets whether to hide the player.
     /// </summary>
-    public bool ShouldHide { get; set; }
-
-    /// <summary>
-    ///     Gets or sets whether to hide the player's weapon.
-    /// </summary>
-    public bool ShouldHideWeapon { get; set; }
+    public bool Enabled { get; set; }
 
     public override void ResetEffects()
     {
         base.ResetEffects();
 
-        ShouldHide = false;
-        ShouldHideWeapon = false;
+        Enabled = false;
     }
 
     public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
     {
         base.ModifyDrawInfo(ref drawInfo);
 
-        if (!ShouldHide)
+        if (!Enabled)
         {
             return;
         }
@@ -57,11 +51,6 @@ public sealed class HidePlayer : ModPlayer
         drawInfo.colorArmorLegs = Color.Transparent;
         drawInfo.colorArmorBody = Color.Transparent;
         drawInfo.colorArmorHead = Color.Transparent;
-
-        if (!ShouldHideWeapon)
-        {
-            return;
-        }
 
         Player.heldProj = -1;
     }

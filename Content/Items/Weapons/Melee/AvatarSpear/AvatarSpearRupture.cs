@@ -97,7 +97,7 @@ public class AvatarSpearRupture : ModProjectile
                     Main.SetCameraLerp(0.4f, 20);
                 }
 
-                Player.GetModPlayer<HidePlayer>().ShouldHide = true;
+                Player.GetModPlayer<HidePlayer>().Enabled = true;
                 Player.SetImmuneTimeForAllTypes(60);
 
                 if (Time < FlickerTime + ExplosionTime / 4)
