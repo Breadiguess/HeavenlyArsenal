@@ -1,5 +1,6 @@
 ﻿using CalamityMod;
 using CalamityMod.Particles;
+using HeavenlyArsenal.Common;
 using Luminance.Common.Easings;
 using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
@@ -27,6 +28,14 @@ public class TheDarkOne : ModProjectile
     public PiecewiseCurve ArrowNockCurve;
 
     public PiecewiseCurve StringCurve;
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        // Check config setting
+        var enabledInConfig = ModContent.GetInstance<HeavenlyArsenalServerConfig>().EnableSpecialItems;
+        var isOtherModLoaded = ModLoader.HasMod("CalRemix");
+
+        return enabledInConfig || isOtherModLoaded;
+    }
 
     public override bool? CanDamage()
     {
@@ -535,6 +544,16 @@ public class TheDarkOne : ModProjectile
 
 internal class noxusHeraldryController : ModPlayer
 {
+
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        // Check config setting
+        var enabledInConfig = ModContent.GetInstance<HeavenlyArsenalServerConfig>().EnableSpecialItems;
+        var isOtherModLoaded = ModLoader.HasMod("CalRemix");
+
+        return enabledInConfig || isOtherModLoaded;
+    }
+
     public Vector2 HeadPos;
 
     public override void PostUpdateMiscEffects()
@@ -554,6 +573,15 @@ internal class noxusHeraldryController : ModPlayer
 
 public class NoxusHeraldry : PlayerDrawLayer
 {
+    public override bool IsLoadingEnabled(Mod mod)
+    {
+        // Check config setting
+        var enabledInConfig = ModContent.GetInstance<HeavenlyArsenalServerConfig>().EnableSpecialItems;
+        var isOtherModLoaded = ModLoader.HasMod("CalRemix");
+
+        return enabledInConfig || isOtherModLoaded;
+    }
+
     public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
     {
         var thing = drawInfo.drawPlayer.HeldItem.type == ModContent.ItemType<NoxusWeapon>();

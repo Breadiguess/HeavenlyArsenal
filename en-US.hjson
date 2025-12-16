@@ -397,6 +397,11 @@ Mods: {
 				DisplayName: Umbral Leech Banner Item
 				Tooltip: ""
 			}
+
+			LeechScarf_Item: {
+				DisplayName: Leech Scarf_ Item
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {
