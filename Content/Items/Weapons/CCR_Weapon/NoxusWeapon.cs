@@ -4,6 +4,7 @@ using CalamityMod.Items;
 using CalamityMod.Particles;
 using CalamityMod.Rarities;
 using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Common.Configuration;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Content.Particles;
 using HeavenlyArsenal.Content.Particles.Metaballs.NoxusGasMetaball;
@@ -62,12 +63,12 @@ internal class NoxusWeapon : ModItem
 
     public static int AltDamage = 4093;
 
-    public static HeavenlyArsenalServerConfig Config => ModContent.GetInstance<HeavenlyArsenalServerConfig>();
+    public static ServerSideConfiguration SideConfiguration => ModContent.GetInstance<ServerSideConfiguration>();
 
     public override bool IsLoadingEnabled(Mod mod)
     {
         // Check config setting
-        var enabledInConfig = ModContent.GetInstance<HeavenlyArsenalServerConfig>().EnableSpecialItems;
+        var enabledInConfig = ModContent.GetInstance<ServerSideConfiguration>().EnableSpecialItems;
         var isOtherModLoaded = ModLoader.HasMod("CalRemix");
 
         return enabledInConfig || isOtherModLoaded;

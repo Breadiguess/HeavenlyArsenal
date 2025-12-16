@@ -2,6 +2,7 @@
 using CalamityMod.Items.Materials;
 using CalamityMod.Items.Potions;
 using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Common.Configuration;
 using HeavenlyArsenal.Content.Buffs.Stims;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Graphics.GeneralScreenEffects;
@@ -107,7 +108,7 @@ internal class CombatStim : ModItem
             );
         }
 
-        if (HeavenlyArsenalClientConfig.Instance.StimVFX)
+        if (ClientSideConfiguration.Instance.StimVFX)
         {
             GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, 3f, 10);
             GeneralScreenEffectSystem.RadialBlur.Start(player.Center, 1, 60);

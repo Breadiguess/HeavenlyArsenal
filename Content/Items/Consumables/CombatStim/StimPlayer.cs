@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Common.Configuration;
 using HeavenlyArsenal.Content.Buffs.Stims;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
@@ -69,7 +70,7 @@ internal class StimPlayer : ModPlayer
             }
 
             //some extra stuff for psychosis
-            if (HeavenlyArsenalClientConfig.Instance.StimVFX)
+            if (ClientSideConfiguration.Instance.StimVFX)
             {
                 //only you can hear it, so you look like a freak
                 if (Main.netMode != NetmodeID.Server)
@@ -198,7 +199,7 @@ internal class StimDraw : PlayerDrawLayer
     public void ManageStimVFX(Player player)
     {
         //prevent horrid visual effects if the right config option is selected
-        if (!HeavenlyArsenalClientConfig.Instance.StimVFX)
+        if (!ClientSideConfiguration.Instance.StimVFX)
         {
             return;
         }
