@@ -81,8 +81,8 @@ internal class Incomplete_gun : ModItem
     {
         CreateRecipe()
             .AddTile<DraedonsForge>()
-            .AddIngredient(ModContent.ItemType<Auric_Catalyst>())
-            .AddIngredient(ModContent.ItemType<shadowspec_GunParts>())
+            .AddIngredient(ModContent.ItemType<AuricCatalystItem>())
+            .AddIngredient(ModContent.ItemType<ShadowspecGunPartsItem>())
             .AddIngredient(ModContent.ItemType<AuricBar>(), 5)
             .Register();
     }

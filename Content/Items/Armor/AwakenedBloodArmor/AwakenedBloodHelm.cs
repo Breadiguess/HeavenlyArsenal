@@ -116,8 +116,8 @@ public class AwakenedBloodHelm : ModItem, ILocalizedModType
             .AddIngredient<OmegaBlueHelmet>()
             .AddRecipeGroup("HeavenlyArsenal:BloodflareHelmets")
             .AddIngredient<YharonSoulFragment>(15)
-            .AddIngredient<UmbralLeechDrop>(3)
-            .AddIngredient<PenumbralMembrane>(2)
+            .AddIngredient<UmbralLeechDropItem>(3)
+            .AddIngredient<PenumbralMembraneItem>(2)
             .AddCondition(conditions: Condition.EclipseOrBloodMoon)
             .AddTile<CosmicAnvil>()
             .Register();

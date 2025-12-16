@@ -127,7 +127,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
-        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<PenumbralMembrane>(), 3, 10));
+        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<PenumbralMembraneItem>(), 3, 10));
         npcLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<RitualAltar>()));
 
         npcLoot.Add(ModContent.ItemType<BloodOrb>(), 1, 10, 18);
