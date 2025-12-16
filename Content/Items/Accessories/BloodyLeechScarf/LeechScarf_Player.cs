@@ -113,7 +113,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                     t.Active = true;
 
                 // If slot is active but projectile is missing or dead, respawn it
-                if (t.Active)
+                if (t.Active && t.Cooldown <= 0)
                 {
                     if (t.proj == null || !t.proj.Projectile.active)
                     {
@@ -226,7 +226,15 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
         {
             if (!Active)
             {
-                TendrilList.Clear();
+                for(int i = 0; i< MAX_TENDRILS; i++)
+                {
+
+                    var t = TendrilList[i];
+
+                    t.Cooldown = MAX_TENDRIL_COOLDOWN;
+
+                    TendrilList[i] = t;
+                }
             }
             Active = false;
         }
