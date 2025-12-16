@@ -1,11 +1,11 @@
 ﻿namespace HeavenlyArsenal.Content.Gores;
 
-internal class MagEjectGore : ModGore
+public class MagazineEjectGore : ModGore
 {
-    public override string Texture => base.Texture;
-
     public override void SetStaticDefaults()
     {
+        base.SetStaticDefaults();
+        
         Gore.goreTime = 40;
     }
 }
