@@ -6,6 +6,7 @@ using CalamityMod.Projectiles.Enemy;
 using CalamityMod.UI.CalamitasEnchants;
 using HeavenlyArsenal.Common;
 using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
+using log4net;
 using NoxusBoss.Content.Items;
 
 namespace HeavenlyArsenal;
@@ -75,6 +76,11 @@ public sealed class HeavenlyArsenal : Mod
     public static IMultiSegmentNPC CurrentMultiSegmnetNPC;
 
     public static bool MultiSegmentEnabler;
+
+    /// <summary>
+    ///     Gets the singleton instance of <see cref="HeavenlyArsenal"/>. Shorthand for <see cref="ModContent.GetInstance"/>.
+    /// </summary>
+    public static HeavenlyArsenal Instance => ModContent.GetInstance<HeavenlyArsenal>();
 
     public override void Load()
     {

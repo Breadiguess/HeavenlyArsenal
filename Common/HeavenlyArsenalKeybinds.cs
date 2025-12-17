@@ -1,3 +1,4 @@
+using HeavenlyArsenal.Common.Input;
 using HeavenlyArsenal.Content.Items.Accessories.SwirlCloak;
 using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
 using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
@@ -49,28 +50,5 @@ public class HeavenlyArsenalKeybinds : ModPlayer
         {
             SwirlCloak.CreateSwirlVortex();
         }
-    }
-}
-
-public class KeybindSystem : ModSystem
-{
-    public static ModKeybind SwirlCloak { get; private set; }
-
-    public static ModKeybind ShadowTeleport { get; private set; }
-
-    public static ModKeybind HaemsongBind { get; private set; }
-
-    public override void Load()
-    {
-        // We localize keybinds by adding a Mods.{ModName}.Keybind.{KeybindName} entry to our localization files. The actual text displayed to English users is in en-US.hjson
-        SwirlCloak = KeybindLoader.RegisterKeybind(Mod, "SwirlCloak_Veil Cloak", "F");
-        HaemsongBind = KeybindLoader.RegisterKeybind(Mod, "Swap BloodArmor Form", "F");
-        ShadowTeleport = KeybindLoader.RegisterKeybind(Mod, "Shadow Teleport", "F");
-    }
-
-    public override void Unload()
-    {
-        HaemsongBind = null;
-        ShadowTeleport = null;
     }
 }

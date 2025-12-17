@@ -6,12 +6,15 @@
         <Reference Include="CalamityMod">
             <HintPath>lib\CalamityMod.dll</HintPath>
         </Reference>
+        
         <Reference Include="Luminance">
             <HintPath>lib\Luminance.dll</HintPath>
         </Reference>
+        
         <Reference Include="NoxusBoss">
             <HintPath>lib\NoxusBoss.dll</HintPath>
         </Reference>
+        
         <Reference Include="SubworldLibrary">
             <HintPath>lib\SubworldLibrary.dll</HintPath>
         </Reference>

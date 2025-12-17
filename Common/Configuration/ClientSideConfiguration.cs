@@ -10,7 +10,7 @@ namespace HeavenlyArsenal.Common.Configuration;
 public sealed class ClientSideConfiguration : ModConfig
 {
     /// <summary>
-    ///     Gets the singleton instance of <see cref="ClientSideConfiguration"/>. Shorthand for <see cref="ModContent.GetInstance"/>
+    ///     Gets the singleton instance of <see cref="ClientSideConfiguration"/>. Shorthand for <see cref="ModContent.GetInstance"/>.
     /// </summary>
     public static ClientSideConfiguration Instance => ModContent.GetInstance<ClientSideConfiguration>();
 
