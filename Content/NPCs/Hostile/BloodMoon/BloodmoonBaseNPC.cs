@@ -61,7 +61,7 @@ public class BloodmoonSpawnControl : GlobalNPC
                 pool.Clear();
 
                 // The float value is the spawn weight relative to others in the pool stupid
-                pool[ModContent.NPCType<ArtilleryCrab>()] = SpawnCondition.OverworldNightMonster.Chance * 0.17f;
+                pool[ModContent.NPCType<ArtilleryCrab>()] = SpawnCondition.OverworldNightMonster.Chance * 0.14f;
                 pool[ModContent.NPCType<newLeech>()] = SpawnCondition.OverworldNightMonster.Chance * 0.074f;
 
                 if (spawnInfo.SpawnTileY < Main.worldSurface * 0.5f)
@@ -134,12 +134,12 @@ public class BloodmoonSpawnControl : GlobalNPC
                 Main.NewText(sb.ToString());
             }*/
 
-            spawnRate = (int)(spawnRate * 0.5f); // Half the delay -> roughly double the spawn frequency
+            spawnRate = (int)(spawnRate * 0.8f); // Half the delay -> roughly double the spawn frequency
             maxSpawns = (int)(maxSpawns * 1.5f); // Increase the cap by 50%
 
             //clamps? hmm
             spawnRate = Math.Max(spawnRate, 30);
-            maxSpawns = Math.Min(maxSpawns, 100);
+            maxSpawns = Math.Min(maxSpawns, 90);
         }
     }
 }
