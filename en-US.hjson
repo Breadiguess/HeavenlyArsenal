@@ -435,6 +435,11 @@ Mods: {
 				DisplayName: Torrential  Downpour
 				TownNPCDialogueName: the Torrential  Downpour
 			}
+
+			"Crimson Deluge": {
+				DisplayName: Crimson  Deluge
+				TownNPCDialogueName: the Crimson  Deluge
+			}
 		}
 
 		Mods: {

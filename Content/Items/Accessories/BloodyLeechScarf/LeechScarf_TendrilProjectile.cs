@@ -2,6 +2,7 @@
 using HeavenlyArsenal.Common.IK;
 using Luminance.Assets;
 using System.Collections.Generic;
+using System.IO;
 using Terraria.DataStructures;
 using Terraria.Utilities;
 
@@ -38,15 +39,32 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
         #endregion
         public Tendril tendril;
         public const int MAX_HITS = 3;
-        public int HitsLeft;
-        public int Slot;
+        public int HitsLeft
+        {
+            get => (int)Projectile.ai[2];
+            set => Projectile.ai[2] = value;
+        }
+        public int Slot
+        {
+            get => (int)Projectile.ai[1];
+            set => Projectile.ai[1] = value;
+        }
         public int Time
         {
             get => (int)Projectile.ai[0];
             set => Projectile.ai[0] = value;
         }
-        bool solidifying;
-        float solidifyProgress; // 0 -> 1
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            base.SendExtraAI(writer);
+          
+        }
+
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            base.ReceiveExtraAI(reader);
+        }
 
         public ref Player Owner => ref Main.player[Projectile.owner];
         public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
@@ -130,7 +148,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                 float wiggle = WiggleStrength;
 
                 return new Vector2(
-                    -Owner.direction * (90 + 30 * MathF.Sin(Time / 10.1f + Slot * 10) * wiggle),
+                    -Owner.direction * (70 + 30 * MathF.Sin(Time / 10.1f + Slot * 10) * wiggle),
                     (Slot * -43 + (10 * (MathF.Cos(Time / 10.1f) + 1) + 40) * wiggle)
                 ) + Owner.velocity;
             }
@@ -243,16 +261,12 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                 Vector2 targetPos = root + toTarget;
 
                 // Blend between idle endpoint and target
-                float seekStrength = 0.25f * WiggleStrength; // fades out as it hardens
+                float seekStrength = 0.35f * WiggleStrength; // fades out as it hardens
                 desired = Vector2.Lerp(desired, targetPos, seekStrength);
             }
 
-            Tendril.UpdateTendril(
-      ref tendril,
-      root,
-      desired,
-      0.8f
-  );
+            Tendril.UpdateTendril(ref tendril, root, desired, 0.8f);
+            Projectile.Center = desired;
         }
      
         void CheckConditions()
@@ -297,6 +311,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
         {
             if (HitsLeft <= 0)
             {
+                
                 Owner.GetModPlayer<LeechScarf_Player>().KillTendril(Slot);
             }
 
@@ -321,22 +336,11 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            //fade color to bone white based on the amount of hits left (no hits = brittle af)
-            Color crimson = Color.Lerp(Color.AntiqueWhite, Color.Crimson, HitsLeft / (float)MAX_HITS).MultiplyRGB(Lighting.GetColor(Owner.Center.ToTileCoordinates()));
-            if (!Projectile.isAPreviewDummy)
-            {
-                for (int i = 0; i < tendril.IKSkeleton.PositionCount - 1; i++)
-                {
-
-
-                    //Utils.DrawLine(Main.spriteBatch, a, b, crimson, crimson, 10f * (1f - LumUtils.InverseLerp(0, tendril.IKSkeleton.PositionCount, i)));
-
-                }
-            }
+            
             RenderTendrils();
 
 
-            Utils.DrawBorderString(Main.spriteBatch, Slot.ToString(), Projectile.Center - Main.screenPosition, Color.AntiqueWhite);
+            //Utils.DrawBorderString(Main.spriteBatch, Slot.ToString(), Projectile.Center - Main.screenPosition, Color.AntiqueWhite);
             return false;
         }
 

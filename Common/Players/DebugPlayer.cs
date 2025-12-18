@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
+using System.Collections.Generic;
 using Terraria.DataStructures;
 //using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
 //using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
@@ -8,139 +9,12 @@ namespace HeavenlyArsenal.Common.Players;
 
 internal class DebugPlayer : PlayerDrawLayer
 {
-    public List<VertexPositionColorTexture> ConeVerts;
-
-    private BasicEffect Cone;
-
     public override Position GetDefaultPosition()
     {
         return new AfterParent(PlayerDrawLayers.Torso);
     }
 
-    private void DrawCone()
-    {
-        if (ConeVerts.Count < 3)
-        {
-            return;
-        }
-
-        var gd = Main.graphics.GraphicsDevice;
-
-        if (Cone == null)
-        {
-            Cone = new BasicEffect(gd)
-            {
-                VertexColorEnabled = true,
-                LightingEnabled = false,
-                TextureEnabled = false
-            };
-        }
-
-        Cone.World = Matrix.Identity;
-        Cone.View = Main.GameViewMatrix.ZoomMatrix;
-
-        Cone.Projection = Matrix.CreateOrthographicOffCenter
-        (
-            0,
-            Main.screenWidth,
-            Main.screenHeight,
-            0,
-            -1000f,
-            1000f
-        );
-
-        foreach (var pass in Cone.CurrentTechnique.Passes)
-        {
-            pass.Apply();
-
-            gd.DrawUserPrimitives
-            (
-                PrimitiveType.TriangleStrip,
-                ConeVerts.ToArray(),
-                0,
-                ConeVerts.Count - 2
-            );
-        }
-    }
-
-    /// <summary>
-    /// </summary>
-    /// <param name="verts"></param>
-    /// <param name="Center">
-    ///     converts to world position, so all you need to do is place this in the spot
-    ///     you want your cone to originate from
-    /// </param>
-    /// <param name="rotation"></param>
-    /// <param name="halfAngle"></param>
-    /// <param name="length"></param>
-    /// <param name="resolution"></param>
-    /// <param name="color"></param>
-    public static void BuildCone(List<VertexPositionColorTexture> verts, Vector2 Center, float rotation, float halfAngle, float length, int resolution, Color color)
-    {
-        verts.Clear();
-        //offset the coordinates so they're in screen coords
-        Center -= Main.screenPosition;
-        // Direction the cone points in
-        var dir = rotation.ToRotationVector2();
-
-        // Create arc segment points
-        for (var i = 0; i <= resolution; i++)
-        {
-            var t = i / (float)resolution;
-            var ang = MathHelper.Lerp(-halfAngle, halfAngle, t);
-            var edgeDir = dir.RotatedBy(ang);
-
-            var p = Center + edgeDir * length;
-
-            var radiusFade = 0.2f;
-            var edgeFade = 0f;
-            var sideFade = MathF.Cos(Math.Abs(ang) / halfAngle * MathHelper.PiOver2);
-
-            // combine fades:
-            var apexAlpha = radiusFade * sideFade;
-            var edgeAlpha = edgeFade * sideFade;
-
-            var apexColor = color * apexAlpha;
-            var edgeColor = color * edgeAlpha;
-
-            verts.Add
-            (
-                new VertexPositionColorTexture
-                (
-                    new Vector3(Center, 0f),
-                    apexColor,
-                    new Vector2(0f, 0f)
-                )
-            );
-
-            verts.Add
-            (
-                new VertexPositionColorTexture
-                (
-                    new Vector3(p, 0f),
-                    edgeColor,
-                    new Vector2(t, 1f)
-                )
-            );
-        }
-    }
-
-    private void prepCone(Player player)
-    {
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin();
-
-        if (ConeVerts == null)
-        {
-            ConeVerts = new List<VertexPositionColorTexture>();
-        }
-
-        BuildCone(ConeVerts, player.Center, player.Center.AngleTo(Main.MouseWorld) + MathHelper.PiOver4 / 2, MathHelper.ToRadians(50), 1000, 30, Color.White);
-        DrawCone();
-
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin();
-    }
+   
 
     protected override void Draw(ref PlayerDrawSet drawInfo)
     {
@@ -164,8 +38,13 @@ internal class DebugPlayer : PlayerDrawLayer
         // msg += $"{Owner.GetModPlayer<PlaceholderName>().blood}";
         // if(Owner.HeldItem.type == ModContent.ItemType<ViscousWhip_Item>())
         //msg += $"{Owner.Center.ToTileCoordinates()}";
+        if(!Main.gameMenu && Owner.GetModPlayer<LeechScarf_Player>().Active)
+        for (int i = 0; i< Owner.GetModPlayer<LeechScarf_Player>().TendrilList.Count; i++)
+        {
 
-        Utils.DrawBorderString(Main.spriteBatch, msg, Owner.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, -1.2f);
+            msg += $"Slot: {Owner.GetModPlayer<LeechScarf_Player>().TendrilList[i].Slot}, Cooldown: {Owner.GetModPlayer<LeechScarf_Player>().TendrilList[i].Cooldown}\n";
+        }
+        //Utils.DrawBorderString(Main.spriteBatch, msg, Owner.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, 1.2f);
 
         //Main.EntitySpriteDraw(newLeech.leechTarget, Owner.Center - Main.screenPosition, null, Color.AntiqueWhite, 0, Vector2.Zero, 1, 0);
     }

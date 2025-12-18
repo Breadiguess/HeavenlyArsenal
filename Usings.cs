@@ -4,3 +4,4 @@ global using Terraria.ID;
 global using Terraria.ModLoader;
 global using Microsoft.Xna.Framework;
 global using Microsoft.Xna.Framework.Graphics;
+global using Luminance.Common.Utilities;

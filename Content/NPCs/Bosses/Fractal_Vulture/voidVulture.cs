@@ -200,7 +200,8 @@ partial class voidVulture : ModNPC
         NPC.knockBackResist = 0;
         NPC.damage = 200;
         NPC.BossBar = ModContent.GetInstance<VoidVultureBar>();
-        Music = MusicLoader.GetMusicSlot(Mod, "Assets/Sounds/Music/AvatarOfEmptinessP2");
+        //placeholder music by "holecatofficial" on discord 
+        Music = MusicLoader.GetMusicSlot(Mod, "Assets/Sounds/Music/BirdUp");
 
         if (Main.netMode != NetmodeID.Server)
         {

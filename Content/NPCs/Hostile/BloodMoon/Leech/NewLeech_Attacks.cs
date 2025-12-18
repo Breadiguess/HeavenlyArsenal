@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using CalamityMod;
+﻿using CalamityMod;
 using CalamityMod.NPCs.Other;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Particles.Metaballs;
+using System.Collections.Generic;
 using Terraria.Audio;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
@@ -320,50 +320,58 @@ public partial class newLeech
                     blood += bloodBankMax / 5;
                 }
             }
-            else
+            else if (currentTarget is Player)
             {
-                if (Time > 60)
+              
                 {
-                    if (currentTarget is Player)
+                    Player t = currentTarget as Player;
+                    if (t.dead)
+                        CurrentState = Behavior.Idle;
+                    if (Time > 60)
                     {
-                        if (currentTarget.Distance(NPC.Center) > 70)
+
                         {
+                            if (currentTarget.Distance(NPC.Center) > 70)
+                            {
+                                blood += bloodBankMax / 5;
+                                Time = 0;
+                                NPC.damage = NPC.defDamage;
+                                CurrentState = Behavior.flee;
+                                SoundEngine.PlaySound(GennedAssets.Sounds.Common.MediumBloodSpill, NPC.Center);
+                            }
+
+                            var temp = currentTarget as Player;
+
+                            if (!temp.HasIFrames())
+                            {
+                                temp.AddBuff(ModContent.BuffType<UmbralSickness>(), 600);
+                                temp.Heal(-100);
+
+                                if (Main.netMode == NetmodeID.SinglePlayer)
+                                {
+                                    temp.statLife -= 100;
+                                }
+
+                                SoundEngine.PlaySound(GennedAssets.Sounds.Common.MediumBloodSpill, NPC.Center);
+                            }
+                            else
+                            {
+                                return;
+                            }
+
                             blood += bloodBankMax / 5;
                             Time = 0;
                             NPC.damage = NPC.defDamage;
                             CurrentState = Behavior.flee;
-                            SoundEngine.PlaySound(GennedAssets.Sounds.Common.MediumBloodSpill, NPC.Center);
                         }
-
-                        var temp = currentTarget as Player;
-
-                        if (!temp.HasIFrames())
-                        {
-                            temp.AddBuff(ModContent.BuffType<UmbralSickness>(), 600);
-                            temp.Heal(-100);
-
-                            if (Main.netMode == NetmodeID.SinglePlayer)
-                            {
-                                temp.statLife -= 100;
-                            }
-
-                            SoundEngine.PlaySound(GennedAssets.Sounds.Common.MediumBloodSpill, NPC.Center);
-                        }
-                        else
-                        {
-                            return;
-                        }
-
-                        blood += bloodBankMax / 5;
-                        Time = 0;
-                        NPC.damage = NPC.defDamage;
-                        CurrentState = Behavior.flee;
-                    }
-                    else
-                    {
-                        throw new Exception("what the fuck did you do man.");
+                    
                     }
                 }
+                  
+            }
+            else
+            {
+                throw new Exception("what the fuck did you do man.");
             }
         }
     }

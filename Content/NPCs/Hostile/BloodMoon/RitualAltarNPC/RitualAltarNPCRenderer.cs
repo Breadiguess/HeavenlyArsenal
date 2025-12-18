@@ -476,7 +476,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         }
 
         a += $"{NPC.whoAmI}\n";
-        Utils.DrawBorderString(spriteBatch, a, NPC.Center - screenPos, Color.AntiqueWhite, 1, 0, -1);
+       // Utils.DrawBorderString(spriteBatch, a, NPC.Center - screenPos, Color.AntiqueWhite, 1, 0, -1);
         SpriteEffects sp = 0;
         var rot = NPC.rotation + MathHelper.PiOver2;
         var Origin = BodyTexture.Size() * 0.5f + new Vector2(0, 30);
@@ -493,7 +493,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         mask(spriteBatch, drawColor);
 
         drawLegs(drawColor);
-        Utils.DrawBorderString(spriteBatch, currentAIState.ToString(), NPC.Center - screenPos, Color.AntiqueWhite);
+       // Utils.DrawBorderString(spriteBatch, currentAIState.ToString(), NPC.Center - screenPos, Color.AntiqueWhite);
         Texture2D Debug = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
 
         for (var i = 0; i < _limbs.Length; i++)

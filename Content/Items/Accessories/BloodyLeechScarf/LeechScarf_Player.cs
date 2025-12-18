@@ -1,16 +1,14 @@
 ﻿using CalamityMod;
-using CalamityMod.Cooldowns;
 using HeavenlyArsenal.Common.Ui.Cooldowns;
-using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
-using Luminance.Common.Utilities;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Utilities;
 using System.Collections.Generic;
+using System.IO;
 using Terraria.Audio;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 {
-    internal class LeechScarf_Player : ModPlayer
+    public class LeechScarf_Player : ModPlayer
     {
         public bool Active { get; set; }
 
@@ -19,6 +17,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
         #region tendrilStruct
         public IReadOnlyList<Tendril> Tendrils => TendrilList;
 
+        public const string PacketName = "LeechScarf_Player_";
         public const int MAX_TENDRIL_COOLDOWN = 60 * 12;
         public const int MAX_TENDRILS = 3;
         public readonly int BaseDamage = 200;
@@ -104,18 +103,18 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                 // Cooldown handling
                 if (t.Cooldown > 0)
                 {
-                    Main.NewText($"{t.Slot}, Cooldown: {t.Cooldown}, HitCooldown: {t.HitCooldown}");
                     t.Cooldown--;
-                    
-                    
+
+
                 }
                 if (t.Cooldown <= 0)
                     t.Active = true;
 
+               
                 // If slot is active but projectile is missing or dead, respawn it
                 if (t.Active && t.Cooldown <= 0)
                 {
-                    if (t.proj == null || !t.proj.Projectile.active)
+                    if (t.proj == null || !t.proj.Projectile.active || t.proj.Type != ModContent.ProjectileType<LeechScarf_TendrilProjectile>())
                     {
                         Projectile p = Projectile.NewProjectileDirect(
                             Player.GetSource_FromThis(),
@@ -131,7 +130,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                         SoundEngine.PlaySound(GennedAssets.Sounds.Common.LargeBloodSpill with { Pitch = -1 }, Player.Center).WithVolumeBoost(1f);
                         {
                             t.proj = p.As<LeechScarf_TendrilProjectile>();
-                            p.As<LeechScarf_TendrilProjectile>().Slot = t.Slot; 
+                            p.As<LeechScarf_TendrilProjectile>().Slot = t.Slot;
                         }
                     }
                 }
@@ -150,21 +149,20 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             {
                 // Consume this tendril
                 t.Active = false;
-                t.Cooldown = 60*12; 
+                t.Cooldown = 60 * 12;
 
-                t.proj.Projectile.Kill();
+                t.proj.Projectile.active = false;
                 t.proj = null;
 
                 TendrilList[slot] = t;
             }
 
         }
+
+
+
+
         #endregion
-
-
-
-
-
         public override void PostUpdateMiscEffects()
         {
             if (!Active)
@@ -174,10 +172,96 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 
             if (!Player.Calamity().cooldowns.ContainsKey(LeechScarfCooldown.ID))
             {
-                Player.AddCooldown(LeechScarfCooldown.ID, MAX_TENDRIL_COOLDOWN);
+                Player.AddCooldown(LeechScarfCooldown.ID, 1);
             }
 
-           
+            if (Main.netMode != NetmodeID.SinglePlayer)
+            {
+                //TODO: If multiplayer, we send a copy of the tendril struct data using ModPacket to ensure its synced between all players, and then we will need to use Mod.HandlePacket()
+
+                for (int i = 0; i < TendrilList.Count; i++)
+                {
+
+                    var t = TendrilList[i];
+
+                    if (t.Cooldown < 1)
+                        return;
+
+                   
+                }
+            }
+
+        }
+
+        public override void SyncPlayer(int toWho, int fromWho, bool newPlayer)
+        {
+
+            for (int i = 0; i < TendrilList.Count; i++)
+            {
+                ModPacket packet = Mod.GetPacket();
+                packet.Write((byte)HeavenlyArsenal.MessageType.LeechScarf_Sync);
+                packet.Write((byte)Player.whoAmI);
+                var t = TendrilList[i];
+                packet.Write((byte)t.Slot);
+                packet.Write((byte)t.Cooldown);
+                packet.Write((byte)t.HitCooldown);
+                packet.Send(toWho, fromWho);
+            }
+
+        }
+        // Called in ExampleMod.Networking.cs
+        public void ReceivePlayerSync(BinaryReader reader)
+        {
+            int slot = reader.ReadByte();
+
+            var t = TendrilList[slot];
+            t.Slot = slot;
+            t.Cooldown = reader.ReadByte();
+            t.HitCooldown = reader.ReadByte();
+
+
+            TendrilList[slot] = t;
+
+        }
+
+        public override void CopyClientState(ModPlayer targetCopy)
+        {
+            LeechScarf_Player clone = (LeechScarf_Player)targetCopy;
+            clone.TendrilList = new List<Tendril>(3);
+            clone.TendrilList.Add(new Tendril());
+            clone.TendrilList.Add(new Tendril());
+            clone.TendrilList.Add(new Tendril());
+
+            for (int i = 0; i < clone.TendrilList.Count; i++)
+            {
+                var t = clone.TendrilList[i];
+                t.Cooldown = this.TendrilList[i].Cooldown;
+                t.HitCooldown = this.TendrilList[i].HitCooldown;
+                t.Slot = this.TendrilList[i].Slot;
+
+                clone.TendrilList[i] = t;
+            }
+            targetCopy = clone;
+
+        }
+
+        public override void SendClientChanges(ModPlayer clientPlayer)
+        {
+            LeechScarf_Player clone = (LeechScarf_Player)clientPlayer;
+
+            for (int i = 0; i < clone.TendrilList.Count; i++)
+            {
+                var t = TendrilList[i];
+                var e = clone.TendrilList[i];
+                if (t.Cooldown != e.Cooldown || t.HitCooldown != e.HitCooldown)
+                {
+                    // This example calls SyncPlayer to send all the data for this ModPlayer when any change is detected,
+                    // but if you are dealing with a large amount of data you should try
+                    // to be more efficient and use custom packets to selectively send only specific data that has changed.
+                    SyncPlayer(toWho: -1, fromWho: Main.myPlayer, newPlayer: false);
+                }
+            }
+
         }
 
 
@@ -191,12 +275,14 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             for (int i = 0; i < MAX_TENDRILS; i++)
             {
                 var t = TendrilList[i];
-                if (!t.Active && t.HitCooldown <=0)
+                if (!t.Active && t.HitCooldown <= 0)
                 {
                     t.Cooldown -= 50;
                     t.HitCooldown = 30;
                 }
                 TendrilList[i] = t;
+
+
             }
 
         }
@@ -218,15 +304,16 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                     t.HitCooldown = 30;
                 }
                 TendrilList[i] = t;
+
             }
 
         }
-      
+
         public override void ResetEffects()
         {
             if (!Active)
             {
-                for(int i = 0; i< MAX_TENDRILS; i++)
+                for (int i = 0; i < TendrilList.Count; i++)
                 {
 
                     var t = TendrilList[i];

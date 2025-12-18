@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 {
     [AutoloadEquip(EquipType.Neck)]
-    internal class LeechScarf_Item : ModItem
+    public class LeechScarf_Item : ModItem
     {
         public const string WearingAccessory = "WearingLeechScarf";
 
@@ -27,7 +27,10 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             Item.rare = ModContent.RarityType<BloodMoonRarity>();
             Item.accessory = true;
         }
-
+        public override void UpdateVanity(Player player)
+        {
+            base.UpdateVanity(player);
+        }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             CalamityPlayer modPlayer = player.Calamity();
