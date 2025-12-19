@@ -43,6 +43,11 @@ Ranged: {
 		DisplayName: Avatar Rifle Test
 		Tooltip: "go away! content not finish yet! "
 	}
+
+	Aoe_Rifle_Item: {
+		DisplayName: Aoe_ Rifle_ Item
+		Tooltip: ""
+	}
 }
 
 Magic: {

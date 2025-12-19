@@ -4,6 +4,7 @@ using Luminance.Common.Utilities;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.FirstPhaseForm;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.Projectiles.SolynProjectiles;
+using NoxusBoss.Content.NPCs.Friendly;
 using Terraria.Audio;
 using static NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm.AvatarOfEmptiness;
 
@@ -11,7 +12,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture;
 
 partial class voidVulture
 {
-    public Action<BattleSolynBird> SolynAction { get; set; }
+    public Action<NoxusBoss.Content.NPCs.Friendly.BattleSolyn> SolynAction { get; set; }
 
     /// <summary>
     ///     The amount of damage homing star bolts from Solyn do to enemies.
@@ -47,7 +48,7 @@ partial class voidVulture
     /// <summary>
     ///     Instructs Solyn to fly near the player.
     /// </summary>
-    public static void StandardSolynBehavior_FlyNearPlayer(BattleSolynBird solyn, NPC avatar)
+    public static void StandardSolynBehavior_FlyNearPlayer(BattleSolyn solyn, NPC avatar)
     {
         var solynNPC = solyn.NPC;
         var playerToFollow = solyn.Player;
@@ -94,7 +95,7 @@ partial class voidVulture
     /// <summary>
     ///     Instructs Solyn to attack the Avatar.
     /// </summary>
-    public static void StandardSolynBehavior_AttackAvatar(BattleSolynBird solyn)
+    public static void StandardSolynBehavior_AttackAvatar(BattleSolyn solyn)
     {
         var solynNPC = solyn.NPC;
         solyn.UseStarFlyEffects();
@@ -186,10 +187,10 @@ partial class voidVulture
         solyn.AfterimageGlowInterpolant = 1f;
     }
 
-    public static void ShieldPlayer_Behavior(BattleSolynBird solyn, NPC npc)
+    public static void ShieldPlayer_Behavior(BattleSolyn solyn, NPC npc)
     {
         var solynNPC = solyn.NPC;
-        var playerToProtect = solyn.Player;
+        var playerToProtect =solyn.Player;
 
         if (playerToProtect is null)
         {
@@ -287,7 +288,7 @@ partial class voidVulture
         solyn.BackglowScale = 0.9f;
     }
 
-    public static void GetImpaled_Behavior(BattleSolynBird solyn, Player player, NPC npc)
+    public static void GetImpaled_Behavior(BattleSolyn solyn, Player player, NPC npc)
     {
         if (npc.As<voidVulture>().Time < 40)
         {

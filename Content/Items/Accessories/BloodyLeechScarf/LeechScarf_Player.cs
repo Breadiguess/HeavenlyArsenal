@@ -105,7 +105,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                 {
                     t.Cooldown--;
 
-
+                    Main.NewText(t.Cooldown);
                 }
                 if (t.Cooldown <= 0)
                     t.Active = true;

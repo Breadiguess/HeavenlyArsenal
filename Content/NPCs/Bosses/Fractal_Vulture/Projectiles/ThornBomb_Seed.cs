@@ -16,6 +16,8 @@ public class ThornBomb_Seed : ModProjectile
 
     private const float DetonateBurstSpeed = 6.5f;
 
+    int NeedleStormStart = FuseTime + 10;
+    int NeedleStormEnd = FuseTime + 60;
     public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
 
     public int Time
@@ -24,7 +26,10 @@ public class ThornBomb_Seed : ModProjectile
         set => Projectile.ai[0] = value;
     }
 
-    public override void SetStaticDefaults() { }
+    public override void SetStaticDefaults()
+    {
+        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 4000;
+    }
 
     public override void SetDefaults()
     {
@@ -59,19 +64,51 @@ public class ThornBomb_Seed : ModProjectile
 
         if (Time > FuseTime - 15)
         {
-            var pulseT = (Time - (FuseTime - 15)) / 15f;
-            Projectile.scale = 1f + 0.12f * (1f - pulseT) * 40;
+            Projectile.scale = 1 + 2*LumUtils.InverseLerp(FuseTime - 15, FuseTime, Time);
         }
 
-        if (Time >= FuseTime)
+        if (Time == FuseTime)
         {
             Detonate();
-            Projectile.Kill();
+            //Projectile.Kill();
         }
+        if(Time < NeedleStormEnd && Time > NeedleStormStart)
+        {
+            if (Time % 10 == 0)
+            LaunchNeedleStorm();
+        }
+        if (Time > NeedleStormEnd)
+            Projectile.Opacity = 1-LumUtils.InverseLerp(NeedleStormEnd, NeedleStormEnd + 60, Time);
 
+        if (Projectile.Opacity == 0)
+            Projectile.Kill();
         Time++;
     }
 
+    private void LaunchNeedleStorm()
+    {
+        const float InitialSpeed = 27.5f;
+
+        var angleStep = MathHelper.TwoPi / ThornCount;
+
+        SoundEngine.PlaySound(SoundID.Item141 with { PitchVariance = 0.2f, MaxInstances = 0}, Projectile.Center).WithVolumeBoost(2);
+        for (var i = 0; i < ThornCount; i++)
+        {
+            var angle = angleStep * i + Projectile.rotation;
+            var velocity = angle.ToRotationVector2() * InitialSpeed * 2;
+
+            Projectile a = Projectile.NewProjectileDirect
+            (
+                Projectile.GetSource_FromThis(),
+                Projectile.Center+ new Vector2(Main.rand.NextFloat(-10,10),0),
+                velocity,
+                ModContent.ProjectileType<SeekingThorn>(),
+                Projectile.damage / 4,
+                10f
+            );
+            a.As<SeekingThorn>().Time = 160;
+        }
+    }
     private void Detonate()
     {
         if (Main.netMode == NetmodeID.MultiplayerClient)
@@ -139,10 +176,18 @@ public class ThornBomb_Seed : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D thornTex = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+        Texture2D thornGlow = GennedAssets.Textures.GreyscaleTextures.BloomFlare;
         Texture2D coreTex = GennedAssets.Textures.GreyscaleTextures.HollowCircleSoftEdge;
 
-        var DrawPos = Projectile.Center - Main.screenPosition;
+        Texture2D thing = AssetDirectory.Textures.BigGlowball.Value;
 
+        Vector2 DrawPos = Projectile.Center - Main.screenPosition;
+
+
+        Color a = Color.Lerp(Color.White, Color.Red, LumUtils.InverseLerp(0, FuseTime, Time)) * Projectile.Opacity;
+        Main.EntitySpriteDraw(thing, DrawPos, null, a, Projectile.rotation, thing.Size() / 2, 0.15f * Projectile.scale, 0);
+
+        Main.EntitySpriteDraw(thornGlow, DrawPos, null, a with { A = 0 }, Projectile.rotation, thornGlow.Size() / 2, 0.15f * Projectile.scale, 0);
         Main.EntitySpriteDraw
         (
             coreTex,
@@ -173,10 +218,20 @@ public class ThornBomb_Seed : ModProjectile
 
             var rotation = angle + MathHelper.PiOver2;
 
-            Main.EntitySpriteDraw(thornTex, pos, null, Color.White * 0.85f, rotation, thornTex.Size() * 0.5f, new Vector2(2f, 60f) * Projectile.scale, 0);
+            Main.EntitySpriteDraw(thornTex, pos, null, a, rotation, new Vector2(0, 0.5f), new Vector2(2f, 60f) * Projectile.scale, 0);
+
+            for(int x = 0; x< 12; x++)
+            {
+                float thing2 = LumUtils.InverseLerp(0, FuseTime, Time);
+                Vector2 newpos = DrawPos + (offset + new Vector2(0, 32* thing2).RotatedBy(x / 12f * MathHelper.TwoPi) * thing2 )* thing2;
+
+                Main.EntitySpriteDraw(thornTex, newpos, null, a, rotation, new Vector2(0, 0.5f), new Vector2(2f, 60f) * Projectile.scale, 0);
+            }
+
+            Utils.DrawLine(Main.spriteBatch, Projectile.Center, Projectile.Center + new Vector2(4000,0).RotatedBy(angle), a * LumUtils.InverseLerp(FuseTime - 60, FuseTime - 10, Time), a * LumUtils.InverseLerp(FuseTime - 60, FuseTime - 10, Time), 4f);
         }
 
-        Utils.DrawBorderString(Main.spriteBatch, Projectile.damage.ToString(), DrawPos, Color.AntiqueWhite);
+       // Utils.DrawBorderString(Main.spriteBatch, Projectile.damage.ToString(), DrawPos, Color.AntiqueWhite);
 
         return false;
     }

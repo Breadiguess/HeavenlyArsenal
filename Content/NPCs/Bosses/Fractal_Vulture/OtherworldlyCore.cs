@@ -91,6 +91,18 @@ internal class OtherworldlyCore : ModNPC
 
     public int BodyTime =>
         Body != null ? Body.Time : 0;
+
+
+    public override bool CheckActive()
+    {
+        //STOP IT
+        return true;
+    }
+    public override void PostAI()
+    {
+
+        NPC.DiscourageDespawn(int.MaxValue);
+    }
     public override void AI()
     {
         if (Body == null || !Body.NPC.active)
@@ -239,7 +251,7 @@ internal class OtherworldlyCore : ModNPC
                 NPC.Center,
                 vel,
                 ModContent.ProjectileType<CoreBlast>(),
-                Body.NPC.defDamage / 3,
+                (int)(Body.NPC.defDamage / 3.5f),
                 0f);
 
             p.As<CoreBlast>().OwnerIndex = NPC.whoAmI;

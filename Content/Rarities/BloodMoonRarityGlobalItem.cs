@@ -207,9 +207,9 @@ public sealed class BloodMoonRarityGlobalItem : GlobalItem
             color.A = 255;
 
             var scale = 1f + wave * 0.01f;
-            Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, Color.Crimson with { A = 200}, scale*1.2f);
+            Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, color , scale*1.2f);
 
-            Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, color, scale);
+            Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, Color.Crimson, scale);
 
             cursor.X += font.MeasureString(letter).X * scale;
         }
@@ -265,7 +265,7 @@ public sealed class BloodMoonRarityGlobalItem : GlobalItem
 
         origin = rift.Size() / 2f;
 
-        //batch.Draw(rift, position, null, Color.White, MathHelper.Pi, origin, 0.1f, SpriteEffects.None, 0f);
+        batch.Draw(rift, position, null, Color.White, MathHelper.Pi, origin, 0.1f, SpriteEffects.None, 0f);
 
         batch.End();
         batch.Begin(in parameters);

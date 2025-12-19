@@ -4,6 +4,7 @@ using Luminance.Core.Graphics;
 using Luminance.Core.Sounds;
 using Microsoft.Xna.Framework;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.AdvancedProjectileOwnership;
 using NoxusBoss.Core.Graphics.GeneralScreenEffects;
@@ -138,8 +139,8 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
 
             if (Time == 1)
             {
-                BattleSolynBird.SummonSolynForBattle(NPC.GetSource_FromThis(), currentTarget.Center, BattleSolynBird.SolynAIType.FightBird);
-
+                //BattleSolynBird.SummonSolynForBattle(NPC.GetSource_FromThis(), currentTarget.Center, BattleSolynBird.SolynAIType.FightBird);
+                  BattleSolyn.SummonSolynForBattle(NPC.GetSource_FromThis(), currentTarget.Center, Funny);
             }
             if (Time == 0)
             {
@@ -202,7 +203,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             Behavior next = !HasSecondPhaseTriggered ? AttackCycleOrder[attackIndex] : AttackCycleOrderPhase2[attackIndex];
 
             attackIndex++;
-            if (attackIndex >= AttackCycleOrder.Length)
+            if (attackIndex >= (!HasSecondPhaseTriggered? AttackCycleOrder.Length : AttackCycleOrderPhase2.Length))
                 attackIndex = 0;
 
             return next;
@@ -359,11 +360,11 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         public static int VomitCone_ShootStart = 40;
         public static int VomitCone_ShootStop
         {
-            get => !Myself.As<voidVulture>().HasSecondPhaseTriggered ? 240 : 260;
+            get => !Myself.As<voidVulture>().HasSecondPhaseTriggered ? 165 : 260;
         }
         public static int VomitCone_ShootEnd
         {
-            get => !Myself.As<voidVulture>().HasSecondPhaseTriggered ? 270 : 300;
+            get => !Myself.As<voidVulture>().HasSecondPhaseTriggered ? 200 : 300;
         }
         void VomitCone()
         {
@@ -475,7 +476,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
 
 
                 if (!HasSecondPhaseTriggered)
-                    neckSpinInterpolant = neckSpinInterpolant.AngleLerp(MathHelper.Pi, 0.012f);
+                    neckSpinInterpolant = MathHelper.ToRadians(250) * InverseLerp(ShootStart, ShootStop, Time);
                 else
                     neckSpinInterpolant = tNorm;
 
@@ -623,10 +624,10 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         void RiseSpin()
         {
             const int StartTime = 40;
-            const int AudioTime = 165;
-            const int RiseTime = 230;
-            const int SprayProjectileTime = 255;
-            const int BehaviorEnd = 360;
+            int AudioTime =!HasSecondPhaseTriggered? 165 : 130;
+            int RiseTime = !HasSecondPhaseTriggered? 230 : 195;
+            int SprayProjectileTime = !HasSecondPhaseTriggered ? 255 : 225;
+            int BehaviorEnd = !HasSecondPhaseTriggered ? 360 : 360-25;
 
             int projectileCount = !HasSecondPhaseTriggered ? 12 : 30;
             if (NPC.Opacity < 0.2f)
@@ -686,7 +687,8 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 if (Time == RiseTime)
                 {
                     ResetTail();
-                    targetInterpolant = 0.08f;
+                    
+                    targetInterpolant = !HasSecondPhaseTriggered? 0.08f : 0.09f;
                     //SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Chirp with { Volume = 2f, Pitch = 1.2f }).WithVolumeBoost(2);
                     SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.BloodFountainErupt with { Pitch = 1.4f }).WithVolumeBoost(2);
                     TargetPosition = new Vector2(NPC.Center.X, currentTarget.Center.Y) - new Vector2(0, 600);
@@ -819,9 +821,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         {
             const int CoreDeployTime = 20;
 
-            const int DashWindupTime = 40;
+            const int DashWindupTime = 50;
             const int DashAccelTime = 12;
-            const int DashSustainTime = 16;
+            const int DashSustainTime = 12;
             const int DashRecoverTime = 20;
 
             const int PreDashDelay = 45;      // after core eject, before first dash
@@ -934,7 +936,8 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             if (DashTimer <= DashWindupTime - 5)
             {
                 HeadPos = NPC.Center + currentTarget.DirectionTo(NPC.Center) * -100;
-                NPC.Center += currentTarget.velocity * 0.7f;
+                NPC.Center += currentTarget.velocity * 0.7f * (1 - InverseLerp(0, DashWindupTime - 5, DashTimer));
+                if (DashTimer < DashWindupTime - 10)
                 DashDirection = NPC.DirectionTo(target.Center + target.velocity * 5f);
                 NPC.velocity *= 0.85f;
                 NPC.damage = 0;
@@ -1276,7 +1279,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         public int letGOcount;
         private void placeholder2()
         {
-            HeadPos = NPC.Center + NPC.AngleTo(BattleSolynBird.GetOriginalSolyn().NPC.Center).ToRotationVector2() * 90;
+            HeadPos = NPC.Center + NPC.AngleTo(BattleSolyn.GetOriginalSolyn().NPC.Center).ToRotationVector2() * 90;
             Projectile a;
             if (Time <= 4)
             {
@@ -1289,7 +1292,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.AbsoluteZeroWave with { PitchVariance = 0.5f, PitchRange = (-2, 0) });
                 a = Projectile.NewProjectileDirect(NPC.GetSource_FromThis(), HeadPos, Vector2.Zero, ModContent.ProjectileType<SeekingEnergy>(), 0, 10);
                 a.As<SeekingEnergy>().Owner = this.NPC;
-                a.As<SeekingEnergy>().Impaled = BattleSolynBird.GetOriginalSolyn().NPC;
+                a.As<SeekingEnergy>().Impaled = BattleSolyn.GetOriginalSolyn().NPC;
 
             }
             int thing = (int)((1 - ReelSolynInterpolant) * 20) + 1;
@@ -1335,7 +1338,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         private void placeholder3()
         {
             Time = -1;
-            currentState = Behavior.RiseSpin;
+             currentState = Behavior.RiseSpin;
         }
 
 

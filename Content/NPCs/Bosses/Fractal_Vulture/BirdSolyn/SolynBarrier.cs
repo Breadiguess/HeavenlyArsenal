@@ -5,11 +5,12 @@ using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.Projectiles.SolynProjectiles;
+using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.Automators;
 
 namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture.Solyn;
 
-internal class SolynBarrier : ModProjectile, IProjOwnedByBoss<BattleSolynBird>, IDrawsWithShader
+internal class SolynBarrier : ModProjectile, IProjOwnedByBoss<BattleSolyn>, IDrawsWithShader
 {
     public NPC Solyn;
 

@@ -18,6 +18,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture;
 [AutoloadBossHead]
 partial class voidVulture : ModNPC
 {
+    public const NoxusBoss.Content.NPCs.Friendly.BattleSolyn.SolynAIType Funny = (NoxusBoss.Content.NPCs.Friendly.BattleSolyn.SolynAIType)(-174993);
+
+
     //CLUTTERR AAAA
     private static NPC? myself;
 

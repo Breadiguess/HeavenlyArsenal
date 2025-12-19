@@ -1,8 +1,12 @@
 ﻿using CalamityMod.Projectiles;
 using HeavenlyArsenal.Common.IK;
 using Luminance.Assets;
+using Luminance.Core.Graphics;
+using NoxusBoss.Assets;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.Utilities;
 
@@ -68,8 +72,32 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 
         public ref Player Owner => ref Main.player[Projectile.owner];
         public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
+
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        {
+            overPlayers.Add(index);
+        }
         public override void SetDefaults()
         {
+            int jointCount = 8;
+            int totalLength = 120;
+            int minPerJoint = 120/8;
+
+            int[] lengths = RandomJointLengths(
+                jointCount,
+                totalLength,
+                minPerJoint,
+                Main.rand
+            );
+
+            var segments = new (float, IKSkeleton.Constraints)[jointCount];
+            for (int i = 0; i < jointCount; i++)
+            {
+                segments[i] = (lengths[i], new IKSkeleton.Constraints());
+            }
+
+            tendril.IKSkeleton = new IKSkeleton(segments);
+            HitsLeft = MAX_HITS;
             Projectile.Size = new Vector2(20, 20);
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
@@ -119,9 +147,9 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
         public override void OnSpawn(IEntitySource source)
         {
 
-            int jointCount = 5;
+            int jointCount = 8;
             int totalLength = 120;
-            int minPerJoint = 20;
+            int minPerJoint = 120/8;
 
             int[] lengths = RandomJointLengths(
                 jointCount,
@@ -238,13 +266,15 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
         {
             CheckConditions();
             Projectile.timeLeft++;
-           
+
 
             //Tendril.UpdateTendril(ref tendril, Owner.Center + new Vector2(14 * Owner.direction, -8), Projectile.Center, 0.8f);
 
 
-            Vector2 root = Owner.Center + new Vector2(14 * Owner.direction, -8);
+            Vector2 root = Owner.Center - Main.OffsetsPlayerHeadgear[Owner.bodyFrame.Y / Owner.bodyFrame.Height] + new Vector2(-9 * Owner.direction, -2);
 
+
+            //Dust.NewDustPerfect(root, DustID.Cloud, Vector2.Zero);
             Vector2 desired = Projectile.Center;
 
 
@@ -334,10 +364,73 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             }*/
             HitsLeft--;
         }
-        public override bool PreDraw(ref Color lightColor)
+
+
+        public override void Load()
         {
-            
-            RenderTendrils();
+            On_Main.CheckMonoliths += DrawSword;
+        }
+        public static RenderTarget2D SwordTarget { get; set; }
+        private void DrawSword(On_Main.orig_CheckMonoliths orig)
+        {
+            if (SwordTarget == null || SwordTarget.IsDisposed)
+                SwordTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth/2, Main.screenHeight/2);
+            else if (SwordTarget.Size() != new Vector2(Main.screenWidth/2, Main.screenHeight/2))
+            {
+                Main.QueueMainThreadAction(() =>
+                {
+                    SwordTarget.Dispose();
+                    SwordTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth/2, Main.screenHeight/2);
+                });
+                return;
+            }
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+
+            Main.graphics.GraphicsDevice.SetRenderTarget(SwordTarget);
+            Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+
+            foreach (Projectile projectile in Main.projectile.Where(n => n.active && n.ai[0] > 0 && n.type == ModContent.ProjectileType<LeechScarf_TendrilProjectile>()))
+            {
+                Drawtendril(projectile);
+            }
+
+            Main.graphics.GraphicsDevice.SetRenderTarget(null);
+
+            Main.spriteBatch.End();
+
+            orig();
+
+        }
+
+        void Drawtendril(Projectile proj)
+        {
+
+            RenderTendrils(proj);
+        }
+
+        public override bool PreDraw(ref Color lightColor)
+            {
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, default, default, null, Main.GameViewMatrix.ZoomMatrix);
+            var  OutlineShader = ShaderManager.GetShader("HeavenlyArsenal.Outline");
+            OutlineShader.SetTexture(SwordTarget, 0);
+            OutlineShader.TrySetParameter("uSize", Vector2.One);
+            OutlineShader.TrySetParameter("uColor", Color.White);
+            OutlineShader.TrySetParameter("uThreshold", 10f);
+            OutlineShader.Apply();
+            Main.spriteBatch.Draw(
+               SwordTarget,
+               Owner.Center - Main.screenPosition,
+               null,
+               Color.White,
+               Projectile.rotation,
+               SwordTarget.Size() / 2f,
+               2,
+               0,
+               0f
+           );
+
+            Main.spriteBatch.ResetToDefault();
 
 
             //Utils.DrawBorderString(Main.spriteBatch, Slot.ToString(), Projectile.Center - Main.screenPosition, Color.AntiqueWhite);
@@ -373,10 +466,14 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                 Vector2 normal = dir.RotatedBy(MathHelper.PiOver2);
 
                 float t = i / (float)(count - 1);
-                float thickness = baseThickness;
+                float thickness =  Math.Clamp(baseThickness * t * 1.4f + 3f ,0, baseThickness);
 
                 Vector2 left = p + normal * thickness;
                 Vector2 right = p - normal * thickness;
+
+
+
+                color = Lighting.GetColor((p).ToTileCoordinates());
 
                 verts.Add(new VertexPositionColorTexture(
                     new Vector3(left - Main.screenPosition, 0f),
@@ -403,12 +500,12 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             }
         }
 
-        Vector2 GetRenderPos(int index)
+        Vector2 GetRenderPos(Projectile proj,int index)
         {
-            Vector2 root = Owner.Center;
-            Vector2 p = tendril.IKSkeleton.Position(index);
+            Vector2 root = proj.As<LeechScarf_TendrilProjectile>().Owner.Center;
+            Vector2 p = proj.As<LeechScarf_TendrilProjectile>().tendril.IKSkeleton.Position(index);
 
-            int dir = Owner.direction;
+            int dir = proj.As<LeechScarf_TendrilProjectile>().Owner.direction;
             float frontness = (p.X - root.X) * dir;
 
             if (frontness > 0f)
@@ -441,20 +538,19 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             // Ensure the tip is included
             sampled.Add(control[^1]);
         }
-        void GetSkeletonPoints(List<Vector2> points)
+        void GetSkeletonPoints(Projectile proj ,List<Vector2> points)
         {
             points.Clear();
-
-            int count = tendril.IKSkeleton.PositionCount;
+            int count = proj.As<LeechScarf_TendrilProjectile>().tendril.IKSkeleton.PositionCount;
             for (int i = 0; i < count; i++)
-                points.Add(GetRenderPos(i));
+                points.Add(GetRenderPos(proj,i));
         }
 
-        void RenderTendrils()
+        void RenderTendrils(Projectile proj)
         {
-            Color boneColor =
-                Color.Lerp(Color.Crimson, Color.AntiqueWhite, HitsLeft / (float)MAX_HITS).MultiplyRGB(Lighting.GetColor(Owner.Center.ToTileCoordinates())); ;
-            GetSkeletonPoints(_control);
+            Color boneColor = Color.White;
+                //Color.Lerp(Color.Crimson, Color.AntiqueWhite, proj.As<LeechScarf_TendrilProjectile>().HitsLeft / (float)LeechScarf_TendrilProjectile.MAX_HITS) ;
+            GetSkeletonPoints(proj, _control);
             SampleSmoothSpine(_control, _smooth, samplesPerSegment: 12);
 
             BuildSmoothTendrilMesh(_verts, _indices, _smooth, 6f, boneColor);
@@ -473,7 +569,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             };
 
             TendrilEffect.Texture = ModContent.Request<Texture2D>($"{Mod.Name}/Content/Items/Accessories/BloodyLeechScarf/LeechTendril").Value;// GennedAssets.Textures.GreyscaleTextures.HollowCircleSoftEdge;
-            TendrilEffect.View = Main.GameViewMatrix.ZoomMatrix;
+            TendrilEffect.View = Matrix.Identity;//Main.GameViewMatrix.ZoomMatrix;
 
             TendrilEffect.Projection = Matrix.CreateOrthographicOffCenter(
                 0,

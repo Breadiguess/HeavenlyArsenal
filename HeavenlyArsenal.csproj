@@ -84,6 +84,8 @@
         <Compile Remove="Content\Particles\CartoonWaveParticle.cs" />
         <Compile Remove="Content\Particles\SpiritCandleParticle.cs" />
         <Compile Remove="Core\Globals\TradeGlobalItem.cs" />
+        <Compile Remove="Core\PixelatedDrawingLayer.cs" />
+        <Compile Remove="Core\RenderTargetsManager.cs" />
         <Compile Remove="Core\Systems\SolynEvents\TestSolynEvent.cs" />
     </ItemGroup>
     <ItemGroup>
@@ -100,8 +102,7 @@
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\SeekingThorn.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\ThornBomb_Seed.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\SolynIntegration.cs" />
-        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.FightBird.cs" />
-        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.cs" />
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\BirdSolyn\BattleSolyn.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerPlacer.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FakeFlowerRender.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\MedusaPlayer.cs" />
@@ -116,8 +117,8 @@
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\IntersectingComet.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\NowhereGoop.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\SeekingEnergy.cs" />
-        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\DirectionalSolynForcefield.cs" />
-        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\SolynBarrier.cs" />
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\BirdSolyn\DirectionalSolynForcefield.cs" />
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\BirdSolyn\SolynBarrier.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVultreWing.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VoidVultureBar.cs" />
@@ -136,8 +137,8 @@
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\PlantForm.png" />
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\NowhereGoop.png" />
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\PlaceholderBlast.png" />
-        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn.png" />
-        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\Solyn\BattleSolyn_Head.png" />
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\BirdSolyn\BattleSolyn.png" />
+        <Content Include="Content\NPCs\Bosses\Fractal_Vulture\BirdSolyn\BattleSolyn_Head.png" />
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Body.png" />
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Body_Behind.png" />
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Face.png" />
@@ -161,7 +162,7 @@
             <HintPath>ModReferences\Luminance.dll</HintPath>
         </Reference>
         <Reference Include="NoxusBoss">
-            <HintPath>ModReferences\NoxusBoss.dll</HintPath>
+          <HintPath>..\..\ModReader\NoxusBoss\NoxusBoss.dll</HintPath>
         </Reference>
         <Reference Include="SubworldLibrary">
             <HintPath>ModReferences\SubworldLibrary.dll</HintPath>

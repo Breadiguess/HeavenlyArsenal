@@ -5,12 +5,13 @@ using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.NPCs.Bosses.Draedon.SpecificEffectManagers;
+using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.Automators;
 using NoxusBoss.Core.Utilities;
 
 namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture.Solyn;
 
-public class DirectionalSolynForcefield3 : ModProjectile, IProjOwnedByBoss<BattleSolynBird>, IDrawsWithShader
+public class DirectionalSolynForcefield3 : ModProjectile, IProjOwnedByBoss<BattleSolyn>, IDrawsWithShader
 {
     private static Projectile? myself;
 
@@ -161,7 +162,7 @@ public class DirectionalSolynForcefield3 : ModProjectile, IProjOwnedByBoss<Battl
 
         foreach (var npc in Main.ActiveNPCs)
         {
-            if (npc.ModNPC is BattleSolynBird solyn && solyn.MultiplayerIndex == Owner.whoAmI)
+            if (npc.ModNPC is BattleSolyn solyn && solyn.MultiplayerIndex == Owner.whoAmI)
             {
                 ownerIndex = npc.whoAmI;
 
