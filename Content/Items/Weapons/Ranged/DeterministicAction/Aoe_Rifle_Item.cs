@@ -16,6 +16,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         public override string Texture => MiscTexturesRegistry.ChromaticBurstPath;
 
+        public override void SetStaticDefaults()
+        {
+            ItemID.Sets.gunProj[Type] = true;   
+        }
         public override void SetDefaults()
         {
             Item.value = Terraria.Item.buyPrice(4, 20, 10, 4);
@@ -25,15 +29,27 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Item.DamageType = DamageClass.Ranged;
             Item.noMelee = true;
             Item.autoReuse = true;
-            //Item.useAmmo = AmmoID.Bullet;
-            Item.shootSpeed = 40;
+            Item.useAmmo = AmmoID.Bullet;
+            Item.shootSpeed = 40;    
             Item.useStyle = ItemUseStyleID.Shoot;
-            Item.shoot = ModContent.ProjectileType<Aoe_Rifle_Laser>();
+            Item.shoot = ModContent.ProjectileType<Aoe_Rifle_HeldProj>();
             Item.noUseGraphic = true;
             Item.useTime = 60;
             Item.useAnimation = 60;
             
         }
+
+        public override void HoldItem(Player player)
+        {
+            if (player.ownedProjectileCounts[Item.shoot] <1)
+            {
+                Projectile.NewProjectileDirect(player.GetSource_FromThis(), player.Center, Vector2.Zero, Item.shoot, 0, 0);
+
+            }
+        }
+        public override bool CanUseItem(Player player) => false;
+        public override bool CanShoot(Player player) => false;
+
 
         public override void UpdateInventory(Player player)
         {

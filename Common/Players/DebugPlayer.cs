@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
+using HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction;
 using System.Collections.Generic;
 using Terraria.DataStructures;
 //using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
@@ -38,13 +39,14 @@ internal class DebugPlayer : PlayerDrawLayer
         // msg += $"{Owner.GetModPlayer<PlaceholderName>().blood}";
         // if(Owner.HeldItem.type == ModContent.ItemType<ViscousWhip_Item>())
         //msg += $"{Owner.Center.ToTileCoordinates()}";
+        msg += $"Authority: {Owner.GetModPlayer<Aoe_Rifle_Player>().Authority}\n AuthorityTimer: {Owner.GetModPlayer<Aoe_Rifle_Player>().AuthorityTimer}\n {Owner.GetModPlayer<Aoe_Rifle_Player>().BulletCount}";
         if(!Main.gameMenu && Owner.GetModPlayer<LeechScarf_Player>().Active)
         for (int i = 0; i< Owner.GetModPlayer<LeechScarf_Player>().TendrilList.Count; i++)
         {
 
-            msg += $"Slot: {Owner.GetModPlayer<LeechScarf_Player>().TendrilList[i].Slot}, Cooldown: {Owner.GetModPlayer<LeechScarf_Player>().TendrilList[i].Cooldown}\n";
+            //msg += $"Slot: {Owner.GetModPlayer<LeechScarf_Player>().TendrilList[i].Slot}, Cooldown: {Owner.GetModPlayer<LeechScarf_Player>().TendrilList[i].Cooldown}\n";
         }
-        //Utils.DrawBorderString(Main.spriteBatch, msg, Owner.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, 1.2f);
+        Utils.DrawBorderString(Main.spriteBatch, msg, Owner.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, -1.2f);
 
         //Main.EntitySpriteDraw(newLeech.leechTarget, Owner.Center - Main.screenPosition, null, Color.AntiqueWhite, 0, Vector2.Zero, 1, 0);
     }

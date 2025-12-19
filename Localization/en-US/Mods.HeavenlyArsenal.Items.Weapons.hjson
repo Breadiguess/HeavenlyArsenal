@@ -45,7 +45,7 @@ Ranged: {
 	}
 
 	Aoe_Rifle_Item: {
-		DisplayName: Aoe_ Rifle_ Item
+		DisplayName: Deterministic Causality
 		Tooltip: ""
 	}
 }
