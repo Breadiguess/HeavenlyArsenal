@@ -392,3 +392,5 @@ FodyWeavers.xsd
 /Assets/AutoloadedEffects/Shaders/SphericalNoise.fxc
 /Content/NPCs/Hostile/BloodMoon/Goreca
 /Content/NPCs/Hostile/BloodMoon/Jellyfish/FileName.cs
+/Core/PixelatedDrawingLayer.cs
+/Core/RenderTargetsManager.cs
