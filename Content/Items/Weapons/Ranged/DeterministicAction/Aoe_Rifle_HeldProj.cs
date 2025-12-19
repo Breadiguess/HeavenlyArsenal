@@ -3,6 +3,7 @@ using CalamityMod;
 using HeavenlyArsenal.Common.Graphics;
 using NoxusBoss.Core.Utilities;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria.Audio;
 using Terraria.GameContent;
 
@@ -130,33 +131,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             string msg = "";
 
 
-            if (clips != null)
-            {
-                for (int x = 0; x < clips.Count; x++)
-                {
-                    if (clips[x].Bullets != null)
-                        for (int i = 0; i < clips[x].Bullets.Count; i++)
-                        {
-                            var clip = clips[x].Bullets[i];
-                            if (clip != null)
-                            {
-                                if (clip.type != ItemID.EndlessMusketPouch)
-                                    Main.instance.LoadItem(clip.type);
-                                else
-                                {
 
-                                    Main.instance.LoadItem(ItemID.MusketBall);
-                                    clip.type = ItemID.MusketBall;
-                                }
-                                //Main.NewText($"{x},{i} type = {clip.Name}");
-                                Texture2D bullet = TextureAssets.Item[clip.type].Value;
-                                Main.EntitySpriteDraw(bullet, DrawPos + new Vector2(10 * i, x * 10 -200), null, Color.White, 0, Origin, 0.5f, 0);
-                            }
-
-                        }
-                }
-            }
-            Utils.DrawBorderString(Main.spriteBatch, msg, DrawPos, Color.White, 1);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, default, default, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.EntitySpriteDraw(ClipTarget, Owner.Center - Main.screenPosition, null, Color.White, 0, ClipTarget.Size() / 2, 2, 0);
+            Main.spriteBatch.ResetToDefault();
+            //Utils.DrawBorderString(Main.spriteBatch, msg, DrawPos, Color.White, 1);
             return false;//base.PreDraw(ref lightColor);
         }
 
@@ -164,11 +144,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             On_Main.CheckMonoliths += On_Main_CheckMonoliths;
         }
-
-        private void On_Main_CheckMonoliths(On_Main.orig_CheckMonoliths orig)
-        {
-
-        }
+       
 
         #region helper/state
         void CheckConditions()
@@ -372,6 +348,72 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 clips.Add(new Clip());
             }
         }
+        void RenderClip(Projectile proj)
+        {
+            Aoe_Rifle_HeldProj gun = proj.ModProjectile as Aoe_Rifle_HeldProj;
+
+            Vector2 DrawPos = gun.Owner.Center - Main.screenPosition;
+            for(int x = 0; x< gun.clips.Count; x++)
+            {
+                if (gun.clips[x].Bullets != null)
+                        for (int i = 0; i < gun.clips[x].Bullets.Count; i++)
+                        {
+                            var clip = gun.clips[x].Bullets[i];
+                            if (clip != null)
+                            {
+                                if (clip.type != ItemID.EndlessMusketPouch)
+                                    Main.instance.LoadItem(clip.type);
+                                else
+                                {
+
+                                    Main.instance.LoadItem(ItemID.MusketBall);
+                                    clip.type = ItemID.MusketBall;
+                                }
+                                //Main.NewText($"{x},{i} type = {clip.Name}");
+                                Texture2D bullet = TextureAssets.Item[clip.type].Value;
+                                Main.EntitySpriteDraw(bullet, DrawPos + new Vector2(4 * i, x * 40 - 100), null, Color.White, 0, new Vector2(bullet.Width/2, bullet.Height), 0.5f, 0);
+                            }
+                        Utils.DrawLine(Main.spriteBatch, DrawPos + new Vector2(-2, x*40-100) + Main.screenPosition, DrawPos + new Vector2(22, x*40-100) + Main.screenPosition, Color.Red,Color.Red, 3);
+                        }
+                
+            }
+
+        }
+
+            
+        
+        public static RenderTarget2D ClipTarget { get; set; }
+        private void On_Main_CheckMonoliths(On_Main.orig_CheckMonoliths orig)
+        {
+            if (ClipTarget == null || ClipTarget.IsDisposed)
+                ClipTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+            else if (ClipTarget.Size() != new Vector2(Main.screenWidth / 2, Main.screenHeight / 2))
+            {
+                Main.QueueMainThreadAction(() =>
+                {
+                    ClipTarget.Dispose();
+                    ClipTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+                });
+                return;
+            }
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+
+            Main.graphics.GraphicsDevice.SetRenderTarget(ClipTarget);
+            Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+
+            foreach (Projectile projectile in Main.projectile.Where(n => n.active && n.ai[0] > 0 && n.type == ModContent.ProjectileType<Aoe_Rifle_HeldProj>()))
+            {
+                RenderClip(projectile);
+            }
+
+            Main.graphics.GraphicsDevice.SetRenderTarget(null);
+
+            Main.spriteBatch.End();
+
+            orig();
+
+        }
+
         #endregion
     }
 }
