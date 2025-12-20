@@ -17,7 +17,7 @@ public sealed class ClientSideConfiguration : ModConfig
     public override ConfigScope Mode { get; } = ConfigScope.ClientSide;
 
     [Header("$Mods.HeavenlyArsenal.Config.Graphics")]
-    [LabelArgs(typeof(CombatStim))]
+    [LabelArgs(typeof(CombatStimItem))]
     [BackgroundColor(192, 54, 64, 192)]
     [Range(0f, 6f)]
     [DefaultValue(true)]

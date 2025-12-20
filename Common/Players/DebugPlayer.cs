@@ -40,8 +40,8 @@ internal class DebugPlayer : PlayerDrawLayer
         // if(Owner.HeldItem.type == ModContent.ItemType<ViscousWhip_Item>())
         //msg += $"{Owner.Center.ToTileCoordinates()}";
         msg += $"Authority: {Owner.GetModPlayer<Aoe_Rifle_Player>().Authority}\n AuthorityTimer: {Owner.GetModPlayer<Aoe_Rifle_Player>().AuthorityTimer}\n {Owner.GetModPlayer<Aoe_Rifle_Player>().BulletCount}";
-        if(!Main.gameMenu && Owner.GetModPlayer<LeechScarf_Player>().Active)
-        for (int i = 0; i< Owner.GetModPlayer<LeechScarf_Player>().TendrilList.Count; i++)
+        if(!Main.gameMenu && Owner.GetModPlayer<LeechScarfPlayer>().Active)
+        for (int i = 0; i< Owner.GetModPlayer<LeechScarfPlayer>().TendrilList.Count; i++)
         {
 
             //msg += $"Slot: {Owner.GetModPlayer<LeechScarf_Player>().TendrilList[i].Slot}, Cooldown: {Owner.GetModPlayer<LeechScarf_Player>().TendrilList[i].Cooldown}\n";

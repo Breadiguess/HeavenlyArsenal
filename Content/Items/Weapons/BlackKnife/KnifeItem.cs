@@ -1,47 +1,86 @@
 ﻿using Terraria.DataStructures;
+using Terraria.ModLoader.IO;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.BlackKnife;
 
-internal class KnifeItem : ModItem
+public class KnifeItem : ModItem
 {
-    private int SwingStage;
+    public int Stage { get; set; }
 
     public override string LocalizationCategory => "Items.Weapons";
 
     public override void SetStaticDefaults()
     {
+        base.SetStaticDefaults();
+        
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(3, 5));
     }
 
     public override void SetDefaults()
     {
+        base.SetDefaults();
+        
+        Item.noUseGraphic = true;
+        Item.noMelee = true;
+        
         Item.DamageType = DamageClass.Generic;
 
         Item.damage = 3000;
-        Item.shoot = ModContent.ProjectileType<KnifeSlash>();
-        Item.shootSpeed = 2;
-
         Item.crit = 96;
-        Item.useStyle = ItemUseStyleID.HiddenAnimation;
-        Item.useAnimation = 30;
+        
+        Item.shootSpeed = 2f;
+        Item.shoot = ModContent.ProjectileType<KnifeSlash>();
+
+
         Item.useTime = 30;
         Item.useAnimation = 30;
-        Item.noUseGraphic = true;
-        Item.noMelee = true;
+        Item.useStyle = ItemUseStyleID.HiddenAnimation;
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        base.LoadData(tag);
+
+        Stage = tag.GetInt(nameof(Stage));
+    }
+
+    public override void SaveData(TagCompound tag)
+    {
+        base.SaveData(tag);
+        
+        tag[nameof(Stage)] = Stage;
+    }
+
+    public override ModItem Clone(Item newEntity)
+    {
+        var instance = base.Clone(newEntity);
+        
+        if (instance is not KnifeItem clone)
+        {
+            return instance;
+        }
+
+        clone.Stage = Stage;
+
+        return clone;
     }
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        Item.useStyle = SwingStage == 0 ? ItemUseStyleID.Swing : ItemUseStyleID.RaiseLamp;
-        var a = Projectile.NewProjectileDirect(player.GetSource_FromThis(), player.Center, velocity, type, damage, knockback);
-        a.ai[2] = SwingStage;
-        SwingStage++;
+        // TODO: Find a suitable method to change the item's use style.
+        Item.useStyle = Stage == 0 ? ItemUseStyleID.Swing : ItemUseStyleID.RaiseLamp;
+        
+        var projectile = Projectile.NewProjectileDirect(player.GetSource_FromThis(), player.Center, velocity, type, damage, knockback, player.whoAmI, 0f, 0f, Stage);
 
-        if (SwingStage > 1)
+        Stage++;
+
+        if (Stage <= 1)
         {
-            SwingStage = 0;
+            return false;
         }
 
+        Stage = 0;
+        
         return false;
     }
 }

@@ -8,7 +8,7 @@ using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Consumables.CombatStim;
 
-internal class StimPlayer : ModPlayer
+public sealed class StimPlayer : ModPlayer
 {
     public int stimsUsed;
 

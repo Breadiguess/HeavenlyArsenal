@@ -27,7 +27,7 @@ namespace HeavenlyArsenal
             {
                 case MessageType.LeechScarf_Sync:
                     byte playerNumber = reader.ReadByte();
-                    LeechScarf_Player examplePlayer = Main.player[playerNumber].GetModPlayer<LeechScarf_Player>();
+                    LeechScarfPlayer examplePlayer = Main.player[playerNumber].GetModPlayer<LeechScarfPlayer>();
                     
                         examplePlayer.ReceivePlayerSync(reader);
 

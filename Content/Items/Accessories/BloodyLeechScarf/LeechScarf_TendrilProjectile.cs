@@ -301,7 +301,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
      
         void CheckConditions()
         {
-            if (Owner == null || Owner.dead || Owner.GetModPlayer<LeechScarf_Player>().Active == false)
+            if (Owner == null || Owner.dead || Owner.GetModPlayer<LeechScarfPlayer>().Active == false)
             {
                 Projectile.active = false;
                 return;
@@ -342,7 +342,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             if (HitsLeft <= 0)
             {
                 
-                Owner.GetModPlayer<LeechScarf_Player>().KillTendril(Slot);
+                Owner.GetModPlayer<LeechScarfPlayer>().KillTendril(Slot);
             }
 
             int heal = (int)Math.Round(damageDone * 0.015f);

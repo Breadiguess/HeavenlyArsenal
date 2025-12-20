@@ -13,44 +13,52 @@ using System.Threading.Tasks;
 namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 {
     [AutoloadEquip(EquipType.Neck)]
-    public class LeechScarf_Item : ModItem
+    public class LeechScarfItem : ModItem
     {
         public const string WearingAccessory = "WearingLeechScarf";
 
         public override string LocalizationCategory => "Items.Accessories";
+        
         public override void SetDefaults()
         {
+            base.SetDefaults();
+            
+            Item.accessory = true;
+            
             Item.width = 26;
             Item.height = 42;
+            
             Item.defense = 7;
+            
             Item.value = CalamityGlobalItem.RarityLightRedBuyPrice;
+            
             Item.rare = ModContent.RarityType<BloodMoonRarity>();
-            Item.accessory = true;
         }
-        public override void UpdateVanity(Player player)
-        {
-            base.UpdateVanity(player);
-        }
+
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            CalamityPlayer modPlayer = player.Calamity();
-            modPlayer.bloodyWormTooth = true;
+            var calamityPlayer = player.Calamity();
+            
+            calamityPlayer.bloodyWormTooth = true;
+            
             player.endurance += 0.12f;
+            
             player.GetDamage(DamageClass.Melee) += 0.12f;
             player.GetDamage(ModContent.GetInstance<TrueMeleeDamageClass>()) += 0.12f;
             player.GetDamage(ModContent.GetInstance<TrueMeleeNoSpeedDamageClass>()) += 0.12f;
 
-            player.GetModPlayer<LeechScarf_Player>().Active = true;
+            player.GetModPlayer<LeechScarfPlayer>().Active = true;
         }
 
         public override void AddRecipes()
         {
-            var recipe = CreateRecipe()
+            base.AddRecipes();
+            
+            CreateRecipe()
                 .AddIngredient<BloodyWormScarf>()
                 .AddIngredient<UmbralLeechDrop>(8)
-                .AddTile(TileID.LunarCraftingStation);
-
-            recipe.Register();
+                .AddTile(TileID.LunarCraftingStation)
+                .Register();
         }
     }
 }

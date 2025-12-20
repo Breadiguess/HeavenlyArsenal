@@ -19,7 +19,7 @@ public class LeechScarfCooldown : CooldownHandler
     public new static string ID => "LeechScarfCooldown";
     public override bool CanTickDown => false;
     public override bool ShouldDisplay =>
-    instance.player.GetModPlayer<LeechScarf_Player>().Active;
+    instance.player.GetModPlayer<LeechScarfPlayer>().Active;
 
     public override LocalizedText DisplayName => Language.GetOrRegister("Leech Scarf Cooldown"); //"HeavenlyArsenal.Cooldowns.AntiShield.BarrierCooldown");
 
@@ -39,12 +39,12 @@ public class LeechScarfCooldown : CooldownHandler
 
     public override bool PersistsThroughDeath => false;
     int TendrilCount =>
-    instance.player.GetModPlayer<LeechScarf_Player>().Tendrils.Count;
+    instance.player.GetModPlayer<LeechScarfPlayer>().Tendrils.Count;
 
     float SegmentAngle => MathHelper.TwoPi / TendrilCount;
 
 
-    float GetTendrilCompletion(LeechScarf_Player.Tendril t, int maxCooldown)
+    float GetTendrilCompletion(LeechScarfPlayer.Tendril t, int maxCooldown)
     {
         if (t.Active)
             return 1f;
@@ -57,18 +57,18 @@ public class LeechScarfCooldown : CooldownHandler
 
     public override void ApplyBarShaders(float opacity)
     {
-        var mp = instance.player.GetModPlayer<LeechScarf_Player>();
+        var mp = instance.player.GetModPlayer<LeechScarfPlayer>();
         var tendrils = mp.Tendrils;
 
         int count = tendrils.Count;
         if (count == 0)
             return;
-        float slice = 1f / LeechScarf_Player.MAX_TENDRILS;
+        float slice = 1f / LeechScarfPlayer.MAX_TENDRILS;
 
         for (int i = 0; i < count; i++)
         {
             var t = tendrils[i];
-            float completion = GetTendrilCompletion(t, LeechScarf_Player.MAX_TENDRIL_COOLDOWN);
+            float completion = GetTendrilCompletion(t, LeechScarfPlayer.MAX_TENDRIL_COOLDOWN);
 
             float rotation = i * slice * MathHelper.TwoPi;
 

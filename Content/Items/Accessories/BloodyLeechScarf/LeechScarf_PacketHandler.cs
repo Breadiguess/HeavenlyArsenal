@@ -28,15 +28,15 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             Player player = Main.player[playerIndex];
             if (!player.active)
                 return;
-            ModContent.GetInstance<HeavenlyArsenal>().Logger.InfoFormat($"{ModContent.GetInstance<HeavenlyArsenal>().Name}: {LeechScarf_Player.PacketName}: Cooldown: {cooldown}, HitCooldown: {hitCooldown}, Slot:{slot}");
+            ModContent.GetInstance<HeavenlyArsenal>().Logger.InfoFormat($"{ModContent.GetInstance<HeavenlyArsenal>().Name}: {LeechScarfPlayer.PacketName}: Cooldown: {cooldown}, HitCooldown: {hitCooldown}, Slot:{slot}");
 
-            var mp = player.GetModPlayer<LeechScarf_Player>();
+            var mp = player.GetModPlayer<LeechScarfPlayer>();
 
             if (slot >= mp.TendrilList.Count)
                 return;
 
             // just grab a copy, im fairly sure that it will work
-            LeechScarf_Player.Tendril t = mp.TendrilList[slot];
+            LeechScarfPlayer.Tendril t = mp.TendrilList[slot];
 
             t.Cooldown = cooldown;
             t.HitCooldown = hitCooldown;

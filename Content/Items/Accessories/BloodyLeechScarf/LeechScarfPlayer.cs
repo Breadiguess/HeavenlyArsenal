@@ -8,7 +8,7 @@ using Terraria.Audio;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 {
-    public class LeechScarf_Player : ModPlayer
+    public sealed class LeechScarfPlayer : ModPlayer
     {
         public bool Active { get; set; }
 
@@ -70,7 +70,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                 this.Slot = slot;
             }
         }
-        public float GetSlotCompletion(LeechScarf_Player.Tendril t)
+        public float GetSlotCompletion(LeechScarfPlayer.Tendril t)
         {
             if (t.Active)
                 return 1f;
@@ -226,7 +226,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 
         public override void CopyClientState(ModPlayer targetCopy)
         {
-            LeechScarf_Player clone = (LeechScarf_Player)targetCopy;
+            LeechScarfPlayer clone = (LeechScarfPlayer)targetCopy;
             clone.TendrilList = new List<Tendril>(3);
             clone.TendrilList.Add(new Tendril());
             clone.TendrilList.Add(new Tendril());
@@ -247,7 +247,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 
         public override void SendClientChanges(ModPlayer clientPlayer)
         {
-            LeechScarf_Player clone = (LeechScarf_Player)clientPlayer;
+            LeechScarfPlayer clone = (LeechScarfPlayer)clientPlayer;
 
             for (int i = 0; i < clone.TendrilList.Count; i++)
             {
