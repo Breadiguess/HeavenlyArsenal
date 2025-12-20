@@ -72,7 +72,7 @@ public class ClothSimulation
         DampeningCoefficient = dampeningCoefficient;
     }
 
-    internal readonly ClothPoint?[,] particleGrid;
+    internal readonly ClothPoint[,] particleGrid;
 
     // Advances the simulation by one time step.
     public void Simulate(float dt, bool collision, Vector3 gravity)

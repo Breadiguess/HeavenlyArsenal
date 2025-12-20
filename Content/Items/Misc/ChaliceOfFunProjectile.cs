@@ -8,7 +8,7 @@ using Terraria.Localization;
 
 namespace HeavenlyArsenal.Content.Projectiles.Misc;
 
-internal class ChaliceOfFunHoldout : ModProjectile
+internal class ChaliceOfFunProjectile : ModProjectile
 {
     public bool isDraining;
 
@@ -24,22 +24,23 @@ internal class ChaliceOfFunHoldout : ModProjectile
 
     public override void SetDefaults()
     {
-        Projectile.width = Projectile.height = 34;
-        Projectile.friendly = true;
-        Projectile.penetrate = -1;
-        Projectile.tileCollide = false;
         Projectile.DamageType = DamageClass.Generic;
+        
+        Projectile.tileCollide = false;
         Projectile.ignoreWater = true;
+        Projectile.friendly = true;
+        
         Projectile.hide = true;
+        
+        Projectile.width = 32;
+        Projectile.height = 32;
+        
+        Projectile.penetrate = -1;
+        
         Projectile.timeLeft = 90000;
-        Projectile.aiStyle = 0;
+
         Projectile.noEnchantmentVisuals = true;
         Projectile.manualDirectionChange = true;
-    }
-
-    public override void SetStaticDefaults()
-    {
-        base.SetStaticDefaults();
     }
 
     public override void AI()
@@ -56,7 +57,7 @@ internal class ChaliceOfFunHoldout : ModProjectile
 
         Owner.heldProj = Projectile.whoAmI;
 
-        if (Owner.HeldItem?.type != ModContent.ItemType<ChaliceOfFun>())
+        if (Owner.HeldItem?.type != ModContent.ItemType<ChaliceOfFunItem>())
         {
             Projectile.Kill();
 

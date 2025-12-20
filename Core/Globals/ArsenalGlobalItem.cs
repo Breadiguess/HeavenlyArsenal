@@ -6,7 +6,7 @@ public class ArsenalGlobalItem : GlobalItem
 {
     public delegate void ModifyItemLootDelegate(Item item, ItemLoot loot);
 
-    public static event ModifyItemLootDelegate? ModifyItemLootEvent;
+    public static event ModifyItemLootDelegate ModifyItemLootEvent;
 
     public override void SetDefaults(Item entity)
     {

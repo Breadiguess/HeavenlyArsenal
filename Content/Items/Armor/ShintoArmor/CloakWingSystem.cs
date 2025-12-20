@@ -23,9 +23,7 @@ using Player = Terraria.Player;
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor
 {
-   
-   
-    class ShintoArmorCapePlayer : ModPlayer
+    public class ShintoArmorCapePlayer : ModPlayer
     {
         private float ExistenceTimer;
 

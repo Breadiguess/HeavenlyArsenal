@@ -85,7 +85,7 @@ public partial class IdolSummoningRitualSystem : ModSystem
         UpdateLoopSound(HarshWindSoundInstance, HarshWindSoundVolume);
     }
 
-    private static void UpdateLoopSound(LoopedSoundInstance? sound, float volume)
+    private static void UpdateLoopSound(LoopedSoundInstance sound, float volume)
     {
         if (sound is null)
             return;

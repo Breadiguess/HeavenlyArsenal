@@ -1,5 +1,4 @@
 ﻿using CalamityMod;
-using HeavenlyArsenal.ArsenalPlayer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -13,37 +12,37 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
     {
         public override void SetStaticDefaults()
         {
-            ItemID.Sets.gunProj[Item.type] = true;
+            base.SetStaticDefaults();
+            
+            ItemID.Sets.gunProj[Type] = true;
         }
 
         public override void SetDefaults()
         {
-            Item.width = 32;
-            Item.height = 32;
-
+            base.SetDefaults();
 
             Item.DamageType = ModContent.GetInstance<RogueDamageClass>();
+            
+            Item.width = 56;
+            Item.height = 68;
+            
             Item.damage = 3002;
             Item.crit = -30;
             Item.knockBack = 2f;
-            Item.useTime = 5;
-            Item.useAnimation = 5;
-
-            // Important for channeling (charging)
+            
+            Item.autoReuse = true;
             Item.channel = true;
             Item.useTurn = true;
-
-            Item.useStyle = ItemUseStyleID.Shoot;
-            Item.noUseGraphic = true;
-            Item.shoot = ModContent.ProjectileType<AvatarRogueHeld>();
-            Item.shootSpeed = 1;
-            Item.autoReuse = true;
-
             
             Item.UseSound = SoundID.Item1;
-            Item.consumable = false;
+            Item.useTime = 5;
+            Item.useAnimation = 5;
+            Item.useStyle = ItemUseStyleID.Shoot;
 
+            Item.noUseGraphic = true;
 
+            Item.shootSpeed = 1f;
+            Item.shoot = ModContent.ProjectileType<AvatarRogueHeld>();
         }
 
         private bool HoldingBowl(Player player) => player.ownedProjectileCounts[Item.shoot] > 0;
@@ -59,7 +58,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
                 }
             }
         }
-        public override bool CanUseItem(Player player) => player.ownedProjectileCounts[ModContent.ProjectileType<AvatarRogueHeld>()] <= 0;
+
+        public override bool CanUseItem(Player player)
+        {
+            return player.ownedProjectileCounts[ModContent.ProjectileType<AvatarRogueHeld>()] == 0;
+        }
 
         public override void UseItemFrame(Player player)
         {
@@ -80,14 +83,13 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.AvatarRogue
             Texture2D barCharge = AssetDirectory.Textures.Bars.BarFill[style].Value;
 
 
-            Rectangle chargeFrame = new Rectangle(0, 0, (int)(barCharge.Width * Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat), barCharge.Height);
-            Color barColor = Color.Lerp(Color.MediumOrchid, Color.Turquoise, Utils.GetLerpValue(0.3f, 0.8f, Main.LocalPlayer.GetModPlayer<HeavenlyArsenalPlayer>().CessationHeat, true));
+            Rectangle chargeFrame = new Rectangle(0, 0, (int)(barCharge.Width * Main.LocalPlayer.GetModPlayer<LifeAndCessationPlayer>().CessationHeat), barCharge.Height);
+            Color barColor = Color.Lerp(Color.MediumOrchid, Color.Turquoise, Utils.GetLerpValue(0.3f, 0.8f, Main.LocalPlayer.GetModPlayer<LifeAndCessationPlayer>().CessationHeat, true));
             barColor.A = 128;
             spriteBatch.Draw(bar, position + new Vector2(0, 35) * scale, bar.Frame(), Color.DarkSlateBlue, 0, bar.Size() * 0.5f, scale * 1.2f, 0, 0);
             spriteBatch.Draw(barCharge, position + new Vector2(0, 35) * scale, chargeFrame, barColor, 0, barCharge.Size() * 0.5f, scale * 1.2f, 0, 0);
         }
-
-
+        
     }
 
     public class AvatarRogueHeld : ModProjectile

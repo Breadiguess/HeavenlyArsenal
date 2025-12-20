@@ -96,9 +96,9 @@ partial class voidVulture
     /// <summary>
     ///     A looping sound for the VomitCone attack.
     /// </summary>
-    public LoopedSoundInstance? VomitLoop { get; set; }
+    public LoopedSoundInstance VomitLoop { get; set; }
 
-    public LoopedSoundInstance? RiserForSpin { get; set; }
+    public LoopedSoundInstance RiserForSpin { get; set; }
 
     public Behavior currentState
     {
