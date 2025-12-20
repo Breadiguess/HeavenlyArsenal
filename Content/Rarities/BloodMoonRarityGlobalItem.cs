@@ -47,7 +47,7 @@ public sealed class BloodMoonRarityGlobalItem : GlobalItem
 
     public override bool AppliesToEntity(Item entity, bool lateInstantiation)
     {
-        return entity.rare == ModContent.RarityType<BloodMoonRarity>();
+        return lateInstantiation && entity.rare == ModContent.RarityType<BloodMoonRarity>();
     }
 
     public override bool PreDrawTooltipLine(Item item, DrawableTooltipLine line, ref int yOffset)
@@ -199,16 +199,17 @@ public sealed class BloodMoonRarityGlobalItem : GlobalItem
                 );
             }
 
-            var wave = MathF.Sin(Main.GameUpdateCount * 0.05f + i);
+            var wave = MathF.Sin(Main.GlobalTimeWrappedHourly*10.1f/2 + i);
 
             offset = new Vector2(0f, wave);
 
-            color = Color.Crimson;
-            color.A = 200;
+            color = Color.Black;
+            color.A = 255;
 
             var scale = 1f + wave * 0.01f;
+            Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, color , scale*1.2f);
 
-            Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, color, scale);
+            Utils.DrawBorderString(Main.spriteBatch, letter, cursor + offset, Color.Crimson, scale);
 
             cursor.X += font.MeasureString(letter).X * scale;
         }

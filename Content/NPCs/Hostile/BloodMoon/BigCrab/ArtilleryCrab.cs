@@ -87,7 +87,7 @@ internal class ArtilleryCrab : BloodMoonBaseNPC
     {
         NPC.width = 100;
         NPC.height = 55;
-        NPC.damage = 200;
+        NPC.damage = 170;
         NPC.defense = 130 / 2;
         NPC.lifeMax = 38470;
         NPC.value = 10000;
@@ -616,7 +616,7 @@ public class BloodMortar : ModNPC
     {
         NPC.width = 50;
         NPC.height = 50;
-        NPC.damage = 488;
+        NPC.damage = 300;
         NPC.lifeMax = 100;
         NPC.defDefense = 4000;
         NPC.noGravity = true;

@@ -119,3 +119,6 @@ DirectionalSolynForcefield3.DisplayName: Directional Solyn Forcefield3
 SolynBarrier.DisplayName: Solyn Barrier
 SeekingThorn.DisplayName: Seeking Thorn
 ThornBomb_Seed.DisplayName: Thorn Bomb_ Seed
+LeechScarf_TendrilProjectile.DisplayName: Leech Scarf_ Tendril Projectile
+Aoe_Rifle_Laser.DisplayName: Aoe_ Rifle_ Laser
+Aoe_Rifle_HeldProj.DisplayName: Aoe_ Rifle_ Held Proj

@@ -70,7 +70,7 @@ internal class CometBackBlast : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.IntersectsConeSlowMoreAccurate(Projectile.Center, 800 * Projectile.scale, Projectile.rotation, MathHelper.ToRadians(70) * Projectile.scale);
+        return targetHitbox.IntersectsConeSlowMoreAccurate(Projectile.Center, 800 * Projectile.scale, Projectile.rotation, MathHelper.ToRadians(60) * Projectile.scale);
     }
 
     #region cone
@@ -188,4 +188,5 @@ internal class CometBackBlast : ModProjectile
     }
 
     #endregion
+    
 }

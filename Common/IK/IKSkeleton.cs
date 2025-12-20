@@ -149,7 +149,7 @@ public struct IKSkeleton
                 break;
             }
 
-            // Check stagnation (solver cannot improve → impossible pose under constraints)
+            // Check stagnation (solver cannot improve -> impossible pose under constraints)
             if (Math.Abs(lastDistance - distance) < 0.0001f)
             {
                 SolveFailed = true;
@@ -184,4 +184,35 @@ public struct IKSkeleton
 
         return MathHelper.ToDegrees(max - min);
     }
+
+    public float GetSolvedJointAngle(int joint, Vector2 startPosition)
+    {
+        // Root-relative angle reconstruction (matches solver logic)
+        float rootAngle = 0f;
+
+        if (joint > 0)
+        {
+            Vector2 prevDir =
+                (joint > 1 ? _positions[joint] - _positions[joint - 1]
+                           : _positions[joint] - startPosition);
+
+            rootAngle = prevDir.ToRotation();
+        }
+
+        Vector2 dir = _positions[joint + 1] - _positions[joint];
+        float absoluteAngle = dir.ToRotation();
+
+        // This is the angle actually clamped by constraints
+        return MathHelper.WrapAngle(absoluteAngle - rootAngle);
+    }
+
+    public void LockCurrentPose(Vector2 startPosition)
+    {
+        for (int i = 0; i < JointCount; i++)
+        {
+            float angle = GetSolvedJointAngle(i, startPosition);
+            SetConstraint(i, angle, angle);
+        }
+    }
+
 }

@@ -4,11 +4,12 @@ using Luminance.Common.DataStructures;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.Projectiles.SolynProjectiles;
+using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.Automators;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.SolynButterfly;
 
-public class SolynButterflyBarrier : ModProjectile, IProjOwnedByBoss<BattleSolynBird>, IDrawsWithShader
+public class SolynButterflyBarrier : ModProjectile, IProjOwnedByBoss<BattleSolyn>, IDrawsWithShader
 {
     /// <summary>
     ///     How long this forcefield has existed for, in frames.

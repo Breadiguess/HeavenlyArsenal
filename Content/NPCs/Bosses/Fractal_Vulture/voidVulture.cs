@@ -18,6 +18,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture;
 [AutoloadBossHead]
 partial class voidVulture : ModNPC
 {
+    public const NoxusBoss.Content.NPCs.Friendly.BattleSolyn.SolynAIType Funny = (NoxusBoss.Content.NPCs.Friendly.BattleSolyn.SolynAIType)(-174993);
+
+
     //CLUTTERR AAAA
     private static NPC? myself;
 
@@ -116,8 +119,6 @@ partial class voidVulture : ModNPC
 
     public override string HeadTexture => this.GetPath() + "_Head";
 
-    public override void Load() { }
-
     public override void BossHeadSlot(ref int index)
     {
         if (NPC.Opacity < 0.2f)
@@ -202,7 +203,8 @@ partial class voidVulture : ModNPC
         NPC.knockBackResist = 0;
         NPC.damage = 200;
         NPC.BossBar = ModContent.GetInstance<VoidVultureBar>();
-        Music = MusicLoader.GetMusicSlot(Mod, "Assets/Sounds/Music/AvatarOfEmptinessP2");
+        //placeholder music by "holecatofficial" on discord 
+        Music = MusicLoader.GetMusicSlot(Mod, "Assets/Sounds/Music/BirdUp");
 
         if (Main.netMode != NetmodeID.Server)
         {

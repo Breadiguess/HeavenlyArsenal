@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text;
+﻿using CalamityMod.Projectiles.Ranged;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using Hjson;
+using Humanizer;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
@@ -13,6 +10,12 @@ using NoxusBoss.Core.DialogueSystem;
 using NoxusBoss.Core.Graphics.UI.SolynDialogue;
 using NoxusBoss.Core.SolynEvents;
 using NoxusBoss.Core.World.GameScenes.RiftEclipse;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text;
+using Terraria;
 using Terraria.GameContent.Events;
 //using HeavenlyArsenal.Content.Items.Accessories.Nightfall;
 
@@ -55,6 +58,7 @@ public class SolynDialogueAddon : ModSystem
         TestNPCDialogue();
         //ChiUpgradeDialogue();
         RiftEclipsePartyDialogue();
+        RiftEclipsePartyDialogueRepeated();
     }
 
     #region dialogue
@@ -167,10 +171,32 @@ public class SolynDialogueAddon : ModSystem
             .LinkChain("Start", "Solyn1", "Solyn2", "Player1", "Solyn3", "Solyn4");
 
         conv6.MakeSpokenByPlayer("Player1");
-        conv6.WithRerollCondition(conversation => !conversation.AppearanceCondition());
+        conv6.WithRerollCondition(conversation => !conversation.AppearanceCondition() && conversation.SeenBefore("SolynRiftFirstPartyDialogue"));
         conv6.MakeFallback(30);
     }
+    private static void RiftEclipsePartyDialogueRepeated()
+    {
+        var conv6 = DialoguePatchFactory.BuildAndRegisterFromMod("SolynRiftPartyDialogue", "Start");
 
+        conv6.WithAppearanceCondition
+            (
+                c =>
+                {
+                    var player = Main.LocalPlayer;
+
+                    if (RiftEclipseManagementSystem.RiftEclipseOngoing && BirthdayParty.PartyIsUp)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+            )
+            .LinkChain("Start", "Player1", "Solyn1","Solyn2", "Player2", "Solyn3");
+        conv6.MakeSpokenByPlayer("Player1", "Player2");
+        conv6.WithRerollCondition(conversation => !conversation.AppearanceCondition() && conversation.SeenBefore("SolynRiftFirstPartyDialogue"));
+        conv6.MakeFallback(30);
+    }
     #endregion
 }
 

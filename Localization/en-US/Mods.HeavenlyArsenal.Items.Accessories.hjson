@@ -1,4 +1,4 @@
-ElectricVambrace: {
+﻿ElectricVambrace: {
 	DisplayName: Vambrace of Otonilou
 	Tooltip:
 		'''
@@ -88,5 +88,18 @@ ShintoArmorWings: {
 		A massive set of frayed wings, woven from old dense rope
 		'Smells slightly of mold'
 		Provides infinite flight while worn
+		'''
+}
+
+LeechScarf_Item: {
+	DisplayName: Bloody Leech Scarf
+	Tooltip:
+		'''
+		Provides a 12% increase to all melee damage
+		Reduces incoming damage by 12%
+		Tendrils protect your back and siphon life
+		After several strikes, they solidify and break
+		Dealing damage up close restores them faster
+		Swapping off this accessory kills the leeches.
 		'''
 }

@@ -107,9 +107,9 @@ partial class newLeech : BloodMoonBaseNPC, IMultiSegmentNPC
 
     public override void SetDefaults()
     {
-        NPC.lifeMax = 80_000;
-        NPC.damage = 180;
-        NPC.defense = 95;
+        NPC.lifeMax = 50_000;
+        NPC.damage = 160;
+        NPC.defense = 145;
         NPC.noGravity = true;
         NPC.aiStyle = -1;
         NPC.npcSlots = 7f;

@@ -397,6 +397,11 @@ Mods: {
 				DisplayName: Umbral Leech Banner Item
 				Tooltip: ""
 			}
+
+			LeechScarf_Item: {
+				DisplayName: Leech Scarf_ Item
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {
@@ -430,6 +435,11 @@ Mods: {
 				DisplayName: Torrential  Downpour
 				TownNPCDialogueName: the Torrential  Downpour
 			}
+
+			"Crimson Deluge": {
+				DisplayName: Crimson  Deluge
+				TownNPCDialogueName: the Crimson  Deluge
+			}
 		}
 
 		Mods: {
@@ -460,5 +470,7 @@ Mods: {
 				}
 			}
 		}
+
+		Prefixes.Aoe_Rifle_Reforge.DisplayName: Aoe_ Rifle_ Reforge
 	}
 }

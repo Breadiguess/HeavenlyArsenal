@@ -14,7 +14,10 @@ public class SeekingThorn : ModProjectile
 
     public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
 
-    public override void SetStaticDefaults() { }
+    public override void SetStaticDefaults() 
+    {
+        
+    }
 
     public override void SetDefaults()
     {

@@ -420,50 +420,7 @@ public class ShintoArmorPlayer : ModPlayer
     /// </summary>
     private void AntishadowHealing()
     {
-        if (!SetActive)
-        {
-            return;
-        }
-
-        if (Player.StandingStill() && Player.velocity.Length() == 0 && Player.itemAnimation == 0)
-        {
-            // Actually apply "standing still" regeneration (the stats are granted even at full health)
-            float regenTimeNeededForTurboRegen = 40;
-            var turboRegenPower = 15 * (1 + (int)Player.lifeRegenTime / 1000);
-
-            // Main.NewText(turboRegenPower);
-            if (turboRegenPower > 0)
-            {
-                if (Player.lifeRegenTime > regenTimeNeededForTurboRegen && Player.lifeRegenTime < 1800f)
-                {
-                    Player.lifeRegenTime = 1800f;
-                }
-
-                Player.lifeRegenCount += turboRegenPower;
-                Player.lifeRegenTime += turboRegenPower;
-            }
-
-            if (Player.lifeRegen > 0 && Player.statLife < Player.Calamity().actualMaxLife)
-            {
-                if (Main.rand.NextBool(1))
-                {
-                    var Blob = ModContent.GetInstance<AntishadowBlob>();
-
-                    for (var i = 0; i < 1; i++)
-
-                    {
-                        float randomoffset = Main.rand.Next(-4, 4);
-                        var bloodSpawnPosition = Player.Center + Main.rand.NextVector2CircularEdge(120 + randomoffset, 120 + randomoffset);
-
-                        //var dust = Dust.NewDustPerfect(bloodSpawnPosition, DustID.AncientLight, Vector2.Zero, default, Color.Red);
-                        //dust.noGravity = true;
-                        Blob.player = Player;
-
-                        Blob.CreateParticle(bloodSpawnPosition, Vector2.Zero, 0);
-                    }
-                }
-            }
-        }
+        
     }
 
     public override bool FreeDodge(Player.HurtInfo info)

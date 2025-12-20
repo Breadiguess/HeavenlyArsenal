@@ -385,3 +385,12 @@ FodyWeavers.xsd
 
 # JetBrains
 .idea/
+/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech.cs
+/Assets/AutoloadedEffects/Shaders/inversion.fx
+/Assets/AutoloadedEffects/Shaders/inversion.fxc
+/Assets/AutoloadedEffects/Shaders/SphericalNoise.fx
+/Assets/AutoloadedEffects/Shaders/SphericalNoise.fxc
+/Content/NPCs/Hostile/BloodMoon/Goreca
+/Content/NPCs/Hostile/BloodMoon/Jellyfish/FileName.cs
+/Core/PixelatedDrawingLayer.cs
+/Core/RenderTargetsManager.cs

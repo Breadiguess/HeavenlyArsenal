@@ -1,21 +1,57 @@
-global using LumUtils = Luminance.Common.Utilities.Utilities;
+﻿global using LumUtils = Luminance.Common.Utilities.Utilities;
 global using WotGUtils = NoxusBoss.Core.Utilities.Utilities;
-
-using System.Runtime.CompilerServices;
 using CalamityMod.Projectiles.Enemy;
 using CalamityMod.UI.CalamitasEnchants;
 using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
 using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
-using log4net;
 using NoxusBoss.Content.Items;
+using System.IO;
+using System.Runtime.CompilerServices;
+using static HeavenlyArsenal.HeavenlyArsenal;
 
 namespace HeavenlyArsenal;
 
 /// <summary>
 ///     The <see cref="Mod"/> implementation of Heavenly Arsenal.
 /// </summary>
-public sealed class HeavenlyArsenal : Mod
+public partial class HeavenlyArsenal : Mod
 {
+    public override void Load()
+    {
+        EnchantmentManager.ItemUpgradeRelationship[ModContent.ItemType<MetallicChunk>()] = ModContent.ItemType<VoidCrestOath>();
+        /*
+        if (ModLoader.GetMod("NoxusBoss") != null)
+        {
+            // Replace the following line:
+            // Type riftType = ModContent.GetModNPC<CeaselessVoidRift>().Type;
+
+            // With this corrected line:
+            Type riftType = ModContent.NPCType<CeaselessVoidRift>();
+            if (riftType != null)
+            {
+                PropertyInfo prop = riftType.GetProperty("CanEnterRift", BindingFlags.Public | BindingFlags.Static);
+                MethodInfo getter = prop?.GetGetMethod();
+                // Type forceRiftOpen = prop.PropertyType;
+                //MethodInfo detourMethod =  forceOpenRift.get
+                if (getter != null)
+                {
+
+                    Hook hook = new Hook(getter, new Func<Func<bool>, bool>(CanEnterRift_Hook));
+                    //HookEndpointManager.Add(getter, hook);
+                }
+            }
+
+        */
+
+        //On_NPC.AI 
+        On_Projectile.Damage += MultisegmentCollideEnabler;
+        On_Projectile.CanHitWithMeleeWeapon += MultisegmentCheckSetter;
+        On_Projectile.Colliding += ExtraHitboxCollide;
+    }
+
+   
+    #region MultiSegmentNPC
     public static class MultiSegmentNPCIterator
     {
         /// <summary>
@@ -77,43 +113,7 @@ public sealed class HeavenlyArsenal : Mod
 
     public static bool MultiSegmentEnabler;
 
-    /// <summary>
-    ///     Gets the singleton instance of <see cref="HeavenlyArsenal"/>. Shorthand for <see cref="ModContent.GetInstance"/>.
-    /// </summary>
-    public static HeavenlyArsenal Instance => ModContent.GetInstance<HeavenlyArsenal>();
-
-    public override void Load()
-    {
-        EnchantmentManager.ItemUpgradeRelationship[ModContent.ItemType<MetallicChunk>()] = ModContent.ItemType<VoidCrestOath>();
-        /*
-        if (ModLoader.GetMod("NoxusBoss") != null)
-        {
-            // Replace the following line:
-            // Type riftType = ModContent.GetModNPC<CeaselessVoidRift>().Type;
-
-            // With this corrected line:
-            Type riftType = ModContent.NPCType<CeaselessVoidRift>();
-            if (riftType != null)
-            {
-                PropertyInfo prop = riftType.GetProperty("CanEnterRift", BindingFlags.Public | BindingFlags.Static);
-                MethodInfo getter = prop?.GetGetMethod();
-                // Type forceRiftOpen = prop.PropertyType;
-                //MethodInfo detourMethod =  forceOpenRift.get
-                if (getter != null)
-                {
-
-                    Hook hook = new Hook(getter, new Func<Func<bool>, bool>(CanEnterRift_Hook));
-                    //HookEndpointManager.Add(getter, hook);
-                }
-            }
-
-        */
-
-        //On_NPC.AI 
-        On_Projectile.Damage += MultisegmentCollideEnabler;
-        On_Projectile.CanHitWithMeleeWeapon += MultisegmentCheckSetter;
-        On_Projectile.Colliding += ExtraHitboxCollide;
-    }
+   
 
     public static void MultisegmentCollideEnabler(On_Projectile.orig_Damage orig, Projectile self)
     {
@@ -248,7 +248,7 @@ public sealed class HeavenlyArsenal : Mod
 
         return result;
     }
-
+    #endregion
     public static void TryAddModIngredient(Recipe recipe, string modName, string itemName)
     {
         if (ModLoader.TryGetMod(modName, out var mod))
@@ -259,6 +259,29 @@ public sealed class HeavenlyArsenal : Mod
             {
                 recipe.AddIngredient(item.Type);
             }
+        }
+    }
+    internal abstract class PacketHandler
+    {
+        internal byte HandlerType { get; set; }
+
+        public abstract void HandlePacket(BinaryReader reader, int fromWho);
+
+        protected PacketHandler(byte handlerType)
+        {
+            HandlerType = handlerType;
+        }
+
+        protected ModPacket GetPacket(byte packetType, int fromWho)
+        {
+            var p = ModContent.GetInstance<HeavenlyArsenal>().GetPacket();
+            p.Write(HandlerType);
+            p.Write(packetType);
+            if (Main.netMode == NetmodeID.Server)
+            {
+                p.Write((byte)fromWho);
+            }
+            return p;
         }
     }
 }

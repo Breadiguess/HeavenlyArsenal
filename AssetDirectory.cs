@@ -47,6 +47,17 @@ public static class AssetDirectory
                 {
                     public static readonly Asset<Texture2D> BolaBall = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/BolaBall");
                 }
+
+                public static class Ranger
+                {
+                    public static readonly Asset<Texture2D> Finality_Chinese = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/Aoe_Rifle/Finality_Chinese");
+                    public static readonly Asset<Texture2D> Finality_German = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/Aoe_Rifle/Finality_German");
+                    public static readonly Asset<Texture2D> Finality_Norse = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/Aoe_Rifle/Harvest_Norse");
+                    public static readonly Asset<Texture2D> Finality_Omega = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/Aoe_Rifle/Death_Omega");
+                    public static readonly Asset<Texture2D> End_Turkish = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/Aoe_Rifle/End_OldTurkish");
+
+
+                }
             }
         }
 

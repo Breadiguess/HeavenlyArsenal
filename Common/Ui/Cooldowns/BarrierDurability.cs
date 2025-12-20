@@ -75,6 +75,7 @@ public class BarrierDurability : CooldownHandler
         var outline = Request<Texture2D>(OutlineTexture).Value;
         var overlay = Request<Texture2D>(OverlayTexture).Value;
 
+        scale *= MathF.Sin(Main.GlobalTimeWrappedHourly);
         // Draw the outline
         spriteBatch.Draw(outline, position, null, OutlineColor * opacity, 0, outline.Size() * 0.5f, scale, SpriteEffects.None, 0f);
 
