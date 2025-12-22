@@ -77,6 +77,14 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             {
                 modifiers.DefenseEffectiveness *= 0;
                 modifiers.ScalingBonusDamage += 3f;
+
+                if (target.SuperArmor)
+                {
+                    modifiers = modifiers with
+                    {
+                        SuperArmor = false
+                    };
+                }
             }
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)

@@ -27,7 +27,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         public override void SetDefaults()
         {
             Item.value = Terraria.Item.buyPrice(4, 20, 10, 4);
-            Item.damage = 20_000;
+            Item.damage = 13_000;
             Item.rare = ModContent.RarityType<AvatarRarity>();
             
             Item.DamageType = DamageClass.Ranged;

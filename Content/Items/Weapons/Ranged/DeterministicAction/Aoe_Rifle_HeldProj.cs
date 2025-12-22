@@ -64,7 +64,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 get => Bullets != null ? Bullets.Count : 0;
             }
 
-           
+                
 
 
             public Clip(List<Item> insertedBullets)
@@ -226,7 +226,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
             AttackStage++;
             Time = -1;
-            if (AmmoStored <= 0 && CurrentState == RifleState.Recoil)
+            if (AmmoStored <= 0 && (CurrentState == RifleState.Recoil|| CurrentState == RifleState.Idle))
                 nextState = RifleState.Reload;
 
             return nextState;
@@ -278,9 +278,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             Owner.SetDummyItemTime(2);
             Item ChosenBullet = GetBulletFromClip();
+            int baseDamage = Owner.GetWeaponDamage(Owner.HeldItem);
+            float knockback = Owner.GetWeaponKnockback(Owner.HeldItem, Owner.HeldItem.knockBack);
 
-
-            int damage = Owner.HeldItem.damage;
+            int finalDamage = baseDamage + ChosenBullet.damage;
+            float finalKnockback = knockback + ChosenBullet.knockBack;
+            int damage = finalDamage;
             if(RiflePlayer.BulletCount == 1)
             {
                 damage *= 2;
@@ -288,7 +291,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             float screenshakeStrength = 1 - LumUtils.InverseLerp(0, 10, RiflePlayer.BulletCount) + (RiflePlayer.BulletCount == 1 ? 2: 1);
             ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 7f * screenshakeStrength, shakeStrengthDissipationIncrement: RiflePlayer.BulletCount != 1 ? 0.4f : 0.2f);
             Projectile a = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center,
-            Projectile.velocity * 120, ModContent.ProjectileType<Aoe_Rifle_Laser>(), damage, Owner.HeldItem.knockBack);
+            Projectile.velocity * 120, ModContent.ProjectileType<Aoe_Rifle_Laser>(), damage, finalKnockback);
 
             a.As<Aoe_Rifle_Laser>().PowerShot = RiflePlayer.BulletCount == 1;
             a.timeLeft += RiflePlayer.BulletCount == 1 ? 2: 0;
