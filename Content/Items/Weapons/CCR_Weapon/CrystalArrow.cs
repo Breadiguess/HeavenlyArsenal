@@ -120,7 +120,7 @@ internal class CrystalArrow : ModProjectile
         }
 
         /*
-        if (victim.active && Timer % 5 == 0)
+        if (victim.active && Time % 5 == 0)
         {
 
             int CrystalAmount = Charge > 4 ? (int)Charge / 2 : (int)Charge;

@@ -1,5 +1,6 @@
 ﻿using HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
 using HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using System.Collections.Generic;
 using Terraria.DataStructures;
 //using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;

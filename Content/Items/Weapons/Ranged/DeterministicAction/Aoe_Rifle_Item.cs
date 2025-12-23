@@ -1,10 +1,14 @@
 ﻿using CalamityMod.Projectiles.Ranged;
+using HeavenlyArsenal.Core.Globals;
 using Luminance.Assets;
 using Microsoft.Xna.Framework.Input;
 using NoxusBoss.Assets.Fonts;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Rarities;
+using NoxusBoss.Core.GlobalInstances;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.UI.Chat;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
@@ -18,16 +22,37 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         public override string LocalizationCategory => "Items.Weapons.Ranged";
 
-        public override string Texture => MiscTexturesRegistry.ChromaticBurstPath;
 
         public override void SetStaticDefaults()
         {
-            ItemID.Sets.gunProj[Type] = true;   
+            ItemID.Sets.gunProj[Type] = true;
+            GlobalNPCEventHandlers.ModifyNPCLootEvent += (npc, npcLoot) =>
+            {
+                if (npc.type == ModContent.NPCType<AvatarOfEmptiness>())
+                {
+                    var normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
+
+                    {
+                        normalOnly.OnSuccess(ItemDropRule.Common(Type));
+                    }
+
+                    npcLoot.Add(normalOnly);
+                }
+            };
+
+            ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
+            {
+                if (item.type == AvatarOfEmptiness.TreasureBagID)
+                {
+                    loot.Add(ItemDropRule.Common(Type));
+                }
+            };
         }
         public override void SetDefaults()
         {
             Item.value = Terraria.Item.buyPrice(4, 20, 10, 4);
             Item.damage = 13_000;
+            Item.crit = -3;
             Item.rare = ModContent.RarityType<AvatarRarity>();
             
             Item.DamageType = DamageClass.Ranged;
@@ -43,6 +68,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Item.knockBack = 7;
         }
 
+        public override void ModifyWeaponCrit(Player player, ref float crit)
+        {
+            crit = 1;
+        }
+
+        public override bool AltFunctionUse(Player player) => true;
         public override void HoldItem(Player player)
         {
             if (player.ownedProjectileCounts[Item.shoot] <1)
@@ -53,11 +84,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         }
         public override bool CanUseItem(Player player) => false;
         public override bool CanShoot(Player player) => false;
-
-
         public override void UpdateInventory(Player player)
         {
+            if (!Main.keyState.IsKeyDown(Keys.LeftShift))
+                return;
 
+            
         }
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
         {
@@ -70,7 +102,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             line.Font = FontRegistry.Instance.AvatarPoemText;
             line.BaseScale *= new Vector2(0.407f, 0.405f);
             /* if (FontRegistry.RussianGameCulture.IsActive)
-                line.BaseScale *= 1f; */
+                line.BaseScale *= 1f; */ 
 
             // Draw lines.
             List<string> lines =
@@ -94,6 +126,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         internal static void DrawHeldShiftTooltip(List<TooltipLine> tooltips, TooltipLine[] holdShiftTooltips, bool hideNormalTooltip = false)
         {
+            //yes, this is literally just the lore item. don't sue me this time.
             // Do not override anything if the Left Shift key is not being held.
             if (!Main.keyState.IsKeyDown(Keys.LeftShift))
                 return;

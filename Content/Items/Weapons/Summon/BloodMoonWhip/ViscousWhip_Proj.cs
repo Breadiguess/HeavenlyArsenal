@@ -207,7 +207,7 @@ internal class ViscousWhip_Proj : CleanBaseWhip
 
 
                 Projectile.GetWhipSettings(Projectile, out float timeToFlyOut, out int _, out float _);
-                float t = Timer / timeToFlyOut;
+                float t = Time / timeToFlyOut;
                 Vector2 a = list[list.Count - 2] - list[2];
                 float rot = a.ToRotation() - MathHelper.PiOver2; // This projectile's sprite faces down, so PiOver2 is used to correct rotation.
 

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria.DataStructures;
+using Terraria.Localization;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 {
@@ -17,6 +18,64 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         public bool PowerShot = false;
         public override string Texture =>  MiscTexturesRegistry.InvisiblePixelPath;
         public const int LASER_RANGE = 6_000;
+        #region pixelation
+        public override void Load()
+        {
+            On_Main.CheckMonoliths += PixelateLaser;
+        }
+        public static RenderTarget2D LaserTarget;
+        private void PixelateLaser(On_Main.orig_CheckMonoliths orig)
+        {
+            if (LaserTarget == null || LaserTarget.IsDisposed)
+                LaserTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+            else if (LaserTarget.Size() != new Vector2(Main.screenWidth / 2, Main.screenHeight / 2))
+            {
+                Main.QueueMainThreadAction(() =>
+                {
+                    LaserTarget.Dispose();
+                    LaserTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+                });
+                return;
+            }
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+
+            Main.graphics.GraphicsDevice.SetRenderTarget(LaserTarget);
+            Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+
+            foreach (Projectile projectile in Main.projectile.Where(n => n.active  && n.type == ModContent.ProjectileType<Aoe_Rifle_Laser>()))
+            {
+               DrawLaser(projectile.ModProjectile as Aoe_Rifle_Laser);
+
+
+            }
+
+            Main.graphics.GraphicsDevice.SetRenderTarget(null);
+
+            Main.spriteBatch.End();
+
+            orig();
+        }
+
+        void DrawLaser(Aoe_Rifle_Laser laser)
+        {
+            Texture2D tex = GennedAssets.Textures.GreyscaleTextures.BloomLine2;
+            Vector2 Origin = new Vector2(tex.Width / 2, 0);
+            Color color = Color.Lerp(Color.Red, Color.Crimson, 1 - LumUtils.InverseLerp(0, 20, laser.Projectile.timeLeft));
+            float scalar = laser.ShrinkCurve.Evaluate(LumUtils.InverseLerp(0, 20, laser.Projectile.timeLeft));
+
+            Vector2 Scale = new Vector2(1 * scalar, 30);
+            if (laser.PowerShot)
+            {
+                Scale = new Vector2(4f * scalar, 30);
+            }
+            Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, color, -MathHelper.PiOver2, Origin, Scale, 0);
+
+
+        }
+        #endregion
+
+
+
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = LASER_RANGE;
@@ -87,6 +146,17 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 }
             }
         }
+        public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+        {
+            var projName = Main.player[Projectile.owner].name.ToString();//Lang.GetProjectileName(Projectile.type).Value;
+            var val = Main.rand.Next(0, 3);
+            var text = NetworkText.FromKey($"Mods.{Mod.Name}.PlayerDeathMessages.Aoe_Rifle{val}", target.name, projName);
+
+            modifiers = new Player.HurtModifiers
+            {
+                DamageSource = PlayerDeathReason.ByCustomReason(text)
+            };
+        }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             //todo: laser collision
@@ -97,18 +167,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         public override bool PreDraw(ref Color lightColor)
         {
-
-            Texture2D tex = GennedAssets.Textures.GreyscaleTextures.BloomLine2;
-            Vector2 Origin = new Vector2(tex.Width / 2, 0);
-            Color color = Color.Lerp(Color.Red, Color.Crimson, 1-  LumUtils.InverseLerp(0,20, Projectile.timeLeft));
-            float scalar = ShrinkCurve.Evaluate(LumUtils.InverseLerp(0, 20, Projectile.timeLeft));
-
-            Vector2 Scale = new Vector2(1 * scalar, 30);
-            if (PowerShot)
-            {
-                Scale = new Vector2(4f * scalar, 30);
-            }
-                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, color with { A = 0 }, Projectile.rotation - MathHelper.PiOver2, Origin, Scale, 0);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, default, default, null, Main.GameViewMatrix.ZoomMatrix);
+            Main.EntitySpriteDraw(LaserTarget, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, LaserTarget.Size() / 2, 2, 0);
+            Main.spriteBatch.ResetToDefault();
 
 
             return false;

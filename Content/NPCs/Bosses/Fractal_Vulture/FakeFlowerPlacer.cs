@@ -22,25 +22,25 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
 
             if (genesisOrigins.Count == 0)
             {
-                Main.NewText("No Genesis tiles found.");
+                //Main.NewText("No Genesis tiles found.");
 
                 return;
             }
 
             foreach (var genesis in genesisOrigins)
             {
-                Main.NewText($"Scanning around Genesis at {genesis.X}, {genesis.Y}...");
+                //Main.NewText($"Scanning around Genesis at {genesis.X}, {genesis.Y}...");
 
                 var spots = FindAllValidPlacementsAround(genesis);
 
                 if (spots.Count == 0)
                 {
-                    Main.NewText("→ No suitable placement locations found.");
+                    //Main.NewText("→ No suitable placement locations found.");
 
                     continue;
                 }
 
-                Main.NewText($"→ Found {spots.Count} possible flower placements.");
+                //Main.NewText($"→ Found {spots.Count} possible flower placements.");
 
                 // REQUIREMENT: avoid placing within 2 tiles of the Genesis unless no other option exists
                 const int MinPreferredDistance = 3;
@@ -70,16 +70,16 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 {
                     // Use safe-distance placements first
                     chosen = preferred[Main.rand.Next(preferred.Count)];
-                    Main.NewText($"→ Choosing a placement NOT near Genesis ({preferred.Count} valid).");
+                    //Main.NewText($"→ Choosing a placement NOT near Genesis ({preferred.Count} valid).");
                 }
                 else
                 {
                     // If absolutely necessary, place close
                     chosen = tooClose[Main.rand.Next(tooClose.Count)];
-                    Main.NewText($"→ Only close placements available ({tooClose.Count}). Using fallback.");
+                    //Main.NewText($"→ Only close placements available ({tooClose.Count}). Using fallback.");
                 }
 
-                Main.NewText($"→ Chosen placement: {chosen.X}, {chosen.Y}");
+                //Main.NewText($"→ Chosen placement: {chosen.X}, {chosen.Y}");
 
                 TryPlaceFakeFlower(chosen);
 
@@ -102,17 +102,17 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
 
             // Debug
             var worldPos = new Vector2(originX, originY).ToWorldCoordinates();
-            Main.NewText($"Placing Fake Flower at origin (tiles): {originX}, {originY}  (world: {worldPos})");
+            //Main.NewText($"Placing Fake Flower at origin (tiles): {originX}, {originY}  (world: {worldPos})");
 
             var success = WorldGen.PlaceObject(originX, originY, fakeFlowerType, style: 0, mute: true);
 
             if (success)
             {
-                Main.NewText("Fake Flower successfully placed!");
+                //Main.NewText("Fake Flower successfully placed!");
             }
             else
             {
-                Main.NewText("Fake Flower FAILED to place.");
+                //Main.NewText("Fake Flower FAILED to place.");
             }
         }
 

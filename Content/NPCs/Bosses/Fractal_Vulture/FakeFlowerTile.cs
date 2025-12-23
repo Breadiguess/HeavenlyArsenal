@@ -68,6 +68,7 @@ public class FakeFlowerTile : ModTile, ICustomPlacementSound
         // Convert the center tile to world position
         var centerWorld = new Vector2(centerTileX, centerTileY).ToWorldCoordinates();
         centerWorld.Y -= 16f;
+        if(voidVulture.Myself is null)
         NPC.NewNPCDirect(null, centerWorld, ModContent.NPCType<voidVulture>());
     }
 

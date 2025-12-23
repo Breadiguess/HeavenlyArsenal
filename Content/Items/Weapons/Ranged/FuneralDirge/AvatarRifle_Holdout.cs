@@ -2,7 +2,6 @@
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Gores;
-using HeavenlyArsenal.Content.Items.Weapons.Ranged.LeverAction;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
@@ -237,10 +236,10 @@ public class AvatarRifle_Holdout : ModProjectile
         shot.GetGlobalProjectile<AvatarRifleSuperBullet>().hasEmpowerment = true;
         shot.GetGlobalProjectile<AvatarRifleSuperBullet>().empowerment = (int)MathHelper.Lerp((int)MathF.Pow(MaxAmmo - AmmoCount, 2), 2, (7 - AmmoCount) / MaxAmmo);
 
-        var darkParticle = AvatarRifle_MuzzleFlash.pool.RequestParticle();
-        darkParticle.Prepare(tipPosition, Projectile.rotation, 70);
+       // var darkParticle = AvatarRifle_MuzzleFlash.pool.RequestParticle();
+       // darkParticle.Prepare(tipPosition, Projectile.rotation, 70);
 
-        ParticleEngine.Particles.Add(darkParticle);
+        //ParticleEngine.Particles.Add(darkParticle);
         recoilIntensity = maxRecoil;
     }
 
@@ -765,7 +764,7 @@ public class AvatarRifle_Holdout : ModProjectile
         /*
         Utils.DrawBorderString(Main.spriteBatch, "| Is empowered: " + Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpowered.ToString(), Projectile.Center - Vector2.UnitY * 60 - Main.screenPosition, Color.White);
         Utils.DrawBorderString(Main.spriteBatch, "| Rifle Charge : " + Owner.GetModPlayer<AvatarRiflePlayer>().RifleCharge.ToString() + " | RifleCharge Decay: " + Owner.GetModPlayer<AvatarRiflePlayer>().RifleChargeDecay, Projectile.Center - Vector2.UnitY * 80 - Main.screenPosition, Color.White);
-        Utils.DrawBorderString(Main.spriteBatch, "| Empowerment Timer: " + Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpoweredTimer.ToString(), Projectile.Center - Vector2.UnitY * 100 - Main.screenPosition, Color.White);
+        Utils.DrawBorderString(Main.spriteBatch, "| Empowerment Time: " + Owner.GetModPlayer<AvatarRiflePlayer>().AvatarRifleEmpoweredTimer.ToString(), Projectile.Center - Vector2.UnitY * 100 - Main.screenPosition, Color.White);
         Utils.DrawBorderString(Main.spriteBatch, "| State: " + CurrentState.ToString() + " | StateTimer: " + StateTimer, Projectile.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
         Utils.DrawBorderString(Main.spriteBatch, "| AttackSpeed: " + Owner.GetTotalAttackSpeed<RangedDamageClass>().ToString(), Projectile.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
         //Utils.DrawBorderString(Main.spriteBatch, "| AmmoType: " + Owner.coinLuck.ToString(), Projectile.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);

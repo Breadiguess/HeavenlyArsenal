@@ -95,6 +95,7 @@
         <None Remove="Content\Particles\SpiritCandle.png" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\FractalBird_Event.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\SeekingThorn.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\Projectiles\ThornBomb_Seed.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\SolynIntegration.cs" />

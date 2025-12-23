@@ -345,7 +345,7 @@ public class RitualBuffNPC : GlobalNPC
             if (npc.type != ModContent.NPCType<RitualAltar>())
             {
 
-                  // Utils.DrawBorderString(spriteBatch, $"{hasRitualBuff}, Buffgranter: {r},\n Timer: {ritualBuffTimer},\n type:{BuffType.ToString()}", Vector2.UnitX * -60 + npc.Center - Main.screenPosition - Vector2.UnitY * -30, Color.Red);
+                  // Utils.DrawBorderString(spriteBatch, $"{hasRitualBuff}, Buffgranter: {r},\n Time: {ritualBuffTimer},\n type:{BuffType.ToString()}", Vector2.UnitX * -60 + npc.Center - Main.screenPosition - Vector2.UnitY * -30, Color.Red);
 
 
             }*/

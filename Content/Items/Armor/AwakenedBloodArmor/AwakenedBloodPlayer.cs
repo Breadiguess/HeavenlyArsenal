@@ -107,7 +107,7 @@ public class AwakenedBloodPlayer : ModPlayer
     public int clotDecayTimer;
 
     /// <summary>
-    ///     Timer to control the rate at which the player gains blood
+    ///     Time to control the rate at which the player gains blood
     /// </summary>
     public int GainTimer;
 
@@ -427,7 +427,7 @@ public class AwakenedBloodDraw : PlayerDrawLayer
         var blood = $"Blood: {bloodplayer.blood}";
         var gaincooldown = $"Blood gain timer: {bloodplayer.GainTimer}";
         var clot = $"clot: {bloodplayer.clot}";
-        var Decaytimer = $"blood decay Timer: {bloodplayer.clotDecayTimer}";
+        var Decaytimer = $"blood decay Time: {bloodplayer.clotDecayTimer}";
 
         var Bloodboostactive = $"Bloodboost Active?: {bloodplayer.BloodBoostActive}";
         var combinedString = blood + ", " + gaincooldown + ", " + clot + ", " + Decaytimer + ", " + Bloodboostactive;

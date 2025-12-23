@@ -106,7 +106,7 @@ public class EnrageTimerVisual : CooldownHandler
 
     public override bool ShouldDisplay => true;
 
-    public override LocalizedText DisplayName => Language.GetOrRegister("Enrage Timer");
+    public override LocalizedText DisplayName => Language.GetOrRegister("Enrage Time");
 
     public override string Texture => "HeavenlyArsenal/Assets/Textures/UI/Cooldowns/EnrageDuration_Icon";
 

@@ -470,12 +470,12 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         var BodyTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/RitualAltarNPC/RitualAltarConcept").Value;
         var a = "";
 
-        if (CultistCoordinator.GetCultOfNPC(NPC) != null)
+        //if (CultistCoordinator.GetCultOfNPC(NPC) != null)
         {
-            a += $"CultID: {CultistCoordinator.GetCultOfNPC(NPC).CultID}\n";
+        //    a += $"CultID: {CultistCoordinator.GetCultOfNPC(NPC).CultID}\n";
         }
 
-        a += $"{NPC.whoAmI}\n";
+        //a += $"{NPC.whoAmI}\n";
        // Utils.DrawBorderString(spriteBatch, a, NPC.Center - screenPos, Color.AntiqueWhite, 1, 0, -1);
         SpriteEffects sp = 0;
         var rot = NPC.rotation + MathHelper.PiOver2;
@@ -502,11 +502,11 @@ internal partial class RitualAltar : BloodMoonBaseNPC
             {
                 var DrawPos2 = _limbs[i].GrabPosition.Value - screenPos;
                 var DrawPos3 = _limbs[i].PreviousGrabPosition.Value - screenPos;
-                spriteBatch.Draw(Debug, DrawPos2, new Rectangle(0, 0, 5, 5), Color.LimeGreen);
-                spriteBatch.Draw(Debug, DrawPos3, new Rectangle(0, 0, 5, 5), Color.Orange);
+                //spriteBatch.Draw(Debug, DrawPos2, new Rectangle(0, 0, 5, 5), Color.LimeGreen);
+                //spriteBatch.Draw(Debug, DrawPos3, new Rectangle(0, 0, 5, 5), Color.Orange);
             }
 
-            spriteBatch.Draw(Debug, NPC.Center + _limbBaseOffsets[i] - screenPos, Color.AntiqueWhite);
+           //spriteBatch.Draw(Debug, NPC.Center + _limbBaseOffsets[i] - screenPos, Color.AntiqueWhite);
         }
 
         Vector2 anchor;

@@ -57,16 +57,17 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Texture2D tex = AssetDirectory.Textures.GlowCone.Value;
             Texture2D glow = GennedAssets.Textures.GreyscaleTextures.Corona;
             Texture2D ting = GennedAssets.Textures.GreyscaleTextures.ChromaticBurst;
+            float Rot = Rotation + MathHelper.Pi;
             Color thing = Color.Lerp(Color.Transparent, Color.Crimson, LumUtils.InverseLerp(0, MaxTime, TimeLeft));
             Vector2 DrawPos = position - Main.screenPosition;
             for(int i = 0; i< 3; i++)
             {
-                Main.EntitySpriteDraw(tex, DrawPos, null, thing with { A = 0 }, Rotation + (i / 3f * MathHelper.Pi) - MathHelper.ToRadians(60), new Vector2(0, tex.Height / 2), new Vector2(1, 0.2f) * LumUtils.InverseLerp(0, MaxTime, TimeLeft), 0);
+                Main.EntitySpriteDraw(tex, DrawPos, null, thing with { A = 0 }, Rot + (i / 3f * MathHelper.Pi) - MathHelper.ToRadians(60), new Vector2(0, tex.Height / 2), new Vector2(1, 0.2f) * LumUtils.InverseLerp(0, MaxTime, TimeLeft), 0);
 
             }
-            Main.EntitySpriteDraw(tex, DrawPos, null, thing with { A = 0 }, Rotation, new Vector2(0, tex.Height / 2), new Vector2(1, 0.2f), 0);
+            Main.EntitySpriteDraw(tex, DrawPos, null, thing with { A = 0 }, Rotation, new Vector2(0, tex.Height / 2), new Vector2(1, 0.05f), 0);
             Main.EntitySpriteDraw(glow, DrawPos, null, thing with { A = 0 }, 0, glow.Size() / 2, 0.12f * LumUtils.InverseLerp(0, MaxTime, TimeLeft), 0);
-            Main.EntitySpriteDraw(ting, DrawPos, null, thing with { A = 0 }, Rotation, ting.Size() / 2, 0.2f+0.2f * (1 - LumUtils.InverseLerp(0, MaxTime, TimeLeft)), 0);
+         //   Main.EntitySpriteDraw(ting, DrawPos, null, thing with { A = 0 }, Rotation, ting.Size() / 2, 0.2f+0.2f * (1 - LumUtils.InverseLerp(0, MaxTime, TimeLeft)), 0);
         }
     }
 }

@@ -120,7 +120,7 @@ partial class newLeech : BloodMoonBaseNPC
             var pos = offset + new Vector2(i * frameWidth, 0);
 
             var seg = segCount - i - 1;
-            var color = Lighting.GetColor((leech.AdjHitboxes[seg].Center() / 16).ToPoint()) * npc.Opacity;
+            var color = Color.White * npc.Opacity;//Lighting.GetColor((leech.AdjHitboxes[seg].Center() / 16).ToPoint()) * npc.Opacity;
 
             Main.spriteBatch.Draw(baseTex, pos, frame, color);
         }
@@ -285,17 +285,20 @@ partial class newLeech : BloodMoonBaseNPC
                 var uvBottom = new Vector2(uMapped, uvBottomY);
                 var uvTop = new Vector2(uMapped, uvTopY);
 
+
+                Color thing = Lighting.GetColor(p1.ToTileCoordinates());
+
                 verts[vIndex++] = new VertexPositionColorTexture
                 (
                     new Vector3(left, 0f),
-                    Color.White,
+                    thing,
                     uvBottom
                 );
 
                 verts[vIndex++] = new VertexPositionColorTexture
                 (
                     new Vector3(right, 0f),
-                    Color.White,
+                    thing,
                     uvTop
                 );
             }
@@ -397,9 +400,9 @@ partial class newLeech : BloodMoonBaseNPC
                 }
                 //Utils.DrawBorderString(spriteBatch, SegmentCount.ToString(), NPC.Center - screenPos, Color.AntiqueWhite);
 
-                //for(int i = 0; i < _ExtraHitBoxes.Count; i++)
+                    for(int i = 0; i < _ExtraHitBoxes.Count; i++)
                 {
-                    // Utils.DrawRectangle(spriteBatch, _ExtraHitBoxes[i].Hitbox.TopLeft(), _ExtraHitBoxes[i].Hitbox.BottomRight(), Color.AntiqueWhite, Color.AntiqueWhite, 2);
+                         //Utils.DrawRectangle(spriteBatch, _ExtraHitBoxes[i].Hitbox.TopLeft(), _ExtraHitBoxes[i].Hitbox.BottomRight(), Color.AntiqueWhite, Color.AntiqueWhite, 2);
                 }
             }
 
