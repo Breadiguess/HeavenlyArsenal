@@ -60,27 +60,27 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
     // This class will only be autoloaded/registered if we're not loading on a server
     [Autoload(Side = ModSide.Client)]
-    internal class ExampleResourceUISystem : ModSystem
+    internal class Aoe_Rifle_UI_System : ModSystem
     {
-        private UserInterface ExampleResourceBarUserInterface; 
+        private UserInterface Aoe_Rifle_UIthingidk; 
 
-        internal Aoe_Rifle_UI ExampleResourceBar;
+        internal Aoe_Rifle_UI Aoe_UI;
 
         public static LocalizedText ExampleResourceText { get; private set; }
 
         public override void Load()
         {
-            ExampleResourceBar = new();
-            ExampleResourceBarUserInterface = new();
-            ExampleResourceBarUserInterface.SetState(ExampleResourceBar);
+            Aoe_UI = new();
+            Aoe_Rifle_UIthingidk = new();
+            Aoe_Rifle_UIthingidk.SetState(Aoe_UI);
 
             string category = "UI";
-            ExampleResourceText ??= Mod.GetLocalization($"{category}.ExampleResource");
+            ExampleResourceText ??= Mod.GetLocalization($"{category}.AmmoCount");
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            ExampleResourceBarUserInterface?.Update(gameTime);
+            Aoe_Rifle_UIthingidk?.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -89,9 +89,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             if (resourceBarIndex != -1)
             {
                 layers.Insert(resourceBarIndex, new LegacyGameInterfaceLayer(
-                    "ExampleMod: Example Resource Bar",
+                    $"{Mod.Name}: AvatarRifleUI",
                     delegate {
-                        ExampleResourceBarUserInterface.Draw(Main.spriteBatch, new GameTime());
+                        Aoe_Rifle_UIthingidk.Draw(Main.spriteBatch, new GameTime());
                         return true;
                     },
                     InterfaceScaleType.UI)
