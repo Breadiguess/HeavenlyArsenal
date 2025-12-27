@@ -71,6 +71,8 @@
         <AdditionalFiles Remove="Content\Particles\SpiritCandle.png" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Remove="Content\Items\Armor\AwakenedBloodArmor\BloodArmorPlayer.cs" />
+        <Compile Remove="Content\Items\Armor\AwakenedBloodArmor\BloodHarpoon.cs" />
         <Compile Remove="Content\Items\Armor\ShintoArmor\CloakWingSystem.cs" />
         <Compile Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.cs" />
         <Compile Remove="Content\Items\Misc\ForgottenShrineTeleporter.cs" />

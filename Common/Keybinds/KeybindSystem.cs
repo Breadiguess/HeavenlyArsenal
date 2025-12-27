@@ -18,7 +18,7 @@ namespace HeavenlyArsenal.Common.Keybinds
             HaemsongBind = KeybindLoader.RegisterKeybind(Mod, "Swap Blood Armor Form", "F");
             ShadowTeleport = KeybindLoader.RegisterKeybind(Mod, "Shadow Teleport", "F");
             SwirlCloak = KeybindLoader.RegisterKeybind(Mod, "Swirl Cloak", "F");
-            BloodArmorParry = KeybindLoader.RegisterKeybind(Mod, "Blood Armor Parry", "F");
+            BloodArmorParry = KeybindLoader.RegisterKeybind(Mod, "Blood Armor Parry", "T");
         }
 
         public override void Unload()

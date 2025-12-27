@@ -156,7 +156,7 @@ internal class BloodNeedle : ModProjectile
         var FromOwner = Projectile.Center - Player.MountedCenter;
         float TargetRange = 380;
 
-        if (Player.GetModPlayer<BloodArmorPlayer>().Frenzy)
+        if (Player.GetModPlayer<AwakenedBloodPlayer>().BloodBoostActive)
         {
             TargetRange = 420;
         }
@@ -251,7 +251,7 @@ internal class BloodNeedle : ModProjectile
 
                 TimeInner++;
 
-                if (Player.GetModPlayer<BloodArmorPlayer>().Frenzy)
+                if (Player.GetModPlayer<AwakenedBloodPlayer>().BloodBoostActive)
                 {
                     TimeInner++;
                 }
@@ -396,7 +396,7 @@ internal class BloodNeedle : ModProjectile
     /// </summary>
     public NPC Target { get; set; }
 
-    public float ClotInterp => Player.GetModPlayer<BloodArmorPlayer>().Clot;
+    public float ClotInterp => 0;
 
     public override void SetStaticDefaults()
     {
@@ -440,7 +440,7 @@ internal class BloodNeedle : ModProjectile
 
     public override void PostAI()
     {
-        var frenzy = Player.GetModPlayer<BloodArmorPlayer>().Frenzy;
+        var frenzy = Player.GetModPlayer<AwakenedBloodPlayer>().BloodBoostActive;
         headFrameCounter++;
 
         if (headFrameCounter >= FrameSpeed)
@@ -516,7 +516,7 @@ internal class BloodNeedle : ModProjectile
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        if (Player.GetModPlayer<BloodArmorPlayer>().Frenzy)
+        if (Player.GetModPlayer<AwakenedBloodPlayer>().BloodBoostActive)
         {
             modifiers.SetCrit();
         }
@@ -696,7 +696,7 @@ internal class BloodNeedle : ModProjectile
         var origin = new Vector2(head.Width / 2f, frameHeight / 2f);
         var drawPos = Projectile.Center - Main.screenPosition;
 
-        if (Player.GetModPlayer<BloodArmorPlayer>().Frenzy)
+        if (Player.GetModPlayer<AwakenedBloodPlayer>().BloodBoostActive)
         {
             drawHeartbeat(drawPos, lightColor, 20);
         }
@@ -779,7 +779,6 @@ internal class BloodNeedle : ModProjectile
                 Main.EntitySpriteDraw(body, points[i] - Main.screenPosition, BodyFrame, lightColor, rot, Borigin, stretch, Tendril);
                 var fixedOffset = clotOffsets[i];
                 var clotDrawPos = points[i] + fixedOffset;
-                Main.EntitySpriteDraw(Clot, clotDrawPos - Main.screenPosition, ScabFrame, lightColor, rot, Clorigin * 0.5f, Player.GetModPlayer<BloodArmorPlayer>().Clot, SpriteEffects.None);
             }
         }
     }

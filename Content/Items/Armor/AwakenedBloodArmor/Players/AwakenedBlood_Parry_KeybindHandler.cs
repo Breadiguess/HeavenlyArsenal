@@ -17,7 +17,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players
         }
         public void Process(Player player)
         {
-           AwakenedBloodPlayer_Parry.AttemptParry(player);
+            var awakened = player.GetModPlayer<AwakenedBloodPlayer>();
+            if (!awakened.AwakenedBloodSetActive)
+                return;
+            if (!KeybindSystem.BloodArmorParry.JustPressed)
+                return;
+            AwakenedBloodPlayer_Parry.AttemptParry(player);
         }
     }
 }

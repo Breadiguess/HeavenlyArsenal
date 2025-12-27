@@ -24,7 +24,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players
             if (!KeybindSystem.HaemsongBind.JustPressed)
                 return;
 
-            var blood = player.GetModPlayer<BloodArmorPlayer>();
 
             SoundEngine.PlaySound(
                 GennedAssets.Sounds.Avatar.ArmJutOut with
@@ -35,10 +34,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players
                 player.Center
             );
 
-            blood.CurrentForm =
-                blood.CurrentForm == BloodArmorForm.Offense
-                    ? BloodArmorForm.Defense
-                    : BloodArmorForm.Offense;
+       
 
             awakened.CurrentForm =
                 awakened.CurrentForm == AwakenedBloodPlayer.Form.Offense

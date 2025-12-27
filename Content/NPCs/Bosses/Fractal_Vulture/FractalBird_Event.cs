@@ -36,7 +36,6 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
 
             if (DownedBossSystem.downedYharon) 
             {
-                Main.NewText(hasBirdBeenDefeated);
                 if (Main.GameUpdateCount % 300 == 0 && Main.rand.NextBool(5) && voidVulture.Myself is null && !hasBirdBeenDefeated)
                 {
                     if (FakeFlowerRender.Count < 1)
