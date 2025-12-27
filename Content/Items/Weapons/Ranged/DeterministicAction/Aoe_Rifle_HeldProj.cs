@@ -678,7 +678,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             RibbonEffect.Projection = Matrix.CreateOrthographicOffCenter(
                 0, Main.screenWidth,
                 Main.screenHeight, 0,
-                -1, 1);
+                -1000, 1000);
             foreach (EffectPass pass in RibbonEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();

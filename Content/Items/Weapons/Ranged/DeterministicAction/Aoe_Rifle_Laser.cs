@@ -37,7 +37,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 });
                 return;
             }
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
 
             Main.graphics.GraphicsDevice.SetRenderTarget(LaserTarget);
             Main.graphics.GraphicsDevice.Clear(Color.Transparent);
@@ -66,10 +66,14 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Vector2 Scale = new Vector2(1 * scalar, 30);
             if (laser.PowerShot)
             {
-                Scale = new Vector2(4f * scalar, 30);
+                Scale = new Vector2(5f * scalar, 30);
+                Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, Color.White, -MathHelper.PiOver2, Origin, Scale * 0.4f, 0);
+
+                Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, Color.Purple, -MathHelper.PiOver2, Origin, Scale * 0.6f, 0);
+
             }
             Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, color, -MathHelper.PiOver2, Origin, Scale, 0);
-
+          
 
         }
         #endregion

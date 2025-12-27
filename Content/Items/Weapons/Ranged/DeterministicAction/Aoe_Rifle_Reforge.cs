@@ -9,15 +9,16 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 {
     internal class Aoe_Rifle_Reforge : ModPrefix
     {
+        public override float RollChance(Item item)
+        {
+            return base.RollChance(item);
+        }
         public override bool CanRoll(Item item)
         {
-            if(item.type != ModContent.ItemType<Aoe_Rifle_Item>()) 
-                return true; 
-            return false;
-            
+
+            return base.CanRoll(item) && item.ModItem is Aoe_Rifle_Item;
         }
         
-        public override LocalizedText DisplayName => base.DisplayName;
 
         public override void SetStats(ref float damageMult, ref float knockbackMult, ref float useTimeMult, ref float scaleMult, ref float shootSpeedMult, ref float manaMult, ref int critBonus)
         {
@@ -26,6 +27,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             useTimeMult = 2;
             shootSpeedMult = 2;
             critBonus *= 10;
+            
         }
     }
 }

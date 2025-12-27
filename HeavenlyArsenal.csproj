@@ -168,7 +168,6 @@
 
     <ItemGroup>
         <Folder Include="Assets\Textures\Items\Weapons\Aoe_Rifle\" />
-        <Folder Include="Content\Items\Armor\Vanity\ScavSona\" />
         <Folder Include="Content\Items\Weapons\Rogue\Boquet\" />
         <Folder Include="Content\NPCs\Hostile\BloodCult\FleshkinAcolyte\" />
     </ItemGroup>

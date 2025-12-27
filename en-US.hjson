@@ -402,6 +402,16 @@ Mods: {
 				DisplayName: Leech Scarf_ Item
 				Tooltip: ""
 			}
+
+			ScavSona_Helmet: {
+				DisplayName: Scav Sona_ Helmet
+				Tooltip: ""
+			}
+
+			ScavSona_Dress: {
+				DisplayName: Scav Sona_ Dress
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {
