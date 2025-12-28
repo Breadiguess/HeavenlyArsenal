@@ -1,4 +1,4 @@
-﻿Ranged: {
+Ranged: {
 	FusionRifle: {
 		ShiftTooltip:
 			'''
@@ -25,8 +25,6 @@
 			'''
 	}
 
-	
-
 	NoxusWeapon: {
 		DisplayName: Breath the of the Last God
 		Tooltip:
@@ -36,7 +34,6 @@
 			'''
 	}
 
-	
 	Aoe_Rifle_Item: {
 		DisplayName: Deterministic Causality
 		Tooltip:
@@ -71,7 +68,6 @@ Magic: {
 		DisplayName: Brutal Forgiveness
 		Tooltip: ""
 	}
-
 
 	RocheLimit: {
 		DisplayName: Roche Limit
