@@ -4,13 +4,17 @@ using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Melee;
 using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Ranged;
 using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Rogue;
 using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner;
+using Luminance.Core.Sounds;
+using NoxusBoss.Assets;
 
 namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
 {
     public class BloodBlightParasite_Player : ModPlayer
     {
         #region Values
-        private float _bloodSaturation;
+
+        public bool Active;
+        internal float _bloodSaturation;
         /// <summary>
         /// resource representing the current saturation of the blood parasite
         /// </summary>
@@ -34,7 +38,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
             get => CombatTimer > 0;
         }
         public int CombatTimer;
-        
+
         public int AscensionTimer;
         public int CrashTimer;
         public bool IsCrashing
@@ -54,15 +58,59 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
         public float OutOfCombatDecay = 0.6f;
         public float CombatGainRate = 0.01f;
         public bool Ascended { get; private set; }
+
+        public int MaxAscentionTimer = 10 * 60;
         #endregion
 
+        #nullable enable
+        public LoopedSoundInstance? AscensionSound
+        {
+            get;
+            private set;
+        }
+
+
+        public override void Load()
+        {
+            On_Player.ItemCheck_PayMana += On_Player_ItemCheck_PayMana;
+            On_Player.GetManaCost += On_Player_GetManaCost;
+        }
+
+        private static int On_Player_GetManaCost(On_Player.orig_GetManaCost orig, Player self, Item item)
+        {
+            var symbiote = self.GetModPlayer<BloodBlightParasite_Player>();
+
+            if(!symbiote.Active)
+                return orig(self, item);
 
 
 
 
+
+            return orig(self, item);
+        }
+
+        private static bool On_Player_ItemCheck_PayMana(On_Player.orig_ItemCheck_PayMana orig, Player self, Item sItem, bool canUse)
+        {
+
+            var symbiote = self.GetModPlayer<BloodBlightParasite_Player>();
+
+            if (!symbiote.Active)
+                return orig(self, sItem, canUse);
+
+
+            if(symbiote.ConstructController is MagicBloodController && symbiote.Ascended)
+            {
+                return canUse;
+            }
+            return orig(self, sItem, canUse);
+        }
 
         public override void PostUpdateMiscEffects()
         {
+            if(!Active)
+                return;
+
             ConstructController?.Update(Player);
             UpdateBloodSaturation();
             CheckBand();
@@ -74,17 +122,33 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
                 CombatTimer--;
 
             UpdateBloodState();
+
+            float SoundInterpolant = 1- LumUtils.InverseLerp(0, MaxAscentionTimer, AscensionTimer);
+            if (AscensionSound != null)
+            {
+                AscensionSound.Update(Player.Center, sound =>
+                {
+                    sound.Pitch = -1 * SoundInterpolant;
+                    sound.Volume = 2.4f * SoundInterpolant;
+                });
+            }
         }
 
-
+        public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (!Active)
+                return;
+        }
         public override void OnHitAnything(float x, float y, Entity victim)
         {
+            if (!Active)
+                return;
             CombatTimer = 8 * 60;
         }
 
         public override void ResetEffects()
         {
-
+            Active = false;
         }
 
 
@@ -161,7 +225,9 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
 
         void UpdateBloodSaturation()
         {
-            CombatGainRate = 0.02f;
+            if (IsCrashing)
+                return;
+            CombatGainRate = 0.45f;
             if (InCombat)
                 BloodSaturation += CombatGainRate;
             else
@@ -176,20 +242,11 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
 
         private bool ShouldCrash()
         {
-            AscensionTimer++;
+            AscensionTimer--;
 
-            if (AscensionTimer < 120) // ~2 seconds
-                return false;
 
-            if (BloodSaturation >= BloodSaturationMax && AscensionTimer > 300)
-                return true;
 
-            float lifeRatio = Player.statLife / (float)Player.statLifeMax2;
-            if (lifeRatio <= 0.15f)
-                return true;
-
-            // Condition 3: Left combat while Ascended
-            if (!InCombat && AscensionTimer > 10 * 60)
+            if(AscensionTimer <=0)
                 return true;
 
             return false;
@@ -226,18 +283,18 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
 
             CrashTimer = 60 * 8;
             AscensionTimer = 0;
-            // Force saturation down but not to zero
-            BloodSaturation = 15f;
+
+            BloodSaturation = 0f;
 
             // Notify controller to violently clean up
             ConstructController?.OnCrash();
 
-            // Apply player penalties (keep these centralized)
             Player.AddBuff(BuffID.Weak, 300);
             Player.AddBuff(BuffID.Slow, 180);
             Player.AddBuff(BuffID.Bleeding, 240);
 
-            // Optional: immediate HP punishment
+            AscensionSound?.Stop();
+
             Player.statLife -= Player.statLifeMax2 / 10;
             Player.HealEffect(-Player.statLifeMax2 / 10, true);
         }
@@ -245,15 +302,21 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
 
         private void EnterAscension()
         {
+            AscensionSound?.Stop();
+            AscensionSound = LoopedSoundManager.CreateNew(
+                GennedAssets.Sounds.Avatar.LilyFiringLoop,
+                () => Player.dead || !Ascended);
+
+
+           
+
             Ascended = true;
-            AscensionTimer = 0;
+            AscensionTimer = MaxAscentionTimer;
 
             CurrentState = BloodState.Ascended;
 
-            // Notify active controller
             ConstructController?.OnAscensionStart();
 
-            // Optional: immediate feedback
             Player.AddBuff(BuffID.Bleeding, 60 * 4);
         }
 

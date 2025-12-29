@@ -17,7 +17,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
         }
 
         // Thrall tracking
-        private readonly List<int> thrallIDs = new();
+        public readonly List<int> thrallIDs = new();
 
         // Limits
         private int maxThralls = 0;

@@ -1,6 +1,6 @@
 ﻿namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Rogue
 {
-    internal class RogueBloodController : IBloodConstructController
+    internal class RogueBloodController : ModPlayer, IBloodConstructController
     {
         private readonly BloodBlightParasite_Player symbiote;
         private readonly Player player;

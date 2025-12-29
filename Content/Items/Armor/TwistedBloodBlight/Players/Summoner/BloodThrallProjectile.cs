@@ -1,5 +1,6 @@
 ﻿using Luminance.Assets;
 using NoxusBoss.Assets;
+using static HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner.BloodOvermind;
 
 namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner
 {
@@ -8,6 +9,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
         private float IdleRadius = 120f;
         private float Inertia = 20f;
         private float MoveSpeed = 8f;
+
+        public OvermindDirective CurrentDirective;
+        public Projectile proj; // the overmind itself
+
         public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
         public ref Player Owner => ref Main.player[Projectile.owner];
         public override void SetDefaults()
@@ -17,7 +22,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
             Projectile.Size = new Vector2(40, 40);
             Projectile.minion = true;
             Projectile.penetrate = -1;
-            Projectile.minionSlots = 0;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
             Projectile.timeLeft = 2;
@@ -94,11 +98,94 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
             BloodOvermind overmind = FindOvermind();
             if (overmind == null)
             {
-              
+                DefaultBehavior();
                 return;
             }
 
-            DefaultBehavior();
+            switch (overmind.CurrentDirective)
+            {
+                case OvermindDirective.Assemble:
+                    AssembleBehavior(overmind);
+                    break;
+
+                case OvermindDirective.Pressure:
+                    PressureBehavior(overmind);
+                    break;
+
+                case OvermindDirective.Frenzy:
+                    FrenzyBehavior(overmind);
+                    break;
+            }
+        }
+
+        private void AssembleBehavior(BloodOvermind overmind)
+        {
+            Vector2 toOvermind = overmind.Projectile.Center - Projectile.Center;
+
+            float speed = 10f;
+            float inertia = 30f; // very smooth, controlled
+
+            Vector2 desiredVelocity =
+                toOvermind.SafeNormalize(Vector2.Zero) * speed;
+
+            Projectile.velocity =
+                (Projectile.velocity * (inertia - 1) + desiredVelocity) / inertia;
+
+
+            Projectile.rotation += 0.03f;
+
+        }
+
+        private void PressureBehavior(BloodOvermind overmind)
+        {
+            int index = Projectile.whoAmI % 6;
+            float angle = MathHelper.TwoPi * index / 6f;
+
+            Vector2 formationOffset =
+                new Vector2(80f, 0f).RotatedBy(angle);
+
+            Vector2 desiredPosition =
+                overmind.Projectile.Center + formationOffset;
+
+            float speed = 8f;
+            float inertia = 18f;
+
+            Vector2 desiredVelocity =
+                (desiredPosition - Projectile.Center)
+                .SafeNormalize(Vector2.Zero) * speed;
+
+            Projectile.velocity =
+                (Projectile.velocity * (inertia - 1) + desiredVelocity) / inertia;
+
+
+            Projectile.rotation += 0.06f;
+        }
+
+
+        private void FrenzyBehavior(BloodOvermind overmind)
+        {
+            NPC target = Projectile.FindTargetWithinRange(1200f, true);
+
+            if (target != null)
+            {
+                float speed = 14f;
+                float inertia = 6f; 
+
+                Vector2 desiredVelocity =
+                    (target.Center - Projectile.Center)
+                    .SafeNormalize(Vector2.Zero) * speed;
+
+                Projectile.velocity =
+                    (Projectile.velocity * (inertia - 1) + desiredVelocity) / inertia;
+            }
+            else
+            {
+                // Even without a target, thralls move erratically
+                Projectile.velocity += Main.rand.NextVector2Circular(2f, 2f);
+            }
+
+
+            Projectile.rotation += 0.2f;
         }
 
 

@@ -27,6 +27,9 @@ internal class DebugPlayer : PlayerDrawLayer
 
         if (parasite == null)
             return;
+
+        if (!parasite.Active)
+            return;
         //prepCone(Owner);
         //float fallSpeedInterpolant = Luminance.Common.Utilities.Utilities.InverseLerp(25f, 130f, Owner.velocity.Y);
         string msg =
@@ -36,14 +39,12 @@ internal class DebugPlayer : PlayerDrawLayer
         Band: {parasite.CurrentBand}
         State: {parasite.CurrentState}
         Crashing: {parasite.IsCrashing}
-
         Morph: {parasite.CurrentMorph?.Name ?? "None"}
         DominantClass: {parasite.DominantClass?.Name ?? "None"}
         DominantTimer: {parasite.DominantClassTimer}
-
         InCombat: {parasite.InCombat}
         CombatTimer: {parasite.CombatTimer}
-
+        AscensionTimer: {parasite.AscensionTimer};
         Controller: {parasite.ConstructController?.GetType().Name ?? "None"}
         """;
 

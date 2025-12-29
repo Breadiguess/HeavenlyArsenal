@@ -75,6 +75,7 @@
         <Compile Remove="Content\Items\Armor\AwakenedBloodArmor\BloodHarpoon.cs" />
         <Compile Remove="Content\Items\Armor\ShintoArmor\CloakWingSystem.cs" />
         <Compile Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.cs" />
+        <Compile Remove="Content\Items\Armor\TwistedBloodBlight\Players\Mage\MagicBlood_ItemEcho.cs" />
         <Compile Remove="Content\Items\Misc\ForgottenShrineTeleporter.cs" />
         <Compile Remove="Content\Items\Misc\IdolSummoner.cs" />
         <Compile Remove="Content\Items\Weapons\Melee\StupidFuckYouSword.cs" />
@@ -174,9 +175,7 @@
 
     <ItemGroup>
         <Folder Include="Assets\Textures\Items\Weapons\Aoe_Rifle\" />
-        <Folder Include="Content\Items\Armor\TwistedBloodBlight\Players\Mage\" />
         <Folder Include="Content\Items\Armor\TwistedBloodBlight\Players\Melee\" />
-        <Folder Include="Content\Items\Armor\TwistedBloodBlight\Players\Rogue\" />
         <Folder Include="Content\Items\Armor\TwistedBloodBlight\Players\Ranged\" />
         <Folder Include="Content\Items\Weapons\Rogue\Boquet\" />
         <Folder Include="Content\NPCs\Hostile\BloodCult\FleshkinAcolyte\" />

@@ -115,3 +115,10 @@ ScavSona: {
 		Tooltip: ""
 	}
 }
+
+BloodBlight: {
+	BloodBlight_Helmet: {
+		DisplayName: Twisted BloodBlight Helm
+		Tooltip: ""
+	}
+}
