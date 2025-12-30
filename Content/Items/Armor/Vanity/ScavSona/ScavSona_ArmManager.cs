@@ -10,7 +10,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
         public override void Load()
         {
             On_Main.CheckMonoliths += CheckRenderArms;
+            On_Player.UpdateTouchingTiles += UpdateArms;
         }
+
+    
         private void CheckRenderArms(On_Main.orig_CheckMonoliths orig)
         {
 
@@ -55,16 +58,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
         {
             var arm = player.GetModPlayer<ScavSona_ArmManager>();
 
-            Texture2D tex = GennedAssets.Textures.GreyscaleTextures.BloomCircle;// ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/Vanity/ScavSona/ScavSona_IKArm").Value;
+            Texture2D tex =  ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/Vanity/ScavSona/ScavSona_IKArm").Value;
             if (arm == null || arm._IKArms == null)
                 return;
             foreach (ScavSona_IKArm Arm in arm._IKArms)
             {
                 RenderIKArmPrimitive(player, Arm);
-               // Main.EntitySpriteDraw(tex, Arm.EndPos - Main.screenPosition, tex.Frame(1,3,0,0), Color.White with { A = 0 }, 0, tex.Frame(1, 3, 0, 0).Size() / 2, 1, 0);
-
-               
-               
 
             }
         }
@@ -171,7 +170,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
                 -1000f, 1000f
             );
             guy.ArmEffect.World = Matrix.Identity;
-
+            
             gd.BlendState = BlendState.AlphaBlend;
             gd.DepthStencilState = DepthStencilState.None;
             gd.RasterizerState = RasterizerState.CullNone;
@@ -216,8 +215,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
             // Ensure the tip is included
             sampled.Add(control[^1]);
         }
-#endregion
-        public const int MAX_IK_ARMS = 4;
+        #endregion
+        public const int MAX_IK_ARMS = 6;
         public List<ScavSona_IKArm> _IKArms;
         public bool Active;
 
@@ -226,13 +225,15 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
             _IKArms = new List<ScavSona_IKArm>(MAX_IK_ARMS);
             for (int i = 0; i < MAX_IK_ARMS; i++)
             {
+                
+                //todo: make the middle arms (alternates) smaller than the other arms, with the longest on the bottom and the shortest near the top
                 IKSkeleton skeleton =
-                    new IKSkeleton((40, new IKSkeleton.Constraints
+                    new IKSkeleton((30, new IKSkeleton.Constraints
                     {
                         
                         
                     }),
-                    (30, new IKSkeleton.Constraints
+                    (20, new IKSkeleton.Constraints
                     {
                     }));
 
@@ -254,22 +255,29 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
                 for (int i = 0; i < MAX_IK_ARMS; i++)
                 {
                     IKSkeleton skeleton =
-                        new IKSkeleton((40, new IKSkeleton.Constraints
+                        new IKSkeleton((30, new IKSkeleton.Constraints
                         {
 
                         }),
-                        (30, new IKSkeleton.Constraints()));
+                        (20, new IKSkeleton.Constraints()));
 
                     _IKArms.Add(new ScavSona_IKArm(Player, skeleton, i % 3 == 0));
                 }
             }
             //_IKArms = null;
 
-            if (_IKArms != null)
+          
+        }
+        private void UpdateArms(On_Player.orig_UpdateTouchingTiles orig, Player self)
+        {
+
+            ScavSona_ArmManager p = self.GetModPlayer<ScavSona_ArmManager>();
+
+            if (p._IKArms != null)
             {
                 for (int i = 0; i < MAX_IK_ARMS; i++)
                 {
-                    ScavSona_IKArm arm = _IKArms[i];
+                    ScavSona_IKArm arm = p._IKArms[i];
 
                     int side = (i % 2 == 0) ? 1 : -1;
 
@@ -280,20 +288,22 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
 
 
                     Vector2 target =
-                        Player.Center +
+                        self.Center +
                         new Vector2(
                             side * 56f + idle * side, yOffset + MathF.Cos(Main.GameUpdateCount * 0.05f) * 14
                         );
 
                     ScavSona_IKArm.UpdateArmIK(
                         arm,
-                        Player.Center,
+                        self.Center,
                         target
                     );
 
                     ScavSona_IKArm.UpdateArmString(arm);
                 }
             }
+
+            p = self.GetModPlayer<ScavSona_ArmManager>();
         }
 
         const float ArmVerticalSpan = 96f; 
@@ -313,7 +323,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
             // Center it around zero
             t = t * 2f - 1f;
 
-            // Optional shaping curve (recommended)
             t = MathF.Sign(t) * MathF.Pow(MathF.Abs(t), 0.85f);
 
             return t * (ArmVerticalSpan * 0.5f);

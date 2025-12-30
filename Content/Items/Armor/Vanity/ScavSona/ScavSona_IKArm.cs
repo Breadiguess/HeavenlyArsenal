@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Common.IK;
+using NoxusBoss.Core.Graphics.RenderTargets;
 using System;
 using System.Collections.Generic;
 using System.Linq;

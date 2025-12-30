@@ -37,6 +37,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
         private void CheckRenderHair(On_Main.orig_CheckMonoliths orig)
         {
 
+            orig();
+            return;
             if (ScavSona_Hair_Target == null || ScavSona_Hair_Target.IsDisposed)
                 ScavSona_Hair_Target = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
             else if (ScavSona_Hair_Target.Size() != new Vector2(Main.screenWidth , Main.screenHeight))
@@ -68,6 +70,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
 
         public static void RenderPlayerHair(Player player)
         {
+
             ScavSona_FloppyHair_Player p = player.GetModPlayer<ScavSona_FloppyHair_Player>();
             player.GetModPlayer<ScavSona_FloppyHair_Player>().hairStrip.DrawHairStrip(player,
                 p.hairStrip.Positions,

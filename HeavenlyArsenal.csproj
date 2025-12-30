@@ -9,7 +9,6 @@
     </PropertyGroup>
     <ItemGroup>
         <AdditionalFiles Remove="Content\Items\Accessories\ManaTransfusion\**" />
-        <AdditionalFiles Remove="Content\Items\Armor\Vanity\ScavSona\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Summon\BadSun\**" />
@@ -22,7 +21,6 @@
         <AdditionalFiles Remove="Content\Waters\**" />
         <AdditionalFiles Remove="Core\Fixes\**" />
         <Compile Remove="Content\Items\Accessories\ManaTransfusion\**" />
-        <Compile Remove="Content\Items\Armor\Vanity\ScavSona\**" />
         <Compile Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <Compile Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
         <Compile Remove="Content\Items\Weapons\Summon\BadSun\**" />
@@ -35,7 +33,6 @@
         <Compile Remove="Content\Waters\**" />
         <Compile Remove="Core\Fixes\**" />
         <EmbeddedResource Remove="Content\Items\Accessories\ManaTransfusion\**" />
-        <EmbeddedResource Remove="Content\Items\Armor\Vanity\ScavSona\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Summon\BadSun\**" />
@@ -48,7 +45,6 @@
         <EmbeddedResource Remove="Content\Waters\**" />
         <EmbeddedResource Remove="Core\Fixes\**" />
         <None Remove="Content\Items\Accessories\ManaTransfusion\**" />
-        <None Remove="Content\Items\Armor\Vanity\ScavSona\**" />
         <None Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <None Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
         <None Remove="Content\Items\Weapons\Summon\BadSun\**" />
@@ -76,6 +72,8 @@
         <Compile Remove="Content\Items\Armor\ShintoArmor\CloakWingSystem.cs" />
         <Compile Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.cs" />
         <Compile Remove="Content\Items\Armor\TwistedBloodBlight\Players\Mage\MagicBlood_ItemEcho.cs" />
+        <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Player.cs" />
+        <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Renderer.cs" />
         <Compile Remove="Content\Items\Misc\ForgottenShrineTeleporter.cs" />
         <Compile Remove="Content\Items\Misc\IdolSummoner.cs" />
         <Compile Remove="Content\Items\Weapons\Melee\StupidFuckYouSword.cs" />
