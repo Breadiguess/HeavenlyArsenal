@@ -312,8 +312,8 @@ public class AntishadowAssassin : ModProjectile
         ArmBowTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArmBow");
         ArmBowOutlineTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArmBow_Outline");
         DateTime date = DateTime.Now;
-      
-            KasaTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinKasa");
+
+        KasaTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinKasa");
         AhogeTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassin_Ahoge");
         LegsTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinLegs");
     }
@@ -418,6 +418,15 @@ public class AntishadowAssassin : ModProjectile
         if (SpiritBowCooldown >= 1)
         {
             SpiritBowCooldown--;
+        }
+        
+        // Sets the projectiles velocity to 0 if it's not valid
+        if (float.IsNaN(Projectile.velocity.X) ||
+        float.IsNaN(Projectile.velocity.Y) ||
+        float.IsInfinity(Projectile.velocity.X) ||
+        float.IsInfinity(Projectile.velocity.Y))
+        {
+            Projectile.velocity = Vector2.Zero;
         }
     }
 
