@@ -128,11 +128,26 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
             {
                 AscensionSound.Update(Player.Center, sound =>
                 {
-                    sound.Pitch = -1 * SoundInterpolant;
+                    sound.Pitch = -2 * SoundInterpolant;
                     sound.Volume = 2.4f * SoundInterpolant;
                 });
             }
+
+
+
+
+
+            if(Player.HeldItem.DamageType.CountsAsClass(ModContent.GetInstance<RogueDamageClass>()))
+            {
+                Player.Calamity().wearingRogueArmor = true;
+                Player.Calamity().rogueStealthMax += 1.3f;
+            }
         }
+
+
+        
+
+
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {

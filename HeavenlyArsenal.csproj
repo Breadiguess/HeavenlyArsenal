@@ -71,7 +71,6 @@
         <Compile Remove="Content\Items\Armor\AwakenedBloodArmor\BloodHarpoon.cs" />
         <Compile Remove="Content\Items\Armor\ShintoArmor\CloakWingSystem.cs" />
         <Compile Remove="Content\Items\Armor\ShintoArmor\ShintoArmorHelmet_New.cs" />
-        <Compile Remove="Content\Items\Armor\TwistedBloodBlight\Players\Mage\MagicBlood_ItemEcho.cs" />
         <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Player.cs" />
         <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Renderer.cs" />
         <Compile Remove="Content\Items\Misc\ForgottenShrineTeleporter.cs" />
@@ -160,6 +159,9 @@
         <Reference Include="CalamityMod">
             <HintPath>ModReferences\CalamityMod.dll</HintPath>
         </Reference>
+        <Reference Include="CalRemix">
+          <HintPath>..\..\ModReader\CalRemix\CalRemix.dll</HintPath>
+        </Reference>
         <Reference Include="Luminance">
             <HintPath>ModReferences\Luminance.dll</HintPath>
         </Reference>
@@ -173,8 +175,6 @@
 
     <ItemGroup>
         <Folder Include="Assets\Textures\Items\Weapons\Aoe_Rifle\" />
-        <Folder Include="Content\Items\Armor\TwistedBloodBlight\Players\Melee\" />
-        <Folder Include="Content\Items\Armor\TwistedBloodBlight\Players\Ranged\" />
         <Folder Include="Content\Items\Weapons\Rogue\Boquet\" />
         <Folder Include="Content\NPCs\Hostile\BloodCult\FleshkinAcolyte\" />
     </ItemGroup>

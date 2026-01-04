@@ -42,7 +42,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
 
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
-            return;
             if (drawInfo.drawPlayer.GetModPlayer<ScavSona_ArmManager>().Active == false)
                 return;
             if (ScavSona_IKArm.ScavSona_IKArm_Target == null)

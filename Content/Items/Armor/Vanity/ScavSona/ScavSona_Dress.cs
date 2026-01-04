@@ -1,4 +1,9 @@
-﻿using CalamityMod.Rarities;
+﻿using CalamityMod;
+using CalamityMod.Items.Armor.Demonshade;
+using CalamityMod.Items.Armor.Statigel;
+using CalamityMod.Rarities;
+using CalRemix.Content.NPCs.Bosses.Origen;
+using HeavenlyArsenal.Content.Items.Materials;
 using NoxusBoss.Content.Rarities;
 using System;
 using System.Collections.Generic;
@@ -26,7 +31,6 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
 
             EquipLoader.AddEquipTexture(Mod, $"{Texture}_{EquipType.Legs}", EquipType.Legs, this);
 
-            On_Main.CheckMonoliths += ShowTheLegsGoddamnYou;
             On_Player.PlayerFrame += ShowtheLegsPLEASE;
         }
 
@@ -44,11 +48,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
             orig(self);
         }
 
-        private void ShowTheLegsGoddamnYou(On_Main.orig_CheckMonoliths orig)
-        {
-
-            orig();
-        }
+      
 
         public override void EquipFrameEffects(Player player, EquipType type)
         {
@@ -77,6 +77,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
             player.GetModPlayer<ScavSona_ArmManager>().Active = true;
         }
 
+        public override void AddRecipes()
+        {
+            var recipe = CreateRecipe()
+           .AddIngredient(ItemID.Silk, 12)
+           .AddIngredient(ItemID.BlackThread)
+           .AddTile(TileID.Loom);
+        }
 
         public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
@@ -93,7 +100,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
 
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
-            return base.PreDrawInWorld(spriteBatch, lightColor, alphaColor, ref rotation, ref scale, whoAmI);
+                      return base.PreDrawInWorld(spriteBatch, lightColor, alphaColor, ref rotation, ref scale, whoAmI);
         }
     }
     

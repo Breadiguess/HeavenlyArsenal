@@ -1,4 +1,5 @@
-﻿using HeavenlyArsenal.Common.Utilities;
+﻿using CalamityMod.Items.Armor.Statigel;
+using HeavenlyArsenal.Common.Utilities;
 using Luminance.Assets;
 using NoxusBoss.Content.Rarities;
 using System;
@@ -33,7 +34,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
         {
             
         }
-
+        public override void AddRecipes()
+        {
+            var recipe = CreateRecipe()
+           .AddIngredient(ItemID.Silk, 6)
+           .AddIngredient(ItemID.BlackThread)
+           .AddTile(TileID.Loom);
+        }
         public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
         {
             Texture2D tex = ModContent.Request<Texture2D>(this.Texture).Value;

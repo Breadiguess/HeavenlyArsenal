@@ -18,6 +18,7 @@ public static class AssetDirectory
 
         public static class Items
         {
+         
             public static class Accessories
             {
                 public static class VoidCrestOath
@@ -56,7 +57,7 @@ public static class AssetDirectory
                     public static readonly Asset<Texture2D> Finality_Omega = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/Aoe_Rifle/Death_Omega");
                     public static readonly Asset<Texture2D> End_Turkish = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/Aoe_Rifle/End_OldTurkish");
                     public static readonly Asset<Texture2D> Pearl = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Items/Weapons/Aoe_Rifle/Pearl");
-                   
+
 
                 }
             }
@@ -229,14 +230,6 @@ public static class AssetDirectory
         //public static readonly Asset<Effect> BasicTrail = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/BasicTrail");
         //public static readonly Asset<Effect> LightningBeam = AssetUtilities.RequestImmediate<Effect>(AssetPath + "Effects/LightningBeam");
         public static readonly Asset<Effect> FlameDissolve = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/FlameDissolve");
-
-        public static readonly Asset<Effect> GoomoireWindR = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/GoomoireSuckEffect");
-
-        public static readonly Asset<Effect> GoomoireWindL = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/GoomoireSuckEffect2");
-
-        public static readonly Asset<Effect> bloodShader = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/BloodBlobShader");
-
-        public static readonly Asset<Effect> FusionRifleCircle = AssetUtilities.RequestImmediate<Effect>(AssetPath + "AutoloadedEffects/Shaders/FusionRifle_Circle");
     }
 
     public static readonly string AssetPath = $"{nameof(HeavenlyArsenal)}/Assets/";

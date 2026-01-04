@@ -7,6 +7,7 @@ using Luminance.Common.Easings;
 using Luminance.Core.Graphics;
 using Luminance.Core.Sounds;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using NoxusBoss.Core.Physics.VerletIntergration;
@@ -374,6 +375,8 @@ public class AntishadowAssassin : ModProjectile
 
     public override void AI()
     {
+
+        //Main.NewText($"{Projectile.velocity.ToString()}, \n{(AvatarOfEmptiness.Myself != null? AvatarOfEmptiness.Myself.As<AvatarOfEmptiness>().CurrentState.ToString() + " ," + AvatarOfEmptiness.Myself.As<AvatarOfEmptiness>().AITimer.ToString(): null)}");
         // Initialize beads if necessary.
         if (BeadRopeA is null || BeadRopeB is null || BeadRopeC is null || BeadRopeD is null)
         {
@@ -680,10 +683,11 @@ public class AntishadowAssassin : ModProjectile
             {
                 teleportDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
             }
-
+            if(target != null && target.CanBeChasedBy(this))
             Projectile.Center = target.Center + teleportDirection * teleportOffset;
             DashStart = Projectile.Center;
             Projectile.velocity = Projectile.SafeDirectionTo(target.Center);
+            
             Projectile.netUpdate = true;
         }
 

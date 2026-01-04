@@ -2,4 +2,4 @@
 author = Bread, Lucille Karma, Blockaroz, Naka
 version = 0.726
 modReferences = NoxusBoss, SubworldLibrary
-weakReferences = CalamityEntropy
+weakReferences = CalamityEntropy, CalRemix

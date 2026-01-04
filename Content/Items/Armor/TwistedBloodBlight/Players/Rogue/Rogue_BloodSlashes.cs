@@ -14,7 +14,32 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Rogue
         public override void SetDefaults()
         {
             Projectile.Calamity().stealthStrike = true;
+            Projectile.Size = new Vector2(40, 40);
+            Projectile.friendly = true;
+            Projectile.hostile = false;
+
+            Projectile.tileCollide = false;
+            Projectile.timeLeft = 120;
+            Projectile.penetrate = -1;
+            Projectile.ignoreWater = true;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
+        }
+
+        public override void AI()
+        {
             
         }
+        
+        public override bool PreDraw(ref Color lightColor)
+        {
+
+
+
+
+            return false;
+        }
+
+
     }
 }

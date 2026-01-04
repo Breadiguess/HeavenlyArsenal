@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner.Thralls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,10 +15,12 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
         {
             this.symbiote = symbiote;
             this.player = symbiote.Player;
+            foreach (ThrallType type in Enum.GetValues(typeof(ThrallType)))
+                thrallsByType[type] = new HashSet<int>();
         }
-
-        // Thrall tracking
-        public readonly List<int> thrallIDs = new();
+        
+        public readonly Dictionary<ThrallType, HashSet<int>> thrallsByType = new();
+        public readonly Dictionary<ThrallType, int> maxPerType = new();
 
         // Limits
         private int maxThralls = 0;
@@ -30,30 +33,17 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
         int overmindID;
 
         #region helpers
-        private void CleanupDeadThralls()
+        private bool CanSpawn(ThrallType type)
         {
-            thrallIDs.RemoveAll(id =>
-                !Main.projectile.IndexInRange(id) ||
-                !Main.projectile[id].active);
-        }
-
-        private void KillAllThralls()
-        {
-            foreach (int id in thrallIDs)
-            {
-                if (Main.projectile.IndexInRange(id))
-                    Main.projectile[id].Kill();
-            }
-
-            thrallIDs.Clear();
+            return thrallsByType[type].Count < maxPerType.GetValueOrDefault(type, 0);
         }
 
 
-
-        private void SpawnThrall()
+        private void SpawnThrall(ThrallType type)
         {
-            if( thrallIDs.Count >= maxThralls)
+            if (!CanSpawn(type))
                 return;
+
             if (player.whoAmI != Main.myPlayer)
                 return;
 
@@ -63,19 +53,30 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
                 player.GetSource_FromThis(),
                 spawnPos,
                 Vector2.Zero,
-                ModContent.ProjectileType<BloodThrallProjectile>(),
+                ThrallTypeToProjectile(type),
                 symbiote.GetThrallDamage(),
                 0f,
                 player.whoAmI
             );
 
-            thrallIDs.Add(proj);
+            thrallsByType[type].Add(proj);
+        }
+
+
+        private void CleanupDeadThralls()
+        {
+            foreach (var kv in thrallsByType)
+            {
+                kv.Value.RemoveWhere(id =>
+                    !Main.projectile.IndexInRange(id) ||
+                    !Main.projectile[id].active);
+            }
         }
 
 
         private void FormOvermind()
         {
-            if (thrallIDs.Count == 0 || overmindActive)
+            if (overmindActive)
                 return;
 
             overmindActive = true;
@@ -93,6 +94,25 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
                 );
             }
         }
+
+
+        private static int ThrallTypeToProjectile(ThrallType type)
+        {
+            return type switch
+            {
+                ThrallType.BasicThrall0 => ModContent.ProjectileType<BloodThrallProjectile>(),   // example
+                //ThrallType.BasicThrall1 => ModContent.ProjectileType<BloodThrallProjectile1>(),  // example
+                //ThrallType.BasicThrall2 => ModContent.ProjectileType<BloodThrallProjectile2>(),  // example
+                //ThrallType.WingedThrall => ModContent.ProjectileType<BloodWingedThrallProjectile>(),
+                //ThrallType.FlowerThrall => ModContent.ProjectileType<BloodFlowerThrallProjectile>(),
+                //ThrallType.HydraThrall => ModContent.ProjectileType<BloodHydraThrallProjectile>(),
+                ThrallType.NerveWormThrall => ModContent.ProjectileType<NeuronWormThrall>(),
+
+                _ => ModContent.ProjectileType<BloodThrallProjectile>()
+            };
+        }
+
+
         #endregion
 
         void IBloodConstructController.OnAscensionStart()
@@ -102,29 +122,38 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
 
         void IBloodConstructController.OnBandChanged(BloodBand newBand)
         {
-            
             currentBand = newBand;
+
+            maxPerType.Clear();
 
             switch (newBand)
             {
                 case BloodBand.Low:
-                    maxThralls = 0;
                     KillAllThralls();
+                    return;
+
+                case BloodBand.MidLow:
+                    maxPerType[ThrallType.BasicThrall0] = 2;
+                    maxPerType[ThrallType.NerveWormThrall] = 6;
                     break;
 
-                case BloodBand.MidLow: // 30–50%
-                    maxThralls = 2;
+                case BloodBand.MidHigh:
+                    maxPerType[ThrallType.BasicThrall0] = 3;
+                    maxPerType[ThrallType.WingedThrall] = 1;
+                    maxPerType[ThrallType.NerveWormThrall] = 10;
                     break;
 
-                case BloodBand.MidHigh: // 50–70%
-                    maxThralls = 4;
-                    break;
-
-                case BloodBand.High: // 70–100%
-                    maxThralls = 6;
+                case BloodBand.High:
+                    maxPerType[ThrallType.BasicThrall0] = 4;
+                    maxPerType[ThrallType.WingedThrall] = 2;
+                    maxPerType[ThrallType.HydraThrall] = 1;
+                    maxPerType[ThrallType.NerveWormThrall] = 16;
                     break;
             }
-        
+        }
+
+        private void KillAllThralls()
+        {
 
         }
 
@@ -141,7 +170,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
         {
             CheckOvermind();
             CleanupDeadThralls();
-            SpawnThrall();
+            SpawnThrall(ThrallType.NerveWormThrall);
         }
 
         private void CheckOvermind()

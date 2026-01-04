@@ -523,7 +523,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             //RenderHead();
             mask(spriteBatch, drawColor);
             DateTime date = DateTime.Now;
-            if (date.Month == 12 || (date.Day ==24 || date.Day == 25))
+            if (date.Month == 12 && (date.Day ==24 || date.Day == 25))
             {
                 float hatScale = 0.1f;
                 Vector2 hatDrawPosition = HeadPos - Main.screenPosition + new Vector2(0,-20);

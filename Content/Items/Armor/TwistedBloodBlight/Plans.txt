@@ -24,7 +24,7 @@ Melee – Blood limbs, grapples, butcher form
 Ranger – Blood tracers, chaining projectiles, Blood Cannons
 Mage – Hemal sigils, autonomous spellcasting
 Summoner – Blood thralls, Overmind
-Rogue – Stealth loops, blood phantoms
+Rogue – blood phantoms, stealth strikes claw enemies, 
 Morphs can shift dynamically during combat.
 
 Design Goals

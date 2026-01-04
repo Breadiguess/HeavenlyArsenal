@@ -376,7 +376,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         public BezierCurve reloadMovement;
         private void HandleReload()
         {
-            Owner.SetDummyItemTime(2);
             //TODO: clip system with animation
             // mostly cosmetic, but its all about the fantasy of the weapon, no?
             //simple at low authority, with exponentially more powerful visuals as authority increases
@@ -424,6 +423,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 return;
             }
 
+            Owner.SetDummyItemTime(2);
             if (Time == 0)
             {
                 

@@ -31,7 +31,8 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
 
     private readonly int worshipLoopFrameEnd = 27;
 
-    public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/FleshlingCultist/FleshlingCultist";
+    public int variant = 0;
+    public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/FleshlingCultist/FleshlingCultist0";
 
     public override float SacrificePrio => 1;
 
@@ -91,6 +92,7 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
 
     public override void OnSpawn(IEntitySource source)
     {
+        variant = Main.rand.Next(0, 2);
         blood = 0;
         CheckForEmptyCults();
 
@@ -243,6 +245,8 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
+        return base.PreDraw(spriteBatch, screenPos, drawColor);
+
         /*
         string a = "";
         a += $"{CurrentState.ToString()}\n";
@@ -253,18 +257,18 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
          if (!NPC.IsABestiaryIconDummy)
             Utils.DrawBorderString(spriteBatch, a, NPC.Center - screenPos, Color.AntiqueWhite, anchory:-1);
         */
+        Texture2D tex = ModContent.Request<Texture2D>($"{Mod.Name}/Content/NPCs/Hostile/BloodMoon/FleshlingCultist/FleshlingCultist{variant}").Value;
+        SpriteEffects flip = NPC.direction.ToSpriteDirection();
 
-        return base.PreDraw(spriteBatch, screenPos, drawColor);
-
+        var Origin = NPC.frame.Size() * 0.5f + new Vector2(0, -1);
+        Main.EntitySpriteDraw(tex, NPC.Center - screenPos, NPC.frame, drawColor, NPC.rotation, Origin, NPC.scale, flip);//spriteBatch.Draw(tex, NPC.Center - Main.screenPosition, NPC.getRect(), drawColor, NPC.rotation, NPC.frame.Size() / 2, NPC.scale, SpriteEffects.None, 0);
+       
         var TextureString = "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/FleshlingCultist/FleshlingCultist";
-        var tex = ModContent.Request<Texture2D>(TextureString).Value;
+       // var tex = ModContent.Request<Texture2D>(TextureString).Value;
 
         var DrawPos = NPC.Center - screenPos;
 
         var frame = tex.Frame();
-        var Origin = frame.Size() * 0.5f + new Vector2(0, -1);
-
-        var flip = NPC.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
         Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, NPC.rotation, Origin, NPC.scale, flip);
         //string debug = "";

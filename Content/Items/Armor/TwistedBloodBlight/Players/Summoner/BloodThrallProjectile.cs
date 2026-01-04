@@ -4,7 +4,7 @@ using static HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summ
 
 namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner
 {
-    internal class BloodThrallProjectile : ModProjectile
+    class BloodThrallProjectile : ModProjectile
     {
         private float IdleRadius = 120f;
         private float Inertia = 20f;

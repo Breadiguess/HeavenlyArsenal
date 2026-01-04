@@ -124,7 +124,7 @@ Mods: {
 
 			TaxidermyBook: {
 				DisplayName: Taxidermy Book
-				Tooltip: ""
+				Tooltip: Contains a frighteningly in-depth analysis of how to-
 			}
 
 			UncannyDye: {
@@ -414,6 +414,16 @@ Mods: {
 
 			ScavSona_Dress: {
 				DisplayName: Scav Sona_ Dress
+				Tooltip: ""
+			}
+
+			BloodBlight_Chestplate: {
+				DisplayName: Blood Blight_ Chestplate
+				Tooltip: ""
+			}
+
+			BloodBlight_Leggings: {
+				DisplayName: Blood Blight_ Leggings
 				Tooltip: ""
 			}
 		}

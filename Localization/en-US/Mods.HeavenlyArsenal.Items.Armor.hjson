@@ -1,4 +1,4 @@
-﻿ShintoArmor: {
+ShintoArmor: {
 	ShintoArmorHelmetRogue: {
 		SetBonus: Mods.HeavenlyArsenal.Items.Armor.ShintoArmor.ShintoArmorHelmetRogue.SetBonus
 		DisplayName: Darkened Cap
@@ -107,12 +107,12 @@ Vanity: {
 ScavSona: {
 	ScavSona_Dress: {
 		DisplayName: Robe of the Faded Spirit
-		Tooltip: ""
+		Tooltip: Simple robe made of silk. It's quite comfortable.
 	}
 
 	ScavSona_Helmet: {
 		DisplayName: Visage of the Faded Spirit
-		Tooltip: ""
+		Tooltip: "A fragment of a now deceased Spirit's light, now tied to you. "
 	}
 }
 
