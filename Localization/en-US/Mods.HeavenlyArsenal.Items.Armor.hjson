@@ -119,6 +119,24 @@ ScavSona: {
 BloodBlight: {
 	BloodBlight_Helmet: {
 		DisplayName: Twisted BloodBlight Helm
+		Crit: " {0}% increased crit chance"
+		Tooltip: apples
+		setBonusTitle: The Parasite Awakens
+		setBonusRogue: rogue
+		setBonusGeneric: Generic
+		setBonusSummoner: summoner
+		setBonusMage: mage
+		setBonusMelee: melee
+		setBonusRanged: ranged
+	}
+
+	BloodBlight_Chestplate: {
+		DisplayName: Twisted BloodBlight Skullplate
+		Tooltip: ""
+	}
+
+	BloodBlight_Leggings: {
+		DisplayName: Twisted BloodBlight Greaves
 		Tooltip: ""
 	}
 }

@@ -187,6 +187,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
             Projectile.ignoreWater = true;
             Projectile.timeLeft = 2;
             Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 60;
             Projectile.DamageType = DamageClass.Summon;
             int SegmentNum = Main.rand.Next(MIN_SEGMENTS, MAX_SEGMENTS);
 
@@ -703,9 +705,11 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
             Projectile.timeLeft = 60;
             Projectile.DamageType = DamageClass.Summon;
             Projectile.penetrate = -1;
-            Projectile.ArmorPenetration = 20;
+            Projectile.ArmorPenetration = 3000;
             Projectile.Size = new Vector2(50);
 
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
         }
 
 

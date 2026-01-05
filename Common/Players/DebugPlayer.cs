@@ -18,7 +18,6 @@ internal class DebugPlayer : PlayerDrawLayer
     { 
         var Owner = drawInfo.drawPlayer;
         var parasite = Owner.GetModPlayer<BloodBlightParasite_Player>();
-
         if (parasite == null)
             return;
 
@@ -49,7 +48,7 @@ internal class DebugPlayer : PlayerDrawLayer
         //msg += $"{Owner.GetModPlayer<ShintoArmorBarrier>().barrier}\n"
         //    + $"{Owner.GetModPlayer<ShintoArmorBarrier>().timeSinceLastHit}\n";
         //msg += $"{fallSpeedInterpolant}\n {Owner.maxFallSpeed}";
-                msg = $"modStealth: {Owner.Calamity().modStealth} \n"
+                msg += $"modStealth: {Owner.Calamity().modStealth} \n"
             + $"rogueStealth: {Owner.Calamity().rogueStealth}\n"
             + $"Stealth Max: {Owner.Calamity().rogueStealthMax}\n"
             + $"StealthAcceleration: {Owner.Calamity().stealthAcceleration}\n"

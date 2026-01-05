@@ -112,6 +112,46 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
             };
         }
 
+        private void ForEachThrall(Action<Projectile, ThrallType> action)
+        {
+            foreach (var (type, ids) in thrallsByType)
+            {
+                foreach (int id in ids)
+                {
+                    if (!Main.projectile.IndexInRange(id))
+                        continue;
+
+                    Projectile p = Main.projectile[id];
+                    if (!p.active)
+                        continue;
+
+                    action(p, type);
+                }
+            }
+        }
+        private void UpdateThrallDamage()
+        {
+            ForEachThrall((proj, type) =>
+            {
+                int baseDamage = symbiote.GetThrallDamage();
+
+                proj.damage = type switch
+                {
+                    ThrallType.BasicThrall0 => baseDamage,
+                    ThrallType.BasicThrall1 => (int)(baseDamage * 1.1f),
+                    ThrallType.BasicThrall2 => (int)(baseDamage * 1.25f),
+
+                    ThrallType.WingedThrall => (int)(baseDamage * 0.8f),
+                    ThrallType.FlowerThrall => (int)(baseDamage * 0.6f),
+
+                    ThrallType.HydraThrall => (int)(baseDamage * 1.6f),
+                    ThrallType.NerveWormThrall => (int)(baseDamage * 0.55f),
+
+                    _ => baseDamage
+                };
+            });
+        }
+
 
         #endregion
 
@@ -171,6 +211,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summone
             CheckOvermind();
             CleanupDeadThralls();
             SpawnThrall(ThrallType.NerveWormThrall);
+            UpdateThrallDamage();
         }
 
         private void CheckOvermind()

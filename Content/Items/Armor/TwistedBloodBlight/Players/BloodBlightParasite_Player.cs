@@ -6,6 +6,8 @@ using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Rogue;
 using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner;
 using Luminance.Core.Sounds;
 using NoxusBoss.Assets;
+using System.Collections.Generic;
+using Terraria;
 
 namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
 {
@@ -104,6 +106,11 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
                 return canUse;
             }
             return orig(self, sItem, canUse);
+        }
+
+        public override void Initialize()
+        {
+            CurrentMorph = DamageClass.Default;
         }
 
         public override void PostUpdateMiscEffects()
@@ -336,10 +343,36 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
         }
 
 
-
-        internal int GetThrallDamage()
+        private static readonly Dictionary<BloodBand, float> BandDamageMultiplier = new()
         {
-            return 40;
+            [BloodBand.Low] = 0.0f,   // no thralls anyway
+            [BloodBand.MidLow] = 0.75f,
+            [BloodBand.MidHigh] = 1.0f,
+            [BloodBand.High] = 1.35f,
+        };
+        public int GetThrallDamage()
+        {
+            // Safety: no damage when thralls are disabled
+            if (CurrentBand == BloodBand.Low)
+                return 0;
+
+            const int BaseThrallDamage = 400;
+
+            float bandMultiplier = BandDamageMultiplier.GetValueOrDefault(CurrentBand, 1f);
+
+            // Summoner scaling (this is the important part)
+            float summonMultiplier = Player.GetDamage(DamageClass.Summon).Additive;
+
+            // Optional soft dampening so swarm counts don't spiral
+            // (prevents 400% summon builds from breaking balance)
+            summonMultiplier = MathHelper.Lerp(1f, summonMultiplier, 0.75f);
+
+            float finalDamage =
+                BaseThrallDamage *
+                bandMultiplier *
+                summonMultiplier;
+
+            return Math.Max(1, (int)MathF.Round(finalDamage));
         }
 
         #endregion
