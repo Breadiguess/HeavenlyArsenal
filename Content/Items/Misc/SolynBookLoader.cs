@@ -7,6 +7,7 @@ namespace HeavenlyArsenal.Content.Items.Misc;
 public class SolynBookRegistry : ModSystem
 {
     public static Mod WotG;
+    public static int SolynBookItemType = -1;
 
     public override void Load()
     {
@@ -49,17 +50,16 @@ public class SolynBookRegistry : ModSystem
         bookDataType.GetField("TexturePath", BindingFlags.Public | BindingFlags.Instance).SetValue(bookData, texturePath); //Sets a texture path
 
         //Register a Solyn Book (creating a item itself and adding to wotg mod's array)
-        var result = FindType(types, "NoxusBoss.Core.Autoloaders.SolynBooks.SolynBookAutoloader")
-            .GetMethod("Create", BindingFlags.Public | BindingFlags.Static)
-            .Invoke
-            (
-                null,
-                new[]
-                {
-                    Mod,
-                    bookData
-                }
-            );
+        var createdItem = FindType(types, "NoxusBoss.Core.Autoloaders.SolynBooks.SolynBookAutoloader")
+             .GetMethod("Create", BindingFlags.Public | BindingFlags.Static)
+             .Invoke(null, new[] { Mod, bookData });
+
+        // The Create method returns a ModItem
+        var modItemType = createdItem.GetType();
+
+        // Grab the Item.Type field
+        var itemField = modItemType.GetProperty("Type", BindingFlags.Public | BindingFlags.Instance);
+        SolynBookItemType = (int)itemField.GetValue(createdItem);
     }
 
     //Used for more compact coding

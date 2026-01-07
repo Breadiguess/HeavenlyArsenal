@@ -1,4 +1,5 @@
-﻿using NoxusBoss.Core.CrossCompatibility.Inbound.BaseCalamity;
+﻿using CalamityMod;
+using NoxusBoss.Core.CrossCompatibility.Inbound.BaseCalamity;
 
 namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture;
 
@@ -41,6 +42,12 @@ partial class voidVulture //_AI
         foreach (var player in Main.ActivePlayers)
         {
             CalamityCompatibility.GrantInfiniteCalFlight(player);
+            if (currentState == Behavior.Roar || currentState == Behavior.reveal)
+            {
+                player.Calamity().rage = 0.0f;
+                player.Calamity().adrenaline = 0.0f;
+            }
+
         }
 
         manageHead();
@@ -75,9 +82,9 @@ partial class voidVulture //_AI
             NPC.dontTakeDamage = CoreDeployed;
         }
 
-        if (currentState == Behavior.reveal)
+        if (currentState == Behavior.reveal || currentState == Behavior.Roar)
         {
-            if (Time == 1)
+            if (Time == 1 && currentState != Behavior.Roar)
                 HeadPos = NPC.Center + new Vector2(0, 100);
             //wings[0].Time = 4;
             //voidVultureWing.UpdateWings(wings[0], NPC);
@@ -136,7 +143,7 @@ partial class voidVulture //_AI
             }
         }
 
-        if (currentState != Behavior.reveal)
+        if (currentState != Behavior.reveal && currentState != Behavior.Roar)
         {
             foreach (var wing in wings)
             {
@@ -198,7 +205,7 @@ partial class voidVulture //_AI
 
         if (currentTarget == null)
             currentTarget = Main.LocalPlayer;
-        if (currentState == Behavior.VomitCone || (currentState == Behavior.CollidingCommet && Time > 60) || currentState == Behavior.reveal)
+        if (currentState == Behavior.VomitCone || (currentState == Behavior.CollidingCommet && Time > 60) || currentState == Behavior.reveal || currentState == Behavior.Roar)
         {
             return;
         }

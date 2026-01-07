@@ -16,11 +16,6 @@ internal class ViscousWhip_Proj : CleanBaseWhip
 
     public ref Player Owner => ref Main.player[Projectile.owner];
 
-    public override SoundStyle? WhipSound => GennedAssets.Sounds.Common.Glitch with
-    {
-        Volume = 0.5f,
-        PitchVariance = 0.2f
-    };
 
     private float Timer
     {
@@ -61,7 +56,7 @@ internal class ViscousWhip_Proj : CleanBaseWhip
         }
         //_controller.AddModifier(new TwirlModifier(0, Segments/2, 0.15f * -Owner.direction));
 
-        _controller.AddModifier(new SmoothSineModifier(0, Segments, 1f, 10f, 1f));
+        _controller.AddModifier(new SmoothSineModifier(0, Segments, 1f,1f,1f));
 
         //_controller.AddModifier(new TwirlModifier(4, Segments, -0.12f * Projectile.direction * thing, true));
         //_controller.AddModifier(new TwirlModifier(8, 16, -0.12f* thing * Projectile.direction, false));
@@ -122,7 +117,7 @@ internal class ViscousWhip_Proj : CleanBaseWhip
         ModifyControlPoints(points);
 
         if (points.Count == 0)
-        {
+        { 
             return;
         }
 
@@ -131,7 +126,6 @@ internal class ViscousWhip_Proj : CleanBaseWhip
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        // rectangle centered on lastTop with 72x72 area
         var rect = new Rectangle((int)lastTop.X - 36, (int)lastTop.Y - 36, 42, 42);
 
         if (rect.Intersects(target.Hitbox))

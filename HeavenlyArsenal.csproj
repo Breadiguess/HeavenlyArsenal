@@ -9,6 +9,8 @@
     </PropertyGroup>
     <ItemGroup>
         <AdditionalFiles Remove="Content\Items\Accessories\ManaTransfusion\**" />
+        <AdditionalFiles Remove="Content\Items\Armor\TwistedBloodBlight\**" />
+        <AdditionalFiles Remove="Content\Items\Weapons\Melee\EdgyDualSwords\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Summon\BadSun\**" />
@@ -21,6 +23,8 @@
         <AdditionalFiles Remove="Content\Waters\**" />
         <AdditionalFiles Remove="Core\Fixes\**" />
         <Compile Remove="Content\Items\Accessories\ManaTransfusion\**" />
+        <Compile Remove="Content\Items\Armor\TwistedBloodBlight\**" />
+        <Compile Remove="Content\Items\Weapons\Melee\EdgyDualSwords\**" />
         <Compile Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <Compile Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
         <Compile Remove="Content\Items\Weapons\Summon\BadSun\**" />
@@ -33,6 +37,8 @@
         <Compile Remove="Content\Waters\**" />
         <Compile Remove="Core\Fixes\**" />
         <EmbeddedResource Remove="Content\Items\Accessories\ManaTransfusion\**" />
+        <EmbeddedResource Remove="Content\Items\Armor\TwistedBloodBlight\**" />
+        <EmbeddedResource Remove="Content\Items\Weapons\Melee\EdgyDualSwords\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Summon\BadSun\**" />
@@ -45,6 +51,8 @@
         <EmbeddedResource Remove="Content\Waters\**" />
         <EmbeddedResource Remove="Core\Fixes\**" />
         <None Remove="Content\Items\Accessories\ManaTransfusion\**" />
+        <None Remove="Content\Items\Armor\TwistedBloodBlight\**" />
+        <None Remove="Content\Items\Weapons\Melee\EdgyDualSwords\**" />
         <None Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <None Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
         <None Remove="Content\Items\Weapons\Summon\BadSun\**" />
@@ -123,6 +131,7 @@
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVultreWing.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VoidVultureBar.cs" />
+        <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVultureIntroScreen.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VoidVulture_Leg.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_AI.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Neck.cs" />
@@ -161,6 +170,9 @@
         </Reference>
         <Reference Include="CalRemix">
           <HintPath>..\..\ModReader\CalRemix\CalRemix.dll</HintPath>
+        </Reference>
+        <Reference Include="InfernumMode">
+          <HintPath>..\..\ModReader\InfernumMode\InfernumMode.dll</HintPath>
         </Reference>
         <Reference Include="Luminance">
             <HintPath>ModReferences\Luminance.dll</HintPath>

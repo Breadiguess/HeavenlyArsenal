@@ -396,13 +396,13 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 WingEffect = new BasicEffect(gd)
                 {
 
-                    TextureEnabled = true,
-                    Texture = wingTex,
                     VertexColorEnabled = true
                 };
 
+            WingEffect.TextureEnabled = true;
+                    WingEffect.Texture = wingTex;
             WingEffect.World = Matrix.Identity;
-            //gd.RasterizerState = new RasterizerState { CullMode = CullMode.None, FillMode = FillMode.WireFrame };
+                gd.RasterizerState = new RasterizerState { CullMode = CullMode.None, FillMode = FillMode.WireFrame };
 
             gd.SamplerStates[0] = SamplerState.PointClamp;
             gd.RasterizerState = new RasterizerState { CullMode = CullMode.None };

@@ -1,5 +1,4 @@
-﻿using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players;
-using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner;
+﻿
 using Terraria.DataStructures;
 using CalamityMod;
 
@@ -15,7 +14,7 @@ internal class DebugPlayer : PlayerDrawLayer
    
 
     protected override void Draw(ref PlayerDrawSet drawInfo)
-    { 
+    { /*
         var Owner = drawInfo.drawPlayer;
         var parasite = Owner.GetModPlayer<BloodBlightParasite_Player>();
         if (parasite == null)
@@ -61,7 +60,7 @@ internal class DebugPlayer : PlayerDrawLayer
         // msg += $"Authority: {Owner.GetModPlayer<Aoe_Rifle_Player>().Authority}\n AuthorityTimer: {Owner.GetModPlayer<Aoe_Rifle_Player>().AuthorityTimer}\n {Owner.GetModPlayer<Aoe_Rifle_Player>().BulletCount}";
       
         Utils.DrawBorderString(Main.spriteBatch, msg, Owner.Center - Main.screenPosition, Color.AntiqueWhite, 1, 0.2f, -0.2f);
-        
+        */
         //Main.EntitySpriteDraw(newLeech.leechTarget, Owner.Center - Main.screenPosition, null, Color.AntiqueWhite, 0, Vector2.Zero, 1, 0);
     }
 }

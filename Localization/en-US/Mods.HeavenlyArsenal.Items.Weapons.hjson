@@ -105,6 +105,11 @@ Melee: {
 
 			'''
 	}
+
+	TrioSword: {
+		DisplayName: Trio Sword
+		Tooltip: ""
+	}
 }
 
 Summon: {

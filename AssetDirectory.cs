@@ -173,6 +173,12 @@ public static class AssetDirectory
 
         public static class Items
         {
+            public static class Misc
+            {
+                public static readonly SoundStyle OrigamiPlush = new(AssetPath + "Sounds/Items/Plushies/idolbellv1origamiskies");
+
+                public static readonly SoundStyle PlayMyMod = new(AssetPath + "Sounds/Items/Plushies/PlayMyMod");
+            }
             public static class Armor
             {
                 public static readonly SoundStyle Antishield_Regen = new(AssetPath + "Sounds/Items/Armor/HAvatarShieldRegenerate");

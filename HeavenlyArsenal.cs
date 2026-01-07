@@ -1,5 +1,6 @@
 ﻿global using LumUtils = Luminance.Common.Utilities.Utilities;
 global using WotGUtils = NoxusBoss.Core.Utilities.Utilities;
+global using System.Collections.Generic;
 using CalamityMod.Projectiles.Enemy;
 using CalamityMod.UI.CalamitasEnchants;
 using HeavenlyArsenal.Common;

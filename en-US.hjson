@@ -1,4 +1,4 @@
-﻿Mods: {
+Mods: {
 	HeavenlyArsenal: {
 		Keybinds: {
 			"Quick Dash.DisplayName": Quick  Dash
@@ -505,6 +505,17 @@
 		UI: {
 			ExampleResource: Mods.HeavenlyArsenal.UI.ExampleResource
 			AmmoCount: Mods.HeavenlyArsenal.UI.AmmoCount
+		}
+
+		Tiles: {
+			ShadowPlushPlaced.MapEntry: Shadow Plush Placed
+			InkPlushPlaced.MapEntry: Ink Plush Placed
+			ScavPlushPlaced.MapEntry: Scav Plush Placed
+			MultiPlushPlaced.MapEntry: Multi Plush Placed
+			OrigamiPlushPlaced.MapEntry: Origami Plush Placed
+			PilPlushPlaced.MapEntry: Pil Plush Placed
+			SumiiPlushPlaced.MapEntry: Sumii Plush Placed
+			VertisPlushPlaced.MapEntry: Vertis Plush Placed
 		}
 	}
 }

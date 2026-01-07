@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using CalamityMod;
+﻿using CalamityMod;
 using CalamityMod.NPCs.NormalNPCs;
+using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
@@ -10,6 +9,8 @@ using Luminance.Assets;
 using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
 using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.SwagRain;
+using System.Collections.Generic;
+using System.IO;
 using Terraria.ModLoader.Utilities;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon;
@@ -276,4 +277,29 @@ public abstract class BloodMoonBaseNPC : ModNPC
     }
 
     #endregion
+}
+
+
+
+public class SolynBookDropNPC : GlobalNPC
+{
+    public override void OnKill(NPC npc)
+    {
+
+        if (SolynBookRegistry.SolynBookItemType <= 0)
+            return;
+
+        // Replace this check with however BloodMoonBaseNPC is identified
+        if (npc.ModNPC is BloodMoonBaseNPC&& npc.type != ModContent.NPCType<Umbralarva>())
+        {
+            if (Main.rand.NextBool(300)) // 1 / 300
+            {
+                Item.NewItem(
+                    npc.GetSource_Loot(),
+                    npc.getRect(),
+                    SolynBookRegistry.SolynBookItemType
+                );
+            }
+        }
+    }
 }

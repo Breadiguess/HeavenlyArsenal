@@ -28,7 +28,13 @@ public abstract class FakeFlowerRender : ModSystem
             Position = p;
         }
     }
-
+    protected static Vector2 GetAnchorWorldPosition(Point tilePos)
+    {
+        return new Vector2(
+            (tilePos.X + 0.5f) * 16f,
+            (tilePos.Y + 1f) * 16f
+        );
+    }
     public virtual bool DropAfterAnimation => true;
 
     public virtual bool AffectedByLight => true;
