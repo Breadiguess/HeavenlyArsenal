@@ -16,41 +16,21 @@ namespace HeavenlyArsenal;
 /// <summary>
 ///     The <see cref="Mod"/> implementation of Heavenly Arsenal.
 /// </summary>
-public partial class HeavenlyArsenal : Mod
+public sealed partial class HeavenlyArsenal : Mod
 {
+    /// <summary>
+    ///     Gets the singleton instance of <see cref="HeavenlyArsenal"/>. Shorthand for <see cref="ModContent.GetInstance"/>.
+    /// </summary>
+    public static HeavenlyArsenal Instance => ModContent.GetInstance<HeavenlyArsenal>();
+    
     public override void Load()
     {
         EnchantmentManager.ItemUpgradeRelationship[ModContent.ItemType<MetallicChunk>()] = ModContent.ItemType<VoidCrestOath>();
-        /*
-        if (ModLoader.GetMod("NoxusBoss") != null)
-        {
-            // Replace the following line:
-            // Type riftType = ModContent.GetModNPC<CeaselessVoidRift>().Type;
 
-            // With this corrected line:
-            Type riftType = ModContent.NPCType<CeaselessVoidRift>();
-            if (riftType != null)
-            {
-                PropertyInfo prop = riftType.GetProperty("CanEnterRift", BindingFlags.Public | BindingFlags.Static);
-                MethodInfo getter = prop?.GetGetMethod();
-                // Type forceRiftOpen = prop.PropertyType;
-                //MethodInfo detourMethod =  forceOpenRift.get
-                if (getter != null)
-                {
-
-                    Hook hook = new Hook(getter, new Func<Func<bool>, bool>(CanEnterRift_Hook));
-                    //HookEndpointManager.Add(getter, hook);
-                }
-            }
-
-        */
-
-        //On_NPC.AI 
         On_Projectile.Damage += MultisegmentCollideEnabler;
         On_Projectile.CanHitWithMeleeWeapon += MultisegmentCheckSetter;
         On_Projectile.Colliding += ExtraHitboxCollide;
     }
-
    
     #region MultiSegmentNPC
     public static class MultiSegmentNPCIterator
@@ -250,39 +230,4 @@ public partial class HeavenlyArsenal : Mod
         return result;
     }
     #endregion
-    public static void TryAddModIngredient(Recipe recipe, string modName, string itemName)
-    {
-        if (ModLoader.TryGetMod(modName, out var mod))
-        {
-            var item = mod.Find<ModItem>(itemName);
-
-            if (item != null)
-            {
-                recipe.AddIngredient(item.Type);
-            }
-        }
-    }
-    internal abstract class PacketHandler
-    {
-        internal byte HandlerType { get; set; }
-
-        public abstract void HandlePacket(BinaryReader reader, int fromWho);
-
-        protected PacketHandler(byte handlerType)
-        {
-            HandlerType = handlerType;
-        }
-
-        protected ModPacket GetPacket(byte packetType, int fromWho)
-        {
-            var p = ModContent.GetInstance<HeavenlyArsenal>().GetPacket();
-            p.Write(HandlerType);
-            p.Write(packetType);
-            if (Main.netMode == NetmodeID.Server)
-            {
-                p.Write((byte)fromWho);
-            }
-            return p;
-        }
-    }
 }

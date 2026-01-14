@@ -185,7 +185,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             for (int i = 0; i < TendrilList.Count; i++)
             {
                 ModPacket packet = Mod.GetPacket();
-                packet.Write((byte)HeavenlyArsenal.MessageType.LeechScarf_Sync);
+                packet.Write((byte)HeavenlyArsenal.NetworkMessageType.LeechScarf_Sync);
                 packet.Write((byte)Player.whoAmI);
                 var t = TendrilList[i];
                 packet.Write((byte)t.Slot);
