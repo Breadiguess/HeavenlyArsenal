@@ -122,7 +122,7 @@ public class Bloodwhip_GlobalProjectile : GlobalProjectile
             var a = Dust.NewDustPerfect(Spawnpos, DustID.Blood);
         }
 
-        //Main.NewText($"Current time:{Timer}. chosen target: {Main.npc[NPCIndex].FullName} ({Main.npc[NPCIndex].whoAmI})");
+        //Main.NewText($"Current time:{Time}. chosen target: {Main.npc[NPCIndex].FullName} ({Main.npc[NPCIndex].whoAmI})");
         if (Timer > 120 * proj.MaxUpdates)
         {
             var toNPC = proj.AngleTo(proj.OwnerMinionAttackTargetNPC.Center).ToRotationVector2() * 30;
@@ -152,7 +152,7 @@ public class Bloodwhip_GlobalProjectile : GlobalProjectile
         }
 
         if (Timer > 0)
-            //Main.NewText(Timer);
+            //Main.NewText(Time);
         {
             Timer = 0;
         }
@@ -205,7 +205,7 @@ public class Bloodwhip_GlobalProjectile : GlobalProjectile
             SpriteEffects.None
         );
 
-        //string a = $"DisipateTimer: {DisipateTimer}\n" + $"Timer: {Timer}\n";
+        //string a = $"DisipateTimer: {DisipateTimer}\n" + $"Time: {Time}\n";
         //Utils.DrawBorderString(Main.spriteBatch, a, DrawPos, Color.AntiqueWhite);
         // Main.spriteBatch.End();
         //Main.spriteBatch.Begin();

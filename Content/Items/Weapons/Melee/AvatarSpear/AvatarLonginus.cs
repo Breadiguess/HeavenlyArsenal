@@ -152,4 +152,19 @@ public class AvatarLonginus : ModItem
     {
         return false;
     }
+
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    {
+        {
+            Texture2D tex = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Melee/AvatarSpear/AvatarLonginusHeld").Value;
+
+            frame = tex.Frame(1, 2, 0, Main.LocalPlayer.GetModPlayer<AvatarSpearHeatPlayer>().Empowered ? 1 : 0);
+            Main.EntitySpriteDraw(tex, position, frame, drawColor, 0, frame.Size() / 2, scale, 0, 0);
+
+
+
+            return false;
+        }
+       
+    }
 }

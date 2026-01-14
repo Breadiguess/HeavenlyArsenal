@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using HeavenlyArsenal.Common.utils;
+using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players;
 using HeavenlyArsenal.Core;
 using Luminance.Common.Easings;
 using Terraria.DataStructures;

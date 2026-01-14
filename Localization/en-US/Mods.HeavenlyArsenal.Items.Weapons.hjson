@@ -25,11 +25,6 @@ Ranged: {
 			'''
 	}
 
-	Samsara: {
-		DisplayName: Samsara
-		Tooltip: Fires Seeds of possibilty that bloom into devastating lasers.
-	}
-
 	NoxusWeapon: {
 		DisplayName: Breath the of the Last God
 		Tooltip:
@@ -39,14 +34,23 @@ Ranged: {
 			'''
 	}
 
-	AvatarRifle: {
-		DisplayName: Avatar Rifle Test
-		Tooltip: "go away! content not finish yet! "
-	}
-
 	Aoe_Rifle_Item: {
 		DisplayName: Deterministic Causality
-		Tooltip: ""
+		Tooltip:
+			'''
+			An ancient rifle from a long dead civilization.
+			Despite the extreme passage of time, its still in relatively good condition.
+			(wip)
+
+			'''
+		Lore:
+			'''
+			WHAT WAS, WILL BE.
+			GRAVITY IS DESIRE.
+			TIME IS SIGHT.
+			IT LOVES US
+			AND WE, IT.
+			'''
 	}
 }
 
@@ -63,11 +67,6 @@ Magic: {
 	BrutalForgiveness: {
 		DisplayName: Brutal Forgiveness
 		Tooltip: ""
-	}
-
-	Goretex: {
-		DisplayName: Goretex
-		Tooltip: in development
 	}
 
 	RocheLimit: {
@@ -105,6 +104,11 @@ Melee: {
 			activate setbonus to clear the empowered form for now.
 
 			'''
+	}
+
+	TrioSword: {
+		DisplayName: Trio Sword
+		Tooltip: ""
 	}
 }
 

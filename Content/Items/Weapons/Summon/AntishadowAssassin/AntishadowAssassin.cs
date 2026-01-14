@@ -1,22 +1,22 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CalamityMod;
+﻿using CalamityMod;
 using CalamityMod.Items.Weapons.Melee;
 using HeavenlyArsenal.Content.Buffs;
 using HeavenlyArsenal.Core.Physics.ClothManagement;
 using Luminance.Assets;
 using Luminance.Common.Easings;
-using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using Luminance.Core.Sounds;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using NoxusBoss.Core.Physics.VerletIntergration;
 using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
 using ReLogic.Utilities;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Terraria.Audio;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
@@ -312,6 +312,8 @@ public class AntishadowAssassin : ModProjectile
         ArmOutlineTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArm_Outline");
         ArmBowTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArmBow");
         ArmBowOutlineTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArmBow_Outline");
+        DateTime date = DateTime.Now;
+
         KasaTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinKasa");
         AhogeTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassin_Ahoge");
         LegsTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinLegs");
@@ -373,6 +375,8 @@ public class AntishadowAssassin : ModProjectile
 
     public override void AI()
     {
+
+        //Main.NewText($"{Projectile.velocity.ToString()}, \n{(AvatarOfEmptiness.Myself != null? AvatarOfEmptiness.Myself.As<AvatarOfEmptiness>().CurrentState.ToString() + " ," + AvatarOfEmptiness.Myself.As<AvatarOfEmptiness>().AITimer.ToString(): null)}");
         // Initialize beads if necessary.
         if (BeadRopeA is null || BeadRopeB is null || BeadRopeC is null || BeadRopeD is null)
         {
@@ -417,6 +421,15 @@ public class AntishadowAssassin : ModProjectile
         if (SpiritBowCooldown >= 1)
         {
             SpiritBowCooldown--;
+        }
+        
+        // Sets the projectiles velocity to 0 if it's not valid
+        if (float.IsNaN(Projectile.velocity.X) ||
+        float.IsNaN(Projectile.velocity.Y) ||
+        float.IsInfinity(Projectile.velocity.X) ||
+        float.IsInfinity(Projectile.velocity.Y))
+        {
+            Projectile.velocity = Vector2.Zero;
         }
     }
 
@@ -679,10 +692,11 @@ public class AntishadowAssassin : ModProjectile
             {
                 teleportDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
             }
-
+            if(target != null && target.CanBeChasedBy(this))
             Projectile.Center = target.Center + teleportDirection * teleportOffset;
             DashStart = Projectile.Center;
             Projectile.velocity = Projectile.SafeDirectionTo(target.Center);
+            
             Projectile.netUpdate = true;
         }
 
@@ -1672,9 +1686,23 @@ public class AntishadowAssassin : ModProjectile
     private void DrawHat(Vector2 center)
     {
         if (Main.specialSeedWorld) { }
-
-        var hat = KasaTexture.Value;
+        Texture2D hat = KasaTexture.Value;
+        //its really bad, especially in comparison to the normal system
+        // i don't really care 
+        DateTime date = DateTime.Now;
+        if (date.Month == 12 || (date.Day == 24 || date.Day == 25))
+        {
+            //hat = GennedAssets.Textures.NamelessDeity.SantaHat;
+        }
         var hatDrawPosition = center + new Vector2(Projectile.spriteDirection * -4f, -128f).RotatedBy(BowRotation * Projectile.spriteDirection) * Projectile.scale;
+
+        Vector2 scale;
+        if (date.Month == 12 || (date.Day == 24 || date.Day == 25))
+        {
+            scale = new Vector2(0.2f, 0.1f) * Projectile.scale;
+        }
+        //else
+            scale = new Vector2(Projectile.scale);
 
         Main.spriteBatch.Draw
         (
@@ -1684,8 +1712,8 @@ public class AntishadowAssassin : ModProjectile
             Color.White * Projectile.Opacity,
             BowRotation * Projectile.spriteDirection,
             hat.Size() * 0.5f,
-            Projectile.scale,
-            Projectile.spriteDirection.ToSpriteDirection(),
+            scale,
+            Projectile.spriteDirection.ToSpriteDirection() | SpriteEffects.FlipHorizontally,
             0f
         );
     }
@@ -1769,7 +1797,7 @@ public class AntishadowAssassin : ModProjectile
             return false;
         }
 
-        ResultsTarget.Request(600, 600, Projectile.identity, RenderIntoResultsTarget);
+        ResultsTarget.Request(3000, 3000, Projectile.identity, RenderIntoResultsTarget);
 
         if (ResultsTarget.TryGetTarget(Projectile.identity, out var target) && target is not null)
         {

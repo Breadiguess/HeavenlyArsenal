@@ -1,4 +1,4 @@
-Materials: {
+﻿Materials: {
 	Auric_Catalyst: {
 		DisplayName: Auric Catalyst
 		Tooltip: ""
@@ -58,4 +58,64 @@ PenumbralMembrane: {
 AvatarMaterial: {
 	DisplayName: Avatar Material
 	Tooltip: a placeholder name for a placeholder part </3
+}
+
+ShadowPlush: {
+	DisplayName: Shadowy Man
+	Tooltip: '''"Play my mod"'''
+}
+
+InkPlush: {
+	DisplayName: The Dreamer Plush
+	Tooltip: '''"deltarune tomorrow"'''
+}
+
+ScavPlush: {
+	DisplayName: Scav Plush
+	Tooltip:
+		'''
+		Resident of a dead, bygone paradise... 
+		Now in a soft, plushie form, how adorable!
+        "There is no art dungeon in Heavenly Arsenal."
+		'''
+}
+
+MultiPlush: {
+	DisplayName: Multi Plush
+	Tooltip: ""
+}
+
+OrigamiPlush: {
+	DisplayName: Origami Plush
+	Tooltip:
+		'''
+		• 1/10000 chance for Withered Foxy jumpscare every second held in inventory
+		• The above statement may or may not be true
+		'''
+}
+
+PilPlush: {
+	DisplayName: Pil Plush
+	Tooltip:
+    '''
+    "erm.... "
+    '''
+}
+
+SumiiPlush: {
+	DisplayName: Sumii Plush
+	Tooltip:
+		'''
+		【50 goozma with Down syndrome coming your way】 
+		【Affirm yes to claim】
+		'''
+}
+
+VertisPlush: {
+	DisplayName: Vertis Plush
+	Tooltip:
+		'''
+		Unity Devotee 
+		"I've Been Kidnapped by the HA Team"
+		'''
 }

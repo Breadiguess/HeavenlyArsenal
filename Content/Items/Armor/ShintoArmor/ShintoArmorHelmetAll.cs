@@ -5,8 +5,12 @@ using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Content.Items.Materials;
+using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Rarities;
+using NoxusBoss.Core.Graphics.RenderTargets;
+using NoxusBoss.Core.Utilities;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.Localization;
 using Player = Terraria.Player;
@@ -22,6 +26,7 @@ public class ShintoArmorHelmetAll : ModItem
 
     private static readonly int MaxMinionIncrease = 10;
 
+    public const string HelmetEquippedName = "ShintoHelmetEquipped";
     public override string LocalizationCategory => "Items.Armor.ShintoArmor";
 
     // Boosted by Cross Necklace.
@@ -160,6 +165,30 @@ public class HelmetFauld : PlayerDrawLayer
     {
         return drawInfo.drawPlayer.head == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorHelmetAll), EquipType.Head);
     }
+
+
+    public static InstancedRequestableTarget HaloTarget { get; private set; }
+
+    public override void Load()
+    {
+        On_PlayerDrawLayers.DrawPlayer_21_Head_TheFace += hmm;
+        //On_Player.UpdateItemDye += FindSkirtItemDyeShader;
+
+        HaloTarget = new InstancedRequestableTarget();
+        Main.ContentThatNeedsRenderTargets.Add(HaloTarget);
+    }
+
+    private void hmm(On_PlayerDrawLayers.orig_DrawPlayer_21_Head_TheFace orig, ref PlayerDrawSet drawinfo)
+    {
+        if (drawinfo.drawPlayer.GetValueRef<bool>(ShintoArmorHelmetAll.HelmetEquippedName))
+        {
+            hmm(orig, ref drawinfo);
+            return;
+        }
+        orig(ref drawinfo);
+    }
+
+    
 
     /// <summary>
     ///     Renders the AoE Void Eyes onto the helmet.
@@ -346,17 +375,72 @@ public class HelmetFauld : PlayerDrawLayer
         drawInfo.DrawDataCache.Add(dots);
     }
 
+
+
+    private static void RenderIntoTarget()
+    {
+        if (GennedAssets.Textures.GreyscaleTextures.WhitePixel.Uninitialized || !GennedAssets.Textures.GreyscaleTextures.WhitePixel.Asset.IsLoaded)
+        {
+            return;
+        }
+
+        if (GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint.Uninitialized || !GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint.Asset.IsLoaded)
+        {
+            return;
+        }
+        Texture2D facePixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+        Texture2D Glow = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
+
+
+        var offsets = new[]
+        {
+            new Vector2(2.5f , 0),
+            new Vector2(2.5f, -5),
+            new Vector2(-0.75f , -2.5f),
+            new Vector2(5.75f, -2.5f)
+        };
+
+
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, default, null);
+
+        foreach (var offset in offsets)
+        {
+            Vector2 pos = offset + new Vector2(WotGUtils.ViewportArea.Width / 2, WotGUtils.ViewportArea.Height / 2);
+            Main.EntitySpriteDraw(facePixel, pos, null, Color.White, 0, facePixel.Size()/2, 1,0);
+            Main.EntitySpriteDraw(Glow, pos, null, Color.White with { A = 0}, 0, Glow.Size() / 2, 0.03f, 0);
+        }
+
+        Main.spriteBatch.End();
+    }
+
+
     protected override void Draw(ref PlayerDrawSet drawInfo)
     {
         var sPlayer = drawInfo.drawPlayer.GetModPlayer<ShintoArmorPlayer>();
 
-        Texture2D DEBUG = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
         //drawInfo.drawPlayer.legFrame.Y = 12 * drawInfo.drawPlayer.legFrame.Height;
 
         // drawInfo.drawPlayer.GetModPlayer<HidePlayer>().ShouldHide = true;
         //DrawFaulds(ref drawInfo, sPlayer);
         DrawVoidEyes(ref drawInfo, sPlayer);
         //DrawDeathMask(ref drawInfo, sPlayer);
+
+        return;
+        if (drawInfo.shadow != 0f || drawInfo.drawPlayer.dead)
+        {
+            return;
+        }
+        HaloTarget.Request(14000, 14000, drawInfo.drawPlayer.whoAmI, RenderIntoTarget);
+
+        if (!HaloTarget.TryGetTarget(drawInfo.drawPlayer.whoAmI, out var portalTexture) || portalTexture is null)
+        {
+            return;
+        }
+        var rift = new DrawData(portalTexture, drawInfo.HeadPosition(), null, Color.White, 0, portalTexture.Size() * 0.5f, 2f, 0);
+        rift.shader = drawInfo.cHead;
+        rift.color = drawInfo.colorArmorHead;
+        drawInfo.DrawDataCache.Add(rift);
+       
     }
 }
 

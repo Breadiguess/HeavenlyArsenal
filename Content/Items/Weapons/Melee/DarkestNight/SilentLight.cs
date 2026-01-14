@@ -661,7 +661,7 @@ public class SilentLight : ModProjectile
         var Origin = new Vector2(0, Cone.Height / 2);
 
         //Main.EntitySpriteDraw(Cone, DrawPos, null, Color.AntiqueWhite, swingDirection, Origin, 1, SpriteEffects.None);
-        //Utils.DrawBorderString(Main.spriteBatch, Timer.ToString(), DrawPos, Color.AntiqueWhite, 1);
+        //Utils.DrawBorderString(Main.spriteBatch, Time.ToString(), DrawPos, Color.AntiqueWhite, 1);
 
         // Determine draw values.
         var circleDrawPosition = Owner.GetBackHandPosition

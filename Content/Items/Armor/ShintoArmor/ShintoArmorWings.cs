@@ -14,6 +14,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 [AutoloadEquip(EquipType.Wings)]
 internal class ShintoArmorWings : ModItem, ILocalizedModType
 {
+    public bool isVanity = false;
     public static int WingSlotID { get; private set; }
 
     public override string Texture => "HeavenlyArsenal/Content/Items/Armor/ShintoArmor/ShintoArmorWings_Item";
@@ -37,7 +38,7 @@ internal class ShintoArmorWings : ModItem, ILocalizedModType
     {
         Item.width = 22;
         Item.height = 20;
-        Item.value = CalamityGlobalItem.RarityVioletBuyPrice;
+        Item.value = Terraria.Item.buyPrice(5, 20, 10, 4);
         Item.rare = ModContent.RarityType<AvatarRarity>();
         Item.accessory = true;
     }
@@ -46,7 +47,10 @@ internal class ShintoArmorWings : ModItem, ILocalizedModType
     {
         player.noFallDmg = true;
     }
-
+    public override void UpdateVisibleAccessory(Player player, bool hideVisual)
+    {
+        isVanity = true;
+    }
     public override bool WingUpdate(Player player, bool inUse)
     {
         if (player.controlJump && player.wingTime > 0 && player.velocity.Y != 0)
@@ -245,7 +249,7 @@ public class ShintoArmorWingsDraw : PlayerDrawLayer
 
         var d = new DrawData(texture, Position, Frame, color, 0f, new Vector2(texture.Width / 2, texture.Height / 18), 1f, drawInfo.playerEffect);
         d.color = drawInfo.colorArmorBody;
-        d.shader = drawInfo.drawPlayer.cWings;
+        d.shader = drawPlayer.GetModPlayer<ShintoWingManager>().Active ?  drawInfo.cBody : drawInfo.drawPlayer.cWings;
         drawInfo.DrawDataCache.Add(d);
     }
 }

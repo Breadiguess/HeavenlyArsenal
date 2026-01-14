@@ -203,6 +203,16 @@ internal class OtherworldlyCore : ModNPC
 
     void UpdateReturning()
     {
+
+        foreach(var projectile in Main.ActiveProjectiles)
+        {
+            if( projectile.type == ModContent.ProjectileType<CoreBlast>())
+            {
+
+                return;
+                break;
+            }    
+        }
         Vector2 returnPos = Body.NPC.Center + new Vector2(0f, ReturnOffsetY);
 
         NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Zero, 0.4f);

@@ -6,6 +6,10 @@ Mods: {
 			"Shadow Teleport.DisplayName": Shadow  Teleport
 			"SwirlCloak_Veil Cloak.DisplayName": Swirl Cloak_ Veil  Cloak
 			"Swap BloodArmor Form.DisplayName": Swap  Blood Armor  Form
+			"Swap Blood Armor Form.DisplayName": Swap  Blood  Armor  Form
+			"Swirl Cloak.DisplayName": Swirl  Cloak
+			"Blood Armor Parry.DisplayName": Blood  Armor  Parry
+			"Blood Blight Purge.DisplayName": Blood  Blight  Purge
 		}
 
 		Items: {
@@ -120,7 +124,7 @@ Mods: {
 
 			TaxidermyBook: {
 				DisplayName: Taxidermy Book
-				Tooltip: ""
+				Tooltip: Contains a frighteningly in-depth analysis of how to-
 			}
 
 			UncannyDye: {
@@ -402,6 +406,31 @@ Mods: {
 				DisplayName: Leech Scarf_ Item
 				Tooltip: ""
 			}
+
+			ScavSona_Helmet: {
+				DisplayName: Scav Sona_ Helmet
+				Tooltip: ""
+			}
+
+			ScavSona_Dress: {
+				DisplayName: Scav Sona_ Dress
+				Tooltip: ""
+			}
+
+			BloodBlight_Chestplate: {
+				DisplayName: Blood Blight_ Chestplate
+				Tooltip: ""
+			}
+
+			BloodBlight_Leggings: {
+				DisplayName: Blood Blight_ Leggings
+				Tooltip: ""
+			}
+
+			BloodBlight_Helmet: {
+				DisplayName: Blood Blight_ Helmet
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {
@@ -471,6 +500,22 @@ Mods: {
 			}
 		}
 
-		Prefixes.Aoe_Rifle_Reforge.DisplayName: Aoe_ Rifle_ Reforge
+		Prefixes.Aoe_Rifle_Reforge.DisplayName: Ancient
+
+		UI: {
+			ExampleResource: Mods.HeavenlyArsenal.UI.ExampleResource
+			AmmoCount: Mods.HeavenlyArsenal.UI.AmmoCount
+		}
+
+		Tiles: {
+			ShadowPlushPlaced.MapEntry: Shadow Plush Placed
+			InkPlushPlaced.MapEntry: Ink Plush Placed
+			ScavPlushPlaced.MapEntry: Scav Plush Placed
+			MultiPlushPlaced.MapEntry: Multi Plush Placed
+			OrigamiPlushPlaced.MapEntry: Origami Plush Placed
+			PilPlushPlaced.MapEntry: Pil Plush Placed
+			SumiiPlushPlaced.MapEntry: Sumii Plush Placed
+			VertisPlushPlaced.MapEntry: Vertis Plush Placed
+		}
 	}
 }

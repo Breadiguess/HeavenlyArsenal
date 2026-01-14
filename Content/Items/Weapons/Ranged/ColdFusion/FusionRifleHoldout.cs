@@ -610,11 +610,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             }
 
             /*
-            Utils.DrawBorderString(Main.spriteBatch, "|State: " + CurrentState.ToString() + " | State Timer: " + StateTimer.ToString(), Projectile.Center - Vector2.UnitY * 90 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|State: " + CurrentState.ToString() + " | State Time: " + StateTimer.ToString(), Projectile.Center - Vector2.UnitY * 90 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|Charge: " + ChargeTimer.ToString() + " | Charge iter: " + (1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7).ToString() + " | 120/chargeiter " + (120 / (1 + 3 * Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 7)).ToString(), Projectile.Center - Vector2.UnitY * 110 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|MaxCharge: " + FusionRifle.MaxChargeTime.ToString(), Projectile.Center - Vector2.UnitY * 130 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|BurstCounter: " + Owner.GetModPlayer<FusionRiflePlayer>().BurstCounter.ToString() + " | BurstTier: " + Owner.GetModPlayer<FusionRiflePlayer>().BurstTier, Projectile.Center - Vector2.UnitY * 150 - Main.screenPosition, Color.White);
-            Utils.DrawBorderString(Main.spriteBatch, "|Controlled burst active: " + Owner.GetModPlayer<FusionRiflePlayer>().ControlledBurstActive + " | ControlledBurst Timer: " + Owner.GetModPlayer<FusionRiflePlayer>().ControlledBurstTimer.ToString(), Projectile.Center - Vector2.UnitY * 170 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "|Controlled burst active: " + Owner.GetModPlayer<FusionRiflePlayer>().ControlledBurstActive + " | ControlledBurst Time: " + Owner.GetModPlayer<FusionRiflePlayer>().ControlledBurstTimer.ToString(), Projectile.Center - Vector2.UnitY * 170 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|Recoil Offset: " + RecoilOffset.ToString(), Projectile.Center - Vector2.UnitY * 190 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "|Estimated damage: " + (Projectile.damage * (1 + Owner.GetModPlayer<FusionRiflePlayer>().BurstTier / 14)).ToString(), Projectile.Center - Vector2.UnitY * 210 - Main.screenPosition, Color.White);
 
@@ -719,7 +719,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             /*
             Utils.DrawBorderString(Main.spriteBatch, "Is Volatile: " + VolatileActive.ToString(), npc.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
 
-            Utils.DrawBorderString(Main.spriteBatch, "Volatile Timer: " + VolatileTimer.ToString(), npc.Center - Vector2.UnitY * 180 - Main.screenPosition, Color.White);
+            Utils.DrawBorderString(Main.spriteBatch, "Volatile Time: " + VolatileTimer.ToString(), npc.Center - Vector2.UnitY * 180 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "VolatileSafe: " + VolatileSafe.ToString(), npc.Center - Vector2.UnitY * 200 - Main.screenPosition, Color.White);
             Utils.DrawBorderString(Main.spriteBatch, "Volatile Cooldown: " + VolatileCooldown.ToString(), npc.Center - Vector2.UnitY * 220 - Main.screenPosition, Color.White);
             */

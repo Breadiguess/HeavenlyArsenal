@@ -53,16 +53,16 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             base.FetchFromPool();
             Velocity = Vector2.Zero;
 
-            offset = position - player.Center;
+            // ffset = position - player.Center;
         }
 
         public override void Update(ref ParticleRendererSettings settings)
         {
 
-            position = offset + player.Center;
+            
             position += Velocity;
 
-            Velocity += new Vector2(offset.X, -1) * (1 - LumUtils.InverseLerp(MaxTime, 0, TimeLeft));
+            Velocity = new Vector2(offset.X, -1) * (1 - LumUtils.InverseLerp(MaxTime, 0, TimeLeft));
             //todo: float upwards from the target
             TimeLeft--;
             if (TimeLeft <= 0)
@@ -75,12 +75,16 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             //todo: normalize all sizes so that they appear at roughly the same size
             //the symbols 'burn' away at the end of their lives, like crumbling into dust
-            float Scale = symbol.Height/100f  * 0.2f;
+            float Scale = 0.2f;
             float OpacityInterp = LumUtils.InverseLerpBump(MaxTime, MaxTime - 7, MaxTime - 60, 0, TimeLeft);
             Color thing = Color.Lerp(Color.Transparent, Color.Crimson, LumUtils.InverseLerp(0, MaxTime, TimeLeft)) * OpacityInterp;
             Vector2 DrawPos = position - Main.screenPosition;
-           
-            for(int i = 0; i< 10; i++)
+
+            for (int i = 0; i < 10; i++)
+            {
+                //Main.EntitySpriteDraw(symbol, DrawPos + new Vector2(4 + MathF.Cos(Main.GlobalTimeWrappedHourly*10.1f +OpacityInterp), 0).RotatedBy(i / 10f * MathHelper.TwoPi), null, Color.Crimson* OpacityInterp, 0, symbol.Size() / 2, Scale, 0);
+            }
+            for (int i = 0; i< 10; i++)
             {
                 Main.EntitySpriteDraw(symbol, DrawPos + new Vector2(3, 0).RotatedBy(i / 10f * MathHelper.TwoPi), null, Color.Black * OpacityInterp, 0, symbol.Size() / 2, Scale, 0);
             }

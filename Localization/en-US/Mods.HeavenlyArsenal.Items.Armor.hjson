@@ -103,3 +103,40 @@ Vanity: {
 		}
 	}
 }
+
+ScavSona: {
+	ScavSona_Dress: {
+		DisplayName: Robe of the Faded Spirit
+		Tooltip: Simple robe made of silk. It's quite comfortable.
+	}
+
+	ScavSona_Helmet: {
+		DisplayName: Visage of the Faded Spirit
+		Tooltip: "A fragment of a now deceased Spirit's light, now tied to you. "
+	}
+}
+
+BloodBlight: {
+	BloodBlight_Helmet: {
+		DisplayName: Twisted BloodBlight Helm
+		Crit: " {0}% increased crit chance"
+		Tooltip: apples
+		setBonusTitle: The Parasite Awakens
+		setBonusRogue: rogue
+		setBonusGeneric: Generic
+		setBonusSummoner: summoner
+		setBonusMage: mage
+		setBonusMelee: melee
+		setBonusRanged: ranged
+	}
+
+	BloodBlight_Chestplate: {
+		DisplayName: Twisted BloodBlight Skullplate
+		Tooltip: ""
+	}
+
+	BloodBlight_Leggings: {
+		DisplayName: Twisted BloodBlight Greaves
+		Tooltip: ""
+	}
+}

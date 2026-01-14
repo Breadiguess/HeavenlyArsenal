@@ -2,6 +2,7 @@
 using NoxusBoss.Assets;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip;
 
@@ -15,11 +16,6 @@ internal class ViscousWhip_Proj : CleanBaseWhip
 
     public ref Player Owner => ref Main.player[Projectile.owner];
 
-    public override SoundStyle? WhipSound => GennedAssets.Sounds.Common.Glitch with
-    {
-        Volume = 0.5f,
-        PitchVariance = 0.2f
-    };
 
     private float Timer
     {
@@ -60,7 +56,7 @@ internal class ViscousWhip_Proj : CleanBaseWhip
         }
         //_controller.AddModifier(new TwirlModifier(0, Segments/2, 0.15f * -Owner.direction));
 
-        _controller.AddModifier(new SmoothSineModifier(0, Segments, 1f, 10f, 1f));
+        _controller.AddModifier(new SmoothSineModifier(0, Segments, 1f,1f,1f));
 
         //_controller.AddModifier(new TwirlModifier(4, Segments, -0.12f * Projectile.direction * thing, true));
         //_controller.AddModifier(new TwirlModifier(8, 16, -0.12f* thing * Projectile.direction, false));
@@ -121,7 +117,7 @@ internal class ViscousWhip_Proj : CleanBaseWhip
         ModifyControlPoints(points);
 
         if (points.Count == 0)
-        {
+        { 
             return;
         }
 
@@ -130,7 +126,6 @@ internal class ViscousWhip_Proj : CleanBaseWhip
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        // rectangle centered on lastTop with 72x72 area
         var rect = new Rectangle((int)lastTop.X - 36, (int)lastTop.Y - 36, 42, 42);
 
         if (rect.Intersects(target.Hitbox))
@@ -149,107 +144,162 @@ internal class ViscousWhip_Proj : CleanBaseWhip
 
         SoundEngine.PlaySound(SoundID.Item14, target.Center);
     }
-    /*
-    private void DrawLine(List<Vector2> list)
+    private BasicEffect whipEffect;
+
+
+    private void DrawWhipPrimitive(List<Vector2> points, float baseWidth = 6f)
     {
-        Texture2D texture = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
-        Rectangle frame = texture.Frame();
-        Vector2 origin = new Vector2(0f, 0.5f);
+        if (points.Count < 2)
+            return;
 
-        Vector2 pos = list[0];
-        for (int i = 0; i < list.Count - 1; i++)
+        GraphicsDevice gd = Main.graphics.GraphicsDevice;
+
+        whipEffect ??= new BasicEffect(gd)
         {
-            Vector2 element = list[i];
-            Vector2 diff = list[i + 1] - element;
+            TextureEnabled = true,
+            VertexColorEnabled = true,
+            LightingEnabled = false
+        };
 
-            float rotation = diff.ToRotation();
-            Color color = Color.Crimson;
-            Vector2 scale = new Vector2(diff.Length() + 2f, 2f);
-            if (i == list.Count - 2)
-            {
-                scale.X -= 5f;
-            }
+        Texture2D texture = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
 
-            Main.EntitySpriteDraw(texture, pos - Main.screenPosition, frame, color, rotation, origin, scale, SpriteEffects.None, 0);
-            Utils.DrawBorderString(Main.spriteBatch, i.ToString(), pos - Main.screenPosition, Color.AntiqueWhite, 0.35f);
-            pos += diff;
+        whipEffect.Texture = texture;
+        whipEffect.View = Main.GameViewMatrix.TransformationMatrix;
+        whipEffect.Projection = Matrix.CreateOrthographicOffCenter(
+            0, Main.screenWidth,
+            Main.screenHeight, 0,
+            -1f, 1f
+        );
+        whipEffect.World = Matrix.Identity;
+
+        List<VertexPositionColorTexture> verts = new();
+
+        float totalLength = 0f;
+        for (int i = 0; i < points.Count - 1; i++)
+            totalLength += Vector2.Distance(points[i], points[i + 1]);
+
+        float accumulated = 0f;
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            Vector2 p = points[i];
+            Vector2 dir;
+
+            if (i == 0)
+                dir = points[1] - p;
+            else if (i == points.Count - 1)
+                dir = p - points[i - 1];
+            else
+                dir = points[i + 1] - points[i - 1];
+
+            if (dir.LengthSquared() < 0.001f)
+                continue;
+
+            dir.Normalize();
+
+            Vector2 normal = dir.RotatedBy(MathHelper.PiOver2);
+
+            float t = accumulated / totalLength;
+            float width = baseWidth * MathHelper.Lerp(1.2f, 0.4f, t); // taper
+
+            Color color = Color.Crimson.MultiplyRGB(Lighting.GetColor(p.ToTileCoordinates()));
+            float u = t;
+
+            Vector2 screen = p - Main.screenPosition;
+
+            verts.Add(new VertexPositionColorTexture(
+                new Vector3(screen + normal * width, 0f),
+                color,
+                new Vector2(u, 0f)
+            ));
+
+            verts.Add(new VertexPositionColorTexture(
+                new Vector3(screen - normal * width, 0f),
+                color,
+                new Vector2(u, 1f)
+            ));
+
+            if (i < points.Count - 1)
+                accumulated += Vector2.Distance(points[i], points[i + 1]);
+        }
+
+        if (verts.Count < 4)
+            return;
+
+        gd.RasterizerState = RasterizerState.CullNone;
+        gd.BlendState = BlendState.AlphaBlend;
+        gd.DepthStencilState = DepthStencilState.None;
+        gd.SamplerStates[0] = SamplerState.LinearClamp;
+
+        foreach (EffectPass pass in whipEffect.CurrentTechnique.Passes)
+        {
+            pass.Apply();
+            gd.DrawUserPrimitives(
+                PrimitiveType.TriangleStrip,
+                verts.ToArray(),
+                0,
+                verts.Count - 2
+            );
         }
     }
+
+    private List<Vector2> ResamplePolyline(
+    List<Vector2> points,
+    float spacing
+)
+    {
+        List<Vector2> result = new();
+        if (points.Count < 2)
+            return result;
+
+        result.Add(points[0]);
+
+        Vector2 prev = points[0];
+        float carry = 0f;
+
+        for (int i = 1; i < points.Count; i++)
+        {
+            Vector2 curr = points[i];
+            Vector2 delta = curr - prev;
+            float length = delta.Length();
+
+            if (length <= 0.0001f)
+                continue;
+
+            Vector2 dir = delta / length;
+
+            float dist = spacing - carry;
+            while (dist <= length)
+            {
+                Vector2 sample = prev + dir * dist;
+                result.Add(sample);
+                dist += spacing;
+            }
+
+            carry = length - (dist - spacing);
+            prev = curr;
+        }
+
+        // Ensure the tip is included
+        if (result[^1] != points[^1])
+            result.Add(points[^1]);
+
+        return result;
+    }
+
     public override bool PreDraw(ref Color lightColor)
     {
         List<Vector2> list = new();
         ModifyControlPoints(list);
         if (list.Count == 0) return false;
 
+        float lodSpacing = 1f;
+        List<Vector2> dense = ResamplePolyline(list, lodSpacing);
 
-        DrawLine(list);
-
-        SpriteEffects flip = Projectile.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-        Texture2D texture = TextureAssets.Projectile[Type].Value;
-        Vector2 pos = list[0];
-
-        Texture2D thing = GennedAssets.Textures.GreyscaleTextures.HollowCircleSoftEdge;
-        for (int i = 0; i < list.Count - 1; i++)
-        {
-            // These two values are set to suit this projectile's sprite, but won't necessarily work for your own.
-            // You can change them if they don't!
-            Rectangle frame = new Rectangle(0, 0, 10, 26); // The size of the Handle (measured in pixels)
-            Vector2 origin = new Vector2(5, 8); // Offset for where the player's hand will start measured from the top left of the image.
-            float scale = 1;
-
-            // These statements determine what part of the spritesheet to draw for the current segment.
-            // They can also be changed to suit your sprite.
-            if (i == list.Count - 2)
-            {
-                // This is the head of the whip. You need to measure the sprite to figure out these values.
-                frame.Y = 74; // Distance from the top of the sprite to the start of the frame.
-                frame.Height = 18; // Height of the frame.
+        DrawWhipPrimitive(dense, baseWidth: 4f);
 
 
-                Projectile.GetWhipSettings(Projectile, out float timeToFlyOut, out int _, out float _);
-                float t = Timer / timeToFlyOut;
-                Vector2 a = list[list.Count - 2] - list[2];
-                float rot = a.ToRotation() - MathHelper.PiOver2; // This projectile's sprite faces down, so PiOver2 is used to correct rotation.
-
-                scale = MathHelper.Lerp(0.5f, 1.5f, Utils.GetLerpValue(0.1f, 0.7f, t, true) * Utils.GetLerpValue(0.9f, 0.7f, t, true));
-                Vector2 thingOffset = thing.Size() * 0.5f + new Vector2(-50, 100);
-                //Main.spriteBatch.End();
-                //Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.TransformationMatrix);
-
-                //Main.EntitySpriteDraw(thing, pos - Main.screenPosition, null, Color.Crimson with { A = 0 }, rot, thingOffset, scale * 0.05f, SpriteEffects.None);
-                //Main.spriteBatch.End();
-                //Main.spriteBatch.Begin();
-            }
-            else if (i > 10)
-            {
-                // Third segment
-                frame.Y = 58;
-                frame.Height = 16;
-            }
-            else if (i > 5)
-            {
-                // Second Segment
-                frame.Y = 42;
-                frame.Height = 16;
-            }
-            else if (i > 0)
-            {
-                // First Segment
-                frame.Y = 26;
-                frame.Height = 16;
-            }
-
-            Vector2 element = list[i];
-            Vector2 diff = list[i + 1] - element;
-
-            float rotation = diff.ToRotation() - MathHelper.PiOver2; // This projectile's sprite faces down, so PiOver2 is used to correct rotation.
-            Color color = Lighting.GetColor(element.ToTileCoordinates());
-
-            //Main.EntitySpriteDraw(texture, pos - Main.screenPosition, frame, color, rotation, origin, scale, flip, 0);
-
-            pos += diff;
-        }
 
         return false;
-    }*/
+    }
 }

@@ -70,28 +70,6 @@ public class ShintoArmorLeggings : ModItem
         recipe.AddIngredient<StatisVoidSash>();
         recipe.Register();
 
-        if (ModLoader.TryGetMod("CalamityHunt", out var CalamityHunt))
-        {
-            CreateRecipe()
-                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
-                .AddIngredient<DemonshadeGreaves>()
-                .AddIngredient(ItemID.NinjaPants)
-                .AddIngredient(ItemID.CrystalNinjaLeggings)
-                .AddIngredient(CalamityHunt.Find<ModItem>("ShogunPants").Type)
-                .AddIngredient<StatisVoidSash>()
-                .AddTile<DraedonsForge>()
-                .Register();
-        }
-        else
-        {
-            CreateRecipe()
-                .AddIngredient(ModContent.ItemType<AvatarMaterial>())
-                .AddIngredient<DemonshadeGreaves>()
-                .AddIngredient(ItemID.NinjaPants)
-                .AddIngredient(ItemID.CrystalNinjaLeggings)
-                .AddIngredient<StatisVoidSash>()
-                .AddTile<DraedonsForge>()
-                .Register();
-        }
+       
     }
 }

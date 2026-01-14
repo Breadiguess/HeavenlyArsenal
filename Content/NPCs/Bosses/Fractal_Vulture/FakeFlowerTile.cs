@@ -60,17 +60,27 @@ public class FakeFlowerTile : ModTile, ICustomPlacementSound
         return false;
     }
 
-    public override void KillMultiTile(int i, int j, int frameX, int frameY)
+
+
+    public override bool RightClick(int i, int j)
     {
+
         var centerTileX = i + Width / 2;
         var centerTileY = j + Height / 2;
 
         // Convert the center tile to world position
         var centerWorld = new Vector2(centerTileX, centerTileY).ToWorldCoordinates();
-        centerWorld.Y -= 16f;
-        NPC.NewNPCDirect(null, centerWorld, ModContent.NPCType<voidVulture>());
-    }
 
+        if (!Main.LocalPlayer.WithinRange(centerWorld, 300))
+            return false;
+
+            centerWorld.Y -= 16f;
+
+
+        if (voidVulture.Myself is null)
+            NPC.NewNPCDirect(null, centerWorld, ModContent.NPCType<voidVulture>());
+        return voidVulture.Myself is null;
+    }
     public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
     {
         r = 0.6f;
@@ -88,6 +98,11 @@ public class FakeFlowerTile : ModTile, ICustomPlacementSound
         }
     }
 
+    //public override bool CanExplode(int i, int j) => false;
+    public override void PlaceInWorld(int i, int j, Item item)
+    {
+
+    }
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
     {
         return false;

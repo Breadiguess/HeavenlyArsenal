@@ -98,3 +98,8 @@ ButterflyMinionBuff: {
 	DisplayName: Butterfly Minion Buff
 	Description: Mods.HeavenlyArsenal.Buffs.ButterflyMinionBuff.Description
 }
+
+Aoe_Rifle_RealityTorn_Buff: {
+	DisplayName: Aoe_ Rifle_ Reality Torn_ Buff
+	Description: Mods.HeavenlyArsenal.Buffs.Aoe_Rifle_RealityTorn_Buff.Description
+}

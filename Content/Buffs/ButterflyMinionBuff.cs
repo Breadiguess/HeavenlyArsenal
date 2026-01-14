@@ -15,26 +15,9 @@ public class ButterflyMinionBuff : ModBuff
         Main.buffNoSave[Type] = true;
 
         PlayerDataManager.ResetEffectsEvent += ResetMinionState;
-        On_Main.MouseText_DrawBuffTooltip += RenderNameWithSpecialFont;
     }
 
-    private void RenderNameWithSpecialFont(On_Main.orig_MouseText_DrawBuffTooltip orig, Main self, string buffString, ref int X, ref int Y, int buffNameHeight)
-    {
-        orig(self, buffString, ref X, ref Y, buffNameHeight);
-
-        if (buffString == this.GetLocalizedValue("Description"))
-        {
-            var vanillaFont = FontAssets.MouseText.Value;
-            var vanillaTextSize = vanillaFont.MeasureString(buffString);
-
-            var font = FontRegistry.Instance.AvatarPoemText;
-            var text = this.GetLocalizedValue("NameText");
-            var drawPosition = new Vector2(X + (int)vanillaTextSize.X + 6f, Y + 42f);
-
-            ChatManager.DrawColorCodedStringWithShadow
-                (Main.spriteBatch, font, text, drawPosition, new Color(252, 37, 74), 0f, font.MeasureString(text) * Vector2.UnitY * 0.5f, Vector2.One * 0.5f, -1f, 1f);
-        }
-    }
+  
 
     private void ResetMinionState(PlayerDataManager p)
     {

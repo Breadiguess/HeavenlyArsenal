@@ -41,6 +41,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         {
             debug,
             reveal,
+            Roar,
             Idle,
             VomitCone,
             RiseSpin,
@@ -94,6 +95,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 case Behavior.reveal:
                     Reveal();
                     break;
+                case Behavior.Roar:
+                    Roar();
+                    break;
                 case Behavior.Idle:
                     Idle();
                     break;
@@ -129,6 +133,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                     break;
             }
         }
+
 
         void ManageTransitionCutscene()
         {
@@ -244,11 +249,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         {
             const int headraiseTime = 270;
 
-            const int InvestigateTime = 450;
-
-            const int ScreamTime = 700;
-            const int StopScreaming = 900;
-            const int endTime = 980;
+            const int endTime = 340;
 
             if(Time == 1)
             {
@@ -294,62 +295,116 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                     
             }
 
-            if(Time > InvestigateTime)
-            {
-
-                HeadPos = Vector2.Lerp(HeadPos, NPC.Center + NPC.DirectionTo(Main.player[0].Center)*100, 0.2f);
-                if(Time % 30 == 0)
-                {
-                    HeadPos += Main.rand.NextVector2Unit();
-                }
-                NPC.Center = Vector2.Lerp(NPC.Center, Main.player[0].Center + new Vector2(50 * Main.player[0].direction * MathF.Cos(Time/30.1f), -200), 0.2f);
-            
-                if(Time == ScreamTime)
-                {
-                    SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Roar with { Pitch = -1 }).WithVolumeBoost(3);
-
-                }
-                if(Time > ScreamTime && Time < StopScreaming)
-                {
-                    if(Time % 4 == 0)
-                    {
-
-                        
-                        float thing = InverseLerp(ScreamTime, StopScreaming, Time);
-                        ScreenShakeSystem.StartShakeAtPoint(HeadPos,  6f * (1- thing));
-                        ExpandingChromaticBurstParticle burst = new ExpandingChromaticBurstParticle(HeadPos, Vector2.Zero, Main.rand.NextBool() ? Color.White : Color.White, 30, 0.2f * thing, 1.7f * thing);
-                        burst.Spawn();
-
-                    }
-                   
-
-                }
-
-            }
+          
             if (Time > endTime)
             {
-                for (int i = 0; i < 2; i++)
-                {
-                    wings[i].WingRotation = wings[i].WingRotation.AngleLerp(MathHelper.ToRadians(60), 0.2f);
-                }
-                string typeName = NPC.FullName;
-                if (Main.netMode == 0)
-                    Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), 175, 75);
-                else if (Main.netMode == 2)
-                    ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken"), new Color(175, 75, 255));
-
+               
                 //TileDisablingSystem.TilesAreUninteractable = true;
                 //Main.NewText($"{NPC.GivenName} has awoken! ", Color.Purple);
                 SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Phase2IntroNeckSnap);
+                currentState = Behavior.Roar;
+                Time = -1;
+                
+            }
+
+        }
+
+        private void Roar()
+        {
+            // Plan (pseudocode):
+            // 1. Keep wing rotations lerping to final pose.
+            // 2. During the scream window, compute a "bump" interpolant that
+            //    rises then falls using InverseLerpBump so that intensity is strongest
+            //    in the middle of the scream region.
+            // 3. Use that bump to:
+            //    - vary spawn frequency (probability per tick) of chromatic burst particles
+            //    - vary burst size/count/scale/lifetime
+            //    - vary screen-shake strength (we combine bump with a linear fade so the
+            //      shake peaks earlier and decays nicely)
+            // 4. Trigger bursts probabilistically each tick according to computed probability.
+            // 5. Preserve the initial "one-shot" scream sound and existing fade-out behavior.
+            //
+            // Implementation notes:
+            // - Use InverseLerpBump(ScreamTime, ScreamTime + rampIn, StopScreaming - rampOut, StopScreaming, Time)
+            //   to produce a bump in the middle of the interval.
+            // - Convert bump into spawn probability and particle parameters via MathHelper.Lerp.
+            // - Use ScreenShakeSystem.StartShakeAtPoint with a shake strength derived from both
+            //   the bump (for mid-peak shaping) and a simple linear fade (to respect original decay).
+            // - Use Main.rand.NextFloat() to determine whether to spawn a burst on this tick.
+
+            for (int i = 0; i < 2; i++)
+            {
+                wings[i].WingRotation = wings[i].WingRotation.AngleLerp(MathHelper.ToRadians(-30), 0.02f);
+            }
+
+            const int ScreamTime = 60;
+            const int StopScreaming = 320;
+            const int EndBehavior = 380;
+            float cameraZoomInterpolant = 1f;
+            CameraPanSystem.PanTowards(NPC.Center, cameraZoomInterpolant);
+            MusicVolumeManipulationSystem.MuffleFactor = 0.1f;
+            if (Time >= ScreamTime && Time < StopScreaming)
+            {
+                if (Time == ScreamTime)
+                {
+                    string typeName = NPC.FullName;
+                    if (Main.netMode == 0)
+                        Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), 175, 75);
+                    else if (Main.netMode == 2)
+                        ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken"), new Color(175, 75, 255));
+
+                    SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Roar with {  Pitch = -0.3f}, NPC.Center).WithVolumeBoost(3);
+                }
+
+                // Create a bump-shaped interpolant that peaks roughly mid-way through the scream window.
+                // rampIn and rampOut control how quickly the bump rises/falls.
+                float rampIn = 60f;
+                float rampOut = 80f;
+                float bump = InverseLerpBump(ScreamTime, ScreamTime + rampIn, StopScreaming - rampOut, StopScreaming, Time);
+                bump = MathHelper.Clamp(bump, 0f, 1f);
+
+                // Also compute a simple linear fade across the window for screenshake base behavior.
+                float linearFade = MathHelper.Clamp(InverseLerp(ScreamTime, StopScreaming, Time), 0f, 1f);
+
+                // Frequency (probability per tick) increases with bump.
+                float spawnProbability = MathHelper.Lerp(0.08f, 0.25f, bump);
+
+                // Particle parameters scale with bump.
+                int burstCount = (int)MathHelper.Lerp(12f, 18f, bump);
+                float burstScale = MathHelper.Lerp(0.12f, 0.28f, bump);
+                float burstLife = MathHelper.Lerp(0.6f, 1.7f, bump);
+
+                // Screen shake: combine bump and linear fade to produce a natural feel.
+                // We want strong shake early-to-mid and reduce to none by StopScreaming.
+                float shakeStrength = 6f * (1f - linearFade) * (1f - 0.4f * bump); // bump slightly tempers peak
+                shakeStrength = Math.Max(0f, shakeStrength);
+
+                // Spawn bursts probabilistically (so frequency changes smoothly).
+                if (Main.rand.NextFloat() < spawnProbability || Time % 12 == 0) // keep occasional rhythm at very low bump
+                {
+                    ScreenShakeSystem.StartShakeAtPoint(HeadPos, shakeStrength, shakeStrengthDissipationIncrement: 0.4f);
+
+                    ExpandingChromaticBurstParticle burst = new ExpandingChromaticBurstParticle(
+                        HeadPos,
+                        Vector2.Zero,
+                        Color.White * 0.6f,
+                        burstCount,
+                        burstScale,
+                        burstLife);
+
+                    burst.Spawn();
+                }
+            }
+            if (Time >= EndBehavior)
+            {
                 currentState = Behavior.Idle;
                 targetInterpolant = 0.2f;
                 NPC.dontTakeDamage = false;
                 hideBar = false;
                 Time = -1;
+
             }
-
         }
-
 
         #region cone vomit
         float neckSpinInterpolant;

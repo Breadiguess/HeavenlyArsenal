@@ -67,5 +67,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 AuthorityTimer = MAX_AUTHORITY_TIMER;
             }
         }
+
+
+
+
+
+
     }
 }

@@ -14,6 +14,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture;
 
 public abstract class FakeFlowerRender : ModSystem
 {
+    public static int Count =>
+    renderSystems.Values.Sum(system => system.tilePoints.Count);
+
     public class PlantTileData
     {
         public Point Position;
@@ -25,7 +28,13 @@ public abstract class FakeFlowerRender : ModSystem
             Position = p;
         }
     }
-
+    protected static Vector2 GetAnchorWorldPosition(Point tilePos)
+    {
+        return new Vector2(
+            (tilePos.X + 0.5f) * 16f,
+            (tilePos.Y + 1f) * 16f
+        );
+    }
     public virtual bool DropAfterAnimation => true;
 
     public virtual bool AffectedByLight => true;
@@ -180,6 +189,7 @@ public abstract class FakeFlowerRender : ModSystem
     public override void SaveWorldData(TagCompound tag)
     {
         tag["PlantPoints"] = tilePoints.Select(d => d.Position).ToList();
+       
     }
 
     public override void LoadWorldData(TagCompound tag)
@@ -196,5 +206,6 @@ public abstract class FakeFlowerRender : ModSystem
                 }
             );
         }
+       
     }
 }

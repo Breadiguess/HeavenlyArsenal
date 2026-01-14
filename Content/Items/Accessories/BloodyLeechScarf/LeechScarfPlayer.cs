@@ -175,21 +175,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                 Player.AddCooldown(LeechScarfCooldown.ID, 1);
             }
 
-            if (Main.netMode != NetmodeID.SinglePlayer)
-            {
-                //TODO: If multiplayer, we send a copy of the tendril struct data using ModPacket to ensure its synced between all players, and then we will need to use Mod.HandlePacket()
-
-                for (int i = 0; i < TendrilList.Count; i++)
-                {
-
-                    var t = TendrilList[i];
-
-                    if (t.Cooldown < 1)
-                        return;
-
-                   
-                }
-            }
+          
 
         }
 
@@ -208,8 +194,8 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
                 packet.Send(toWho, fromWho);
             }
 
-        }
-        // Called in ExampleMod.Networking.cs
+            }
+            // Called in ExampleMod.Networking.cs
         public void ReceivePlayerSync(BinaryReader reader)
         {
             int slot = reader.ReadByte();

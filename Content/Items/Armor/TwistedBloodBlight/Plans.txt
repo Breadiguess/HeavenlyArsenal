@@ -1,0 +1,37 @@
+﻿Twisted Bloodblight
+
+Twisted Bloodblight is a living, parasitic armor set that forms a symbiotic bond with its wearer.
+It does not simply increase stats — it responds to bloodshed, adapts to combat stress, and asserts control when pushed too far.
+
+Core Mechanic — Blood Saturation
+Combat generates Blood Saturation, a resource that ranges from 0–100.
+Dealing damage increases saturation
+Taking damage increases saturation
+Prolonged combat accelerates saturation
+Leaving combat causes saturation to decay
+As Blood Saturation rises, the armor mutates its behavior.
+Saturation Bands
+Band	State	Description
+0–30%	Dormant	Defensive, restrained, stable
+30–70%	Symbiosis	Peak cooperation, active abilities
+70–100%	Ascension	Extreme power, heavy risk
+
+Remaining at high saturation for too long causes a Crash, forcibly weakening the player.
+Class Morphs
+Twisted Bloodblight adapts to the player’s dominant damage class:
+
+Melee – Blood limbs, grapples, butcher form
+Ranger – Blood tracers, chaining projectiles, Blood Cannons
+Mage – Hemal sigils, autonomous spellcasting
+Summoner – Blood thralls, Overmind
+Rogue – blood phantoms, stealth strikes claw enemies, 
+Morphs can shift dynamically during combat.
+
+Design Goals
+
+No stance toggles
+Power is earned, unstable, and dangerous
+
+High skill expression
+
+Strong visual and mechanical identity

@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Common.Utilities;
+using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players;
 using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;

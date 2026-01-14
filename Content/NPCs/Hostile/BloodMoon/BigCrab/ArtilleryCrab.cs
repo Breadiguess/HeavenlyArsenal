@@ -553,7 +553,7 @@ internal class ArtilleryCrab : BloodMoonBaseNPC
         {
             //Utils.DrawBorderString(spriteBatch, " | State: " + CurrentState, NPC.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
             //Utils.DrawBorderString(spriteBatch, " | Ammo: " + AmmoCount, NPC.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
-            //Utils.DrawBorderString(spriteBatch, " | Timer: " + Time, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
+            //Utils.DrawBorderString(spriteBatch, " | Time: " + Time, NPC.Center - Vector2.UnitY * 120 - Main.screenPosition, Color.White);
         }
 
         var texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/BigCrab/ArtilleryCrab").Value;

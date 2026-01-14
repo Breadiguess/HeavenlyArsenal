@@ -5,6 +5,7 @@ using CalamityMod.Items.Armor.Bloodflare;
 using CalamityMod.Items.Armor.OmegaBlue;
 using CalamityMod.Items.Materials;
 using CalamityMod.Tiles.Furniture.CraftingStations;
+using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using HeavenlyArsenal.Content.Rarities;
 using Terraria.Localization;

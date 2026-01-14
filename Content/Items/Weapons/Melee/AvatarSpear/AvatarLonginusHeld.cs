@@ -1233,7 +1233,7 @@ public class AvatarLonginusHeld : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        var texturePath = "HeavenlyArsenal/Content/Items/Weapons/Melee/AvatarSpear/AvatarLonginusHeld_Alt1";
+        var texturePath = "HeavenlyArsenal/Content/Items/Weapons/Melee/AvatarSpear/AvatarLonginusHeld";
         //if(Main.LocalPlayer.name == "ModTester2")
         //    texturePath = "HeavenlyArsenal/Content/Projectiles/Weapons/Melee/AvatarSpear/AvatarLonginusHeld";
 
@@ -1245,7 +1245,7 @@ public class AvatarLonginusHeld : ModProjectile
         //    frame = texture.Frame(1, 2,0, IsEmpowered? 2 :1);
 
         {
-            frame = texture.Frame(1, 11, 0, CurrentFrame);
+            frame = texture.Frame(1, 2, 0, IsEmpowered? 1:0);
         }
 
         var glow = AssetDirectory.Textures.BigGlowball.Value;

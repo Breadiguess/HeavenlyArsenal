@@ -128,7 +128,7 @@ internal class CloseureStrikePlayer : ModPlayer
                 targetedNPC.StrikeInstantKill();
             }
 
-            //Main.NewText($"{Timer}");
+            //Main.NewText($"{Time}");
         }
     }
 

@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using CalamityMod;
+﻿using CalamityMod;
 using CalamityMod.NPCs.NormalNPCs;
-using HeavenlyArsenal.Content.Biomes;
+using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
@@ -11,27 +9,35 @@ using Luminance.Assets;
 using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
 using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.SwagRain;
+using System.Collections.Generic;
+using System.IO;
 using Terraria.ModLoader.Utilities;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon;
 
 public class BlackListProjectileNPCs : ModSystem
 {
-    public static bool[] Blacklisted = NPCID.Sets.Factory.CreateBoolSet();
+    //blacklisted NPCs are to be ignored as potential targets.
+    public static HashSet<int> BlackListedNPCs = new();
+
+    //todo: create a modsystem that does this for us, and then write it back to this npc upon loading the world or some shit
 
     public override void PostSetupContent()
     {
-        base.PostSetupContent();
-        
+        //doubtless doesn't work, but you know what who gaf, i'm writing in github i can fix it later.
+        //the whole point is to have something in place already to work off of.
         for (var i = 0; i < NPCLoader.NPCCount; i++)
         {
-            if (!NPCID.Sets.ProjectileNPC[i])
+            if (NPCID.Sets.ProjectileNPC[i])
             {
-                continue;
+                BlackListedNPCs.Add(i);
             }
-            
-            Blacklisted[i] = true;
         }
+
+        BlackListedNPCs.Add(ModContent.NPCType<Solyn>());
+        BlackListedNPCs.Add(ModContent.NPCType<CeaselessVoidRift>());
+
+        BlackListedNPCs.Add(ModContent.NPCType<SuperDummyNPC>());
     }
 }
 
@@ -210,7 +216,7 @@ public abstract class BloodMoonBaseNPC : ModNPC
     public override void SetDefaults()
     {
         NPC.Calamity().VulnerableToHeat = false;
-        SpawnModBiomes = [ModContent.GetInstance<RiftEclipseBiome>().Type];
+        SpawnModBiomes = [ModContent.GetInstance<RiftEclipseBloodMoon>().Type];
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
@@ -271,4 +277,29 @@ public abstract class BloodMoonBaseNPC : ModNPC
     }
 
     #endregion
+}
+
+
+
+public class SolynBookDropNPC : GlobalNPC
+{
+    public override void OnKill(NPC npc)
+    {
+
+        if (SolynBookRegistry.SolynBookItemType <= 0)
+            return;
+
+        // Replace this check with however BloodMoonBaseNPC is identified
+        if (npc.ModNPC is BloodMoonBaseNPC&& npc.type != ModContent.NPCType<Umbralarva>())
+        {
+            if (Main.rand.NextBool(300)) // 1 / 300
+            {
+                Item.NewItem(
+                    npc.GetSource_Loot(),
+                    npc.getRect(),
+                    SolynBookRegistry.SolynBookItemType
+                );
+            }
+        }
+    }
 }

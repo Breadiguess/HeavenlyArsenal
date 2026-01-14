@@ -713,7 +713,7 @@ public class FrenzyGlowLayer : PlayerDrawLayer
         string BloodClotString = (" | Blood = " + modPlayer.CurrentBlood + " | Clot = " + modPlayer.Clot + " | Total = " + modPlayer.TotalResource.ToString());
         Utils.DrawBorderString(Main.spriteBatch, BloodClotString, (Vector2.UnitX* -230)+drawInfo.drawPlayer.Center - Vector2.UnitY * 160 - Main.screenPosition, Color.White);
 
-        string FrenzyString = (" | Frenzy : "+modPlayer.Frenzy.ToString()+" | Timer : "+ modPlayer.frenzyTimer.ToString());
+        string FrenzyString = (" | Frenzy : "+modPlayer.Frenzy.ToString()+" | Time : "+ modPlayer.frenzyTimer.ToString());
 
         Utils.DrawBorderString(Main.spriteBatch, FrenzyString, (Vector2.UnitX * -230) + drawInfo.drawPlayer.Center - Vector2.UnitY * 140 - Main.screenPosition, Color.White);
 

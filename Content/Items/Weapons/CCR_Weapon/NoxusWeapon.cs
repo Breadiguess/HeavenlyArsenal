@@ -1,18 +1,22 @@
-﻿using System.Linq;
-using CalamityMod;
+﻿using CalamityMod;
 using CalamityMod.Items;
 using CalamityMod.Particles;
 using CalamityMod.Rarities;
+using CalRemix.Content.NPCs.Bosses.Noxus;
 using HeavenlyArsenal.Common;
 using HeavenlyArsenal.Common.Configuration;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Content.Particles;
 using HeavenlyArsenal.Content.Particles.Metaballs.NoxusGasMetaball;
+using HeavenlyArsenal.Core.Globals;
 using Luminance.Assets;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Core.GlobalInstances;
+using System.Linq;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent.ItemDropRules;
 using static HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon.EntropicCrystal;
 using Player = Terraria.Player;
 
@@ -73,6 +77,30 @@ internal class NoxusWeapon : ModItem
 
         return enabledInConfig || isOtherModLoaded;
     }
+
+
+    public override void SetStaticDefaults()
+    {
+        ItemID.Sets.gunProj[Type] = true;
+        if (ModLoader.TryGetMod("CalRemix", out var CalamityRemix))
+        {
+            if (CalamityRemix.TryFind<ModNPC>("EntropicGod", out var entropicGodNPC))
+            {
+                GlobalNPCEventHandlers.ModifyNPCLootEvent += (npc, npcLoot) =>
+                {
+                    //todo: find "EntropicGod" npc 
+                    if (npc.type == entropicGodNPC.Type)
+                    {
+                        var normalOnly = new LeadingConditionRule(new Conditions.BeatAnyMechBoss());
+                        normalOnly.OnSuccess(ItemDropRule.Common(Type));
+                        npcLoot.Add(normalOnly);
+                    }
+                };
+            }
+        }
+    }
+
+
 
     public override string LocalizationCategory => "Items.Weapons.Ranged";
 

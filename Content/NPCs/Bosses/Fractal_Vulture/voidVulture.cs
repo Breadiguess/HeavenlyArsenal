@@ -227,7 +227,10 @@ partial class voidVulture : ModNPC
         return base.CanHitPlayer(target, ref cooldownSlot);
     }
 
-    public override void OnKill() { }
+    public override void OnKill()
+    {
+        ModContent.GetInstance<FractalBird_Event>().hasBirdBeenDefeated = true;
+    }
 
     public void ManageNeck()
     {

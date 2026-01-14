@@ -62,6 +62,7 @@ public abstract class CleanBaseWhip : ModProjectile
             //Main.NewText(Segments);
             RangeMult = range > 0 ? range : DefaultRangeMult;
             //Main.NewText(RangeMult);
+            Projectile.spriteDirection = player.direction;
         }
 
         var toProjectile = player.MountedCenter.AngleTo(Projectile.Center) - MathHelper.PiOver2;
@@ -73,7 +74,6 @@ public abstract class CleanBaseWhip : ModProjectile
 
         Time++;
         Projectile.Center = Main.GetPlayerArmPosition(Projectile) + Projectile.velocity * (Projectile.ai[0] - 1f);
-        Projectile.spriteDirection = player.direction;
 
         Projectile.rotation = Projectile.velocity.ToRotation();
 
@@ -98,8 +98,6 @@ public abstract class CleanBaseWhip : ModProjectile
             return false;
         }
 
-        // Play sound at the tip of the whip
-        //todo: make this a virtual thing so that the time at which the whipcrack sounds can be modified
         if (Math.Abs(Time - _flyTime / 2f) < 1f)
         {
             if (WhipSound != null && _controlPoints.Count > 0)
