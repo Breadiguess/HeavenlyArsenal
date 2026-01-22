@@ -395,3 +395,7 @@ FodyWeavers.xsd
 /Core/PixelatedDrawingLayer.cs
 /Core/RenderTargetsManager.cs
 /Content/Items/Armor/AwakenedBloodArmor/Tendril4.cs
+/Content/Items/Weapons/Rogue/Boquet/FlowerGame_HeldProj.cs
+/Content/Items/Weapons/Rogue/Boquet/FlowerGame_Item.cs
+/Content/Items/Weapons/Rogue/Boquet/LillyStarProjectile.cs
+/Content/Items/Weapons/Rogue/Boquet/LillyStarProjectile.png
