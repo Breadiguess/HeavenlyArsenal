@@ -9,10 +9,11 @@
     </PropertyGroup>
     <ItemGroup>
         <AdditionalFiles Remove="Content\Items\Accessories\ManaTransfusion\**" />
-        <AdditionalFiles Remove="Content\Items\Armor\TwistedBloodBlight\**" />
-        <AdditionalFiles Remove="Content\Items\Weapons\Melee\EdgyDualSwords\**" />
+        <AdditionalFiles Remove="Content\Items\Weapons\Ranged\FuneralDirge\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
+        <AdditionalFiles Remove="Content\Items\Weapons\Rogue\Boquet\**" />
+        <AdditionalFiles Remove="Content\Items\Weapons\Rogue\WeeabouScythe\**" />
         <AdditionalFiles Remove="Content\Items\Weapons\Summon\BadSun\**" />
         <AdditionalFiles Remove="Content\NPCs\Bosses\**" />
         <AdditionalFiles Remove="Content\NPCs\Friendly\**" />
@@ -23,10 +24,11 @@
         <AdditionalFiles Remove="Content\Waters\**" />
         <AdditionalFiles Remove="Core\Fixes\**" />
         <Compile Remove="Content\Items\Accessories\ManaTransfusion\**" />
-        <Compile Remove="Content\Items\Armor\TwistedBloodBlight\**" />
-        <Compile Remove="Content\Items\Weapons\Melee\EdgyDualSwords\**" />
+        <Compile Remove="Content\Items\Weapons\Ranged\FuneralDirge\**" />
         <Compile Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <Compile Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
+        <Compile Remove="Content\Items\Weapons\Rogue\Boquet\**" />
+        <Compile Remove="Content\Items\Weapons\Rogue\WeeabouScythe\**" />
         <Compile Remove="Content\Items\Weapons\Summon\BadSun\**" />
         <Compile Remove="Content\NPCs\Bosses\**" />
         <Compile Remove="Content\NPCs\Friendly\**" />
@@ -37,10 +39,11 @@
         <Compile Remove="Content\Waters\**" />
         <Compile Remove="Core\Fixes\**" />
         <EmbeddedResource Remove="Content\Items\Accessories\ManaTransfusion\**" />
-        <EmbeddedResource Remove="Content\Items\Armor\TwistedBloodBlight\**" />
-        <EmbeddedResource Remove="Content\Items\Weapons\Melee\EdgyDualSwords\**" />
+        <EmbeddedResource Remove="Content\Items\Weapons\Ranged\FuneralDirge\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
+        <EmbeddedResource Remove="Content\Items\Weapons\Rogue\Boquet\**" />
+        <EmbeddedResource Remove="Content\Items\Weapons\Rogue\WeeabouScythe\**" />
         <EmbeddedResource Remove="Content\Items\Weapons\Summon\BadSun\**" />
         <EmbeddedResource Remove="Content\NPCs\Bosses\**" />
         <EmbeddedResource Remove="Content\NPCs\Friendly\**" />
@@ -51,10 +54,11 @@
         <EmbeddedResource Remove="Content\Waters\**" />
         <EmbeddedResource Remove="Core\Fixes\**" />
         <None Remove="Content\Items\Accessories\ManaTransfusion\**" />
-        <None Remove="Content\Items\Armor\TwistedBloodBlight\**" />
-        <None Remove="Content\Items\Weapons\Melee\EdgyDualSwords\**" />
+        <None Remove="Content\Items\Weapons\Ranged\FuneralDirge\**" />
         <None Remove="Content\Items\Weapons\Ranged\ZealotsReward\**" />
         <None Remove="Content\Items\Weapons\Rogue\AvatarRogue\**" />
+        <None Remove="Content\Items\Weapons\Rogue\Boquet\**" />
+        <None Remove="Content\Items\Weapons\Rogue\WeeabouScythe\**" />
         <None Remove="Content\Items\Weapons\Summon\BadSun\**" />
         <None Remove="Content\NPCs\Bosses\**" />
         <None Remove="Content\NPCs\Friendly\**" />
@@ -87,7 +91,6 @@
         <Compile Remove="Content\NPCs\AnAffrontToGod.cs" />
         <Compile Remove="Content\NPCs\FileName.cs" />
         <Compile Remove="Content\NPCs\Hostile\BloodMoon\BigCrab\NewCrab.cs" />
-        <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech.cs" />
         <Compile Remove="Content\NPCs\Hostile\BloodMoon\RitualAltarNPC\TemporaryCrabLeg.cs" />
         <Compile Remove="Content\Particles\CartoonWaveParticle.cs" />
         <Compile Remove="Content\Particles\SpiritCandleParticle.cs" />
@@ -138,6 +141,7 @@
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_State.cs" />
         <Compile Include="Content\NPCs\Bosses\Fractal_Vulture\VultureRenderer.cs" />
         <Compile Include="Content\Tiles\Banners\EnemyBannerTile.cs" />
+        <Compile Include="Content\Tiles\GloriousBlubberPlaced.cs" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\GenesisFlowerSeeder.png" />
@@ -156,6 +160,7 @@
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\voidVulture_Leg.png" />
         <Content Include="Content\NPCs\Bosses\Fractal_Vulture\WingTexture.png" />
         <Content Include="Content\Tiles\Banners\EnemyBannerTile.png" />
+        <Content Include="Content\Tiles\GloriousBlubberPlaced.png" />
     </ItemGroup>
     <ItemGroup>
         <None Include="HeavenlyArsenal.sln" />
@@ -187,7 +192,6 @@
 
     <ItemGroup>
         <Folder Include="Assets\Textures\Items\Weapons\Aoe_Rifle\" />
-        <Folder Include="Content\Items\Weapons\Rogue\Boquet\" />
         <Folder Include="Content\NPCs\Hostile\BloodCult\FleshkinAcolyte\" />
     </ItemGroup>
 

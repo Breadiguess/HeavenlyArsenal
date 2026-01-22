@@ -431,6 +431,11 @@ Mods: {
 				DisplayName: Blood Blight_ Helmet
 				Tooltip: ""
 			}
+
+			GloriousBlubberItem: {
+				DisplayName: Glorious Blubber Item
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {
@@ -516,6 +521,8 @@ Mods: {
 			PilPlushPlaced.MapEntry: Pil Plush Placed
 			SumiiPlushPlaced.MapEntry: Sumii Plush Placed
 			VertisPlushPlaced.MapEntry: Vertis Plush Placed
+			GloriousBlubberPlaced.MapEntry: Glorious Blubber Placed
+			BobulousPlushPlaced.MapEntry: Bobulous Plush Placed
 		}
 	}
 }

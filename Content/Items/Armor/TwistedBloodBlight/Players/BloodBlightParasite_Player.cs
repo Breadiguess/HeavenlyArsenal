@@ -174,6 +174,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
         }
 
 
+      
+
         public static void AttemptPurge(Player player)
         {
             player.GetModPlayer<BloodBlightParasite_Player>().ConstructController?.OnPurge();
@@ -376,6 +378,10 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players
         }
 
         #endregion
+
+
+     
+
     }
 }
 

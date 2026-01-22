@@ -1,4 +1,4 @@
-﻿Materials: {
+Materials: {
 	Auric_Catalyst: {
 		DisplayName: Auric Catalyst
 		Tooltip: ""
@@ -67,7 +67,7 @@ ShadowPlush: {
 
 InkPlush: {
 	DisplayName: The Dreamer Plush
-	Tooltip: '''"deltarune tomorrow"'''
+	Tooltip: '''"Jimbus Bingbong"'''
 }
 
 ScavPlush: {
@@ -76,7 +76,7 @@ ScavPlush: {
 		'''
 		Resident of a dead, bygone paradise... 
 		Now in a soft, plushie form, how adorable!
-        "There is no art dungeon in Heavenly Arsenal."
+		      "There is no art dungeon in Heavenly Arsenal."
 		'''
 }
 
@@ -96,10 +96,7 @@ OrigamiPlush: {
 
 PilPlush: {
 	DisplayName: Pil Plush
-	Tooltip:
-    '''
-    "erm.... "
-    '''
+	Tooltip: '''"erm.... "'''
 }
 
 SumiiPlush: {
@@ -118,4 +115,9 @@ VertisPlush: {
 		Unity Devotee 
 		"I've Been Kidnapped by the HA Team"
 		'''
+}
+
+BobulousPlush: {
+	DisplayName: Bobulous Plush
+	Tooltip: ""
 }
