@@ -90,6 +90,9 @@
         <Compile Remove="Content\Items\Weapons\Melee\StupidFuckYouSword.cs" />
         <Compile Remove="Content\NPCs\AnAffrontToGod.cs" />
         <Compile Remove="Content\NPCs\FileName.cs" />
+        <Compile Remove="Content\NPCs\Hostile\BloodMoon\BigCrab\BloodCrab.cs" />
+        <Compile Remove="Content\NPCs\Hostile\BloodMoon\BigCrab\BloodCrabAttacks.cs" />
+        <Compile Remove="Content\NPCs\Hostile\BloodMoon\BigCrab\BloodCrabRenderer.Cs" />
         <Compile Remove="Content\NPCs\Hostile\BloodMoon\BigCrab\NewCrab.cs" />
         <Compile Remove="Content\NPCs\Hostile\BloodMoon\RitualAltarNPC\TemporaryCrabLeg.cs" />
         <Compile Remove="Content\Particles\CartoonWaveParticle.cs" />
@@ -193,6 +196,7 @@
     <ItemGroup>
         <Folder Include="Assets\Textures\Items\Weapons\Aoe_Rifle\" />
         <Folder Include="Content\NPCs\Hostile\BloodCult\FleshkinAcolyte\" />
+        <Folder Include="Content\NPCs\Hostile\Monstrosities\" />
     </ItemGroup>
 
     <!-- References -->

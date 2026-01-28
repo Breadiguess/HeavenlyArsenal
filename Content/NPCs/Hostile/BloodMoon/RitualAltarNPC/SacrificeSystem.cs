@@ -67,7 +67,7 @@ internal partial class RitualAltar
             return false;
         }
 
-        if (npc.type == ModContent.NPCType<Umbralarva>())
+        if (npc.type == ModContent.NPCType<UmbralLarva>())
         {
             return false;
         }

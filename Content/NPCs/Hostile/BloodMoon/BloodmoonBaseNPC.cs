@@ -1,6 +1,7 @@
 ﻿using CalamityMod;
 using CalamityMod.NPCs.NormalNPCs;
 using HeavenlyArsenal.Content.Items.Misc;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
@@ -69,7 +70,7 @@ public class BloodmoonSpawnControl : GlobalNPC
                 {
                     pool[ModContent.NPCType<BloodJelly>()] = SpawnCondition.OverworldNightMonster.Chance * 0.04f;
                 }
-
+                pool[ModContent.NPCType<FleshkinAcolyte_Assassin>()] = SpawnCondition.OverworldNightMonster.Chance * 0.05f;
                 pool[ModContent.NPCType<RitualAltar>()] = SpawnCondition.OverworldNightMonster.Chance * 0.035f;
                 pool[ModContent.NPCType<FleshlingCultist.FleshlingCultist>()] = SpawnCondition.OverworldNightMonster.Chance * 0.42f;
             }
@@ -290,7 +291,7 @@ public class SolynBookDropNPC : GlobalNPC
             return;
 
         // Replace this check with however BloodMoonBaseNPC is identified
-        if (npc.ModNPC is BloodMoonBaseNPC&& npc.type != ModContent.NPCType<Umbralarva>())
+        if (npc.ModNPC is BloodMoonBaseNPC&& npc.type != ModContent.NPCType<UmbralLarva>())
         {
             if (Main.rand.NextBool(300)) // 1 / 300
             {

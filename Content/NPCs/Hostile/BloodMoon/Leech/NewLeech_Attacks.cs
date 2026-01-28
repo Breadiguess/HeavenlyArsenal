@@ -112,7 +112,7 @@ public partial class newLeech
                 continue;
             }
 
-            if (npc.type == ModContent.NPCType<Umbralarva>())
+            if (npc.type == ModContent.NPCType<UmbralLarva>())
             {
                 continue;
             }
@@ -544,7 +544,7 @@ public partial class newLeech
 
             if (blood == bloodBankMax)
             {
-                NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<Umbralarva>());
+                NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<UmbralLarva>());
             }
 
             NPC.NPCLoot();

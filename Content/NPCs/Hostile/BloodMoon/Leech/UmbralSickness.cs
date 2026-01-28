@@ -24,7 +24,7 @@ internal class UmbralSickness : ModBuff
 
             for (var i = 0; i < Main.rand.Next(2, 5); i++)
             {
-                NPC.NewNPCDirect(npc.GetSource_FromThis(), npc.Center, ModContent.NPCType<Umbralarva>());
+                NPC.NewNPCDirect(npc.GetSource_FromThis(), npc.Center, ModContent.NPCType<UmbralLarva>());
                 var metaball = ModContent.GetInstance<BloodMetaball>();
 
                 for (var x = 0; x < 10; x++)
@@ -51,7 +51,7 @@ internal class UmbralSickness : ModBuff
         {
             for (var i = 0; i < Main.rand.Next(6, 21); i++)
             {
-                NPC.NewNPCDirect(player.GetSource_FromThis(), player.Center, ModContent.NPCType<Umbralarva>());
+                NPC.NewNPCDirect(player.GetSource_FromThis(), player.Center, ModContent.NPCType<UmbralLarva>());
                 var metaball = ModContent.GetInstance<BloodMetaball>();
 
                 for (var x = 0; x < 40; x++)
