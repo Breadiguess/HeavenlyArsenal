@@ -399,3 +399,9 @@ FodyWeavers.xsd
 /Content/Items/Weapons/Rogue/Boquet/FlowerGame_Item.cs
 /Content/Items/Weapons/Rogue/Boquet/LillyStarProjectile.cs
 /Content/Items/Weapons/Rogue/Boquet/LillyStarProjectile.png
+/Content/NPCs/Bosses/Idol/TestIdol.cs
+/Content/NPCs/Bosses/Idol/Render/TestIdol.cs
+/Content/NPCs/Bosses/Idol/Render/TestIdol.Render.Head.cs
+/Content/NPCs/Bosses/Idol/Render/TestIdol.Renderer.Body.cs
+/Content/NPCs/Bosses/Idol/Render/TestIdol.Renderering.cs
+/Content/NPCs/Bosses/Idol/Render/TestIdol.Rendering.Final.cs
