@@ -42,7 +42,7 @@ internal class BloodDart : ModProjectile
 
     public NPC StuckNPC
     {
-        get => Main.npc[(int)Projectile.ai[2]];
+        get => Projectile.ai[2] == -1? null : Main.npc[(int)Projectile.ai[2]];
         set => Projectile.ai[2] = value.whoAmI;
     }
 
@@ -208,12 +208,14 @@ internal class BloodDart : ModProjectile
 
             if (StuckNPC == null)
             {
+                Projectile.velocity = Projectile.rotation.ToRotationVector2() * 30f;
                 return;
             }
 
-            if (StuckNPC.dontTakeDamage)
+            if (StuckNPC.dontTakeDamage || !StuckNPC.active)
             {
-                StuckNPC = null;
+                Projectile.ai[2] = -1;
+                return;
             }
 
             if (StuckNPC != null)

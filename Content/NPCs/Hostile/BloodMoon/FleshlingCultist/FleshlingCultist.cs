@@ -7,7 +7,7 @@ using Terraria.GameContent.Bestiary;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist;
 
-internal partial class FleshlingCultist : BloodMoonBaseNPC
+internal partial class FleshlingCultist : BaseBloodMoonNPC
 {
     public static float BaseKnockback = 0.4f;
 
@@ -34,36 +34,23 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
     public int variant = 0;
     public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/FleshlingCultist/FleshlingCultist0";
 
-    public override float SacrificePrio => 1;
 
-    public override int bloodBankMax => 30;
 
-    public override void SendExtraAI(BinaryWriter writer)
+    public override int MaxBlood => 30;
+
+    public override BloodMoonBalanceStrength Strength => new(0.4f, 0.4f, 1);
+
+    public override void SendExtraAI2(BinaryWriter writer)
     {
         writer.Write(isWorshipping);
     }
 
-    public override void ReceiveExtraAI(BinaryReader reader)
+    public override void ReceiveExtraAI2(BinaryReader reader)
     {
         isWorshipping = reader.ReadBoolean();
     }
 
-    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
-    {
-        bestiaryEntry.Info.AddRange
-        (
-            [
-                // Sets the preferred biomes of this town NPC listed in the bestiary.
-                // With Town NPCs, you usually set this to what biome it likes the most in regards to NPC happiness.
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
-                // Sets your NPC's flavor text in the bestiary. (use localization keys)
-                new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.FleshlingCultist1")
-
-                //new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.ArtilleryCrab2")
-            ]
-        );
-    }
-
+   
     public override void SetStaticDefaults()
     {
         NPCID.Sets.ReflectStarShotsInForTheWorthy[Type] = true;
@@ -74,10 +61,10 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
         NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
     }
 
-    public override void SetDefaults()
+    protected override void SetDefaults2()
     {
         NPC.aiStyle = -1;
-        NPC.lifeMax = 30_000;
+        NPC.lifeMax = 10_000;
         NPC.damage = 70;
         NPC.defense = 27;
         NPC.knockBackResist = 0.6f;
@@ -93,7 +80,7 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
     public override void OnSpawn(IEntitySource source)
     {
         variant = Main.rand.Next(0, 2);
-        blood = 0;
+        Blood = 0;
         CheckForEmptyCults();
 
         if (CultistCoordinator.GetCultOfNPC(NPC) != null)
@@ -183,7 +170,7 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit)
     {
-        blood += 2;
+        Blood += 2;
     }
 
     public override void FindFrame(int frameHeight)

@@ -2,7 +2,7 @@
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
-internal partial class RitualAltar
+internal partial class RitualAltar : BaseBloodMoonNPC
 {
     #region Limb System
 

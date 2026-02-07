@@ -15,6 +15,7 @@ public class ShintoArmorDash : PlayerDashEffect
 
     public bool AngleSwap = true;
 
+    public override string DashID => "ShintoArmorDash";
     public new static string ID => "ShintoArmorDash";
 
     public override DashCollisionType CollisionType => DashCollisionType.NoCollision;

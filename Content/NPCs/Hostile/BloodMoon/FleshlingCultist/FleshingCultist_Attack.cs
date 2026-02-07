@@ -3,7 +3,7 @@ using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.FleshlingCultist;
 
-internal partial class FleshlingCultist : BloodMoonBaseNPC
+internal partial class FleshlingCultist : BaseBloodMoonNPC
 {
     //todo: put this into NPC.ai[2]l
     public enum Behaviors
@@ -25,14 +25,14 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
         {
             isWorshipping = false;
 
-            if (canBeSacrificed == false)
+            if (CanBeSacrificed == false)
             {
-                canBeSacrificed = true;
+                CanBeSacrificed= true;
             }
         }
         else
         {
-            canBeSacrificed = false;
+            CanBeSacrificed = false;
         }
 
         switch (CurrentState)
@@ -66,7 +66,7 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
         {
             if (NPC.Center.Distance(d.Leader.Center) > 200)
             {
-                SacrificePrio++;
+                
                 NPC.velocity.X = NPC.AngleTo(d.Leader.Center).ToRotationVector2().X * 2;
             }
         }
@@ -137,18 +137,18 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
 
     private void BlindRush()
     {
-        if (playerTarget == null)
+        if (Target == null)
         {
             FindPlayer();
         }
 
-        NPC.velocity.X = float.Lerp(NPC.velocity.X, NPC.AngleTo(playerTarget.Center).ToRotationVector2().X * 6, 0.2f);
+        NPC.velocity.X = float.Lerp(NPC.velocity.X, NPC.AngleTo(Target.Center).ToRotationVector2().X * 6, 0.2f);
         Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
         var horizontalRange = 100f;
 
         // Check if horizontally close but vertically offset
-        if (Math.Abs(playerTarget.Center.X - NPC.Center.X) < horizontalRange &&
-            playerTarget.Center.Y < NPC.Center.Y - 16f &&
+        if (Math.Abs(Target.Center.X - NPC.Center.X) < horizontalRange &&
+            Target.Center.Y < NPC.Center.Y - 16f &&
             NPC.velocity.Y == 0)
         {
             // Jump
@@ -180,6 +180,6 @@ internal partial class FleshlingCultist : BloodMoonBaseNPC
 
     private void FindPlayer()
     {
-        playerTarget = Main.player[NPC.FindClosestPlayer()];
+        Target = Main.player[NPC.FindClosestPlayer()];
     }
 }

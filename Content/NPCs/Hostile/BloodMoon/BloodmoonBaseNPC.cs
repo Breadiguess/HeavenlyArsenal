@@ -180,12 +180,13 @@ public abstract class BloodMoonBaseNPC : ModNPC
 
     public override void ModifyTypeName(ref string typeName)
     {
+        /*
         if (NPC.GetGlobalNPC<RitualBuffNPC>().hasRitualBuff)
         {
             var val = (int)NPC.GetGlobalNPC<RitualBuffNPC>().BuffType;
             var Modifier = $"{RitualBuffNPC.NameModifiers[val]}";
             typeName = $"{Modifier} {typeName}";
-        }
+        }*/
     }
 
     public override void SendExtraAI(BinaryWriter writer)

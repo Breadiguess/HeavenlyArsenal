@@ -31,8 +31,9 @@ public enum HemocrabAI
     DeathAnim
 }
 
-internal class ArtilleryCrab : BloodMoonBaseNPC
+internal class ArtilleryCrab : BaseBloodMoonNPC
 {
+    public override BloodMoonBalanceStrength Strength => new(1,1, 0.2f);
     public const int totalFrameCount = 13;
 
     public const int WalkFrameCount = 6;
@@ -56,8 +57,7 @@ internal class ArtilleryCrab : BloodMoonBaseNPC
     public int BodyFrame;
 
     public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/BigCrab/ArtilleryCrab";
-
-    public override int bloodBankMax => 3_000;
+    public override int MaxBlood => 300;
 
     public ref float Time => ref NPC.ai[0];
 
@@ -67,22 +67,11 @@ internal class ArtilleryCrab : BloodMoonBaseNPC
 
     public static Asset<Texture2D>[] BigCrabGores { get; private set; }
 
-    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
-    {
-        bestiaryEntry.Info.AddRange
-        (
-            [
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
-                new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.ArtilleryCrab1")
-
-                //new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.ArtilleryCrab2")
-            ]
-        );
-    }
+    
 
     public override void Load() { }
 
-    public override void SetDefaults()
+    protected override void SetDefaults2()
     {
         NPC.width = 100;
         NPC.height = 55;

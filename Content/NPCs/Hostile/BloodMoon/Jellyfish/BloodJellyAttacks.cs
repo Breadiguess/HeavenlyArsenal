@@ -87,9 +87,9 @@ internal partial class BloodJelly
 
     private void Drift()
     {
-        if (currentTarget != null)
+        if (Target != null)
         {
-            NPC.velocity = NPC.AngleTo(currentTarget.Center).ToRotationVector2() * 3;
+            NPC.velocity = NPC.AngleTo(Target.Center).ToRotationVector2() * 3;
         }
 
         NPC.rotation = NPC.rotation.AngleLerp(NPC.velocity.ToRotation() + MathHelper.PiOver2, 0.2f);
@@ -133,7 +133,7 @@ internal partial class BloodJelly
         //Main.NewText(debugOutput);
 
         Time = 0;
-        currentTarget = temp2[0];
+        Target = temp2[0];
         CurrentState = Behavior.CommandThreat;
     }
 
@@ -143,7 +143,7 @@ internal partial class BloodJelly
         {
             var down = Vector2.UnitY;
 
-            var toPlayer = currentTarget.Center - NPC.Center;
+            var toPlayer = Target.Center - NPC.Center;
             toPlayer.Normalize();
 
             var angleToDown = MathF.Acos(Vector2.Dot(toPlayer, down));
@@ -162,7 +162,7 @@ internal partial class BloodJelly
             return;
         }
 
-        NPC.rotation = NPC.rotation.AngleLerp(NPC.AngleTo(currentTarget.Center) + MathHelper.PiOver2, 0.6f);
+        NPC.rotation = NPC.rotation.AngleLerp(NPC.AngleTo(Target.Center) + MathHelper.PiOver2, 0.6f);
         NPC.velocity *= 0.8f;
 
         if (Time % Main.rand.Next(1, 4) == 0)
@@ -186,7 +186,7 @@ internal partial class BloodJelly
                 {
                     var theThreat = threat.ModProjectile as TheThreat;
 
-                    theThreat.Target = currentTarget;
+                    theThreat.Target = Target;
                     theThreat.Time = 0;
                     theThreat.CurrentState = TheThreat.Behavior.Concussive;
 
@@ -223,7 +223,7 @@ internal partial class BloodJelly
         if (attackCycleTime < lockOnDuration)
         {
             // Track target while locking on
-            var desiredRot = NPC.Center.AngleTo(currentTarget.Center + currentTarget.velocity * 2) + MathHelper.PiOver2;
+            var desiredRot = NPC.Center.AngleTo(Target.Center + Target.velocity * 2) + MathHelper.PiOver2;
             NPC.rotation = NPC.rotation.AngleLerp(desiredRot, 0.2f);
         }
         else if (attackCycleTime > lockOnDuration)
@@ -265,7 +265,7 @@ internal partial class BloodJelly
         const int WindupTime = 90;
         var down = Vector2.UnitY;
 
-        var toPlayer = currentTarget.Center - NPC.Center;
+        var toPlayer = Target.Center - NPC.Center;
         toPlayer.Normalize();
 
         var angleToDown = MathF.Acos(Vector2.Dot(toPlayer, down));
@@ -274,7 +274,7 @@ internal partial class BloodJelly
         {
             if (toPlayer.Y < 0 || angleToDown > MathHelper.PiOver4)
             {
-                currentTarget = default;
+                Target = default;
                 Time = 0;
                 CurrentState = Behavior.FindTarget;
 
@@ -296,7 +296,7 @@ internal partial class BloodJelly
             {
                 NPC.rotation = NPC.rotation.AngleLerp
                 (
-                    NPC.AngleTo(currentTarget.Center) + MathHelper.PiOver2,
+                    NPC.AngleTo(Target.Center) + MathHelper.PiOver2,
                     0.5f
                 );
             }
@@ -352,7 +352,7 @@ internal partial class BloodJelly
 
         if (Collision.SolidCollision(NPC.Center, NPC.width, NPC.height))
         {
-            currentTarget = default;
+            Target = default;
             Time = 0;
             CurrentState = Behavior.StickAndExplode;
         }
@@ -435,7 +435,7 @@ internal partial class BloodJelly
 
     private void Reposition()
     {
-        var target = currentTarget;
+        var target = Target;
 
         if (target == null || !target.active)
         {
@@ -443,7 +443,7 @@ internal partial class BloodJelly
         }
 
         var toPlayer = target.Center - NPC.Center;
-        var distance = NPC.Distance(currentTarget.Center);
+        var distance = NPC.Distance(Target.Center);
 
         if (distance < 760f)
         {

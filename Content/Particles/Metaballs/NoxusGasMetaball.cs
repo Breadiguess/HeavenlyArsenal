@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CalamityMod.Enums;
 using CalamityMod.Graphics.Metaballs;
 using HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon;
 
@@ -44,7 +45,7 @@ public class NoxusGasMetaball : Metaball
         }
     }
 
-    public override MetaballDrawLayer DrawContext => MetaballDrawLayer.BeforeProjectiles;
+    public override GeneralDrawLayer DrawLayer => GeneralDrawLayer.BeforeProjectiles;
 
     public static void CreateParticle(Vector2 spawnPosition, Vector2 velocity, float size)
     {

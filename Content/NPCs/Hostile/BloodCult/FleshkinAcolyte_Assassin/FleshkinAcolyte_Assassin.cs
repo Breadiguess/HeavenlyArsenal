@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin
 {
-    public partial class FleshkinAcolyte_Assassin : BloodMoonBaseNPC
+    public partial class FleshkinAcolyte_Assassin : BaseBloodMoonNPC
     {
         public override string Texture => this.GetPath();
 
@@ -16,7 +16,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
             Main.npcFrameCount[NPC.type] = 30;
             NPCID.Sets.CantTakeLunchMoney[Type] = true;
         }
-        public override void SetDefaults()
+        public override BloodMoonBalanceStrength Strength => new(1,1,1);
+        public override int MaxBlood =>  30;
+        protected override void SetDefaults2()
         {
             NPC.Size = new Vector2(50, 50);
 

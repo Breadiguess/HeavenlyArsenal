@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using Terraria.Audio;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
-internal partial class RitualAltar
+internal partial class RitualAltar : BaseBloodMoonNPC
 {
     public List<NPC> Sacrifices = new(Main.npc.Length);
 
@@ -57,7 +58,7 @@ internal partial class RitualAltar
         }
 
         //Main.NewText("Passed Modnpc Check");
-        if (npc.ModNPC is not BloodMoonBaseNPC)
+        if (npc.ModNPC is not BaseBloodMoonNPC)
         {
             return false;
         }
@@ -110,7 +111,7 @@ internal partial class RitualAltar
         //TODO: sort by BloodMoonBaseNPC BuffPrio (so that lower buff priority targets get selected to be sacrifices)
         // and by distance (so that the first index is always the closest npc)
         Sacrifices.RemoveAll(id => id == null || !id.active || RitualSystem.IsNPCBuffed(id) || id.type == ModContent.NPCType<RitualAltar>());
-        Sacrifices.RemoveAll(id => { return id.ModNPC is BloodMoonBaseNPC b ? b.canBeSacrificed : true; });
+        Sacrifices.RemoveAll(id => { return id.ModNPC is not BaseBloodMoonNPC b; });
 
         //Main.NewText($"BuffedNPCs count: {RitualSystem.BuffedNPCs.Count}");
 
@@ -121,8 +122,8 @@ internal partial class RitualAltar
         (
             (a, b) =>
             {
-                var aPrio = a.ModNPC is BloodMoonBaseNPC aBloodmoon ? aBloodmoon.SacrificePrio : 0f;
-                var bPrio = b.ModNPC is BloodMoonBaseNPC bBloodmoon ? bBloodmoon.SacrificePrio : 0f;
+                var aPrio = a.ModNPC is BaseBloodMoonNPC aBloodmoon ? aBloodmoon.SacrificePriority : 0f;
+                var bPrio = b.ModNPC is BaseBloodMoonNPC bBloodmoon ? bBloodmoon.SacrificePriority : 0f;
 
                 return bPrio.CompareTo(aPrio);
             }
@@ -133,13 +134,14 @@ internal partial class RitualAltar
         foreach (NPC npc in Sacrifices)
         {
 
-            BloodMoonBaseNPC d = npc.ModNPC as BloodMoonBaseNPC;
-            a += $"{npc.FullName}, whoami? {npc.whoAmI}, Sacrifice Prio: {d.SacrificePrio}, {i}\n";
+            BaseBloodMoonNPC d = npc.ModNPC as BaseBloodMoonNPC;
+            a += $"{npc.FullName}, whoami? {npc.whoAmI}, Sacrifice Prio: {d.SacrificePriority}, {i}\n";
             i++;
         }
         if(Sacrifices.Count>0 || a.Length>0)
             Main.NewText(a);
         */
+        
     }
 
     // Tunables
@@ -147,25 +149,25 @@ internal partial class RitualAltar
 
     private float BuffCost()
     {
-        return bloodBankMax / 5f;
+        return MaxBlood / 5f;
     }
 
     private float SacrificeThreshold()
     {
-        return bloodBankMax / 2.25f;
+        return MaxBlood / 2.25f;
     }
 
     private void StateMachine()
     {
         switch (currentAIState)
         {
-            // Look for targets to buff. If not enough blood to buff, flip to sacrifice mode.
+            // Look for targets to buff. If not enough Blood to buff, flip to sacrifice mode.
             case AltarAI.lookForBuffTargets:
             case AltarAI.Buffing:
             {
-                if (blood < BuffCost())
+                if (Blood < BuffCost())
                 {
-                    //Main.NewText($"[AI] Blood low ({blood:F0} < {BuffCost():F0}) → LookingForSacrifice");
+                    //Main.NewText($"[AI] Blood low ({Blood:F0} < {BuffCost():F0}) → LookingForSacrifice");
                     currentAIState = AltarAI.LookingForSacrifice;
 
                     break;
@@ -189,14 +191,14 @@ internal partial class RitualAltar
 
             case AltarAI.LookingForSacrifice:
             {
-                if (blood < SacrificeThreshold())
+                if (Blood < SacrificeThreshold())
                 {
-                    //Main.NewText($"[AI] Blood {blood:F0} < {SacrificeThreshold():F0} → Sacrifice");
+                    //Main.NewText($"[AI] Blood {Blood:F0} < {SacrificeThreshold():F0} → Sacrifice");
                     SacrificeNPC();
                 }
                 else
                 {
-                    //Main.NewText($"[AI] Blood OK ({blood:F0}) → lookForBuffTargets");
+                    //Main.NewText($"[AI] Blood OK ({Blood:F0}) → lookForBuffTargets");
                     currentAIState = AltarAI.lookForBuffTargets;
                 }
 
@@ -207,9 +209,9 @@ internal partial class RitualAltar
             {
                 SacrificeNPC();
 
-                if (blood >= bloodBankMax)
+                if (Blood >= MaxBlood)
                 {
-                    //Main.NewText($"[AI] Blood full ({blood:F0}) → lookForBuffTargets");
+                    //Main.NewText($"[AI] Blood full ({Blood:F0}) → lookForBuffTargets");
                     currentAIState = AltarAI.lookForBuffTargets;
                 }
 
@@ -220,13 +222,34 @@ internal partial class RitualAltar
                 WalkTowardsPlayer();
 
                 break;
+
+            case AltarAI.DeathAnimation:
+                DoDeathAnimation();
+                break;
+        }
+    }
+
+    private void DoDeathAnimation()
+    {
+            NPC.Opacity = 1-LumUtils.InverseLerp(0, 120, Time);
+        
+        if(NPC.Opacity<=0.001f)
+        {
+            NPC.life = 0;
+            NPC.checkDead();
+            NPC.active = false;
+            SoundEngine.PlaySound(SoundID.NPCDeath52, NPC.position);
+            for (int i = 0; i < 30; i++)
+            {
+                Dust.NewDustPerfect(NPC.Center + Main.rand.NextVector2Circular(40, 40), DustID.Blood, Main.rand.NextVector2Circular(3, 3), Scale: 1.5f);
+            }
         }
     }
 
     private bool BuffOtherEnemies()
     {
-        // Not enough blood to even try buffing.
-        if (blood <= bloodBankMax / 4f)
+        // Not enough Blood to even try buffing.
+        if (Blood <= MaxBlood / 4f)
         {
             return false;
         }
@@ -269,17 +292,17 @@ internal partial class RitualAltar
             {
                 continue;
             }
+            if (npc.type == ModContent.NPCType<UmbralLarva>() || npc.type == ModContent.NPCType<UmbralLarvae_Egg>())
+            {
+                continue;
+            }
 
             if (npc.ModNPC != null)
             {
-                if (npc.ModNPC.Type == ModContent.NPCType<BloodMoonBaseNPC>())
+                if (npc.ModNPC.Type == ModContent.NPCType<BaseBloodMoonNPC>())
                 {
-                    var d = npc.ModNPC as BloodMoonBaseNPC;
+                    var d = npc.ModNPC as BaseBloodMoonNPC;
 
-                    if (!d.canBebuffed)
-                    {
-                        continue;
-                    }
                 }
             }
 

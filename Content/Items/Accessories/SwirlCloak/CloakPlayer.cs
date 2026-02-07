@@ -13,7 +13,7 @@ internal class CloakPlayer : ModPlayer
 
     public void CreateSwirlVortex()
     {
-        var stealth = Player.Calamity().modStealth;
+        var stealth = Player.Calamity().rogueStealth;
         float MaxStealth = 1;
         Main.NewText($"Attempting to create vortex! Stealth: {stealth}");
 

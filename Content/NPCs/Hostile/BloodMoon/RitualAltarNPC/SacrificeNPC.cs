@@ -25,7 +25,7 @@ internal class SacrificeNPC : GlobalNPC
                 isSacrificed = false;
             }
 
-            var a = npc.ModNPC as BloodMoonBaseNPC;
+            var a = npc.ModNPC as BaseBloodMoonNPC;
 
             if (!npc.noGravity)
             {
@@ -44,7 +44,7 @@ internal class SacrificeNPC : GlobalNPC
                     npc.active = false;
                 }
 
-                Priest.blood += a.blood;
+                Priest.Blood += a.Blood;
                 Priest.SacrificeCooldown = 60 * 5;
 
                 if (Priest.NPC.life < Priest.NPC.lifeMax)
@@ -55,9 +55,9 @@ internal class SacrificeNPC : GlobalNPC
 
                 Priest.NPCTarget = null;
 
-                if (a.blood <= 0)
+                if (a.Blood <= 0)
                 {
-                    Priest.blood += Priest.bloodBankMax / 5;
+                    Priest.Blood += Priest.MaxBlood/ 5;
                 }
 
                 Priest.isSacrificing = false;

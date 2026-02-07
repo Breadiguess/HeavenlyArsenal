@@ -3,7 +3,7 @@ using ReLogic.Content;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 
-partial class newLeech : BloodMoonBaseNPC
+partial class newLeech : BaseBloodMoonNPC
 {
     public static RenderTarget2D leechTarget;
 

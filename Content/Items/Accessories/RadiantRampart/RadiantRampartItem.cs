@@ -25,7 +25,7 @@ public class RadiantRampartItem : ModItem
         Item.defense = 12;
         Item.defense += 8;
         Item.accessory = true;
-        Item.rare = ModContent.RarityType<Violet>();
+        Item.rare = ModContent.RarityType<CalamityMod.Rarities.HotPink>();
     }
 
     public override void AddRecipes()

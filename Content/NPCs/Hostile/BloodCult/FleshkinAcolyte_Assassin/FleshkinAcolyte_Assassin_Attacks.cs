@@ -5,7 +5,7 @@ using Terraria.Audio;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin
 {
-    public partial class FleshkinAcolyte_Assassin : BloodMoonBaseNPC
+    public partial class FleshkinAcolyte_Assassin
     {
 
 
@@ -82,10 +82,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
                 StealthAmount = Math.Min(_stealthMax, StealthAmount + 1);
             }
 
-            if (currentTarget == null)
+            if (Target == null)
             {
                 NPC.TargetClosest(true);
-                currentTarget = Main.player[NPC.target];
+                Target = Main.player[NPC.target];
             }
             else
             {
@@ -95,7 +95,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
                 const float sneakSpeed = 2f;
                 const float runSpeed = 6f;
 
-                float dirX = NPC.DirectionTo(currentTarget.Center).X;
+                float dirX = NPC.DirectionTo(Target.Center).X;
 
               
                 NPC.velocity.X = dirX * float.Lerp(sneakSpeed, runSpeed, 1-LumUtils.InverseLerp(0,StealthRunThreshold, StealthAmount));
@@ -105,7 +105,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
                 NPC.spriteDirection = NPC.direction;
 
 
-                if (NPC.Distance(currentTarget.Center) < 75)
+                if (NPC.Distance(Target.Center) < 75)
                 {
                     NPC.velocity = Vector2.Zero;
                     CurrentState = Behaviors.slash;
@@ -146,7 +146,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
         {
             NPC.direction = -NPC.velocity.X.DirectionalSign();
             NPC.spriteDirection = NPC.direction;
-            NPC.velocity.X = -NPC.HorizontalDirectionTo(currentTarget.Center) * 5;
+            NPC.velocity.X = -NPC.HorizontalDirectionTo(Target.Center) * 5;
 
             if (Time > 40 * 5)
             {
@@ -197,7 +197,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
             }
         }
 
-        //todo: find a solid (ish) spot to place the npc, and then set their coords to it. cannot be too close to where the npc already is, and preferably away from "CurrentTarget".
+        //todo: find a solid (ish) spot to place the npc, and then set their coords to it. cannot be too close to where the npc already is, and preferably away from "Target".
         private void Reposition()
         {
             const int maxAttempts = 200;
@@ -205,10 +205,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
             const float minDistanceFromTargetPx = 200f;
             const float maxDistancePx = 800f;
 
-            if (currentTarget == null)
+            if (Target == null)
             {
                 NPC.TargetClosest(true);
-                currentTarget = Main.player[NPC.target];
+                Target = Main.player[NPC.target];
             }
 
             for (int attempt = 0; attempt < maxAttempts; attempt++)
@@ -254,7 +254,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
                     continue;
                 }
 
-                if (currentTarget != null && Vector2.Distance(spawnCenter, currentTarget.Center) < minDistanceFromTargetPx)
+                if (Target != null && Vector2.Distance(spawnCenter, Target.Center) < minDistanceFromTargetPx)
                 {
                     continue;
                 }
@@ -271,9 +271,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
                 return;
             }
 
-            if (currentTarget != null)
+            if (Target != null)
             {
-                Vector2 away = NPC.Center - currentTarget.Center;
+                Vector2 away = NPC.Center - Target.Center;
                 if (away == Vector2.Zero)
                 {
                     away = new Vector2(1f, 0f);

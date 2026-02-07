@@ -53,9 +53,16 @@ internal class EnergyAbsorption : ModProjectile
         }
     }
 
-    public Color TrailColor(float completionRatio)
+    private float TrailWidth(float trailLengthInterpolant, Vector2 vertexPosition)
     {
-        var t = MathHelper.Clamp(completionRatio, 0f, 1f);
+        var widthInterpolant = Utils.GetLerpValue(0f, 0.25f, trailLengthInterpolant, true) * Utils.GetLerpValue(1.1f, 0.7f, trailLengthInterpolant, true);
+
+        return MathHelper.SmoothStep(8f, 20f, widthInterpolant);
+    }
+
+    private Color TrailColor(float trailLengthInterpolant, Vector2 vertexPosition)
+    {
+        var t = MathHelper.Clamp(trailLengthInterpolant, 0f, 1f);
         var crimson = new Color(255, 255, 255);
         var brightness = MathHelper.SmoothStep(1f, 0.6f, t);
 
@@ -67,14 +74,6 @@ internal class EnergyAbsorption : ModProjectile
 
         return finalColor;
     }
-
-    public float TrailWidth(float completionRatio)
-    {
-        var widthInterpolant = Utils.GetLerpValue(0f, 0.25f, completionRatio, true) * Utils.GetLerpValue(1.1f, 0.7f, completionRatio, true);
-
-        return MathHelper.SmoothStep(8f, 20f, widthInterpolant);
-    }
-
     public override bool PreDraw(ref Color lightColor)
     {
         Main.spriteBatch.EnterShaderRegion();
@@ -82,9 +81,11 @@ internal class EnergyAbsorption : ModProjectile
         GameShaders.Misc["CalamityMod:ArtAttack"].SetShaderTexture(ModContent.Request<Texture2D>("CalamityMod/ExtraTextures/Trails/ScarletDevilStreak"));
         GameShaders.Misc["CalamityMod:ArtAttack"].Apply();
 
-        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(TrailWidth, TrailColor, _ => Projectile.Size * 0.5f, shader: GameShaders.Misc["CalamityMod:ArtAttack"]), 180);
+        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(TrailWidth, TrailColor, shader: GameShaders.Misc["CalamityMod:ArtAttack"]), 180);
         Main.spriteBatch.ExitShaderRegion();
 
         return base.PreDraw(ref lightColor);
     }
+
+  
 }

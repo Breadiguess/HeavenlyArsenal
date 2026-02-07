@@ -8,7 +8,7 @@ internal partial class DebugNPC
 {
     public List<VertexPositionColorTexture> ConeVerts;
 
-    private BasicEffect Cone;
+    private BasicEffect? Cone;
 
     private void DrawCone()
     {
@@ -19,12 +19,15 @@ internal partial class DebugNPC
 
         var gd = Main.graphics.GraphicsDevice;
 
-        Cone = new BasicEffect(gd)
+        if (Cone == null)
         {
-            VertexColorEnabled = true,
-            LightingEnabled = false,
-            TextureEnabled = true
-        };
+            Cone = new BasicEffect(gd)
+            {
+                VertexColorEnabled = true,
+                LightingEnabled = false,
+                TextureEnabled = true
+            };
+        }
 
         Cone.World = Matrix.Identity;
         Cone.View = Main.GameViewMatrix.ZoomMatrix;

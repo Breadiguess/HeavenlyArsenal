@@ -63,7 +63,6 @@ public class AwakenedBloodHelm : ModItem, ILocalizedModType
         player.GetAttackSpeed<MeleeDamageClass>() += 0.18f;
         modPlayer.bloodflareSet = true;
 
-        modPlayer.reaverRegen = true;
         //player.GetModPlayer<BloodArmorPlayer>().BloodArmorEquipped = true;
         player.GetModPlayer<AwakenedBloodPlayer>().AwakenedBloodSetActive = true;
         player.crimsonRegen = true;

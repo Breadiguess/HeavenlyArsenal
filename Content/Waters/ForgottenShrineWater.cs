@@ -26,6 +26,7 @@ public class ForgottenShrineWater : ModWaterStyle
 
     private void ModifyWaterOpacity(ILContext il)
     {
+        return;
         ILCursor cursor = new ILCursor(il);
         if (!cursor.TryGotoNext(MoveType.Before, c => c.MatchLdarg2(), c => c.MatchLdloc3(), c => c.MatchLdloc(4), c => c.MatchCall<Main>("DrawTileInWater")))
         {

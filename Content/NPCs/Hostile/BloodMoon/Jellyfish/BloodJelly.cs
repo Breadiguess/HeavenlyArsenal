@@ -10,8 +10,9 @@ using Terraria.GameContent.Bestiary;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 
-internal partial class BloodJelly : BloodMoonBaseNPC
+internal partial class BloodJelly : BaseBloodMoonNPC
 {
+    
     public override void AI()
     {
         if (NPC.ai[2] != 0)
@@ -32,7 +33,7 @@ internal partial class BloodJelly : BloodMoonBaseNPC
     {
         Player thing;
         projectile.TryGetOwner(out thing);
-        currentTarget = thing;
+        Target = thing;
     }
 
     public override void PostAI()
@@ -144,10 +145,6 @@ internal partial class BloodJelly : BloodMoonBaseNPC
 
     #region Setup
 
-    public override bool canBeSacrificed => false;
-
-    public override bool canBebuffed => false;
-
     public override void SetStaticDefaults()
     {
         NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
@@ -156,25 +153,7 @@ internal partial class BloodJelly : BloodMoonBaseNPC
         Main.ContentThatNeedsRenderTargets.Add(BestiaryTarget);
     }
 
-    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
-    {
-        //for all the completionists out there
-        var avatarID = ModContent.NPCType<AvatarOfEmptiness>();
-
-        bestiaryEntry.UIInfoProvider = new HighestOfMultipleUICollectionInfoProvider
-        (
-            new CommonEnemyUICollectionInfoProvider(ContentSamples.NpcBestiaryCreditIdsByNpcNetIds[Type], true),
-            new CommonEnemyUICollectionInfoProvider(ContentSamples.NpcBestiaryCreditIdsByNpcNetIds[avatarID], true)
-        );
-
-        bestiaryEntry.Info.AddRange
-        (
-            [
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
-                new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.BloodJelly1")
-            ]
-        );
-    }
+   
 
     public static InstancedRequestableTarget BestiaryTarget { get; set; } = new();
 
@@ -201,11 +180,15 @@ internal partial class BloodJelly : BloodMoonBaseNPC
         set => NPC.localAI[0] = value;
     }
 
+    public override int MaxBlood => 600;
+
+    public override BloodMoonBalanceStrength Strength => new(0.2f, 0, 1f);
+
     private readonly int tendrilCount = 5;
 
     private int MaxCapacity;
 
-    public override void SetDefaults()
+    protected override void SetDefaults2()
     {
         NPC.lifeMax = 41934;
         NPC.damage = 300;
@@ -261,7 +244,7 @@ internal partial class BloodJelly : BloodMoonBaseNPC
         }
     }
 
-    public override void SendExtraAI(BinaryWriter writer)
+    public override void SendExtraAI2(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
         //writer.Write(MaxCapacity);
@@ -270,7 +253,7 @@ internal partial class BloodJelly : BloodMoonBaseNPC
         //   writer.Write(ThreatIndicies[i]);
     }
 
-    public override void ReceiveExtraAI(BinaryReader reader)
+    public override void ReceiveExtraAI2(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
         //MaxCapacity = reader.ReadInt32();

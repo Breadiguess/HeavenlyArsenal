@@ -33,8 +33,6 @@ public class ElectricVambrace : ModItem, ILocalizedModType
         player.GetModPlayer<DischargePlayer>().Active = true;
         var modPlayer = player.Calamity();
         modPlayer.transformer = true;
-        modPlayer.aSpark = true;
-
         //modPlayer.DashID = ElectricVambraceDash.ID;
     }
 
@@ -42,7 +40,6 @@ public class ElectricVambrace : ModItem, ILocalizedModType
     {
         CreateRecipe()
             .AddIngredient<TheTransformer>()
-            .AddIngredient<AmidiasSpark>()
             .AddIngredient<SlagsplitterPauldron>()
             .AddIngredient<LeviathanAmbergris>()
             .AddIngredient<AscendantSpiritEssence>(8)

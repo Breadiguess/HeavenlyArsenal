@@ -191,7 +191,6 @@ internal class CombatStim : ModItem
             .AddIngredient<AstralInjection>(6)
             // .AddIngredient(ItemID.BottledWater)
             .AddIngredient<BloodOrb>(20)
-            .AddIngredient<BloodSample>(10)
             .AddIngredient<Bloodstone>(5)
             .AddTile(TileID.Bottles)
             .Register();

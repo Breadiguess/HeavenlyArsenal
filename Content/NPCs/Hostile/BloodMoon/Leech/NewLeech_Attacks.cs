@@ -34,6 +34,8 @@ public partial class newLeech
     }
 
     private Vector2 DisiapteEnd;
+    private Entity currentTarget;
+    private Player playerTarget;
 
     private void StateMachine()
     {
@@ -137,9 +139,9 @@ public partial class newLeech
             return;
         }
 
-        if (blood < bloodBankMax / 1.5f)
+        if (Blood < MaxBlood / 1.5f)
         {
-            pickNPCChance = (float)bloodBankMax / (blood + 1);
+            pickNPCChance = (float)MaxBlood / (Blood + 1);
         }
         else
         {
@@ -317,7 +319,7 @@ public partial class newLeech
                     Time = 0;
                     NPC.damage = NPC.defDamage;
                     CurrentState = Behavior.flee;
-                    blood += bloodBankMax / 5;
+                    Blood += MaxBlood / 5;
                 }
             }
             else if (currentTarget is Player)
@@ -333,7 +335,7 @@ public partial class newLeech
                         {
                             if (currentTarget.Distance(NPC.Center) > 70)
                             {
-                                blood += bloodBankMax / 5;
+                                Blood += MaxBlood / 5;
                                 Time = 0;
                                 NPC.damage = NPC.defDamage;
                                 CurrentState = Behavior.flee;
@@ -359,7 +361,7 @@ public partial class newLeech
                                 return;
                             }
 
-                            blood += bloodBankMax / 5;
+                            Blood += MaxBlood/ 5;
                             Time = 0;
                             NPC.damage = NPC.defDamage;
                             CurrentState = Behavior.flee;
@@ -490,12 +492,12 @@ public partial class newLeech
 
     private void DoDeathAnimation()
     {
-        if (NPC.GetGlobalNPC<RitualBuffNPC>().hasRitualBuff && NPC.GetGlobalNPC<RitualBuffNPC>().IsRessurecting)
-        {
-            CurrentState = Behavior.Idle;
-
-            return;
-        }
+        //if (NPC.GetGlobalNPC<RitualBuffNPC>().hasRitualBuff && NPC.GetGlobalNPC<RitualBuffNPC>().IsRessurecting)
+       // {
+          //  CurrentState = Behavior.Idle;
+        //
+            //return;
+       // }
 
         var metaball = ModContent.GetInstance<BloodMetaball>();
         const int DeathTime = 260;
@@ -542,7 +544,7 @@ public partial class newLeech
                 NPC.Center
             );
 
-            if (blood == bloodBankMax)
+            if (Blood == MaxBlood)
             {
                 NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<UmbralLarva>());
             }

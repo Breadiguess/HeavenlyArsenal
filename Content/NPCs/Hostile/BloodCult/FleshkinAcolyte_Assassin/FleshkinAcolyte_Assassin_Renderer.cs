@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin
 {
-    public partial class FleshkinAcolyte_Assassin : BloodMoonBaseNPC
+    public partial class FleshkinAcolyte_Assassin
     {
 
 
