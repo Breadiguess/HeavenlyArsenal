@@ -380,9 +380,6 @@ public class AntishadowAssassin : ModProjectile
 
     public override void AI()
     {
-
-        //Main.NewText($"{Projectile.velocity.ToString()}, \n{(AvatarOfEmptiness.Myself != null? AvatarOfEmptiness.Myself.As<AvatarOfEmptiness>().CurrentState.ToString() + " ," + AvatarOfEmptiness.Myself.As<AvatarOfEmptiness>().AITimer.ToString(): null)}");
-        // Initialize beads if necessary.
         if (BeadRopeA is null || BeadRopeB is null || BeadRopeC is null || BeadRopeD is null)
         {
             InitializeBeads();
@@ -398,8 +395,6 @@ public class AntishadowAssassin : ModProjectile
             HandleMinionBuffs();
         }
 
-        //Main.NewText($"State: {State}");
-        //Main.NewText($"Particle count: {AntishadowFireParticleSystemManager.BackParticleSystem.Keys.Count.ToString()}");
         ExecuteState();
 
         if (Owner.MinionAttackTargetNPC != -1 && Main.npc[Owner.MinionAttackTargetNPC].active)
@@ -428,7 +423,7 @@ public class AntishadowAssassin : ModProjectile
             SpiritBowCooldown--;
         }
 
-        // Sets the projectiles velocity to 0 if it's not valid
+        // Sets the projectiles velocity to 0 if it's not valid.
         if (float.IsNaN(Projectile.velocity.X) ||
         float.IsNaN(Projectile.velocity.Y) ||
         float.IsInfinity(Projectile.velocity.X) ||
@@ -436,6 +431,15 @@ public class AntishadowAssassin : ModProjectile
         {
             Projectile.velocity = Vector2.Zero;
         }
+
+        // Failsafe to ensure the assassin does not
+        // get deleted due to following enemies out of the world.
+        // This happens infamously when attacking Nameless in
+        // his subworld.
+        Rectangle worldRectangle = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
+        worldRectangle.Inflate(-400, -400);
+        if (!Projectile.Hitbox.Intersects(worldRectangle))
+            Projectile.Center = Vector2.Clamp(Projectile.Center, worldRectangle.TopLeft(), worldRectangle.BottomRight());
     }
 
     /// <summary>
