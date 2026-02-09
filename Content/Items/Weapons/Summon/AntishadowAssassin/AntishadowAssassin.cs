@@ -14,6 +14,7 @@ using ReLogic.Content;
 using ReLogic.Utilities;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Terraria.Audio;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
@@ -43,6 +44,8 @@ public class AntishadowAssassin : ModProjectile
 
         Leave
     }
+
+    private static readonly FieldInfo AssetsField = typeof(AssetRepository).GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
 
     /// <summary>
     ///     The chime sound played by this assassin at random.
@@ -215,7 +218,11 @@ public class AntishadowAssassin : ModProjectile
     /// <summary>
     ///     The amount of mask variants that exist for this assassin.
     /// </summary>
-    public static int TotalMasks => 6;
+    public static int TotalMasks
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     ///     The maximum search range this assassin can examine for targets.
@@ -296,12 +303,14 @@ public class AntishadowAssassin : ModProjectile
 
     private void PerformStupidAssetBoilerplateLoading()
     {
+        Dictionary<string, IAsset> assets = (Dictionary<string, IAsset>)AssetsField.GetValue(Mod.Assets);
+        while (assets.ContainsKey($"Content\\Gores\\AntishadowAssassinMask{TotalMasks + 1}"))
+            TotalMasks++;
+
         AntishadowAssassinMasks = new Asset<Texture2D>[TotalMasks];
 
         for (var i = 1; i <= TotalMasks; i++)
-        {
             AntishadowAssassinMasks[i - 1] = ModContent.Request<Texture2D>($"HeavenlyArsenal/Content/Gores/AntishadowAssassinMask{i}");
-        }
 
         var texturePrefix = $"{Mod.Name}/Content/Items/Weapons/Summon/AntishadowAssassin";
         BodyTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassin");
@@ -309,7 +318,6 @@ public class AntishadowAssassin : ModProjectile
         ArmOutlineTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArm_Outline");
         ArmBowTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArmBow");
         ArmBowOutlineTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArmBow_Outline");
-        DateTime date = DateTime.Now;
 
         KasaTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinKasa");
         AhogeTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassin_Ahoge");
