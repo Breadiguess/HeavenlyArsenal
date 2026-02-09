@@ -424,13 +424,12 @@ public class AntishadowAssassin : ModProjectile
         }
 
         // Sets the projectiles velocity to 0 if it's not valid.
-        if (float.IsNaN(Projectile.velocity.X) ||
-        float.IsNaN(Projectile.velocity.Y) ||
-        float.IsInfinity(Projectile.velocity.X) ||
-        float.IsInfinity(Projectile.velocity.Y))
-        {
+        // The root issue SHOULD be fixed now (see DoBehavior_SliceTargetRepeatedly), but
+        // keeping this around doesn't do any harm.
+        bool nanVelocity = float.IsNaN(Projectile.velocity.X) || float.IsNaN(Projectile.velocity.Y);
+        bool infiniteVelocity = float.IsInfinity(Projectile.velocity.X) || float.IsInfinity(Projectile.velocity.Y);
+        if (nanVelocity || infiniteVelocity)
             Projectile.velocity = Vector2.Zero;
-        }
 
         // Failsafe to ensure the assassin does not
         // get deleted due to following enemies out of the world.
@@ -815,8 +814,20 @@ public class AntishadowAssassin : ModProjectile
                 );
             }
 
+            Vector2 fallbackDirection = (target.position - target.oldPosition).SafeNormalize(Vector2.UnitX * Projectile.spriteDirection);
+            if (target.position.WithinRange(target.oldPosition, 1e-5f))
+                fallbackDirection = Vector2.UnitX * Projectile.spriteDirection;
+
             Projectile.Center = target.Center;
-            Projectile.velocity = target.velocity.SafeNormalize((target.position - target.oldPosition).SafeNormalize(Vector2.UnitX * Projectile.spriteDirection));
+            Projectile.velocity = target.velocity.SafeNormalize(fallbackDirection);
+
+            // SafeNormalize isn't so safe after all.
+            // It can result in unstable values if the magnitude is
+            // tiny but still technically greater than zero, such as
+            // due to an NPC's velocity exponentially decaying to zero.
+            if (target.velocity.LengthSquared() < 1e-7f)
+                Projectile.velocity = fallbackDirection;
+
             Projectile.spriteDirection = Projectile.velocity.X.NonZeroSign();
             DashStart = Projectile.Center;
             ScreenShakeSystem.StartShakeAtPoint(target.Center, 1.75f);
