@@ -1688,24 +1688,18 @@ public class AntishadowAssassin : ModProjectile
     /// </summary>
     private void DrawHat(Vector2 center)
     {
-        if (Main.specialSeedWorld) { }
         Texture2D hat = KasaTexture.Value;
-        //its really bad, especially in comparison to the normal system
-        // i don't really care 
         DateTime date = DateTime.Now;
-        if (date.Month == 12 || (date.Day == 24 || date.Day == 25))
-        {
-            //hat = GennedAssets.Textures.NamelessDeity.SantaHat;
-        }
-        var hatDrawPosition = center + new Vector2(Projectile.spriteDirection * -4f, -128f).RotatedBy(BowRotation * Projectile.spriteDirection) * Projectile.scale;
+        bool christmasOrChristmasEve = date.Month == 12 && (date.Day == 24 || date.Day == 25);
+        Vector2 hatDrawPosition = center + new Vector2(Projectile.spriteDirection * -4f, -128f).RotatedBy(BowRotation * Projectile.spriteDirection) * Projectile.scale;
+        Vector2 scale = Vector2.One * Projectile.scale;
 
-        Vector2 scale;
-        if (date.Month == 12 || (date.Day == 24 || date.Day == 25))
+        if (christmasOrChristmasEve)
         {
-            scale = new Vector2(0.2f, 0.1f) * Projectile.scale;
+            hat = GennedAssets.Textures.NamelessDeity.SantaHat;
+            scale *= 0.16f;
+            hatDrawPosition.Y -= scale.Y * 56f;
         }
-        //else
-        scale = new Vector2(Projectile.scale);
 
         Main.spriteBatch.Draw
         (
@@ -1716,7 +1710,7 @@ public class AntishadowAssassin : ModProjectile
             BowRotation * Projectile.spriteDirection,
             hat.Size() * 0.5f,
             scale,
-            Projectile.spriteDirection.ToSpriteDirection() | SpriteEffects.FlipHorizontally,
+            Projectile.spriteDirection.ToSpriteDirection() ^ SpriteEffects.FlipHorizontally,
             0f
         );
     }
