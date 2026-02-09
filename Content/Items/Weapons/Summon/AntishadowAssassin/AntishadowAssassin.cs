@@ -6,15 +6,12 @@ using Luminance.Assets;
 using Luminance.Common.Easings;
 using Luminance.Core.Graphics;
 using Luminance.Core.Sounds;
-using NoxusBoss.Assets;
-using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using NoxusBoss.Core.Physics.VerletIntergration;
 using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
 using ReLogic.Utilities;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terraria.Audio;
@@ -143,7 +140,7 @@ public class AntishadowAssassin : ModProjectile
     /// <summary>
     ///     The cloth simulation that composes this assassin's robe.
     /// </summary>
-    public ClothSimulation Robe { get; set; } = new(Vector3.Zero, 22, 21, 4.4f, 60f, 0.019f);
+    public ClothSimulation Robe { get; set; } = new(Vector3.Zero, 12, 11, 8.7f, 60f, 0.019f);
 
     /// <summary>
     ///     The ambient loop sound instance.
@@ -422,7 +419,7 @@ public class AntishadowAssassin : ModProjectile
         {
             SpiritBowCooldown--;
         }
-        
+
         // Sets the projectiles velocity to 0 if it's not valid
         if (float.IsNaN(Projectile.velocity.X) ||
         float.IsNaN(Projectile.velocity.Y) ||
@@ -683,20 +680,18 @@ public class AntishadowAssassin : ModProjectile
 
         if (Time == 2f)
         {
-            //Projectile.Opacity = Projectile.Opacity.StepTowards(1f, 0.3f);
-
             var teleportOffset = Main.rand.NextFloat(300f, 500f);
             var teleportDirection = Main.rand.NextVector2Unit();
 
             if (dashCounter == 0f)
-            {
                 teleportDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
-            }
-            if(target != null && target.CanBeChasedBy(this))
-            Projectile.Center = target.Center + teleportDirection * teleportOffset;
+
+            if (target != null && target.CanBeChasedBy(this))
+                Projectile.Center = target.Center + teleportDirection * teleportOffset;
+
             DashStart = Projectile.Center;
             Projectile.velocity = Projectile.SafeDirectionTo(target.Center);
-            
+
             Projectile.netUpdate = true;
         }
 
@@ -1702,7 +1697,7 @@ public class AntishadowAssassin : ModProjectile
             scale = new Vector2(0.2f, 0.1f) * Projectile.scale;
         }
         //else
-            scale = new Vector2(Projectile.scale);
+        scale = new Vector2(Projectile.scale);
 
         Main.spriteBatch.Draw
         (
@@ -1797,7 +1792,7 @@ public class AntishadowAssassin : ModProjectile
             return false;
         }
 
-        ResultsTarget.Request(3000, 3000, Projectile.identity, RenderIntoResultsTarget);
+        ResultsTarget.Request(2000, 2000, Projectile.identity, RenderIntoResultsTarget);
 
         if (ResultsTarget.TryGetTarget(Projectile.identity, out var target) && target is not null)
         {

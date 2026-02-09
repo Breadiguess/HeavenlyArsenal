@@ -1,5 +1,4 @@
 ﻿using Luminance.Core.Graphics;
-using NoxusBoss.Assets;
 using Terraria.GameContent;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Summon.AntishadowAssassin;
@@ -128,7 +127,7 @@ public class AntishadowAssassinSlash : ModProjectile
                 WidthFunction = TrailWidthFunction,
                 ColorFunction = TrailColorFunction
             },
-            (int)(100 * MathHelper.Pi)
+            17
         );
 
         return false;
