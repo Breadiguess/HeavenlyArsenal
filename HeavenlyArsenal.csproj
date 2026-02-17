@@ -127,11 +127,6 @@
         <Compile Include="Content\NPCs\Bosses\Idol\IdolSummoningRitualSystem.cs" />
         <Compile Include="Content\NPCs\Bosses\Idol\IdolSummoningRitualSystem.OpenStatueEye.cs" />
         <Compile Include="Content\NPCs\Bosses\Idol\IdolSummoningRitualSystem.WorldRumble.cs" />
-        <Compile Include="Content\NPCs\Bosses\Idol\Render\TestIdol.Render.Head.cs" />
-        <Compile Include="Content\NPCs\Bosses\Idol\Render\TestIdol.Renderer.Body.cs" />
-        <Compile Include="Content\NPCs\Bosses\Idol\Render\TestIdol.Renderering.cs" />
-        <Compile Include="Content\NPCs\Bosses\Idol\Render\TestIdol.cs" />
-        <Compile Include="Content\NPCs\Bosses\Idol\Render\TestIdol.Rendering.Final.cs" />
         <Compile Include="Content\Tiles\Banners\EnemyBannerTile.cs" />
         <Compile Include="Content\Tiles\ForgottenShrine\CrimsonFence.cs" />
         <Compile Include="Content\Tiles\ForgottenShrine\EnigmaticTapestry.cs" />
