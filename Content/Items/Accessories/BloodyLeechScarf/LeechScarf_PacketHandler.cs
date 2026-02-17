@@ -2,11 +2,9 @@
 
 using System.IO;
 using System.Runtime.CompilerServices;
-using static HeavenlyArsenal.HeavenlyArsenal;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 {
-
     internal sealed class LeechScarf_PacketHandler : PacketHandler
     {
         public LeechScarf_PacketHandler(byte packetType)

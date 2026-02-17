@@ -11,7 +11,7 @@ public sealed class BloodLightPurgeKeybindPlayer : ModPlayer
             
         var parasitePlayer = Player.GetModPlayer<BloodBlightParasite_Player>();
 
-        if (!KeybindSystem.BloodBlight_Purge.JustPressed)
+        if (!KeybindSystem.BloodBlightPurge.JustPressed)
         {
             return;
         }
