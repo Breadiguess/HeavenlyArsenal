@@ -67,7 +67,7 @@ internal class BloodNeedle : ModProjectile
             Projectile.Kill();
         }
 
-        if (!Player.active || Player.GetModPlayer<AwakenedBloodPlayer>().CurrentForm != AwakenedBloodPlayer.Form.Offense || Player.GetModPlayer<AwakenedBloodPlayer>().AwakenedBloodSetActive != true)
+        if (!Player.active || Player.GetModPlayer<AwakenedBloodPlayer>().Form != AwakenedBloodForm.Offense || Player.GetModPlayer<AwakenedBloodPlayer>().Enabled != true)
         {
             // If the player is no longer wearing the armor, retract the needles towards the player and then delete them.
             var toPlayer = Player.MountedCenter - Projectile.Center;
@@ -176,8 +176,8 @@ internal class BloodNeedle : ModProjectile
             var npcDeadOrInactive = !Target.active || Target.life <= 0 || Target.friendly;
 
             var armorLost = !Player.active ||
-                            Player.GetModPlayer<AwakenedBloodPlayer>().CurrentForm != AwakenedBloodPlayer.Form.Offense ||
-                            !Player.GetModPlayer<AwakenedBloodPlayer>().AwakenedBloodSetActive;
+                            Player.GetModPlayer<AwakenedBloodPlayer>().Form != AwakenedBloodForm.Offense ||
+                            !Player.GetModPlayer<AwakenedBloodPlayer>().Enabled;
 
             var tooFarFromPlayer = Vector2.Distance(Target.Center, Player.MountedCenter) > TargetRange + 100f;
 

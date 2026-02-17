@@ -65,7 +65,7 @@ public class AwakenedBloodHelm : ModItem, ILocalizedModType
 
         modPlayer.reaverRegen = true;
         //player.GetModPlayer<BloodArmorPlayer>().BloodArmorEquipped = true;
-        player.GetModPlayer<AwakenedBloodPlayer>().AwakenedBloodSetActive = true;
+        player.GetModPlayer<AwakenedBloodPlayer>().Enabled = true;
         player.crimsonRegen = true;
         player.aggro += 900;
     }

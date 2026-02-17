@@ -46,7 +46,13 @@ public sealed class TransgenderPlayer : ModPlayer
             return;
         }
 
-        // TODO: Override SyncPlayer and send a ModPacket to synchronize the value.
         SyncPlayer(-1, Main.myPlayer, false);
+    }
+
+    public override void SyncPlayer(int toWho, int fromWho, bool newPlayer)
+    {
+        base.SyncPlayer(toWho, fromWho, newPlayer);
+        
+        // TODO: Use a ModPacket to synchronize player properties.
     }
 }

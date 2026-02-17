@@ -1,14 +1,11 @@
 ﻿using CalamityMod.Cooldowns;
-using HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
-using HeavenlyArsenal.Content.Items.Armor;
-using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.Localization;
 using static CalamityMod.CalamityUtils;
 using static Terraria.ModLoader.ModContent;
 
-namespace HeavenlyArsenal.Common.Ui.Cooldowns;
+namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
 
 public class LeechScarfCooldown : CooldownHandler
 {

@@ -21,7 +21,7 @@ internal class BloodHelmetDrawLayer : PlayerDrawLayer
         var Owner = drawInfo.drawPlayer;
 
         var texString = "HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/AwakenedBloodHelm";
-        var a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().CurrentForm.ToString();
+        var a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().Form.ToString();
 
         texString += $"{a}_Head";
         var helmet = ModContent.Request<Texture2D>(texString).Value;
@@ -61,7 +61,7 @@ internal class BloodChestplateDrawLayer : PlayerDrawLayer
     {
         var Owner = drawInfo.drawPlayer;
         var texString = "HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/AwakenedBloodplate";
-        var a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().CurrentForm.ToString();
+        var a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().Form.ToString();
         texString += $"{a}_Body";
         var chestplate = ModContent.Request<Texture2D>(texString).Value;
         var Flip = Owner.direction == 1 ? 0 : SpriteEffects.FlipHorizontally;
@@ -123,7 +123,7 @@ internal class BloodChestplateArmDrawLayer : PlayerDrawLayer
         var walkOffset = Owner.gravDir * Main.OffsetsPlayerHeadgear[Owner.bodyFrame.Y / Owner.bodyFrame.Height];
 
         var texString = "HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/AwakenedBloodplate";
-        var a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().CurrentForm.ToString();
+        var a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().Form.ToString();
         texString += $"{a}_Body";
         var chestplate = ModContent.Request<Texture2D>(texString).Value;
         var Flip = Owner.direction == 1 ? 0 : SpriteEffects.FlipHorizontally;
@@ -178,7 +178,7 @@ public class MyArmOverlay_Front : PlayerDrawLayer
         var walkOffset = Owner.gravDir * Main.OffsetsPlayerHeadgear[Owner.bodyFrame.Y / Owner.bodyFrame.Height];
 
         var texString = "HeavenlyArsenal/Content/Items/Armor/AwakenedBloodArmor/AwakenedBloodplate";
-        var a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().CurrentForm.ToString();
+        var a = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>().Form.ToString();
         texString += $"{a}_Body";
         var chestplate = ModContent.Request<Texture2D>(texString).Value;
 

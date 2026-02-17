@@ -1,8 +1,8 @@
 ﻿using System.IO;
+using HeavenlyArsenal.Common.Networking;
 using HeavenlyArsenal.Common.Networking.Enums;
-using HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
 
-namespace HeavenlyArsenal.Common.Networking.Handlers;
+namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
 
 public sealed class LeechScarfNetworkHandler : ModPacketHandler
 {
