@@ -3,9 +3,11 @@
 using System.IO;
 using System.Runtime.CompilerServices;
 
+// TODO: Implement packet handler from new networking system.
 namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 {
-    internal sealed class LeechScarf_PacketHandler : PacketHandler
+    /*
+     *     internal sealed class LeechScarf_PacketHandler : PacketHandler
     {
         public LeechScarf_PacketHandler(byte packetType)
             : base(packetType)
@@ -43,5 +45,5 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             mp.TendrilList[slot] = t;
         }
     }
-
+     */
 }
