@@ -51,7 +51,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Mage
             if (Clone.HeldItem.ModItem != null)
             {
                 Clone.HeldItem.ModItem.UseItem(Clone);
-                Clone.Calamity().mouseWorld = Owner.Calamity().mouseWorld;
+              //  Clone.Calamity().mouseWorld = Owner.Calamity().mouseWorld;
                 
                 Clone.ItemCheck();
             }

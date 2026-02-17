@@ -48,7 +48,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
         public ref Player Owner => ref Main.player[Projectile.owner];
 
         public new string LocalizationCategory => "Projectiles.Ranged";
-        public bool OwnerCanShoot => Owner.HasAmmo(Owner.ActiveItem()) && !Owner.noItems && !Owner.CCed;
+        public bool OwnerCanShoot => Owner.HasAmmo(Owner.HeldItem) && !Owner.noItems && !Owner.CCed;
         public float ChargeupInterpolant => Utils.GetLerpValue(FusionRifle.ShootDelay, FusionRifle.MaxChargeTime, ChargeTimer, true);
         public ref float CurrentChargingFrames => ref Projectile.ai[0];
         public ref float ChargeTimer => ref Projectile.ai[1];

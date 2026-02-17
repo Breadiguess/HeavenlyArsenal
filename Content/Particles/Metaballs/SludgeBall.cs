@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CalamityMod.Enums;
 using CalamityMod.Graphics.Metaballs;
 using HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture.Projectiles;
 using NoxusBoss.Assets;
@@ -24,19 +25,17 @@ public class SludgeBall : Metaball
     //public override MetaballDrawLayerType DrawContext => MetaballDrawLayerType.AfterProjectiles;
     public override Color EdgeColor => Color.White;
 
-    public override IEnumerable<Texture2D> Layers
-    {
-        get
-        {
-            {
-                yield return GennedAssets.Textures.Noise.SwirlNoise2;
-            }
-        }
-    }
-
+    
     public override bool AnythingToDraw => Main.projectile.Any(p => p.active && p.type == ModContent.ProjectileType<NowhereGoop>());
 
-    public override MetaballDrawLayer DrawContext => MetaballDrawLayer.AfterProjectiles;
+   
+    public override IEnumerable<Texture2D> Layers =>
+    new Texture2D[]
+    {
+        GennedAssets.Textures.Noise.SwirlNoise2.Value
+    };
+
+    public override GeneralDrawLayer DrawLayer => GeneralDrawLayer.BeforeProjectiles;
 
     public static void CreateParticle(Vector2 spawnPosition, Vector2 velocity, float size)
     {

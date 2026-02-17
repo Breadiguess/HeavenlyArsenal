@@ -41,7 +41,7 @@ Ranged: {
 			An ancient rifle from a long dead civilization.
 			Despite the extreme passage of time, its still in relatively good condition.
 			(wip)
-
+			         Stores up to two clips within the item that it draws from to fire.
 			'''
 		Lore:
 			'''
@@ -108,6 +108,11 @@ Melee: {
 
 	TrioSword: {
 		DisplayName: Trio Sword
+		Tooltip: ""
+	}
+
+	TrioSword_Item: {
+		DisplayName: Trio Sword_ Item
 		Tooltip: ""
 	}
 }

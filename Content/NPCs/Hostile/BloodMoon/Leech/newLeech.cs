@@ -6,7 +6,6 @@ using HeavenlyArsenal.Common;
 using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip;
-using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using ReLogic.Content;
 using Terraria.DataStructures;
@@ -15,8 +14,12 @@ using Terraria.GameContent.ItemDropRules;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 
-partial class newLeech : BloodMoonBaseNPC, IMultiSegmentNPC
+partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
 {
+
+
+    public override BloodMoonBalanceStrength Strength => new(0.3f, 0.7f, 1.3f);
+
     private static readonly Vector2[] WhiskerAnchors = new[]
     {
         new Vector2(16, 0),
@@ -49,11 +52,12 @@ partial class newLeech : BloodMoonBaseNPC, IMultiSegmentNPC
 
     public int variant { get; set; }
 
-    public override int bloodBankMax => 50;
+    public override int MaxBlood => 50;
 
     //temporary debug ai slot
     public ref float Debug => ref NPC.ai[1];
 
+    public object NPCTarget { get; private set; }
     public Behavior CurrentState
     {
         get => (Behavior)NPC.ai[2];
@@ -84,28 +88,8 @@ partial class newLeech : BloodMoonBaseNPC, IMultiSegmentNPC
         };
     }
 
-    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
-    {
-        var avatarID = ModContent.NPCType<AvatarOfEmptiness>();
 
-        bestiaryEntry.UIInfoProvider =
-            new HighestOfMultipleUICollectionInfoProvider
-            (
-                new CommonEnemyUICollectionInfoProvider(ContentSamples.NpcBestiaryCreditIdsByNpcNetIds[Type], true),
-                new CommonEnemyUICollectionInfoProvider(ContentSamples.NpcBestiaryCreditIdsByNpcNetIds[avatarID], true)
-            );
-
-        bestiaryEntry.Info.AddRange
-        (
-            [
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
-
-                new FlavorTextBestiaryInfoElement("Mods.HeavenlyArsenal.Bestiary.UmbralLeech")
-            ]
-        );
-    }
-
-    public override void SetDefaults()
+    protected override void SetDefaults2()
     {
         NPC.lifeMax = 50_000;
         NPC.damage = 160;
@@ -128,7 +112,7 @@ partial class newLeech : BloodMoonBaseNPC, IMultiSegmentNPC
         ];
     }
 
-    public override void SendExtraAI(BinaryWriter writer)
+    public override void SendExtraAI2(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
         var hasHitboxes = AdjHitboxes != null && AdjHitboxes.Length > 0;
@@ -148,7 +132,7 @@ partial class newLeech : BloodMoonBaseNPC, IMultiSegmentNPC
         writer.Write(variant);
     }
 
-    public override void ReceiveExtraAI(BinaryReader reader)
+    public override void ReceiveExtraAI2(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
         var hasHitboxes = reader.ReadBoolean();
@@ -236,7 +220,7 @@ partial class newLeech : BloodMoonBaseNPC, IMultiSegmentNPC
 
         StateMachine();
 
-        if (NPC.life < NPC.lifeMax / 3 && !hasUsedEmergency && !NPC.GetGlobalNPC<SacrificeNPC>().isSacrificed)
+        if (NPC.life < NPC.lifeMax / 3 && !hasUsedEmergency )//&& !NPC.GetGlobalNPC<SacrificeNPC>().isSacrificed)
         {
             if (Main.rand.NextBool(3))
             {

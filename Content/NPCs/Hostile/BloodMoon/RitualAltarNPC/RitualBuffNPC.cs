@@ -110,7 +110,7 @@ public class RitualBuffNPC : GlobalNPC
 
             if (ritualBuffTimer > 180 && isBeingBuffed)
             {
-                altar.blood -= altar.bloodBankMax / 5;
+                altar.Blood -= altar.MaxBlood / 5;
 
                 altar.NPCTarget = null;
                 isBeingBuffed = false;

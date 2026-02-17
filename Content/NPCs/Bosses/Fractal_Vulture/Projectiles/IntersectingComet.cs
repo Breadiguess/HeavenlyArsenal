@@ -198,9 +198,28 @@ internal class IntersectingComet : ModProjectile
         Projectile.Kill();
     }
 
-    public Color TrailColor(float completionRatio)
+   
+
+    public override bool PreDraw(ref Color lightColor)
     {
-        var t = MathHelper.Clamp(completionRatio, 0f, 1f);
+        Texture2D thing = GennedAssets.Textures.GraphicalUniverseImager.EclipseSelectionBox_BloodMoon;
+
+        Main.spriteBatch.EnterShaderRegion();
+        //yes, i'm using the art attack shader. so sue me,
+        GameShaders.Misc["CalamityMod:ArtAttack"].SetShaderTexture(ModContent.Request<Texture2D>("CalamityMod/ExtraTextures/Trails/ZapTrail"));
+        GameShaders.Misc["CalamityMod:ArtAttack"].Apply();
+
+        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(TrailWidth, TrailColor, shader: GameShaders.Misc["CalamityMod:ArtAttack"]), 180);
+        Main.spriteBatch.ExitShaderRegion();
+
+        Main.EntitySpriteDraw(thing, Projectile.Center - Main.screenPosition, null, Color.AntiqueWhite, Projectile.rotation, thing.Size() / 2, 1, 0);
+
+        return base.PreDraw(ref lightColor);
+    }
+
+    private Color TrailColor(float trailLengthInterpolant, Vector2 vertexPosition)
+    {
+        var t = MathHelper.Clamp(trailLengthInterpolant, 0f, 1f);
         var crimson = new Color(255, 255, 255);
         var brightness = MathHelper.SmoothStep(1f, 0.6f, t);
 
@@ -213,27 +232,10 @@ internal class IntersectingComet : ModProjectile
         return finalColor;
     }
 
-    public float TrailWidth(float completionRatio)
+    private float TrailWidth(float trailLengthInterpolant, Vector2 vertexPosition)
     {
-        var widthInterpolant = Utils.GetLerpValue(0f, 0.25f, completionRatio, true) * Utils.GetLerpValue(1.1f, 0.7f, completionRatio, true);
+        var widthInterpolant = Utils.GetLerpValue(0f, 0.25f, trailLengthInterpolant, true) * Utils.GetLerpValue(1.1f, 0.7f, trailLengthInterpolant, true);
 
         return MathHelper.SmoothStep(2, 12f, widthInterpolant);
-    }
-
-    public override bool PreDraw(ref Color lightColor)
-    {
-        Texture2D thing = GennedAssets.Textures.GraphicalUniverseImager.EclipseSelectionBox_BloodMoon;
-
-        Main.spriteBatch.EnterShaderRegion();
-        //yes, i'm using the art attack shader. so sue me,
-        GameShaders.Misc["CalamityMod:ArtAttack"].SetShaderTexture(ModContent.Request<Texture2D>("CalamityMod/ExtraTextures/Trails/ZapTrail"));
-        GameShaders.Misc["CalamityMod:ArtAttack"].Apply();
-
-        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(TrailWidth, TrailColor, _ => Projectile.Size * 0.5f, shader: GameShaders.Misc["CalamityMod:ArtAttack"]), 180);
-        Main.spriteBatch.ExitShaderRegion();
-
-        Main.EntitySpriteDraw(thing, Projectile.Center - Main.screenPosition, null, Color.AntiqueWhite, Projectile.rotation, thing.Size() / 2, 1, 0);
-
-        return base.PreDraw(ref lightColor);
     }
 }

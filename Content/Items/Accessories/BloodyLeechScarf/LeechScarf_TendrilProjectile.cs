@@ -348,8 +348,8 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             int heal = (int)Math.Round(damageDone * 0.015f);
             {
                 //stupid calamity balancing wtf
-                if (CalamityGlobalProjectile.CanSpawnLifeStealProjectile(1f, heal))
-                    CalamityGlobalProjectile.SpawnLifeStealProjectile(Projectile, Owner, heal, ProjectileID.VampireHeal, 0, 0.15f); //BalancingConstants.LifeStealRange, BalancingConstants.LifeStealAccessoryCooldownMultiplier);
+                //if (CalamityGlobalProjectile.CanSpawnLifeStealProjectile(1f, heal))
+                //    CalamityGlobalProjectile.SpawnLifeStealProjectile(Projectile, Owner, heal, ProjectileID.VampireHeal, 0, 0.15f); //BalancingConstants.LifeStealRange, BalancingConstants.LifeStealAccessoryCooldownMultiplier);
 
             }
             /*

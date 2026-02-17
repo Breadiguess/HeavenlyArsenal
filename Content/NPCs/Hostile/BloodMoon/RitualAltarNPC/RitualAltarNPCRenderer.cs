@@ -3,7 +3,7 @@ using NoxusBoss.Assets;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
-internal partial class RitualAltar : BloodMoonBaseNPC
+internal partial class RitualAltar : BaseBloodMoonNPC
 {
     private VertexBuffer isohedronBuffer;
 
@@ -250,7 +250,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
         basicEffect.Texture = faceTex;
         basicEffect.View = Main.GameViewMatrix.ZoomMatrix;
-
+       
         basicEffect.Projection = Matrix.CreateOrthographicOffCenter
         (
             0,
@@ -260,8 +260,6 @@ internal partial class RitualAltar : BloodMoonBaseNPC
             -1000f,
             1000f
         );
-
-        // Scale -> Yaw -> Pitch -> Translate
 
         basicEffect.World =
             Matrix.CreateScale(pixelSize) *
@@ -400,7 +398,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
             Main.GameViewMatrix.TransformationMatrix
         );
 
-        RebuildMaskMesh(drawColor, 20, 12, -0.2f);
+        RebuildMaskMesh(drawColor* NPC.Opacity, 20, 12, -0.2f);
         //RebuildMaskMesh_ColorDebug(20, 12, -0.2f);
 
         if (currentTarget != null)
@@ -492,7 +490,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
         mask(spriteBatch, drawColor);
 
-        drawLegs(drawColor);
+        drawLegs(drawColor * NPC.Opacity);
        // Utils.DrawBorderString(spriteBatch, currentAIState.ToString(), NPC.Center - screenPos, Color.AntiqueWhite);
         Texture2D Debug = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
 

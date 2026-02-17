@@ -275,10 +275,9 @@ public class TheThreat : ModProjectile
             DamageSource = PlayerDeathReason.ByCustomReason(text)
         };
     }
-
-    public Color TrailColor(float completionRatio)
+    private Color TrailColor(float trailLengthInterpolant, Vector2 vertexPosition)
     {
-        var t = MathHelper.Clamp(completionRatio, 0f, 1f);
+        var t = MathHelper.Clamp(trailLengthInterpolant, 0f, 1f);
         var crimson = new Color(220, 20, 76);
         var brightness = MathHelper.SmoothStep(1f, 0.6f, t);
 
@@ -290,13 +289,13 @@ public class TheThreat : ModProjectile
 
         return finalColor;
     }
-
-    public float TrailWidth(float completionRatio)
+    private float TrailWidth(float trailLengthInterpolant, Vector2 vertexPosition)
     {
-        var widthInterpolant = Utils.GetLerpValue(0f, 0.25f, completionRatio, true) * Utils.GetLerpValue(1.1f, 0.7f, completionRatio, true);
+        var widthInterpolant = Utils.GetLerpValue(0f, 0.25f, trailLengthInterpolant, true) * Utils.GetLerpValue(1.1f, 0.7f, trailLengthInterpolant, true);
 
         return MathHelper.SmoothStep(8f, 20f, widthInterpolant);
     }
+  
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -320,7 +319,7 @@ public class TheThreat : ModProjectile
         GameShaders.Misc["CalamityMod:ArtAttack"].SetShaderTexture(ModContent.Request<Texture2D>("CalamityMod/ExtraTextures/Trails/DoubleTrail"));
         GameShaders.Misc["CalamityMod:ArtAttack"].Apply();
 
-        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(TrailWidth, TrailColor, _ => Projectile.Size * 0.5f, shader: GameShaders.Misc["CalamityMod:ArtAttack"]), 180);
+        PrimitiveRenderer.RenderTrail(Projectile.oldPos, new PrimitiveSettings(TrailWidth, TrailColor, shader: GameShaders.Misc["CalamityMod:ArtAttack"]), 180);
         Main.spriteBatch.ExitShaderRegion();
         var squishFactor = Utils.Remap(Projectile.velocity.Length(), 0, 40, 1, 0.5f);
 
@@ -354,4 +353,6 @@ public class TheThreat : ModProjectile
         //Utils.DrawBorderString(Main.spriteBatch, Projectile.velocity.Length().ToString(), DrawPos, Color.AntiqueWhite);
         return false; // base.PreDraw(ref lightColor);
     }
+
+    
 }

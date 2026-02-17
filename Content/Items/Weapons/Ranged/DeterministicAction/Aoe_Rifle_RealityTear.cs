@@ -115,7 +115,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         public override void AI()
         {
-           
+            Projectile.Opacity = LumUtils.InverseLerp(0, 180, Projectile.timeLeft);
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -145,20 +145,22 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 }
             }
 
-            return false;
+            return base.Colliding(projHitbox, targetHitbox);
         }
 
 
         public override bool PreDraw(ref Color lightColor)
         {
+
+            Color color = Color.White * Projectile.Opacity;
             foreach (var s in segments)
             {
                 Utils.DrawLine(
                     Main.spriteBatch,
                     s.Start,
                     s.End,
-                    Color.White,
-                    Color.White,
+                   color,
+                    color,
                     s.Thickness*3
                 );
             }

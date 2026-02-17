@@ -22,10 +22,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         public override void SetStats(ref float damageMult, ref float knockbackMult, ref float useTimeMult, ref float scaleMult, ref float shootSpeedMult, ref float manaMult, ref int critBonus)
         {
-            damageMult = 2;
-            knockbackMult = 2;
-            useTimeMult = 2;
-            shootSpeedMult = 2;
+            damageMult = 1.2f;
+            useTimeMult =1.1f;
+            shootSpeedMult = 1.1f;
             critBonus *= 10;
             
         }

@@ -284,7 +284,7 @@ public class TheDarkOne : ModProjectile
         if (Time == 1)
         {
             int ArrowID = ProjectileID.BoneArrow;
-            Owner.PickAmmo(Owner.ActiveItem(), out ArrowID, out var SpeedNoUse, out var bulletDamage, out var kBackNoUse, out var _);
+            Owner.PickAmmo(Owner.HeldItem, out ArrowID, out var SpeedNoUse, out var bulletDamage, out var kBackNoUse, out var _);
 
             SoundEngine.PlaySound(SoundID.Item5, Owner.Center);
             var Velocity = Projectile.rotation.ToRotationVector2() * 30;

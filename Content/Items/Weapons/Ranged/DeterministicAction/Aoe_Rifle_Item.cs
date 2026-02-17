@@ -88,8 +88,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             if (!Main.keyState.IsKeyDown(Keys.LeftShift))
                 return;
-            if(Item.prefix != ModContent.PrefixType<Aoe_Rifle_Reforge>())
-            Item.Prefix(ModContent.PrefixType<Aoe_Rifle_Reforge>());
+           
             
         }
         public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)

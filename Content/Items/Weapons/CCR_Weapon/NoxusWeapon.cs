@@ -112,7 +112,7 @@ internal class NoxusWeapon : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.crit = 10;
         Item.damage = 4900;
-        Item.rare = ModContent.RarityType<Violet>();
+        Item.rare = ModContent.RarityType<CalamityMod.Rarities.HotPink>();
         Item.value = CalamityGlobalItem.RarityVioletBuyPrice;
         Item.useTime = 1;
         Item.useAnimation = 1;

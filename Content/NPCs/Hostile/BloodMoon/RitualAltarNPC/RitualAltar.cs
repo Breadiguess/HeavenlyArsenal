@@ -11,8 +11,9 @@ using Terraria.GameContent.ItemDropRules;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
-internal partial class RitualAltar : BloodMoonBaseNPC
+internal partial class RitualAltar : BaseBloodMoonNPC
 {
+    public override BloodMoonBalanceStrength Strength => new(0.2f,0.2f,0.2f);
     public enum AltarAI
     {
         LookingForSacrifice,
@@ -23,7 +24,9 @@ internal partial class RitualAltar : BloodMoonBaseNPC
 
         Buffing,
 
-        WalkTowardsPlayer
+        WalkTowardsPlayer,
+
+        DeathAnimation
     }
 
     public int SacrificeCooldown;
@@ -35,14 +38,16 @@ internal partial class RitualAltar : BloodMoonBaseNPC
     private float SpeedMulti = 1;
 
     private int Variant;
+    private Entity currentTarget;
+    private Player playerTarget;
 
+    public NPC NPCTarget { get; set; }
     public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/RitualAltarNPC/RitualAltarConcept";
 
-    public override float buffPrio => 0;
 
-    public override bool canBeSacrificed => false;
 
-    public override int bloodBankMax => 100;
+    public override int MaxBlood => 100;
+
 
     public override void SetStaticDefaults()
     {
@@ -59,7 +64,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         };
     }
 
-    public override void SendExtraAI(BinaryWriter writer)
+    public override void SendExtraAI2(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
 
@@ -69,7 +74,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         }
     }
 
-    public override void ReceiveExtraAI(BinaryReader reader)
+    public override void ReceiveExtraAI2(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
 
@@ -101,30 +106,19 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         }
     }
 
-    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
+
+    public override bool CheckDead()
     {
-        bestiaryEntry.Info.RemoveAll(i => i is NPCPortraitInfoElement);
+        if (NPC.Opacity > 0)
+        {
+            Time = -1;
+            NPC.life = 1;
+            NPC.dontTakeDamage = true;
+            currentAIState = AltarAI.DeathAnimation;
+        }
 
-        // We can use AddRange instead of calling Add multiple times in order to add multiple items at once
-        bestiaryEntry.Info.AddRange
-        (
-            [
-                // Sets the spawning conditions of this NPC that is listed in the bestiary.
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
-
-                // Sets the description of this NPC that is listed in the bestiary.
-                new FlavorTextBestiaryInfoElement($"Mods.{Mod.Name}.Bestiary.RitualAltar1"),
-
-                // By default the last added IBestiaryBackgroundImagePathAndColorProvider will be used to show the background image.
-                // The ExampleSurfaceBiome ModBiomeBestiaryInfoElement is automatically populated into bestiaryEntry.Info prior to this method being called
-                // so we use this line to tell the game to prioritize a specific InfoElement for sourcing the background image.
-                //new BestiaryPortraitBackgroundProviderPreferenceInfoElement(ModContent.GetInstance<ExampleSurfaceBiome>().ModBiomeBestiaryInfoElement),
-                new NPCPortraitInfoElement(0),
-                new RiftBloodMoonBackground()
-            ]
-        );
+        return false;
     }
-
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
         npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<PenumbralMembrane>(), 4, 1));
@@ -133,7 +127,7 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         npcLoot.Add(ModContent.ItemType<BloodOrb>(), 1, 10, 18);
     }
 
-    public override void SetDefaults()
+    protected override void SetDefaults2()
     {
         Variant = Main.rand.Next(1, 5);
         NPC.width = 80;
@@ -146,10 +140,8 @@ internal partial class RitualAltar : BloodMoonBaseNPC
         NPC.noGravity = false;
         NPC.noTileCollide = false;
 
-        SpawnModBiomes =
-        [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type, ModContent.GetInstance<DeadUniverseBiome>().Type
-        ];
+        CanBeSacrificed = false;
+       
     }
 
     public override void AI()

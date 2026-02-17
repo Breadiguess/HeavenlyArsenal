@@ -14,7 +14,7 @@ public class ShintoArmorLeggings : ModItem
     public static readonly int MoveSpeedBonus = 5;
 
     //public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MoveSpeedBonus);
-
+   
     public override string LocalizationCategory => "Items.Armor.ShintoArmor";
 
     public override void SetStaticDefaults()
@@ -50,7 +50,7 @@ public class ShintoArmorLeggings : ModItem
         player.jumpSpeedBoost += 1.6f;
         player.noFallDmg = true;
         player.GetModPlayer<ShintoArmorPlayer>().VoidBeltEquipped = true;
-        modPlayer.DashID = ShintoArmorDash.ID;
+        modPlayer.DashID = ShintoArmorDash.ID;    
         player.dashType = 0;
         player.spikedBoots = 2;
     }

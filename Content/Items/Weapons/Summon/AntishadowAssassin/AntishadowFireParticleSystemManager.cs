@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Luminance.Core.Graphics;
-using NoxusBoss.Assets;
+﻿using Luminance.Core.Graphics;
 using NoxusBoss.Content.NPCs.Bosses.NamelessDeity.SpecificEffectManagers;
 using NoxusBoss.Core.Graphics.FastParticleSystems;
 
@@ -90,7 +88,7 @@ public class AntishadowFireParticleSystemManager : ModSystem
             return;
         }
 
-        var maxParticles = 1024;
+        var maxParticles = 512;
         FireParticleSystem system;
 
         if (behindProjectiles)

@@ -58,7 +58,7 @@ public class DischargePlayer : ModPlayer
             {
                 if (Player.miscCounter % 6 == 0 && Player.velocity != Vector2.Zero)
                 {
-                    var damage = Player.ApplyArmorAccDamageBonusesTo(Player.GetBestClassDamage().ApplyTo(170));
+                    var damage = 180;//r.ApplyArmorAccDamageBonusesTo(Player.GetBestClassDamage().ApplyTo(170));
                 }
 
                 Player.endurance += 0.20f;
@@ -75,7 +75,7 @@ public class DischargePlayer : ModPlayer
                         Player.Center
                     );
 
-                    var damage = Player.ApplyArmorAccDamageBonusesTo(Player.GetBestClassDamage().ApplyTo(750));
+                    var damage = 750;// Player.ApplyArmorAccDamageBonusesTo(Player.GetBestClassDamage().ApplyTo(750));
                     isVambraceDashing = true;
 
                     if (!SpawnedCharge)
