@@ -1,15 +1,12 @@
-﻿using HeavenlyArsenal.Core.Globals;
+﻿using HeavenlyArsenal.Core.Graphics;
 using Luminance.Assets;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
-using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Rarities;
-using NoxusBoss.Core.GlobalInstances;
-using Terraria.GameContent.ItemDropRules;
 
 namespace HeavenlyArsenal.Content.Items.Materials;
 
-internal class AvatarMaterial : ModItem, ILocalizedModType
+public class AvatarMaterial : ModItem, ILocalizedModType
 {
     public override string LocalizationCategory => "Items.Misc";
 
@@ -17,82 +14,64 @@ internal class AvatarMaterial : ModItem, ILocalizedModType
 
     public override void SetStaticDefaults()
     {
+        base.SetStaticDefaults();
+
         ItemID.Sets.ItemNoGravity[Type] = true;
-
-        GlobalNPCEventHandlers.ModifyNPCLootEvent += (npc, npcLoot) =>
-        {
-            if (npc.type == ModContent.NPCType<AvatarOfEmptiness>())
-            {
-                var normalOnly = new LeadingConditionRule(new Conditions.NotExpert());
-
-                {
-                    normalOnly.OnSuccess(ItemDropRule.Common(Type, minimumDropped: 3, maximumDropped: 3));
-                }
-
-                npcLoot.Add(normalOnly);
-            }
-        };
-
-        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
-        {
-            if (item.type == AvatarOfEmptiness.TreasureBagID)
-            {
-                loot.Add(ItemDropRule.Common(Type, minimumDropped: 3, maximumDropped: 3));
-            }
-        };
     }
 
     public override void SetDefaults()
     {
-        Item.width = 20;
-        Item.height = 20;
-        Item.maxStack = 999;
-        Item.value = Item.buyPrice(0, 0, 0, 3);
-        Item.rare = ModContent.RarityType<AvatarRarity>();
-    }
+        base.SetDefaults();
 
-    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
-    {
-        return base.PreDrawInWorld(spriteBatch, lightColor, alphaColor, ref rotation, ref scale, whoAmI);
+        Item.maxStack = Item.CommonMaxStack;
+
+        Item.width = 32;
+        Item.height = 32;
+
+        Item.value = Item.buyPrice(0, 0, 0, 3);
+
+        Item.rare = ModContent.RarityType<AvatarRarity>();
     }
 
     public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
     {
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+        var batch = Main.spriteBatch;
+        var parameters = batch.Capture();
 
-        var particleDrawCenter = position + new Vector2(0f);
-        var glow = AssetDirectory.Textures.BigGlowball.Value;
+        batch.End();
+        batch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
 
-        //Main.EntitySpriteDraw(glow, particleDrawCenter - Main.screenPosition, glow.Frame(), Color.Red with { A = 200 }, 0, glow.Size() * 0.5f, new Vector2(0.12f, 0.25f), 0, 0);
-        Texture2D BaseE = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
+        var texture = GennedAssets.Textures.GreyscaleTextures.WhitePixel.Value;
 
-        var AOEMaterial = ShaderManager.GetShader("HeavenlyArsenal.avatarMaterial");
+        var shader = ShaderManager.GetShader("HeavenlyArsenal.avatarMaterial");
 
-        var s = AOEMaterial;
-        s.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
-        s.TrySetParameter("Color", Color.Red.ToVector4());
-        s.TrySetParameter("MorphSpeed", 0.5f); // try 0.15–0.5
-        s.TrySetParameter("Threshold", 0.20f);
-        s.TrySetParameter("EdgeWidth", 0.08f); // try 0.06–0.12 for smoother edges
-        s.TrySetParameter("NoiseScale", new Vector2(2f, 2f));
-        s.TrySetParameter("WarpStrength", 0.05f); // keep small to avoid clamping
-        s.TrySetParameter("NoiseSpeed", 0.15f);
-        AOEMaterial.SetTexture(GennedAssets.Textures.FirstPhaseForm.AvatarRift, 0);
-        AOEMaterial.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 1, SamplerState.AnisotropicWrap);
-        AOEMaterial.SetTexture(GennedAssets.Textures.GoodAppleHearts.BarsLifeOverlay_Fill, 2);
+        shader.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
+        shader.TrySetParameter("Color", Color.Red.ToVector4());
 
-        AOEMaterial.SetTexture(GennedAssets.Textures.SecondPhaseForm.Beads2, 3);
-        AOEMaterial.Apply();
+        // Try between 0.15f and 0.5f
+        shader.TrySetParameter("MorphSpeed", 0.5f);
+        shader.TrySetParameter("Threshold", 0.20f);
 
-        Main.spriteBatch.Draw(BaseE, particleDrawCenter, null, Color.White, 0, BaseE.Size() * 0.5f, new Vector2(20f), 0, 0);
+        // Try between 0.06f and 0.12f for smoother edges
+        shader.TrySetParameter("EdgeWidth", 0.08f);
+        shader.TrySetParameter("NoiseScale", new Vector2(2f, 2f));
 
-        Main.spriteBatch.End();
+        // Keep small to avoid clamping
+        shader.TrySetParameter("WarpStrength", 0.05f);
+        shader.TrySetParameter("NoiseSpeed", 0.15f);
 
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+        shader.SetTexture(GennedAssets.Textures.FirstPhaseForm.AvatarRift, 0);
+        shader.SetTexture(GennedAssets.Textures.Noise.DendriticNoiseZoomedOut, 1, SamplerState.AnisotropicWrap);
+        shader.SetTexture(GennedAssets.Textures.GoodAppleHearts.BarsLifeOverlay_Fill, 2);
 
-        //spriteBatch.Draw(itemTexture, position, itemFrame, drawColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        shader.SetTexture(GennedAssets.Textures.SecondPhaseForm.Beads2, 3);
+        shader.Apply();
 
-        return base.PreDrawInInventory(spriteBatch, position, frame, drawColor, itemColor, origin, scale);
+        batch.Draw(texture, position, null, Color.White, 0, texture.Size() / 2f, new Vector2(20f), SpriteEffects.None, 0f);
+
+        batch.End();
+        batch.Begin(in parameters);
+
+        return true;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CalamityMod;
+using HeavenlyArsenal.Content.Biomes;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Core.Graphics.RenderTargets;
@@ -202,7 +203,7 @@ internal partial class BloodJelly : BaseBloodMoonNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 

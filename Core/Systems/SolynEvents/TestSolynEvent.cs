@@ -28,7 +28,7 @@ namespace HeavenlyArsenal.Core.Systems.SolynEvents
             ConversationSelector.PriorityConversationSelectionEvent += SelectHoverDialogue;
         }
 
-        private Conversation? SelectHoverDialogue()
+        private Conversation SelectHoverDialogue()
         {
             if (!Finished && CanStart)
                 return DialogueManager.FindByRelativePrefix("SolynHoverEventDialogue");

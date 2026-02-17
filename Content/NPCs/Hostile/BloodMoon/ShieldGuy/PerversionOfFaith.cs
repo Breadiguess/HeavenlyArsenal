@@ -1,4 +1,5 @@
-﻿using Terraria.DataStructures;
+﻿using HeavenlyArsenal.Content.Biomes;
+using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy;
 
@@ -22,7 +23,7 @@ internal partial class PerversionOfFaith : BloodMoonBaseNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 

@@ -382,7 +382,7 @@ public class AvatarRifle_Holdout : ModProjectile
                 Projectile.GetSource_FromThis(),
                 Projectile.Center - new Vector2(30 * Projectile.direction, 0),
                 new Vector2(Projectile.direction * -4f, 0f),
-                ModContent.GoreType<MagEjectGore>()
+                ModContent.GoreType<MagazineEjectGore>()
             );
         }
 

@@ -21,7 +21,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
 
         private void On_PlayerDrawLayers_DrawPlayer_28_ArmOverItem(On_PlayerDrawLayers.orig_DrawPlayer_28_ArmOverItem orig, ref PlayerDrawSet drawinfo)
         {
-            if (drawinfo.drawPlayer.GetValueRef<bool>(LeechScarf_Item.WearingAccessory))
+            if (drawinfo.drawPlayer.GetValueRef<bool>(LeechScarfItem.WearingAccessory))
             {
                 Draw(ref drawinfo);
                 return;
@@ -37,7 +37,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             
             Player guy = drawInfo.drawPlayer;
 
-            return guy.GetModPlayer<LeechScarf_Player>().Active;
+            return guy.GetModPlayer<LeechScarfPlayer>().Active;
         }
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {

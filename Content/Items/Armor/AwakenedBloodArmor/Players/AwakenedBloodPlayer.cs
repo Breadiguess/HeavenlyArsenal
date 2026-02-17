@@ -1,399 +1,408 @@
 ﻿using HeavenlyArsenal.Common.Ui;
-using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using Terraria.Audio;
-using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players;
 
-public class AwakenedBloodPlayer : ModPlayer
+public sealed class AwakenedBloodPlayer : ModPlayer
 {
-    public override void PostUpdate()
+    /// <summary>
+    ///     The default maximum amount of blood and clot resources the player can have.
+    /// </summary>
+    public const int DEFAULT_MAX_RESOURCE = 100;
+
+    private int blood;
+
+    private int clot;
+
+    /// <summary>
+    ///     Gets or sets whether the Awakened Blood armor set bonus is currently active for the player.
+    /// </summary>
+    public bool Enabled { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether the Blood Boost is currently active for the player.
+    /// </summary>
+    public bool BloodBoostActive { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the duration, in frames, that the Blood Boost remains active before it starts to
+    ///     rapidly drain the player's blood resource.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to 6 seconds (<c>360</c> frames).
+    /// </remarks>
+    public int BloodBoostSink { get; set; } = 6 * 60;
+
+    /// <summary>
+    ///     Gets or sets the total time, in frames, that the Blood Boost has been active for the player.
+    /// </summary>
+    public int BloodBoostTotalTime { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the timer, in frames, used to control the rate at which the player loses blood
+    ///     while the Blood Boost is active.
+    /// </summary>
+    public int BloodBoostDrainTimer { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the multiplier applied to incoming damage to determine how much blood the player
+    ///     loses.
+    /// </summary>
+    public float BloodLossMultiplier { get; set; } = 0.1f;
+
+    /// <summary>
+    ///     Gets or sets the player's active form of the Awakened Blood Armor set bonus.
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to <see cref="AwakenedBloodForm.Offense" />.
+    /// </remarks>
+    public AwakenedBloodForm Form { get; set; } = AwakenedBloodForm.Offense;
+
+    /// <summary>
+    ///     Gets or sets the timer, in frames, used to control the rate at which the player loses clot.
+    /// </summary>
+    public int ClotDecayTimer { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the timer, in frames, used to control the rate at which the player gains blood.
+    /// </summary>
+    public int BloodGainTimer { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the player's current blood resource amount.
+    /// </summary>
+    /// <remarks>
+    ///     The value is clamped between <c>0</c> and <see cref="MaxBlood" />.
+    /// </remarks>
+    public int Blood
     {
-        if (!AwakenedBloodSetActive)
-        {
-            return;
-        }
+        get => blood;
+        set => blood = (int)MathHelper.Clamp(value, 0, MaxBlood);
+    }
 
-        HandleForm();
+    /// <summary>
+    ///     Gets or sets the maximum amount of blood the player can have.
+    /// </summary>
+    public int MaxBlood { get; set; } = DEFAULT_MAX_RESOURCE;
 
-        ManageBloodBoost();
+    /// <summary>
+    ///     Gets or sets the player's current clot resource amount.
+    /// </summary>
+    /// <remarks>
+    ///     The value is clamped between <c>0</c> and <see cref="MaxClot" />.
+    /// </remarks>
+    public int Clot
+    {
+        get => clot;
+        set => clot = (int)MathHelper.Clamp(value, 0, MaxClot);
+    }
 
-        ConvertClot();
+    /// <summary>
+    ///     Gets or sets the maximum amount of clot the player can have.
+    /// </summary>
+    public int MaxClot { get; set; } = DEFAULT_MAX_RESOURCE;
+
+    /// <summary>
+    ///     Gets the total amount of blood and clot resources the player currently has.
+    /// </summary>
+    /// <remarks>
+    ///     Equivalent of <see cref="Blood" /> + <see cref="Clot" />.
+    /// </remarks>
+    public int Combined => Blood + Clot;
+
+    public override void ResetEffects()
+    {
+        base.ResetEffects();
+
+        Enabled = false;
     }
 
     public override void PreUpdate()
     {
-        if (GainTimer > 0)
-        {
-            GainTimer--;
-        }
+        base.PreUpdate();
 
-        if (!AwakenedBloodSetActive)
+        UpdateGainTimer();
+
+        if (!Enabled)
         {
             return;
         }
 
-        var bloodPercent = blood / (float)MaxResource;
-        var clotPercent = clot / (float)MaxResource;
-        var bloodclot = (blood + clot) / (float)MaxResource;
-
-        WeaponBar.DisplayBar(Color.AntiqueWhite, Color.Crimson, bloodPercent, 150, 0, new Vector2(0, -20));
-        WeaponBar.DisplayBar(Color.Crimson, Color.AntiqueWhite, clotPercent, 150, 0, new Vector2(0, -30));
-        WeaponBar.DisplayBar(Color.HotPink, Color.Silver, bloodclot, 150, 1, new Vector2(0, -40));
-        //this shit sucks
-
-        //Main.NewText($"{bloodPercent}, clot: {clotPercent}, decay timer: {clotDecayTimer}");
-
-        ControlResource();
+        UpdateDisplayBars();
     }
 
-    public override void ResetEffects()
+    public override void PostUpdate()
     {
-        AwakenedBloodSetActive = false;
+        base.PostUpdate();
+
+        if (!Enabled)
+        {
+            return;
+        }
+
+        UpdateForm();
+
+        UpdateBloodBoost();
+        UpdateBloodConversion();
     }
 
     public override void ArmorSetBonusActivated()
     {
-        if (!AwakenedBloodSetActive)
+        base.ArmorSetBonusActivated();
+
+        if (!Enabled)
         {
             return;
         }
 
-        if (CurrentForm == Form.Offense)
+        switch (Form)
         {
-            var value = 76;
-
-            if (value > 75 && !BloodBoostActive)
-            {
-                BloodBoostDrainTimer = 0;
-                BloodBoostActive = true;
-                SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.BloodCry);
-            }
-        }
-        else if (CurrentForm == Form.Defense)
-        {
-            Player.HealEffect(clot);
-            Player.statLife += clot;
-            clot = 0;
+            case AwakenedBloodForm.Offense:
+                ActivateOffense();
+                break;
+            case AwakenedBloodForm.Defense:
+                ActivateDefense();
+                break;
         }
     }
-
-    #region values
-
-    public enum Form
-    {
-        Offense,
-
-        Defense
-    }
-
-    public Form CurrentForm = Form.Offense;
-
-    public bool AwakenedBloodSetActive;
-
-    public bool BloodBoostActive;
-
-    public int BloodBoostSink = 6 * 60;
-
-    public int BloodBoostTotalTime;
-
-    public int BloodBoostDrainTimer;
-
-    public int blood;
-
-    public int clot;
-
-    public int clotDecayTimer;
-
-    /// <summary>
-    ///     Time to control the rate at which the player gains blood
-    /// </summary>
-    public int GainTimer;
-
-    public int CombinedResource => blood + clot;
-
-    public int MaxResource = 100;
-
-    #endregion
-
-    #region Hit NPC
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (AwakenedBloodSetActive && GainTimer <= 0) //&& !BlackListProjectileNPCs.BlackListedNPCs.Contains(target.type))
+        base.OnHitNPC(target, hit, damageDone);
+
+        if (!Enabled || BloodGainTimer > 0)
         {
-            GainBlood();
-            ControlResource();
+            return;
         }
 
-        base.OnHitNPC(target, hit, damageDone);
+        ApplyBloodGain(5);
     }
 
     public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (AwakenedBloodSetActive && GainTimer <= 0) //&& !BlackListProjectileNPCs.BlackListedNPCs.Contains(target.type))
+        if (!Enabled || BloodGainTimer > 0)
         {
-            GainTimer = 20;
-            GainBlood();
-            ControlResource();
+            return;
         }
+
+        ApplyBloodGain(5);
     }
 
     public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (AwakenedBloodSetActive && GainTimer <= 0) // && !BlackListProjectileNPCs.BlackListedNPCs.Contains(target.type))
+        if (!Enabled || BloodGainTimer > 0)
         {
-            GainBlood();
-            ControlResource();
+            return;
         }
+
+        ApplyBloodGain(5);
     }
-
-    #endregion
-
-    #region hitByNPC or Projectile
 
     public override void OnHitByNPC(NPC npc, Player.HurtInfo hurtInfo)
     {
-        if (AwakenedBloodSetActive)
+        base.OnHitByNPC(npc, hurtInfo);
+
+        if (!Enabled)
         {
-            BloodLoss(hurtInfo);
+            return;
         }
+
+        ApplyBloodLoss(in hurtInfo);
     }
 
     public override void OnHitByProjectile(Projectile proj, Player.HurtInfo hurtInfo)
     {
-        if (AwakenedBloodSetActive)
+        base.OnHitByProjectile(proj, hurtInfo);
+
+        if (!Enabled)
         {
-            BloodLoss(hurtInfo);
+            return;
         }
+
+        ApplyBloodLoss(in hurtInfo);
     }
 
-    #endregion
-
-    #region helpers
-
-    private void HandleForm()
+    /// <summary>
+    ///     Reduces the player's blood based on incoming damage.
+    /// </summary>
+    /// <param name="hurtInfo">The <see cref="Player.HurtInfo" /> used to determine blood loss.</param>
+    /// <remarks>
+    ///     The amount of blood lost is calculated as <c>hurtInfo.Damage * BloodLossMultiplier</c>. The
+    ///     resulting value is applied through <see cref="Blood" />, which enforces clamping.
+    /// </remarks>
+    public void ApplyBloodLoss(in Player.HurtInfo hurtInfo)
     {
-        switch (CurrentForm)
-        {
-            case Form.Offense:
-                ManageOffense();
+        Blood -= (int)(hurtInfo.Damage * BloodLossMultiplier);
+    }
 
+    /// <summary>
+    ///     Attempts to grant blood to the player.
+    /// </summary>
+    /// <param name="amount"> The amount of blood to add.</param>
+    /// <remarks>
+    ///     Blood gain is prevented while <see cref="BloodGainTimer" /> is greater than <c>0</c> or if the
+    ///     player's <see cref="Combined" /> resources have reached <see cref="DEFAULT_MAX_RESOURCE" />.
+    ///     When successful, blood is increased and <see cref="ClotDecayTimer" /> is incremented.
+    /// </remarks>
+    public void ApplyBloodGain(int amount)
+    {
+        BloodGainTimer = 20;
+
+        if (BloodGainTimer > 0 || Combined >= DEFAULT_MAX_RESOURCE)
+        {
+            return;
+        }
+
+        Blood += amount;
+
+        ClotDecayTimer++;
+    }
+    
+    private void ActivateOffense()
+    {
+        var value = 76;
+
+        if (value > 75 && !BloodBoostActive)
+        {
+            BloodBoostDrainTimer = 0;
+            BloodBoostActive = true;
+
+            SoundEngine.PlaySound(in GennedAssets.Sounds.Avatar.BloodCry);
+        }
+    }
+    
+    private void ActivateDefense()
+    {
+        Clot = 0;
+
+        Player.Heal(Clot);
+    }
+
+    private void UpdateGainTimer()
+    {
+        if (BloodGainTimer <= 0)
+        {
+            return;
+        }
+
+        BloodGainTimer--;
+    }
+
+    private void UpdateDisplayBars()
+    {
+        var bloodPercent = Blood / (float)MaxBlood;
+        var clotPercent = Clot / (float)MaxClot;
+        var bloodClotPercent = (Blood + Clot) / (float)(MaxBlood + MaxClot);
+
+        WeaponBar.DisplayBar(Color.AntiqueWhite, Color.Crimson, bloodPercent, 150, 0, new Vector2(0, -20));
+        WeaponBar.DisplayBar(Color.Crimson, Color.AntiqueWhite, clotPercent, 150, 0, new Vector2(0, -30));
+        WeaponBar.DisplayBar(Color.HotPink, Color.Silver, bloodClotPercent, 150, 1, new Vector2(0, -40));
+    }
+
+    private void UpdateForm()
+    {
+        switch (Form)
+        {
+            case AwakenedBloodForm.Offense:
+                UpdateOffense();
                 break;
-
-            case Form.Defense:
-                ManageDefense();
-
+            case AwakenedBloodForm.Defense:
+                UpdateDefense();
                 break;
         }
     }
 
-    private void ManageOffense()
+    private void UpdateOffense()
     {
-        var Type = ModContent.ProjectileType<BloodNeedle>();
-        var TendrilCount = 2;
-        var TendrilBaseDamage = 600;
+        const int defenseBonus = 75;
 
-        if (Player.ownedProjectileCounts[Type] < TendrilCount)
-        {
-            for (var i = 0; i < TendrilCount; i++)
-            {
-                var a = Projectile.NewProjectileDirect(Player.GetSource_FromThis(), Player.Center, Vector2.Zero, Type, TendrilBaseDamage, 1);
-                a.localAI[0] = i + 1;
-            }
-        }
+        Player.statDefense -= defenseBonus;
 
-        Player.statDefense -= 75;
-      
-    }
+        const float knockback = 1f;
 
-    private void ManageDefense()
-    {
-        Player.statDefense += 25;
-        PurgeClot();
-    }
+        const int count = 2;
+        const int damage = 600;
 
-    public void ControlResource()
-    {
-        blood = Utils.Clamp(blood, 0, 100);
-        clot = Utils.Clamp(clot, 0, 100);
+        var type = ModContent.ProjectileType<BloodNeedle>();
 
-        if (CombinedResource > MaxResource)
-        {
-            var difference = MaxResource - blood;
-        }
-    }
-
-    public void GainBlood()
-    {
-        if (GainTimer <= 0 && CombinedResource < MaxResource)
-        {
-            blood += 5;
-            clotDecayTimer++;
-        }
-
-        GainTimer = 20;
-    }
-
-    public void ConvertClot()
-    {
-        clotDecayTimer++;
-
-        var ClotMax = 0;
-        ClotMax = CurrentForm == Form.Defense ? 60 : 180;
-
-        if (clotDecayTimer ! < ClotMax)
+        if (Player.ownedProjectileCounts[type] >= count)
         {
             return;
         }
 
-        if (CombinedResource >= MaxResource)
+        for (var i = 0; i < count; i++)
+        {
+            var projectile = Projectile.NewProjectileDirect(Player.GetSource_FromThis(), Player.Center, Vector2.Zero, type, damage, knockback);
+
+            projectile.localAI[0] = i + 1f;
+        }
+    }
+
+    private void UpdateDefense()
+    {
+        const int defenseBonus = 25;
+
+        Player.statDefense += defenseBonus;
+
+        if (Clot <= 0 || Player.statLife >= Player.statLifeMax2)
         {
             return;
         }
 
-        var value = (int)Math.Round(MaxResource * (blood / (float)MaxResource));
+        Clot = 0;
 
-        value /= 4;
-        blood -= value;
+        var amount = Clot * 4;
 
-        clot += value;
-        clotDecayTimer = 0;
+        Player.Heal(amount);
     }
 
-    public void BloodLoss(Player.HurtInfo hurtInfo)
-    {
-        var bloodLoss = (int)(hurtInfo.Damage * 0.1f);
-        blood -= bloodLoss;
-
-        if (blood < 0)
-        {
-            blood = 0;
-        }
-        //Main.NewText($"Lost {bloodLoss} blood. Total Blood: {blood}");
-    }
-
-    public void PurgeClot()
-    {
-        if (clot <= 0 || Player.statLife >= Player.statLifeMax2)
-        {
-            return;
-        }
-
-        Player.HealEffect(clot * 4);
-        Player.statLife += clot * 4;
-        clot = 0;
-    }
-
-    public void ManageBloodBoost()
+    private void UpdateBloodBoost()
     {
         if (!BloodBoostActive)
         {
             return;
         }
 
-        var DrainGate = BloodBoostTotalTime < BloodBoostSink ? 4 : 2;
+        var gate = BloodBoostTotalTime < BloodBoostSink ? 4 : 2;
 
         Player.GetDamage(DamageClass.Generic) += 0.55f;
         Player.GetArmorPenetration(DamageClass.Generic) += 15;
         Player.GetCritChance(DamageClass.Generic) += 10;
 
-        if (blood > 0 && BloodBoostDrainTimer > DrainGate)
+        if (Blood > 0 && BloodBoostDrainTimer > gate)
         {
-            blood--;
+            Blood--;
             BloodBoostDrainTimer = 0;
         }
 
-        if (blood <= 0)
-        {
-            BloodBoostActive = false;
-        }
-
         BloodBoostDrainTimer++;
-
         BloodBoostTotalTime++;
-    }
 
-    #endregion
-}
-
-public class AwakenedBloodDraw : PlayerDrawLayer
-{
-    public override bool IsHeadLayer => false;
-
-    public override Position GetDefaultPosition()
-    {
-        return new AfterParent(PlayerDrawLayers.Head);
-    }
-
-    public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
-    {
-        return true;
-        // drawInfo.drawPlayer.head == EquipLoader.GetEquipSlot(Mod, nameof(ShintoArmorHelmetAll), EquipType.Head);
-    }
-
-    protected override void Draw(ref PlayerDrawSet drawInfo)
-    {
-        // DrawDebug(ref drawInfo);
-
-        ManageBloodBoostVFX(drawInfo.drawPlayer);
-    }
-
-    public void ManageBloodBoostVFX(Player player)
-    {
-        var bloodplayer = player.GetModPlayer<AwakenedBloodPlayer>();
-
-        if (!bloodplayer.AwakenedBloodSetActive && bloodplayer.blood <= 0)
+        if (Blood > 0)
         {
             return;
         }
 
-        if (!bloodplayer.BloodBoostActive)
+        BloodBoostActive = false;
+    }
+
+    private void UpdateBloodConversion()
+    {
+        ClotDecayTimer++;
+
+        var max = Form == AwakenedBloodForm.Defense ? 60 : 180;
+
+        if (ClotDecayTimer < max || Combined >= DEFAULT_MAX_RESOURCE)
         {
             return;
         }
 
-        var suctionShader = ShaderManager.GetFilter("HeavenlyArsenal.BloodFrenzy");
+        var amount = (int)Math.Round(DEFAULT_MAX_RESOURCE * (Blood / (float)DEFAULT_MAX_RESOURCE)) / 4;
 
-        suctionShader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
-        suctionShader.TrySetParameter("intensityFactor", 1);
-        suctionShader.TrySetParameter("opacity", 00);
-        suctionShader.TrySetParameter("psychadelicExponent", 0);
-        suctionShader.TrySetParameter("psychedelicColorTint", Color.Crimson.ToVector4());
-        suctionShader.TrySetParameter("colorAccentuationFactor", 0f);
+        Blood -= amount;
+        Clot += amount;
 
-        suctionShader.SetTexture(GennedAssets.Textures.Extra.BloodWater, 2);
-
-        suctionShader.Activate();
-
-        //sampler baseTexture : register(s0);
-        //sampler psychedelicTexture : register(s1);
-        //sampler noiseTexture : register(s2);
-
-        //float globalTime;
-        //float opacity;
-        // float intensityFactor;
-        // float psychedelicExponent;
-        // float colorAccentuationFactor;
-        // float3 colorToAccentuate;
-        // float4 goldColor;
-        //  float4 psychedelicColorTint;
-    }
-
-    protected void DrawDebug(ref PlayerDrawSet drawInfo)
-    {
-        var bloodplayer = drawInfo.drawPlayer.GetModPlayer<AwakenedBloodPlayer>();
-
-        var blood = $"Blood: {bloodplayer.blood}";
-        var gaincooldown = $"Blood gain timer: {bloodplayer.GainTimer}";
-        var clot = $"clot: {bloodplayer.clot}";
-        var Decaytimer = $"blood decay Time: {bloodplayer.clotDecayTimer}";
-
-        var Bloodboostactive = $"Bloodboost Active?: {bloodplayer.BloodBoostActive}";
-        var combinedString = blood + ", " + gaincooldown + ", " + clot + ", " + Decaytimer + ", " + Bloodboostactive;
-        var DrawPos = drawInfo.drawPlayer.Center - Main.screenPosition;
-        var Offset = Vector2.UnitY * -120 + Vector2.UnitX * -120;
-        Utils.DrawBorderString(Main.spriteBatch, combinedString, DrawPos + Offset, Color.AntiqueWhite);
+        ClotDecayTimer = 0;
     }
 }

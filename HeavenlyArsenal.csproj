@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <!-- Import tModLoader mod properties -->
     <Import Project="..\tModLoader.targets" />
 
-    <!-- General -->
     <PropertyGroup>
-      <LangVersion>preview</LangVersion>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
         <AdditionalFiles Remove="Content\Items\Accessories\ManaTransfusion\**" />
@@ -214,7 +212,7 @@
             <HintPath>..\..\ModReader\CalamityEntropy\CalamityEntropy.dll</HintPath>
         </Reference>
         <Reference Include="CalamityMod">
-          <HintPath>..\ModAssemblies\CalamityMod_v2.1.dll</HintPath>
+            <HintPath>ModReferences\CalamityMod.dll</HintPath>
         </Reference>
         <Reference Include="CalRemix">
           <HintPath>..\..\ModReader\CalRemix\CalRemix.dll</HintPath>
@@ -232,12 +230,5 @@
             <HintPath>ModReferences\SubworldLibrary.dll</HintPath>
         </Reference>
     </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Assets\Textures\Items\Weapons\Aoe_Rifle\" />
-        <Folder Include="Content\NPCs\Hostile\BloodCult\FleshkinAcolyte\" />
-    </ItemGroup>
-
-    <!-- References -->
 
 </Project>

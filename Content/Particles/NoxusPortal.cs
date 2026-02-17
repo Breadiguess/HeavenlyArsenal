@@ -22,7 +22,7 @@ public class NoxusPortal : BaseParticle
 
     public float PortalInterp;
 
-    public Projectile? Bolt;
+    public Projectile Bolt;
 
     public void Prepare(Vector2 position, Vector2 velocity, Color color, float rotation, int TimeLeft, float portalInterp, Projectile bolt)
     {

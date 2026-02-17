@@ -40,7 +40,7 @@ internal class SolynAffirmsYou : SolynEvent
         ConversationSelector.PriorityConversationSelectionEvent += SelectHoverDialogue;
     }
 
-    private Conversation? SelectHoverDialogue()
+    private Conversation SelectHoverDialogue()
     {
         if (!Finished && CanStart)
         {

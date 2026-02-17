@@ -72,7 +72,7 @@ partial class voidVulture : ModNPC
 
     private List<(Vector2[], Vector2[])> neckStrandPositions;
 
-    public static NPC? Myself
+    public static NPC Myself
     {
         get
         {

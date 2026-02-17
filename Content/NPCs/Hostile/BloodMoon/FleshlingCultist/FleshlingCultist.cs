@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 using NoxusBoss.Content.Particles.Metaballs;
 using NoxusBoss.Core.AdvancedProjectileOwnership;
@@ -73,7 +74,7 @@ internal partial class FleshlingCultist : BaseBloodMoonNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 

@@ -100,8 +100,8 @@ public class AwakenedBloodplate : ModItem, ILocalizedModType
             .AddIngredient<OmegaBlueChestplate>()
             .AddIngredient<BloodflareBodyArmor>()
             .AddCondition(conditions: Condition.BloodMoon)
-            .AddIngredient<UmbralLeechDrop>(5)
-            .AddIngredient<ShellFragment>(7)
+            .AddIngredient<UmbralLeechDropItem>(5)
+            .AddIngredient<ShellFragmentItem>(7)
             .AddIngredient<YharonSoulFragment>(20)
             .AddTile<CosmicAnvil>()
             .Register();

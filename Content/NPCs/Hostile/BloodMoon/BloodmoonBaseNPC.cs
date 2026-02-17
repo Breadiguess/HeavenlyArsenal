@@ -292,7 +292,7 @@ public class SolynBookDropNPC : GlobalNPC
             return;
 
         // Replace this check with however BloodMoonBaseNPC is identified
-        if (npc.ModNPC is BloodMoonBaseNPC&& npc.type != ModContent.NPCType<UmbralLarva>())
+        if (npc.ModNPC is BaseBloodMoonNPC && npc.type != ModContent.NPCType<UmbralLarva>())
         {
             if (Main.rand.NextBool(300)) // 1 / 300
             {

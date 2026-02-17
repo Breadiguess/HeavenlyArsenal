@@ -6,7 +6,7 @@ using Terraria.Localization;
 
 namespace HeavenlyArsenal.Content.Buffs;
 
-public class AntimatterAnnihilationAll_Buff : ModBuff
+public class AntimatterAnnihilationAllBuff : ModBuff
 {
     public const string DPSVariableName = "AntimatterAnnihilationDPS";
 
@@ -14,10 +14,11 @@ public class AntimatterAnnihilationAll_Buff : ModBuff
 
     public override void SetStaticDefaults()
     {
+        base.SetStaticDefaults();
+        
         Main.debuff[Type] = true;
         Main.buffNoSave[Type] = true;
         Main.buffNoTimeDisplay[Type] = true;
-        //PlayerDataManager.UpdateBadLifeRegenEvent += ApplyDPS;
 
         new ManagedILEdit
         (
@@ -53,7 +54,7 @@ public class AntimatterAnnihilationAll_Buff : ModBuff
         (
             (NetworkText text, Player player) =>
             {
-                if (player.HasBuff<AntimatterAnnihilationAll_Buff>())
+                if (player.HasBuff<AntimatterAnnihilationAllBuff>())
                 {
                     var deathText = Language.GetText($"Mods.NoxusBoss.Death.AntimatterAnnihilation{Main.rand.Next(5) + 1}");
 
@@ -64,6 +65,4 @@ public class AntimatterAnnihilationAll_Buff : ModBuff
             }
         );
     }
-
-    public override void Update(NPC npc, ref int buffIndex) { }
 }

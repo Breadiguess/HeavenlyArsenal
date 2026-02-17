@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.IO;
+using Luminance.Common.Utilities;
+using Microsoft.Xna.Framework;
 using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.CrossCompatibility.Inbound;
 using NoxusBoss.Core.DialogueSystem;
@@ -77,41 +79,47 @@ public class FightvoidVulture : SolynEvent
     public override void OnWorldLoad()
     {
         base.OnWorldLoad();
-        MarsBeingSummoned = false;
-        HasSpokenToDraedonBefore = false;
+        
+        // MarsBeingSummoned = false;
+        // HasSpokenToDraedonBefore = false;
     }
 
     public override void OnWorldUnload()
     {
         base.OnWorldUnload();
-        MarsBeingSummoned = false;
-        HasSpokenToDraedonBefore = false;
+        
+        // MarsBeingSummoned = false;
+        //HasSpokenToDraedonBefore = false;
     }
 
     public override void NetSend(BinaryWriter writer)
     {
         base.NetSend(writer);
-        writer.Write(MarsBeingSummoned);
-        writer.Write(HasSpokenToDraedonBefore);
+        
+        // writer.Write(MarsBeingSummoned);
+        // writer.Write(HasSpokenToDraedonBefore);
     }
 
     public override void NetReceive(BinaryReader reader)
     {
         base.NetReceive(reader);
-        MarsBeingSummoned = reader.ReadBoolean();
-        HasSpokenToDraedonBefore = reader.ReadBoolean();
+        
+        // MarsBeingSummoned = reader.ReadBoolean();
+        // HasSpokenToDraedonBefore = reader.ReadBoolean();
     }
 
     public override void SaveWorldData(TagCompound tag)
     {
         base.SaveWorldData(tag);
-        if (HasSpokenToDraedonBefore)
-            tag["HasSpokenToDraedonBefore"] = true;
+        
+        // if (HasSpokenToDraedonBefore)
+        //    tag["HasSpokenToDraedonBefore"] = true;
     }
 
     public override void LoadWorldData(TagCompound tag)
     {
         base.LoadWorldData(tag);
-        HasSpokenToDraedonBefore = tag.ContainsKey("HasSpokenToDraedonBefore");
+        
+        // HasSpokenToDraedonBefore = tag.ContainsKey("HasSpokenToDraedonBefore");
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CalamityMod.Items.Weapons.Rogue;
 using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Common.Configuration;
 using HeavenlyArsenal.Content.Items.Consumables.CombatStim;
 using NoxusBoss.Assets.Fonts;
 using NoxusBoss.Core.Graphics.GeneralScreenEffects;
@@ -57,11 +58,11 @@ internal class CombatStimBuff : ModBuff
                                       player.HeldItem.type != ModContent.ItemType<Hypothermia>() &&
                                       player.HeldItem.type != ModContent.ItemType<Wrathwing>();
 
-        if (HeavenlyArsenalClientConfig.Instance != null && HeavenlyArsenalClientConfig.Instance.StimVFX)
+        if (ClientSideConfiguration.Instance != null && ClientSideConfiguration.Instance.StimVFX)
         {
             if (!GeneralScreenEffectSystem.ChromaticAberration.Active)
             {
-                GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, HeavenlyArsenalClientConfig.Instance.ChromaticAbberationMultiplier, 0);
+                GeneralScreenEffectSystem.ChromaticAberration.Start(player.Center, ClientSideConfiguration.Instance.ChromaticAbberationMultiplier, 0);
             }
         }
 

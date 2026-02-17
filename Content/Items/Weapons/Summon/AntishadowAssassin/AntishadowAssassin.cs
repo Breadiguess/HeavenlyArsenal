@@ -6,17 +6,15 @@ using Luminance.Assets;
 using Luminance.Common.Easings;
 using Luminance.Core.Graphics;
 using Luminance.Core.Sounds;
-using NoxusBoss.Assets;
-using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Particles;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using NoxusBoss.Core.Physics.VerletIntergration;
 using NoxusBoss.Core.Utilities;
 using ReLogic.Content;
 using ReLogic.Utilities;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Terraria.Audio;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
@@ -46,6 +44,8 @@ public class AntishadowAssassin : ModProjectile
 
         Leave
     }
+
+    private static readonly FieldInfo AssetsField = typeof(AssetRepository).GetField("_assets", BindingFlags.NonPublic | BindingFlags.Instance);
 
     /// <summary>
     ///     The chime sound played by this assassin at random.
@@ -143,7 +143,7 @@ public class AntishadowAssassin : ModProjectile
     /// <summary>
     ///     The cloth simulation that composes this assassin's robe.
     /// </summary>
-    public ClothSimulation Robe { get; set; } = new(Vector3.Zero, 22, 21, 4.4f, 60f, 0.019f);
+    public ClothSimulation Robe { get; set; } = new(Vector3.Zero, 12, 11, 8.7f, 60f, 0.019f);
 
     /// <summary>
     ///     The ambient loop sound instance.
@@ -218,7 +218,11 @@ public class AntishadowAssassin : ModProjectile
     /// <summary>
     ///     The amount of mask variants that exist for this assassin.
     /// </summary>
-    public static int TotalMasks => 6;
+    public static int TotalMasks
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     ///     The maximum search range this assassin can examine for targets.
@@ -299,12 +303,14 @@ public class AntishadowAssassin : ModProjectile
 
     private void PerformStupidAssetBoilerplateLoading()
     {
+        Dictionary<string, IAsset> assets = (Dictionary<string, IAsset>)AssetsField.GetValue(Mod.Assets);
+        while (assets.ContainsKey($"Content\\Gores\\AntishadowAssassinMask{TotalMasks + 1}"))
+            TotalMasks++;
+
         AntishadowAssassinMasks = new Asset<Texture2D>[TotalMasks];
 
         for (var i = 1; i <= TotalMasks; i++)
-        {
             AntishadowAssassinMasks[i - 1] = ModContent.Request<Texture2D>($"HeavenlyArsenal/Content/Gores/AntishadowAssassinMask{i}");
-        }
 
         var texturePrefix = $"{Mod.Name}/Content/Items/Weapons/Summon/AntishadowAssassin";
         BodyTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassin");
@@ -312,7 +318,6 @@ public class AntishadowAssassin : ModProjectile
         ArmOutlineTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArm_Outline");
         ArmBowTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArmBow");
         ArmBowOutlineTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinArmBow_Outline");
-        DateTime date = DateTime.Now;
 
         KasaTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassinKasa");
         AhogeTexture = ModContent.Request<Texture2D>($"{texturePrefix}/AntishadowAssassin_Ahoge");
@@ -375,9 +380,6 @@ public class AntishadowAssassin : ModProjectile
 
     public override void AI()
     {
-
-        //Main.NewText($"{Projectile.velocity.ToString()}, \n{(AvatarOfEmptiness.Myself != null? AvatarOfEmptiness.Myself.As<AvatarOfEmptiness>().CurrentState.ToString() + " ," + AvatarOfEmptiness.Myself.As<AvatarOfEmptiness>().AITimer.ToString(): null)}");
-        // Initialize beads if necessary.
         if (BeadRopeA is null || BeadRopeB is null || BeadRopeC is null || BeadRopeD is null)
         {
             InitializeBeads();
@@ -393,8 +395,6 @@ public class AntishadowAssassin : ModProjectile
             HandleMinionBuffs();
         }
 
-        //Main.NewText($"State: {State}");
-        //Main.NewText($"Particle count: {AntishadowFireParticleSystemManager.BackParticleSystem.Keys.Count.ToString()}");
         ExecuteState();
 
         if (Owner.MinionAttackTargetNPC != -1 && Main.npc[Owner.MinionAttackTargetNPC].active)
@@ -422,15 +422,23 @@ public class AntishadowAssassin : ModProjectile
         {
             SpiritBowCooldown--;
         }
-        
-        // Sets the projectiles velocity to 0 if it's not valid
-        if (float.IsNaN(Projectile.velocity.X) ||
-        float.IsNaN(Projectile.velocity.Y) ||
-        float.IsInfinity(Projectile.velocity.X) ||
-        float.IsInfinity(Projectile.velocity.Y))
-        {
+
+        // Sets the projectiles velocity to 0 if it's not valid.
+        // The root issue SHOULD be fixed now (see DoBehavior_SliceTargetRepeatedly), but
+        // keeping this around doesn't do any harm.
+        bool nanVelocity = float.IsNaN(Projectile.velocity.X) || float.IsNaN(Projectile.velocity.Y);
+        bool infiniteVelocity = float.IsInfinity(Projectile.velocity.X) || float.IsInfinity(Projectile.velocity.Y);
+        if (nanVelocity || infiniteVelocity)
             Projectile.velocity = Vector2.Zero;
-        }
+
+        // Failsafe to ensure the assassin does not
+        // get deleted due to following enemies out of the world.
+        // This happens infamously when attacking Nameless in
+        // his subworld.
+        Rectangle worldRectangle = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
+        worldRectangle.Inflate(-400, -400);
+        if (!Projectile.Hitbox.Intersects(worldRectangle))
+            Projectile.Center = Vector2.Clamp(Projectile.Center, worldRectangle.TopLeft(), worldRectangle.BottomRight());
     }
 
     /// <summary>
@@ -683,20 +691,18 @@ public class AntishadowAssassin : ModProjectile
 
         if (Time == 2f)
         {
-            //Projectile.Opacity = Projectile.Opacity.StepTowards(1f, 0.3f);
-
             var teleportOffset = Main.rand.NextFloat(300f, 500f);
             var teleportDirection = Main.rand.NextVector2Unit();
 
             if (dashCounter == 0f)
-            {
                 teleportDirection = Projectile.velocity.SafeNormalize(Vector2.Zero);
-            }
-            if(target != null && target.CanBeChasedBy(this))
-            Projectile.Center = target.Center + teleportDirection * teleportOffset;
+
+            if (target != null && target.CanBeChasedBy(this))
+                Projectile.Center = target.Center + teleportDirection * teleportOffset;
+
             DashStart = Projectile.Center;
             Projectile.velocity = Projectile.SafeDirectionTo(target.Center);
-            
+
             Projectile.netUpdate = true;
         }
 
@@ -808,8 +814,20 @@ public class AntishadowAssassin : ModProjectile
                 );
             }
 
+            Vector2 fallbackDirection = (target.position - target.oldPosition).SafeNormalize(Vector2.UnitX * Projectile.spriteDirection);
+            if (target.position.WithinRange(target.oldPosition, 1e-5f))
+                fallbackDirection = Vector2.UnitX * Projectile.spriteDirection;
+
             Projectile.Center = target.Center;
-            Projectile.velocity = target.velocity.SafeNormalize((target.position - target.oldPosition).SafeNormalize(Vector2.UnitX * Projectile.spriteDirection));
+            Projectile.velocity = target.velocity.SafeNormalize(fallbackDirection);
+
+            // SafeNormalize isn't so safe after all.
+            // It can result in unstable values if the magnitude is
+            // tiny but still technically greater than zero, such as
+            // due to an NPC's velocity exponentially decaying to zero.
+            if (target.velocity.LengthSquared() < 1e-7f)
+                Projectile.velocity = fallbackDirection;
+
             Projectile.spriteDirection = Projectile.velocity.X.NonZeroSign();
             DashStart = Projectile.Center;
             ScreenShakeSystem.StartShakeAtPoint(target.Center, 1.75f);
@@ -1685,24 +1703,18 @@ public class AntishadowAssassin : ModProjectile
     /// </summary>
     private void DrawHat(Vector2 center)
     {
-        if (Main.specialSeedWorld) { }
         Texture2D hat = KasaTexture.Value;
-        //its really bad, especially in comparison to the normal system
-        // i don't really care 
         DateTime date = DateTime.Now;
-        if (date.Month == 12 || (date.Day == 24 || date.Day == 25))
-        {
-            //hat = GennedAssets.Textures.NamelessDeity.SantaHat;
-        }
-        var hatDrawPosition = center + new Vector2(Projectile.spriteDirection * -4f, -128f).RotatedBy(BowRotation * Projectile.spriteDirection) * Projectile.scale;
+        bool christmasOrChristmasEve = date.Month == 12 && (date.Day == 24 || date.Day == 25);
+        Vector2 hatDrawPosition = center + new Vector2(Projectile.spriteDirection * -4f, -128f).RotatedBy(BowRotation * Projectile.spriteDirection) * Projectile.scale;
+        Vector2 scale = Vector2.One * Projectile.scale;
 
-        Vector2 scale;
-        if (date.Month == 12 || (date.Day == 24 || date.Day == 25))
+        if (christmasOrChristmasEve)
         {
-            scale = new Vector2(0.2f, 0.1f) * Projectile.scale;
+            hat = GennedAssets.Textures.NamelessDeity.SantaHat;
+            scale *= 0.16f;
+            hatDrawPosition.Y -= scale.Y * 56f;
         }
-        //else
-            scale = new Vector2(Projectile.scale);
 
         Main.spriteBatch.Draw
         (
@@ -1713,7 +1725,7 @@ public class AntishadowAssassin : ModProjectile
             BowRotation * Projectile.spriteDirection,
             hat.Size() * 0.5f,
             scale,
-            Projectile.spriteDirection.ToSpriteDirection() | SpriteEffects.FlipHorizontally,
+            Projectile.spriteDirection.ToSpriteDirection() ^ SpriteEffects.FlipHorizontally,
             0f
         );
     }
@@ -1797,7 +1809,7 @@ public class AntishadowAssassin : ModProjectile
             return false;
         }
 
-        ResultsTarget.Request(3000, 3000, Projectile.identity, RenderIntoResultsTarget);
+        ResultsTarget.Request(2000, 2000, Projectile.identity, RenderIntoResultsTarget);
 
         if (ResultsTarget.TryGetTarget(Projectile.identity, out var target) && target is not null)
         {

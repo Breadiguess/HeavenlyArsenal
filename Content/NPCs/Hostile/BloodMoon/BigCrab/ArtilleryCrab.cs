@@ -1,5 +1,6 @@
 ﻿using CalamityMod;
 using CalamityMod.Items.Materials;
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using Luminance.Common.Utilities;
 using ReLogic.Content;
@@ -85,7 +86,7 @@ internal class ArtilleryCrab : BaseBloodMoonNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 
@@ -497,7 +498,7 @@ internal class ArtilleryCrab : BaseBloodMoonNPC
 
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
-        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<ShellFragment>(), 30, 25));
+        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<ShellFragmentItem>(), 30, 25));
         npcLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<ArtilleryCrab>()));
 
         npcLoot.Add(ModContent.ItemType<BloodOrb>(), 1, 40, 48);

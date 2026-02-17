@@ -3,6 +3,7 @@ using System.IO;
 using CalamityMod;
 using CalamityMod.Items.Materials;
 using HeavenlyArsenal.Common;
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
 using HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
@@ -107,7 +108,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
 
         SpawnModBiomes =
         [
-            ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+            ModContent.GetInstance<RiftEclipseBiome>().Type
         ];
     }
 
@@ -377,7 +378,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
         npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<ViscousWhip_Item>(), 36, 24));
-        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<UmbralLeechDrop>(), 3, 2));
+        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<UmbralLeechDropItem>(), 3, 2));
         npcLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<newLeech>()));
 
         npcLoot.Add(ModContent.ItemType<BloodOrb>(), 1, 40, 48);

@@ -119,7 +119,7 @@ public partial class newLeech
                 continue;
             }
 
-            if (npc.Distance(NPC.Center) < 1000 && !temp.Contains(npc) && !BlackListProjectileNPCs.BlackListedNPCs.Contains(npc.whoAmI))
+            if (npc.Distance(NPC.Center) < 1000 && !temp.Contains(npc) && !BlackListProjectileNPCs.Blacklisted[npc.whoAmI])
             {
                 temp.Add(npc);
             }
