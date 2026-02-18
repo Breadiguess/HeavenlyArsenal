@@ -81,11 +81,4 @@ public static class PlayerDrawSetExtensions
 
         return position + drawPlayer.legPosition + drawInfo.legVect;
     }
-
-    public static void ApplyVerticalOffset(ref this Vector2 drawPos, PlayerDrawSet drawInfo)
-    {
-        var value = Main.OffsetsPlayerHeadgear[drawInfo.drawPlayer.bodyFrame.Y / drawInfo.drawPlayer.bodyFrame.Height];
-        value.Y -= 2f;
-        drawPos += value * -drawInfo.playerEffect.HasFlag(SpriteEffects.FlipVertically).ToDirectionInt();
-    }
 }

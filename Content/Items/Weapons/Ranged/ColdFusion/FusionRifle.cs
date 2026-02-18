@@ -13,6 +13,7 @@ using NoxusBoss.Core.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
 using System.Linq;
+using HeavenlyArsenal.Utilities;
 using HeavenlyArsenal.Utilities.Extensions;
 using Terraria;
 using Terraria.Audio;
@@ -164,11 +165,18 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             //Texture2D swirlTexture = FusionRifle.backSwirlTexture.Value;
             //Texture2D antennaTexture = FusionRifle.backAntennaTexture.Value;
 
-            Vector2 vec5 = drawInfo.GetBodyDrawPosition() + new Vector2(-16 * drawInfo.drawPlayer.direction, -1 * drawInfo.drawPlayer.gravDir);
-            vec5 = vec5.Floor();
-            vec5.ApplyVerticalOffset(drawInfo);
+            Vector2 position = drawInfo.GetBodyDrawPosition() + new Vector2(-16 * drawInfo.drawPlayer.direction, -1 * drawInfo.drawPlayer.gravDir);
+            position = position.Floor();
+            
+            var offset = Main.OffsetsPlayerHeadgear[drawInfo.drawPlayer.bodyFrame.Y / drawInfo.drawPlayer.bodyFrame.Height];
+        
+            offset.Y -= 2f;
 
-            Vector2 aPos = vec5 + new Vector2(9 * drawInfo.drawPlayer.direction, -18 * drawInfo.drawPlayer.gravDir);
+            var direction = drawInfo.playerEffect.HasFlag(SpriteEffects.FlipVertically).ToDirectionInt();
+        
+            position -= offset * direction;
+
+            Vector2 aPos = position + new Vector2(9 * drawInfo.drawPlayer.direction, -18 * drawInfo.drawPlayer.gravDir);
             
 
             //if (drawInfo.shadow == 0f)
@@ -186,7 +194,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             Rectangle itemFrame = texture.Frame(1, 1, 0, 
                 drawInfo.drawPlayer.legFrame.Y / drawInfo.drawPlayer.legFrame.Height);
 
-            DrawData item = new DrawData(texture, vec5, itemFrame, Lighting.GetColor(drawInfo.drawPlayer.MountedCenter.ToTileCoordinates()) * (1f - drawInfo.shadow), drawInfo.drawPlayer.bodyRotation, itemFrame.Size() * 0.5f, 1f, drawInfo.playerEffect);
+            DrawData item = new DrawData(texture, position, itemFrame, Lighting.GetColor(drawInfo.drawPlayer.MountedCenter.ToTileCoordinates()) * (1f - drawInfo.shadow), drawInfo.drawPlayer.bodyRotation, itemFrame.Size() * 0.5f, 1f, drawInfo.playerEffect);
             drawInfo.DrawDataCache.Add(item);
         }
     }
