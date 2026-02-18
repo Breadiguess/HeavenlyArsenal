@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Common.Utilities;
+﻿using HeavenlyArsenal.Utilities.Extensions;
 using NoxusBoss.Assets;
 using Terraria.DataStructures;
 
@@ -23,7 +23,7 @@ public sealed class LightHaloDrawLayer : PlayerDrawLayer
         var texture = GennedAssets.Textures.NamelessDeity.NamelessDeityEyeFull.Value;
         var origin = texture.Size() / 2f;
 
-        var position = drawInfo.HeadPosition() + new Vector2(10 * -player.direction, -5 + MathF.Sin(Main.GlobalTimeWrappedHourly + player.whoAmI * 10));
+        var position = drawInfo.GetHeadDrawPosition() + new Vector2(10 * -player.direction, -5 + MathF.Sin(Main.GlobalTimeWrappedHourly + player.whoAmI * 10));
         
         var rotation = MathHelper.ToRadians(1.5f) * player.direction;
         

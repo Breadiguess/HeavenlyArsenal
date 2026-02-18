@@ -1,5 +1,5 @@
-﻿using HeavenlyArsenal.Common.Utilities;
-using HeavenlyArsenal.Core.Physics.ClothManagement;
+﻿using HeavenlyArsenal.Core.Physics.ClothManagement;
+using HeavenlyArsenal.Utilities.Extensions;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using Terraria.DataStructures;
@@ -214,7 +214,7 @@ public class AntiShadowCloak_DrawLayer : PlayerDrawLayer
         drawInfo.drawPlayer.GetModPlayer<ShintoArmorPlayer>().ShadowVeil = true;
 
         var data = capePlayer.GetRobeTarget();
-        data.position = drawInfo.BodyPosition() + new Vector2(2 * drawInfo.drawPlayer.direction, ((drawInfo.drawPlayer.gravDir < 0 ? 11 : 0) + -8) * drawInfo.drawPlayer.gravDir);
+        data.position = drawInfo.GetBodyDrawPosition() + new Vector2(2 * drawInfo.drawPlayer.direction, ((drawInfo.drawPlayer.gravDir < 0 ? 11 : 0) + -8) * drawInfo.drawPlayer.gravDir);
         data.color = Color.White;
         data.effect = Main.GameViewMatrix.Effects;
         data.shader = drawInfo.cBody;

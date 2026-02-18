@@ -1,5 +1,4 @@
 ﻿using CalamityMod.Graphics.Renderers;
-using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Utilities;
@@ -8,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HeavenlyArsenal.Utilities.Extensions;
 using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
@@ -44,7 +44,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
            
             Texture2D texture = ModContent.Request<Texture2D>($"{Mod.Name}/Content/Items/Accessories/BloodyLeechScarf/LeechScarf_Item_Shoulder").Value;
 
-            var Position = drawInfo.BodyPosition() +new Vector2(0);
+            var Position = drawInfo.GetBodyDrawPosition() +new Vector2(0);
 
 
             Color color = Lighting.GetColor(drawInfo.drawPlayer.Center.ToTileCoordinates().X, drawInfo.drawPlayer.Center.ToTileCoordinates().Y, Color.White);

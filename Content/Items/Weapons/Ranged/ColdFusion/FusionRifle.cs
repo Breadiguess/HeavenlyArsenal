@@ -1,6 +1,5 @@
 ﻿using CalamityMod;
 using HeavenlyArsenal.Common;
-using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Content.Items.Misc;
 using Luminance.Common.Utilities;
@@ -14,6 +13,7 @@ using NoxusBoss.Core.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
 using System.Linq;
+using HeavenlyArsenal.Utilities.Extensions;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -164,7 +164,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             //Texture2D swirlTexture = FusionRifle.backSwirlTexture.Value;
             //Texture2D antennaTexture = FusionRifle.backAntennaTexture.Value;
 
-            Vector2 vec5 = drawInfo.BodyPosition() + new Vector2(-16 * drawInfo.drawPlayer.direction, -1 * drawInfo.drawPlayer.gravDir);
+            Vector2 vec5 = drawInfo.GetBodyDrawPosition() + new Vector2(-16 * drawInfo.drawPlayer.direction, -1 * drawInfo.drawPlayer.gravDir);
             vec5 = vec5.Floor();
             vec5.ApplyVerticalOffset(drawInfo);
 

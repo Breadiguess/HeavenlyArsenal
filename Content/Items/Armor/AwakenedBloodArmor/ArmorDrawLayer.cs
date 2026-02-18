@@ -1,5 +1,5 @@
-﻿using HeavenlyArsenal.Common.Utilities;
-using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players;
+﻿using HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor.Players;
+using HeavenlyArsenal.Utilities.Extensions;
 using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Armor.AwakenedBloodArmor;
@@ -32,7 +32,7 @@ internal class BloodHelmetDrawLayer : PlayerDrawLayer
         var helm = new DrawData
         (
             helmet,
-            drawInfo.HeadPosition() + new Vector2(0, 5.6f),
+            drawInfo.GetHeadDrawPosition() + new Vector2(0, 5.6f),
             Owner.legFrame,
             drawInfo.colorArmorHead,
             drawInfo.drawPlayer.headRotation,
@@ -73,7 +73,7 @@ internal class BloodChestplateDrawLayer : PlayerDrawLayer
         var chest = new DrawData
         (
             chestplate,
-            drawInfo.BodyPosition() + walkOffset + new Vector2(0, -2),
+            drawInfo.GetBodyDrawPosition() + walkOffset + new Vector2(0, -2),
             bodyFrame,
             drawInfo.colorArmorBody,
             Owner.bodyRotation,
@@ -88,7 +88,7 @@ internal class BloodChestplateDrawLayer : PlayerDrawLayer
         var shoulder = new DrawData
         (
             chestplate,
-            drawInfo.HeadPosition() + new Vector2(0, 3.6f) + walkOffset,
+            drawInfo.GetHeadDrawPosition() + new Vector2(0, 3.6f) + walkOffset,
             drawInfo.compBackShoulderFrame,
             drawInfo.colorArmorBody,
             Owner.fullRotation,
@@ -131,7 +131,7 @@ internal class BloodChestplateArmDrawLayer : PlayerDrawLayer
         var data = new DrawData
         (
             chestplate,
-            drawInfo.HeadPosition() + new Vector2(0, 3.6f) + walkOffset,
+            drawInfo.GetHeadDrawPosition() + new Vector2(0, 3.6f) + walkOffset,
             drawInfo.compBackArmFrame,
             drawInfo.colorArmorBody,
             drawInfo.compositeBackArmRotation,
@@ -185,7 +185,7 @@ public class MyArmOverlay_Front : PlayerDrawLayer
         var data = new DrawData
         (
             chestplate,
-            drawInfo.BodyPosition() + walkOffset,
+            drawInfo.GetBodyDrawPosition() + walkOffset,
             drawInfo.compFrontArmFrame,
             drawInfo.colorArmorBody,
             drawInfo.compositeFrontArmRotation,
@@ -200,7 +200,7 @@ public class MyArmOverlay_Front : PlayerDrawLayer
         var shoulder = new DrawData
         (
             chestplate,
-            drawInfo.HeadPosition() + new Vector2(0, 3.6f) + walkOffset,
+            drawInfo.GetHeadDrawPosition() + new Vector2(0, 3.6f) + walkOffset,
             drawInfo.compFrontShoulderFrame,
             drawInfo.colorArmorBody,
             Owner.fullRotation,

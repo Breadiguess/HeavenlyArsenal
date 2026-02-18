@@ -1,5 +1,5 @@
-﻿using HeavenlyArsenal.Common.Utilities;
-using HeavenlyArsenal.Core.Globals;
+﻿using HeavenlyArsenal.Core.Globals;
+using HeavenlyArsenal.Utilities.Extensions;
 using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.GlobalInstances;
@@ -70,7 +70,7 @@ internal class lightCultist_Drawlayer : PlayerDrawLayer
         var texture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/Vanity/LightCultist/Halo");
 
         var drawData = new DrawData
-            (texture.Value, drawInfo.HeadPosition(), drawInfo.drawPlayer.headFrame, drawInfo.colorHair, drawInfo.drawPlayer.headRotation, drawInfo.headVect, 1f, drawInfo.playerEffect);
+            (texture.Value, drawInfo.GetHeadDrawPosition(), drawInfo.drawPlayer.headFrame, drawInfo.colorHair, drawInfo.drawPlayer.headRotation, drawInfo.headVect, 1f, drawInfo.playerEffect);
 
         //drawData.shader = drawInfo.hairDyePacked;
         drawInfo.DrawDataCache.Add(drawData);

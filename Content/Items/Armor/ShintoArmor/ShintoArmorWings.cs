@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using CalamityMod.Items;
-using HeavenlyArsenal.Common.Utilities;
+using HeavenlyArsenal.Utilities.Extensions;
 using Luminance.Core.Hooking;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -237,7 +237,7 @@ public class ShintoArmorWingsDraw : PlayerDrawLayer
 
         var texture = yharwingTexture.Value;
 
-        var Position = drawInfo.BodyPosition() +
+        var Position = drawInfo.GetBodyDrawPosition() +
                        new Vector2(16 * -drawInfo.drawPlayer.direction, -6) +
                        new Vector2(0, drawPlayer.GetModPlayer<ShintoArmorPlayer>().offset * drawPlayer.GetModPlayer<ShintoArmorPlayer>().ShadeTeleportInterpolant);
 
