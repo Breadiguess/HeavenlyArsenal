@@ -348,9 +348,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 if (Time == ScreamTime)
                 {
                     string typeName = NPC.FullName;
-                    if (Main.netMode == 0)
+                    if (Main.netMode == NetmodeID.SinglePlayer)
                         Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), 175, 75);
-                    else if (Main.netMode == 2)
+                    else if (Main.netMode == NetmodeID.Server)
                         ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken"), new Color(175, 75, 255));
 
                     SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.Roar with {  Pitch = -0.3f}, NPC.Center).WithVolumeBoost(3);

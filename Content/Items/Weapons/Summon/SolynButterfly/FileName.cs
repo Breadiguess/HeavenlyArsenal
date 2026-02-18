@@ -75,7 +75,7 @@ public class SolynButterflyChargeUp : ModProjectile, IProjOwnedByBoss<BattleSoly
 
         AimTowardsMouse();
 
-        var energy = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(200f, 200f), 264);
+        var energy = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(200f, 200f), DustID.PortalBoltTrail;
         energy.velocity = energy.position.SafeDirectionTo(Projectile.Center) * Main.rand.NextFloat(10f);
         energy.noGravity = true;
         energy.noLight = true;

@@ -151,7 +151,7 @@ public class LonginusRift : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         var glow = AssetDirectory.Textures.BigGlowball.Value;
-        var flare = TextureAssets.Extra[98].Value;
+        var flare = TextureAssets.Extra[ExtrasID.SharpTears].Value;
 
         Main.EntitySpriteDraw
         (

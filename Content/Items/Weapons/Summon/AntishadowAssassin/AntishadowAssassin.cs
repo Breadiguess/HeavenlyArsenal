@@ -1244,7 +1244,7 @@ public class AntishadowAssassin : ModProjectile
 
                 if (Main.rand.NextBool(8) && Main.GetProjectileDesiredShader(Projectile) == 0)
                 {
-                    var fire = Dust.NewDustPerfect(position, 261);
+                    var fire = Dust.NewDustPerfect(position, DustID.AncientLight);
                     fire.velocity = Main.rand.NextVector2Circular(30f, 30f) - directionalForce * 0.4f;
                     fire.color = Color.Red;
                     fire.noGravity = true;
