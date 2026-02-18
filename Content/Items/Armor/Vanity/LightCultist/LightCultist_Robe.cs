@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Core.Globals;
+﻿using HeavenlyArsenal.Core.Items;
 using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.GlobalInstances;
@@ -51,13 +51,7 @@ internal class LightCultist_Robe : ModItem
             }
         };
 
-        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
-        {
-            if (item.type == NamelessDeityBoss.TreasureBagID)
-            {
-                loot.Add(ItemDropRule.Common(Type, minimumDropped: 1, maximumDropped: 1));
-            }
-        };
+        ItemLootGlobalItem.RegisterLoot(NamelessDeityBoss.TreasureBagID, ItemDropRule.Common(Type));
     }
 
     public override void SetMatch(bool male, ref int equipSlot, ref bool robes)

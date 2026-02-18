@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Core.Globals;
+﻿using HeavenlyArsenal.Core.Items;
 using Luminance.Assets;
 using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
@@ -38,13 +38,7 @@ public class RocheLimit : ModItem
             }
         };
 
-        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
-        {
-            if (item.type == NamelessDeityBoss.TreasureBagID)
-            {
-                loot.Add(ItemDropRule.Common(Type));
-            }
-        };
+        ItemLootGlobalItem.RegisterLoot(NamelessDeityBoss.TreasureBagID, ItemDropRule.Common(Type));
     }
 
     public override void SetDefaults()

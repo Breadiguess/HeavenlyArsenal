@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Core.Globals;
+﻿using HeavenlyArsenal.Core.Items;
 using NoxusBoss.Content.NPCs.Bosses.NamelessDeity;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.GlobalInstances;
@@ -26,13 +26,7 @@ public class BrutalForgiveness : ModItem
             }
         };
 
-        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
-        {
-            if (item.type == NamelessDeityBoss.TreasureBagID)
-            {
-                loot.Add(ItemDropRule.Common(Type));
-            }
-        };
+        ItemLootGlobalItem.RegisterLoot(NamelessDeityBoss.TreasureBagID, ItemDropRule.Common(Type));
     }
 
     public override void SetDefaults()
