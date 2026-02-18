@@ -5,29 +5,29 @@
     <PropertyGroup>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <Reference Include="CalamityEntropy">
-            <HintPath>..\..\ModReader\CalamityEntropy\CalamityEntropy.dll</HintPath>
-        </Reference>
-        <Reference Include="CalamityMod">
-            <HintPath>ModReferences\CalamityMod.dll</HintPath>
-        </Reference>
-        <Reference Include="CalRemix">
-          <HintPath>..\..\ModReader\CalRemix\CalRemix.dll</HintPath>
-        </Reference>
-        <Reference Include="InfernumMode">
-          <HintPath>..\..\ModReader\InfernumMode\InfernumMode.dll</HintPath>
-        </Reference>
-        <Reference Include="Luminance">
-            <HintPath>ModReferences\Luminance.dll</HintPath>
-        </Reference>
-        <Reference Include="NoxusBoss">
-          <HintPath>..\..\ModReader\NoxusBoss\NoxusBoss.dll</HintPath>
-        </Reference>
-        <Reference Include="SubworldLibrary">
-            <HintPath>ModReferences\SubworldLibrary.dll</HintPath>
-        </Reference>
+      <Reference Include="CalamityEntropy">
+        <HintPath>lib\CalamityEntropy.dll</HintPath>
+      </Reference>
+      <Reference Include="CalamityMod">
+        <HintPath>lib\CalamityMod.dll</HintPath>
+      </Reference>
+      <Reference Include="CalRemix">
+        <HintPath>lib\CalRemix.dll</HintPath>
+      </Reference>
+      <Reference Include="InfernumMode">
+        <HintPath>lib\InfernumMode.dll</HintPath>
+      </Reference>
+      <Reference Include="Luminance">
+        <HintPath>lib\Luminance.dll</HintPath>
+      </Reference>
+      <Reference Include="NoxusBoss">
+        <HintPath>lib\NoxusBoss.dll</HintPath>
+      </Reference>
+      <Reference Include="SubworldLibrary">
+        <HintPath>lib\SubworldLibrary.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
