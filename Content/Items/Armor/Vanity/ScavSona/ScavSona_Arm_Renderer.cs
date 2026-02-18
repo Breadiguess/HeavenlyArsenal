@@ -1,5 +1,4 @@
-﻿using HeavenlyArsenal.Common.Utilities;
-using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
+﻿using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using Microsoft.Build.Tasks;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HeavenlyArsenal.Utilities.Extensions;
 using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
@@ -48,13 +48,13 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
                 return;
             for(int i = 0; i< 6; i++)
             {
-                DrawData b= new DrawData(ScavSona_IKArm.ScavSona_IKArm_Target, drawInfo.BodyPosition() + new Vector2(1f,0).RotatedBy(i/6f * MathHelper.TwoPi), null, Color.White, 0, ScavSona_IKArm.ScavSona_IKArm_Target.Size() / 2, 2, 0);
+                DrawData b= new DrawData(ScavSona_IKArm.ScavSona_IKArm_Target, drawInfo.GetBodyDrawPosition() + new Vector2(1f,0).RotatedBy(i/6f * MathHelper.TwoPi), null, Color.White, 0, ScavSona_IKArm.ScavSona_IKArm_Target.Size() / 2, 2, 0);
 
                 b.color = Color.White.MultiplyRGB(drawInfo.colorArmorHead);
                 b.shader = drawInfo.cBody;
                   drawInfo.DrawDataCache.Add(b);
             }
-            DrawData a = new DrawData(ScavSona_IKArm.ScavSona_IKArm_Target, drawInfo.BodyPosition(), null, Color.Black, 0, ScavSona_IKArm.ScavSona_IKArm_Target.Size() / 2, 2, 0);
+            DrawData a = new DrawData(ScavSona_IKArm.ScavSona_IKArm_Target, drawInfo.GetBodyDrawPosition(), null, Color.Black, 0, ScavSona_IKArm.ScavSona_IKArm_Target.Size() / 2, 2, 0);
 
             a.shader = drawInfo.cBody;
             drawInfo.DrawDataCache.Add(a);
@@ -75,7 +75,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
 
             var val = (float)Math.Sin(Main.GlobalTimeWrappedHourly / 2) * 2;
             var Rot = drawInfo.drawPlayer.fullRotation + MathHelper.ToRadians(drawInfo.drawPlayer.direction * -45);
-            var position = drawInfo.HeadPosition() + new Vector2(0, -20f + val).RotatedBy(Rot);
+            var position = drawInfo.GetHeadDrawPosition() + new Vector2(0, -20f + val).RotatedBy(Rot);
 
             var rift = new DrawData(portalTexture, position, null, Color.White, Rot + MathHelper.Pi, portalTexture.Size() * 0.5f, 1f, 0);
             //drawInfo.DrawDataCache.Add(rift);

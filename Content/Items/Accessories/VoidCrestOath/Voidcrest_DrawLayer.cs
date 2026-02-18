@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Common.Utilities;
+﻿using HeavenlyArsenal.Utilities.Extensions;
 using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
@@ -122,7 +122,7 @@ public class Voidcrest_DrawLayer : PlayerDrawLayer
         var interp = drawInfo.drawPlayer.GetModPlayer<VoidCrestOathPlayer>().ResourceInterp;
         var val = (float)Math.Sin(Main.GlobalTimeWrappedHourly / 2) * 2 + 1;
         var Rot = drawInfo.drawPlayer.fullRotation + MathHelper.ToRadians(drawInfo.drawPlayer.direction * -45);
-        var position = drawInfo.HeadPosition() + new Vector2(0, -20f + val / 2).RotatedBy(Rot) + new Vector2(0, 1 * val);
+        var position = drawInfo.GetHeadDrawPosition() + new Vector2(0, -20f + val / 2).RotatedBy(Rot) + new Vector2(0, 1 * val);
         var particleDrawCenter = position + new Vector2(0f, 0f);
         var glow = AssetDirectory.Textures.BigGlowball.Value;
 
@@ -186,7 +186,7 @@ public class Voidcrest_DrawLayer : PlayerDrawLayer
 
         var val = (float)Math.Sin(Main.GlobalTimeWrappedHourly / 2) * 2;
         var Rot = drawInfo.drawPlayer.fullRotation + MathHelper.ToRadians(drawInfo.drawPlayer.direction * -45);
-        var position = drawInfo.HeadPosition() + new Vector2(0, -20f + val).RotatedBy(Rot);
+        var position = drawInfo.GetHeadDrawPosition() + new Vector2(0, -20f + val).RotatedBy(Rot);
 
         var rift = new DrawData(portalTexture, position, null, Color.White, Rot + MathHelper.Pi, portalTexture.Size() * 0.5f, 1f, 0);
         //drawInfo.DrawDataCache.Add(rift);

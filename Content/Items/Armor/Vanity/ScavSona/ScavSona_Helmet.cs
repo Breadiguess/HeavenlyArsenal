@@ -1,5 +1,4 @@
 ﻿using CalamityMod.Items.Armor.Statigel;
-using HeavenlyArsenal.Common.Utilities;
 using Luminance.Assets;
 using NoxusBoss.Content.Rarities;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HeavenlyArsenal.Utilities.Extensions;
 using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
@@ -85,7 +85,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona
 
 
 
-            DrawData a = new DrawData(tex, drawInfo.HeadPosition() + new Vector2(0,-6.45f), Owner.legFrame, Color.White, Owner.headRotation, Owner.legFrame.Size() / 2, 1,b);
+            DrawData a = new DrawData(tex, drawInfo.GetHeadDrawPosition() + new Vector2(0,-6.45f), Owner.legFrame, Color.White, Owner.headRotation, Owner.legFrame.Size() / 2, 1,b);
             a.shader = drawInfo.cHead;
             a.color = drawInfo.colorArmorHead;
             drawInfo.DrawDataCache.Add(a);

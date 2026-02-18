@@ -15,7 +15,7 @@ internal class Closure : ModItem
 
         Item.crit = 70;
         Item.damage = 4000;
-        Item.useStyle = 1;
+        Item.useStyle = ItemUseStyleID.Swing;
         Item.width = 20;
         Item.height = 20;
         Item.useTime = 4;

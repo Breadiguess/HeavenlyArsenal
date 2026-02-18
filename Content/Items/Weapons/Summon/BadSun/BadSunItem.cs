@@ -19,7 +19,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BadSun
         public override void SetDefaults()
         {
             Item.useTime = 2;
-            Item.useStyle = 4;
+            Item.useStyle = ItemUseStyleID.HoldUp;
             Item.useAnimation = 2;
             Item.damage = 30000;
             Item.DamageType = DamageClass.Summon;

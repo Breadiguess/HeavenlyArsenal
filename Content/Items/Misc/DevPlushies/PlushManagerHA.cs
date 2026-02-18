@@ -225,7 +225,7 @@ namespace HeavenlyArsenal.Content.Misc.DevPlushies
             TileObjectData.addTile(Type);
             LocalizedText name = CreateMapEntryName();
             AddMapEntry(new Color(144, 148, 144), name);
-            DustType = 11;
+            DustType = DustID.Silver;
         }
 
         public override void PostSetupTileMerge()

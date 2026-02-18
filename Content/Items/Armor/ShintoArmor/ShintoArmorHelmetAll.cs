@@ -3,7 +3,6 @@ using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
-using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Content.Items.Materials;
 using HeavenlyArsenal.Utilities.Extensions;
 using Luminance.Core.Graphics;
@@ -202,7 +201,7 @@ public class HelmetFauld : PlayerDrawLayer
         Texture2D facePixel = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
         Texture2D Glow = GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint;
 
-        var baseHeadPos = drawInfo.HeadPosition();
+        var baseHeadPos = drawInfo.GetHeadDrawPosition();
         var walkOffset = player.gravDir * Main.OffsetsPlayerHeadgear[player.bodyFrame.Y / player.bodyFrame.Height];
 
         var offsets = new[]
@@ -279,7 +278,7 @@ public class HelmetFauld : PlayerDrawLayer
         var Left = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/ShintoArmor/ShintoArmor_LeftFauld").Value;
         var Right = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/ShintoArmor/ShintoArmor_RightFauld").Value;
 
-        var BasePosition = drawInfo.HeadPosition();
+        var BasePosition = drawInfo.GetHeadDrawPosition();
         var time = Main.GameUpdateCount * 0.1f;
         float bobRotation = 0;
 
@@ -346,7 +345,7 @@ public class HelmetFauld : PlayerDrawLayer
 
         var player = drawInfo.drawPlayer;
 
-        var baseHeadPos = drawInfo.HeadPosition();
+        var baseHeadPos = drawInfo.GetHeadDrawPosition();
         var walkOffset = player.gravDir * Main.OffsetsPlayerHeadgear[player.bodyFrame.Y / player.bodyFrame.Height];
         var MaskOrigin = new Vector2(Mask.Width / 2, Mask.Height / 24 / 2);
         var DrawOffset = new Vector2(2.5f * player.direction, -4);
@@ -437,7 +436,7 @@ public class HelmetFauld : PlayerDrawLayer
         {
             return;
         }
-        var rift = new DrawData(portalTexture, drawInfo.HeadPosition(), null, Color.White, 0, portalTexture.Size() * 0.5f, 2f, 0);
+        var rift = new DrawData(portalTexture, drawInfo.GetHeadDrawPosition(), null, Color.White, 0, portalTexture.Size() * 0.5f, 2f, 0);
         rift.shader = drawInfo.cHead;
         rift.color = drawInfo.colorArmorHead;
         drawInfo.DrawDataCache.Add(rift);
@@ -465,7 +464,7 @@ public class Helmetwings : PlayerDrawLayer
         var player = drawInfo.drawPlayer;
         Texture2D tex = GennedAssets.Textures.GreyscaleTextures.WhitePixel; //ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Particles/Metaballs/BasicCircle").Value;
         //GennedAssets.Textures.GreyscaleTextures.BloomCirclePinpoint ;
-        var baseHeadPos = drawInfo.HeadPosition() + new Vector2(0, player.gravDir == 1 ? 0 : 6);
+        var baseHeadPos = drawInfo.GetHeadDrawPosition() + new Vector2(0, player.gravDir == 1 ? 0 : 6);
         var walkOffset = Main.OffsetsPlayerHeadgear[player.bodyFrame.Y / player.bodyFrame.Height];
 
         var drawPos = baseHeadPos + walkOffset;
@@ -516,7 +515,7 @@ public class Helmetwings : PlayerDrawLayer
         var player = drawInfo.drawPlayer;
         var Warthings = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Armor/ShintoArmor/ShintoArmor_Warthings").Value;
 
-        var baseHeadPos = drawInfo.HeadPosition() + new Vector2(0, player.gravDir == 1 ? 0 : 6);
+        var baseHeadPos = drawInfo.GetHeadDrawPosition() + new Vector2(0, player.gravDir == 1 ? 0 : 6);
         var walkOffset = Main.OffsetsPlayerHeadgear[player.bodyFrame.Y / player.bodyFrame.Height];
 
         var drawPos = baseHeadPos + walkOffset;

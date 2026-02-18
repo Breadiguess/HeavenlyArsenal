@@ -106,7 +106,7 @@ public abstract class FakeFlowerRender : ModSystem
             {
                 var position = tilePoints[j].Position;
 
-                if (Main.netMode != 1 && DropAfterAnimation)
+                if (Main.netMode != NetmodeID.MultiplayerClient && DropAfterAnimation)
                 {
                     var num = Item.NewItem(new EntitySource_TileBreak(position.X, position.Y), position.ToWorldCoordinates(0f, 12f), ItemID);
                     Main.item[num].velocity = Vector2.UnitY * -0.4f;
@@ -176,7 +176,7 @@ public abstract class FakeFlowerRender : ModSystem
 
     public void AddPoint(Point point)
     {
-        if (Main.netMode == 1 && !tilePoints.Any(p => p.Position == point))
+        if (Main.netMode == NetmodeID.MultiplayerClient && !tilePoints.Any(p => p.Position == point))
         {
             PacketManager.SendPacket<AddGenesisPlantPointPacket>(Name, point.X, point.Y);
         }

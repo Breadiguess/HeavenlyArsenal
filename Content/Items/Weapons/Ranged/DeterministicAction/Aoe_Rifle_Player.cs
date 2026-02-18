@@ -8,7 +8,6 @@
         public int BulletCount 
         {
             get => Player.HeldItem.GetGlobalItem<Aoe_Rifle_ClipItem>().TotalBullets;
-            set;
         }
 
         //hitting shots with rifle builds authority
