@@ -180,7 +180,6 @@ internal class CombatStimItem : ModItem
             .AddIngredient<YharonSoulFragment>(3)
             .AddIngredient<AstralInjection>(6)
             .AddIngredient<BloodOrb>(20)
-            .AddIngredient<BloodSample>(10)
             .AddIngredient<Bloodstone>(5)
             .AddTile(TileID.Bottles)
             .Register();

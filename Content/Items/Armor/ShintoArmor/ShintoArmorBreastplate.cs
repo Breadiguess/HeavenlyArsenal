@@ -4,6 +4,7 @@ using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.Content.Items.Materials;
+using HeavenlyArsenal.Utilities.Extensions;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Rarities;
 
@@ -77,7 +78,7 @@ public class ShintoArmorBreastplate : ModItem
                 .AddIngredient(ItemID.CrystalNinjaChestplate)
                 .AddIngredient(ModContent.ItemType<StatigelArmor>());
 
-        HeavenlyArsenal.TryAddModIngredient(recipe, "CalamityHunt", "ShogunChestplate");
+        RecipeExtensions.TryAddIngredient(recipe, "CalamityHunt", "ShogunChestplate");
 
         recipe.AddIngredient<TheSponge>()
             .AddTile<DraedonsForge>()

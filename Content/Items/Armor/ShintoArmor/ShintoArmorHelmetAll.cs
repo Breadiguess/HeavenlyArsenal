@@ -5,6 +5,7 @@ using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.Common.Utilities;
 using HeavenlyArsenal.Content.Items.Materials;
+using HeavenlyArsenal.Utilities.Extensions;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Content.Rarities;
@@ -59,7 +60,7 @@ public class ShintoArmorHelmetAll : ModItem
             .AddIngredient<OccultSkullCrown>()
             .AddTile<DraedonsForge>();
 
-        HeavenlyArsenal.TryAddModIngredient(recipe, "CalamityHunt", "ShogunHelm");
+        RecipeExtensions.TryAddIngredient(recipe, "CalamityHunt", "ShogunHelm");
 
         recipe.Register();
     }

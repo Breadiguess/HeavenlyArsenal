@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using CalamityMod.BiomeManagers;
 using CalamityMod.Systems;
+using HeavenlyArsenal.Content.Subworlds;
 using SubworldLibrary;
 
 namespace HeavenlyArsenal.Common.Compatibility;

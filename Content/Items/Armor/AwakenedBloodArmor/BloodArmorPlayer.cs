@@ -278,7 +278,7 @@ public class BloodArmorPlayer : ModPlayer
                         damage *= 2;
                     }
 
-                    damage = Player.ApplyArmorAccDamageBonusesTo(damage);
+                    //damage = Player.ApplyArmorAccDamageBonusesTo(damage);
 
                     var source = Player.GetSource_FromThis(AwakenedBloodHelm.TentacleEntitySourceContext);
                     var vel = new Vector2(Main.rand.Next(-13, 14), Main.rand.Next(-13, 14)) * 0.25f;

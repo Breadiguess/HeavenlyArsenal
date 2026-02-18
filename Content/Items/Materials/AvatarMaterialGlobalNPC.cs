@@ -16,7 +16,7 @@ public sealed class AvatarMaterialGlobalNPC : GlobalNPC
 
         var rule = new LeadingConditionRule(new Conditions.NotExpert());
 
-        rule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<AvatarMaterial>(), 3, 3));
+        rule.OnSuccess(ItemDropRule.Common(ModContent.ItemType<AvatarMaterial>(), 3, 3,3));
 
         npcLoot.Add(rule);
     }

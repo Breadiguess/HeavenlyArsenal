@@ -96,7 +96,7 @@ public abstract class FakeFlowerRender : ModSystem
         {
             var tileSafely = Framing.GetTileSafely(tilePoints[i].Position);
             var value = !tileSafely.HasTile || tileSafely.TileType != tileID;
-            tilePoints[i].GrowthInterpolant = Utilities.Saturate(tilePoints[i].GrowthInterpolant - value.ToDirectionInt() * 0.01f);
+            tilePoints[i].GrowthInterpolant = LumUtils.Saturate(tilePoints[i].GrowthInterpolant - value.ToDirectionInt() * 0.01f);
             UpdatePoint(tilePoints[i].Position);
         }
 
@@ -154,7 +154,7 @@ public abstract class FakeFlowerRender : ModSystem
             {
                 var growthInterpolant = tilePoint.GrowthInterpolant;
                 var value = EasingCurves.Elastic.Evaluate(EasingType.Out, growthInterpolant.Squared());
-                value = MathHelper.Lerp(value, 1f, Utilities.InverseLerp(0.25f, 0.5f, growthInterpolant));
+                value = MathHelper.Lerp(value, 1f, LumUtils.InverseLerp(0.25f, 0.5f, growthInterpolant));
                 var tileSafely = Framing.GetTileSafely(tilePoint.Position);
                 var disappearing = !tileSafely.HasTile || tileSafely.TileType != tileID;
                 InstaceRenderFunction(disappearing, growthInterpolant, value, tilePoint.Position.X, tilePoint.Position.Y, Main.spriteBatch);

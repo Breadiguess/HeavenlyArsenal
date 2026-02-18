@@ -14,6 +14,6 @@ public sealed class AvatarMaterialGlobalItem : GlobalItem
     {
         base.ModifyItemLoot(item, itemLoot);
 
-        itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<AvatarMaterial>(), 3, 3));
+        itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<AvatarMaterial>(), 3, 3,3));
     }
 }

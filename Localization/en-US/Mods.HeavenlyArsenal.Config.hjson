@@ -30,43 +30,66 @@
 
 	HeavenlyArsenalServerConfig: {
 		EnableSpecialItems: {
-			Tooltip: {
-				$parentVal: ""
-			}
-
-			Label: {
-				$parentVal: Enable Special Items
-			}
+			Tooltip: ""
+			Label: Enable Special Items
 		}
 
-		DisplayName: {
-			$parentVal: Heavenly Arsenal Server Config
-		}
+		DisplayName: Heavenly Arsenal Server Config
 	}
 
 	HeavenlyArsenalClientConfig: {
 		ChromaticAbberationMultiplier: {
-			Tooltip: {
-				$parentVal: ""
-			}
-
-			Label: {
-				$parentVal: Chromatic Abberation Multiplier
-			}
+			Tooltip: ""
+			Label: Chromatic Abberation Multiplier
 		}
 
 		StimVFX: {
-			Tooltip: {
-				$parentVal: ""
-			}
+			Tooltip: ""
+			Label: Stim V F X
+		}
 
+		DisplayName: Heavenly Arsenal Client Config
+	}
+
+	ClientSideConfiguration: {
+		DisplayName: {
+			$parentVal: Client Side Configuration
+		}
+
+		StimVFX: {
 			Label: {
 				$parentVal: Stim V F X
 			}
+
+			Tooltip: {
+				$parentVal: ""
+			}
 		}
 
+		ChromaticAbberationMultiplier: {
+			Label: {
+				$parentVal: Chromatic Abberation Multiplier
+			}
+
+			Tooltip: {
+				$parentVal: ""
+			}
+		}
+	}
+
+	ServerSideConfiguration: {
 		DisplayName: {
-			$parentVal: Heavenly Arsenal Client Config
+			$parentVal: Server Side Configuration
+		}
+
+		EnableSpecialItems: {
+			Label: {
+				$parentVal: Enable Special Items
+			}
+
+			Tooltip: {
+				$parentVal: ""
+			}
 		}
 	}
 }

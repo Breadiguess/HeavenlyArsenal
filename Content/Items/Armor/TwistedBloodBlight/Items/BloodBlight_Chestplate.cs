@@ -39,8 +39,8 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Items
                 .AddIngredient<OmegaBlueChestplate>()
                 .AddIngredient<BloodflareBodyArmor>()
                 .AddCondition(Condition.BloodMoon)
-                .AddIngredient<UmbralLeechDrop>(5)
-                .AddIngredient<ShellFragment>(7)
+                .AddIngredient<UmbralLeechDropItem>(5)
+                .AddIngredient<ShellFragmentItem>(7)
                 .AddIngredient<YharonSoulFragment>(20)
                 .AddTile<CosmicAnvil>()
                 .Register();

@@ -15,6 +15,6 @@ public static class AwakenedBloodParryPlayerExtensions
 
         awakenedBloodParryPlayer.Time = time;
 
-        awakenedBloodParryPlayer.Parry();
+        //awakenedBloodParryPlayer.Parry();
     }
 }

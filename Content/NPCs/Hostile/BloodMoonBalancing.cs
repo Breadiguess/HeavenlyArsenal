@@ -37,24 +37,30 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
                 DefenseMultiplier = 1.0f;
                 return;
             }
-            if (DownedBossSystem.downedPolterghast)
+            if (DownedBossSystem.downedDoG)
             {
                 DamageMultiplier = 1.0f;
-                HealthMultiplier = 1.2f;
-                DefenseMultiplier = 1.0f;
+                HealthMultiplier = 0.6f;
+                DefenseMultiplier = 0.8f;
+            }
+            if (DownedBossSystem.downedPolterghast)
+            {
+                DamageMultiplier = 0.8f;
+                HealthMultiplier = 0.5f;
+                DefenseMultiplier = 0.7f;
                 return;
             }
             if (DownedBossSystem.downedProvidence)
             {
                 DamageMultiplier = 0.7f;
-                HealthMultiplier = 0.82f;
+                HealthMultiplier = 0.4f;
                 DefenseMultiplier = 0.6f;
                 return;
             }
             if (DownedBossSystem.downedGuardians)
             {
                 DamageMultiplier = 0.55f;
-                HealthMultiplier = 0.7f;
+                HealthMultiplier = 0.3f;
                 DefenseMultiplier = 0.42f;
                 return;
             }

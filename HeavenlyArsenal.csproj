@@ -5,6 +5,40 @@
     <PropertyGroup>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Remove="Content\Items\Weapons\Rogue\**" />
+      <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <Compile Remove="Content\Items\Weapons\Rogue\**" />
+      <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <EmbeddedResource Remove="Content\Items\Weapons\Rogue\**" />
+      <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <None Remove="Content\Items\Weapons\Rogue\**" />
+      <None Remove="Content\Projectiles\Weapons\Rogue\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Remove="Content\Items\Misc\AncientCoin.png" />
+      <AdditionalFiles Remove="Content\Items\Misc\ChaliceOfFunItem.png" />
+      <AdditionalFiles Remove="Content\Items\Misc\ChaliceOfFunProjectile.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Content\Biomes\RiftEclipseBestiaryBackgroundProvider.cs" />
+      <Compile Remove="Content\Biomes\RiftEclipseBestiaryBackgroundSystem.cs" />
+      <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Player.cs" />
+      <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Renderer.cs" />
+      <Compile Remove="Content\Items\Misc\AncientCoin.cs" />
+      <Compile Remove="Content\Items\Misc\ChaliceOfFunItem.cs" />
+      <Compile Remove="Content\Items\Misc\ChaliceOfFunProjectile.cs" />
+      <Compile Remove="Core\Systems\VoidTradingSystem.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Content\Items\Misc\AncientCoin.png" />
+      <None Remove="Content\Items\Misc\ChaliceOfFunItem.png" />
+      <None Remove="Content\Items\Misc\ChaliceOfFunProjectile.png" />
+    </ItemGroup>
     
     <ItemGroup>
         <Reference Include="CalamityEntropy">

@@ -474,6 +474,11 @@ Mods: {
 				DisplayName: Crimson  Deluge
 				TownNPCDialogueName: the Crimson  Deluge
 			}
+
+			RiftEclipseBiome: {
+				DisplayName: Rift Eclipse Biome
+				TownNPCDialogueName: the Rift Eclipse Biome
+			}
 		}
 
 		Mods: {

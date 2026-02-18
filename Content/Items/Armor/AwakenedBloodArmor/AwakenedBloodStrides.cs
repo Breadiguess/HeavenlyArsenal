@@ -89,7 +89,7 @@ public class AwakenedBloodStrides : ModItem, ILocalizedModType
             .AddIngredient<BloodflareCuisses>()
             .AddCondition(conditions: Condition.BloodMoon)
             .AddIngredient<YharonSoulFragment>(15)
-            .AddIngredient<PenumbralMembraneItem>(4)
+            .AddIngredient<PenumbralMembrane>(4)
             .AddTile<CosmicAnvil>()
             .Register();
     }

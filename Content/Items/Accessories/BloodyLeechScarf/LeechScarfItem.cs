@@ -56,7 +56,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             
             CreateRecipe()
                 .AddIngredient<BloodyWormScarf>()
-                .AddIngredient<UmbralLeechDrop>(8)
+                .AddIngredient<UmbralLeechDropItem>(8)
                 .AddTile(TileID.LunarCraftingStation)
                 .Register();
         }

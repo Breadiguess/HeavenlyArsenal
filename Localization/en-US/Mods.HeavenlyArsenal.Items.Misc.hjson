@@ -13,6 +13,16 @@ Materials: {
 			these parts are capable of creating a weapon of unimaginable power...
 			'''
 	}
+
+	AuricCatalystItem: {
+		DisplayName: Auric Catalyst Item
+		Tooltip: ""
+	}
+
+	ShadowspecGunPartsItem: {
+		DisplayName: Shadowspec Gun Parts Item
+		Tooltip: ""
+	}
 }
 
 AncientCoin: {
@@ -119,5 +129,15 @@ VertisPlush: {
 
 BobulousPlush: {
 	DisplayName: Bobulous Plush
+	Tooltip: ""
+}
+
+ShellFragmentItem: {
+	DisplayName: Shell Fragment Item
+	Tooltip: ""
+}
+
+UmbralLeechDropItem: {
+	DisplayName: Umbral Leech Drop Item
 	Tooltip: ""
 }

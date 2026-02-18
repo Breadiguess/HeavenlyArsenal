@@ -1,4 +1,5 @@
 ﻿using CalamityMod;
+using HeavenlyArsenal.Common.Networking.Enums;
 using HeavenlyArsenal.Common.Ui.Cooldowns;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Utilities;
@@ -185,7 +186,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
             for (int i = 0; i < TendrilList.Count; i++)
             {
                 ModPacket packet = Mod.GetPacket();
-                packet.Write((byte)HeavenlyArsenal.NetworkMessageType.LeechScarf_Sync);
+                packet.Write((byte)NetworkMessageType.SyncLeechScarf);
                 packet.Write((byte)Player.whoAmI);
                 var t = TendrilList[i];
                 packet.Write((byte)t.Slot);

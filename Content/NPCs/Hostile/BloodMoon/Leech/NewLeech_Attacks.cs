@@ -119,7 +119,7 @@ public partial class newLeech
                 continue;
             }
 
-            if (npc.Distance(NPC.Center) < 1000 && !temp.Contains(npc) && !BlackListProjectileNPCs.Blacklisted[npc.whoAmI])
+            if (npc.Distance(NPC.Center) < 1000 && !temp.Contains(npc) && !BlackListProjectileNPCs.BlackListedNPCs.Contains(npc.whoAmI))
             {
                 temp.Add(npc);
             }
@@ -194,7 +194,7 @@ public partial class newLeech
     {
         if (currentTarget != null)
         {
-            NPC.velocity = NPC.AngleTo(currentTarget.Center).ToRotationVector2() * 10;
+            NPC.velocity = NPC.AngleTo(currentTarget.Center).ToRotationVector2() * 9.99f;
 
             if (Main.rand.NextBool(3) && currentTarget is Player && Time % 160 == 0)
             {

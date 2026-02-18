@@ -4,6 +4,7 @@ using CalamityMod.Items.Armor.Demonshade;
 using CalamityMod.Items.Armor.Statigel;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using HeavenlyArsenal.Content.Items.Materials;
+using HeavenlyArsenal.Utilities.Extensions;
 using NoxusBoss.Content.Rarities;
 
 namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
@@ -65,7 +66,7 @@ public class ShintoArmorLeggings : ModItem
             .AddIngredient<StatigelGreaves>()
             .AddTile<DraedonsForge>();
 
-        HeavenlyArsenal.TryAddModIngredient(recipe, "CalamityHunt", "ShogunPants");
+        RecipeExtensions.TryAddIngredient(recipe, "CalamityHunt", "ShogunPants");
 
         recipe.AddIngredient<StatisVoidSash>();
         recipe.Register();

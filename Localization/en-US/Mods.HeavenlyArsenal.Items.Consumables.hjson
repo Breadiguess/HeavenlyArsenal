@@ -10,3 +10,9 @@ CombatStim: {
 		'''
 	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStim.StimDuration
 }
+
+CombatStimItem: {
+	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStimItem.StimDuration
+	DisplayName: Combat Stim Item
+	Tooltip: ""
+}

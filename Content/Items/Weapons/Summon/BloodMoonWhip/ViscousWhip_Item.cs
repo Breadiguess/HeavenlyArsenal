@@ -76,7 +76,7 @@ public class ViscousWhip_Item : ModItem
     {
         var text = "[c/FF2C00:Debug:]\n";
         text += $"Swingstage: {SwingStage}";
-
+        /*
         foreach (var projectile in Main.ActiveProjectiles)
         {
             if (BlacklistedProjectiles.BlackListedProjectiles.Contains(projectile.type))
@@ -103,7 +103,7 @@ public class ViscousWhip_Item : ModItem
 
             text += $"\n {projectile.Name}=> Spit Damage: {Damage}";
         }
-
+        */
         var line = new TooltipLine(Mod, "Debug", text);
         tooltips.Add(line);
     }

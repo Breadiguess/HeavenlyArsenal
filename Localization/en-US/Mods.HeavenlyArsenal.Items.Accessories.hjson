@@ -1,4 +1,4 @@
-﻿ElectricVambrace: {
+ElectricVambrace: {
 	DisplayName: Vambrace of Otonilou
 	Tooltip:
 		'''
@@ -102,4 +102,14 @@ LeechScarf_Item: {
 		Dealing damage up close restores them faster
 		Swapping off this accessory kills the leeches.
 		'''
+}
+
+EvilCardItem: {
+	DisplayName: Evil Card Item
+	Tooltip: ""
+}
+
+LeechScarfItem: {
+	DisplayName: Leech Scarf Item
+	Tooltip: ""
 }

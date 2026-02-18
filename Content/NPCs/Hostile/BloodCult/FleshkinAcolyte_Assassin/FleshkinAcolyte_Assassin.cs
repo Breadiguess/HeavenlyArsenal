@@ -16,7 +16,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
             Main.npcFrameCount[NPC.type] = 30;
             NPCID.Sets.CantTakeLunchMoney[Type] = true;
         }
-        public override BloodMoonBalanceStrength Strength => new(1,1,1);
+        public override BloodMoonBalanceStrength Strength => new(0,1,1);
         public override int MaxBlood =>  30;
         protected override void SetDefaults2()
         {
@@ -24,7 +24,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
 
             NPC.friendly = false;
 
-            NPC.lifeMax = 120_000;
+            NPC.lifeMax = 30_000;
 
             NPC.knockBackResist = 0.1f;
 

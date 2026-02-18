@@ -1,5 +1,6 @@
 ﻿using CalamityMod;
 using CalamityMod.NPCs.NormalNPCs;
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
@@ -218,7 +219,7 @@ public abstract class BloodMoonBaseNPC : ModNPC
     public override void SetDefaults()
     {
         NPC.Calamity().VulnerableToHeat = false;
-        SpawnModBiomes = [ModContent.GetInstance<RiftEclipseBloodMoon>().Type];
+        SpawnModBiomes = [ModContent.GetInstance<RiftEclipseBiome>().Type];
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

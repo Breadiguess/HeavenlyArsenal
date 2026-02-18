@@ -74,7 +74,7 @@ public sealed class RiftEclipseBestiaryBackgroundSystem : ModSystem
         device.SetRenderTarget(Target);
         device.Clear(Color.Transparent);
 
-        DrawBloodMoon();
+       // DrawBloodMoon();
 
         device.SetRenderTarget(null);
 

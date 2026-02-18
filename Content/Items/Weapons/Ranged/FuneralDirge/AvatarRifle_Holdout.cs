@@ -220,7 +220,7 @@ public class AvatarRifle_Holdout : ModProjectile
     {
         SoundEngine.PlaySound(FireSoundNormal);
         int bulletAMMO = ProjectileID.Bullet;
-        Owner.PickAmmo(Owner.ActiveItem(), out bulletAMMO, out var SpeedNoUse, out var bulletDamage, out var kBackNoUse, out var _);
+        Owner.PickAmmo(Owner.HeldItem, out bulletAMMO, out var SpeedNoUse, out var bulletDamage, out var kBackNoUse, out var _);
         var armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, true);
         var tipPosition = armPosition + Projectile.velocity * Projectile.width * 1.55f + new Vector2(3, -3);
         var MuzzleFlash = armPosition + Projectile.velocity * Projectile.width * 2f + new Vector2(3, -6);

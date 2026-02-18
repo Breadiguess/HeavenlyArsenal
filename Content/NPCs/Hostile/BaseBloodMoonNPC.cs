@@ -1,4 +1,5 @@
-﻿using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon;
+﻿using HeavenlyArsenal.Content.Biomes;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using System.IO;
 using Terraria.GameContent.Bestiary;
@@ -110,7 +111,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
             SetDefaults2();
             SpawnModBiomes =
             [
-                ModContent.GetInstance<RiftEclipseBloodMoon>().Type
+                ModContent.GetInstance<RiftEclipseBiome>().Type
             ];
 
         }

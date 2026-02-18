@@ -18,7 +18,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
     private bool CheckCandidates(NPC npc)
     {
-        if (BlackListProjectileNPCs.Blacklisted[npc.type])
+        if (BlackListProjectileNPCs.BlackListedNPCs.Contains(npc.type))
         {
             return false;
         }
@@ -278,7 +278,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
                 continue;
             }
 
-            if (BlackListProjectileNPCs.Blacklisted[npc.type])
+            if (BlackListProjectileNPCs.BlackListedNPCs.Contains(npc.type))
             {
                 continue;
             }

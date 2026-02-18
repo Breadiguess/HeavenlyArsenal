@@ -10,11 +10,10 @@ using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Waters;
 
-public class ForgottenShrineWaterflow : ModWaterfallStyle { }
 
 public class ForgottenShrineWater : ModWaterStyle
 {
-    public override int ChooseWaterfallStyle() => ModContent.Find<ModWaterfallStyle>("HeavenlyArsenal/ForgottenShrineWaterflow").Slot;
+    public override int ChooseWaterfallStyle() => ModContent.Find<ModWaterfallStyle>("HeavenlyArsenal/ForgottenShrineWaterfall").Slot;
 
     public override int GetSplashDust() => DustID.BloodWater;
 
