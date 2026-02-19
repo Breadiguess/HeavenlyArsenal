@@ -1,5 +1,4 @@
 ﻿using CalamityMod.Projectiles.Ranged;
-using HeavenlyArsenal.Core.Globals;
 using Luminance.Assets;
 using Microsoft.Xna.Framework.Input;
 using NoxusBoss.Assets.Fonts;
@@ -8,6 +7,7 @@ using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.GlobalInstances;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using HeavenlyArsenal.Core.Items;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.UI.Chat;
 
@@ -40,14 +40,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 }
             };
 
-            ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
-            {
-                if (item.type == AvatarOfEmptiness.TreasureBagID)
-                {
-                    loot.Add(ItemDropRule.Common(Type));
-                }
-            };
+            ItemLootGlobalItem.RegisterLoot(AvatarOfEmptiness.TreasureBagID, ItemDropRule.Common(Type));
         }
+        
         public override void SetDefaults()
         {
             Item.value = Terraria.Item.buyPrice(4, 20, 10, 4);

@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Core.Globals;
+﻿using HeavenlyArsenal.Core.Items;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Content.Rarities;
 using NoxusBoss.Core.GlobalInstances;
@@ -41,14 +41,8 @@ public class AntishadowBead : ModItem
                 npcLoot.Add(normalOnly);
             }
         };
-
-        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
-        {
-            if (item.type == AvatarOfEmptiness.TreasureBagID)
-            {
-                loot.Add(ItemDropRule.Common(Type));
-            }
-        };
+        
+        ItemLootGlobalItem.RegisterLoot(AvatarOfEmptiness.TreasureBagID, ItemDropRule.Common(Type));
     }
 
     public override void SetDefaults()
