@@ -8,7 +8,6 @@ using HeavenlyArsenal.Common.Configuration;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Content.Particles;
 using HeavenlyArsenal.Content.Particles.Metaballs.NoxusGasMetaball;
-using HeavenlyArsenal.Core.Globals;
 using Luminance.Assets;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;

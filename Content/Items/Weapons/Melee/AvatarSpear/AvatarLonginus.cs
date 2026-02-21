@@ -1,6 +1,6 @@
 ﻿using CalamityMod;
 using CalamityMod.Rarities;
-using HeavenlyArsenal.Core.Globals;
+using HeavenlyArsenal.Core.Items;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using NoxusBoss.Core.GlobalInstances;
 using Terraria.DataStructures;
@@ -35,13 +35,7 @@ public class AvatarLonginus : ModItem
             }
         };
 
-        ArsenalGlobalItem.ModifyItemLootEvent += (item, loot) =>
-        {
-            if (item.type == AvatarOfEmptiness.TreasureBagID)
-            {
-                loot.Add(ItemDropRule.Common(Type));
-            }
-        };
+        ItemLootGlobalItem.RegisterLoot(AvatarOfEmptiness.TreasureBagID, ItemDropRule.Common(Type));
     }
 
     public override void SetDefaults()
