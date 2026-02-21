@@ -295,7 +295,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundStrong with { Volume = 2, Pitch = 0.7f * (1 - LumUtils.InverseLerp(1, 9, RiflePlayer.BulletCount)), Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(8);
             else
                 SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundSuper with { Volume = 2 , Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(13);
-            RiflePlayer.BulletCount--;
+            
             Recoil += 30;
             for (int x = 0; x < 2; x++)
             {
@@ -469,7 +469,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                     }
                     int loaded = Owner.HeldItem.GetGlobalItem<Aoe_Rifle_ClipItem>().AssembleClip(Owner, 0);
 
-                    RiflePlayer.BulletCount += loaded;
+                    //RiflePlayer.BulletCount += loaded;
 
                     SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.MagEmptySound with { Pitch = -0.3f }, Owner.Center).WithVolumeBoost(1);
                     //RiflePlayer.BulletCount += clips[0].BulletCount;
@@ -484,7 +484,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 {
                     int loaded = Owner.HeldItem.GetGlobalItem<Aoe_Rifle_ClipItem>().AssembleClip(Owner, 0);
 
-                    RiflePlayer.BulletCount += loaded;
+                    //RiflePlayer.BulletCount += loaded;
 
                     SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.MagEmptySound with { Pitch = 0.3f }, Owner.Center).WithVolumeBoost(1);
                     //RiflePlayer.BulletCount += clips[1].BulletCount;

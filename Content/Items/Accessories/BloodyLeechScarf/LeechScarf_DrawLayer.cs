@@ -42,7 +42,7 @@ namespace HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf
         protected override void Draw(ref PlayerDrawSet drawInfo)
         {
            
-            Texture2D texture = ModContent.Request<Texture2D>($"{Mod.Name}/Content/Items/Accessories/BloodyLeechScarf/LeechScarf_Item_Shoulder").Value;
+            Texture2D texture = ModContent.Request<Texture2D>($"{Mod.Name}/Content/Items/Accessories/BloodyLeechScarf/LeechScarfItem_Shoulder").Value;
 
             var Position = drawInfo.GetBodyDrawPosition() +new Vector2(0);
 

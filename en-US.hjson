@@ -436,6 +436,11 @@ Mods: {
 				DisplayName: Glorious Blubber Item
 				Tooltip: ""
 			}
+
+			AvatarRogue: {
+				DisplayName: Avatar Rogue
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {

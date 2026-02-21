@@ -107,7 +107,8 @@ public class AvatarLonginusHeld : ModProjectile
         _slashPositions = new Vector2[slashLength];
         _slashRotations = new float[slashLength];
     }
-
+    public Vector2 offset = Vector2.Zero;
+    public float attackSpeed => Player.GetAttackSpeed(DamageClass.Melee) * (1f + Projectile.extraUpdates * 0.15f);
     public override void AI()
     {
         Projectile.extraUpdates = 3;
@@ -139,9 +140,8 @@ public class AvatarLonginusHeld : ModProjectile
         useSlash = false;
         holdTrailUpdate = false;
 
-        var offset = Vector2.Zero;
         handPosition = Player.MountedCenter;
-        var attackSpeed = Player.GetAttackSpeed(DamageClass.Melee) * (1f + Projectile.extraUpdates * 0.15f);
+        
 
         if (AttackState != (int)AvatarSpearAttacks.Idle)
         {
@@ -153,6 +153,63 @@ public class AvatarLonginusHeld : ModProjectile
                 Projectile.netUpdate = true;
             }
         }
+
+        StateMachine();
+
+
+        handPosition = Player.RotatedRelativePoint(handPosition);
+
+        if (!throwMode)
+        {
+            Projectile.Center = handPosition + offset - Projectile.velocity;
+        }
+
+        if (canHit)
+        {
+            for (var i = 0; i < 3; i++)
+            {
+                var size = (int)(70 * MathF.Exp(-i));
+                Projectile.EmitEnchantmentVisualsAt(Projectile.Center + new Vector2((120 + 40 * i) * Projectile.scale, 0).RotatedBy(Projectile.rotation) - new Vector2(size / 2), size, size);
+            }
+        }
+
+        Projectile.localAI[0]++;
+
+        if (Projectile.localAI[0] > 240)
+        {
+            Projectile.localAI[0] = 0;
+        }
+
+        UpdateTrail();
+
+        if (!_holdSlashUpdate)
+        {
+            UpdateSlash();
+        }
+
+        _holdSlashUpdate = false;
+
+        Lighting.AddLight(Player.Center, Color.DarkRed.ToVector3());
+
+        if (HitTimer > 0)
+        {
+            HitTimer--;
+        }
+
+        if (Main.myPlayer == Projectile.owner)
+        {
+            var heat = Player.GetModPlayer<AvatarSpearHeatPlayer>().Heat;
+
+            if (heat > 0f)
+            {
+                WeaponBar.DisplayBar(Color.DarkRed, Color.Red, heat, style: 1, BarOffset: IsEmpowered ? Main.rand.NextVector2Circular(2, 2) : Vector2.Zero);
+            }
+        }
+    }
+
+
+    public void StateMachine()
+    {
 
         switch (AttackState)
         {
@@ -885,57 +942,7 @@ public class AvatarLonginusHeld : ModProjectile
 
                 break;
         }
-
-        handPosition = Player.RotatedRelativePoint(handPosition);
-
-        if (!throwMode)
-        {
-            Projectile.Center = handPosition + offset - Projectile.velocity;
-        }
-
-        if (canHit)
-        {
-            for (var i = 0; i < 3; i++)
-            {
-                var size = (int)(70 * MathF.Exp(-i));
-                Projectile.EmitEnchantmentVisualsAt(Projectile.Center + new Vector2((120 + 40 * i) * Projectile.scale, 0).RotatedBy(Projectile.rotation) - new Vector2(size / 2), size, size);
-            }
-        }
-
-        Projectile.localAI[0]++;
-
-        if (Projectile.localAI[0] > 240)
-        {
-            Projectile.localAI[0] = 0;
-        }
-
-        UpdateTrail();
-
-        if (!_holdSlashUpdate)
-        {
-            UpdateSlash();
-        }
-
-        _holdSlashUpdate = false;
-
-        Lighting.AddLight(Player.Center, Color.DarkRed.ToVector3());
-
-        if (HitTimer > 0)
-        {
-            HitTimer--;
-        }
-
-        if (Main.myPlayer == Projectile.owner)
-        {
-            var heat = Player.GetModPlayer<AvatarSpearHeatPlayer>().Heat;
-
-            if (heat > 0f)
-            {
-                WeaponBar.DisplayBar(Color.DarkRed, Color.Red, heat, style: 1, BarOffset: IsEmpowered ? Main.rand.NextVector2Circular(2, 2) : Vector2.Zero);
-            }
-        }
     }
-
     public void ResetTrail(bool rotation = false)
     {
         for (var i = 0; i < Projectile.oldPos.Length; i++)

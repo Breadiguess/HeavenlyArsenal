@@ -7,13 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <AdditionalFiles Remove="Content\Items\Weapons\Rogue\**" />
       <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
-      <Compile Remove="Content\Items\Weapons\Rogue\**" />
       <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
-      <EmbeddedResource Remove="Content\Items\Weapons\Rogue\**" />
       <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
-      <None Remove="Content\Items\Weapons\Rogue\**" />
       <None Remove="Content\Projectiles\Weapons\Rogue\**" />
     </ItemGroup>
 
@@ -26,6 +22,7 @@
     <ItemGroup>
       <Compile Remove="Content\Biomes\RiftEclipseBestiaryBackgroundProvider.cs" />
       <Compile Remove="Content\Biomes\RiftEclipseBestiaryBackgroundSystem.cs" />
+      <Compile Remove="Content\Items\Accessories\BloodyLeechScarf\LeechScarfNetworkHandler.cs" />
       <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Player.cs" />
       <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Renderer.cs" />
       <Compile Remove="Content\Items\Misc\AncientCoin.cs" />
