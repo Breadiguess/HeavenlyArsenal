@@ -7,9 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <None Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <None Remove="Content\Projectiles\Weapons\Rogue\**" />
     </ItemGroup>
 
@@ -59,6 +63,10 @@
         <Reference Include="SubworldLibrary">
             <HintPath>ModReferences\SubworldLibrary.dll</HintPath>
         </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Content\NPCs\Hostile\BloodMoon\Temp\" />
     </ItemGroup>
 
 </Project>

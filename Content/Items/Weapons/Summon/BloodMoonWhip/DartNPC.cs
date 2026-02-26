@@ -4,60 +4,73 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Summon.BloodMoonWhip;
 
 internal class DartNPC : GlobalNPC
 {
-    public HashSet<Projectile> dart = new(Main.maxProjectiles);
+    // Store IDs, not Projectile refs (projectile slots are recycled)
+    private readonly HashSet<int> dartIds = new();
 
     public override bool InstancePerEntity => true;
 
     public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
     {
-        if (projectile.type == ModContent.ProjectileType<BloodDart>())
-        {
-            var Dart = projectile.ModProjectile as BloodDart;
+        int bloodDartType = ModContent.ProjectileType<BloodDart>();
+        int stingType = ModContent.ProjectileType<BloodySting_Projectile>();
 
-            if (Dart.CurrentState == BloodDart.NeedleState.StuckInEnemy)
+        // Track stuck darts
+        if (projectile.type == bloodDartType)
+        {
+            if (projectile.ModProjectile is BloodDart dart &&
+                dart.CurrentState == BloodDart.NeedleState.StuckInEnemy)
             {
-                dart.Add(projectile);
+                dartIds.Add(projectile.whoAmI);
             }
         }
 
-        if (projectile.type == ModContent.ProjectileType<ViscousWhip_Proj>())
+        // Whip detonation logic
+        if (projectile.type == stingType)
         {
-            if (dart.Count > 3)
+            // Purge invalid/recycled entries before counting/using them
+            CleanupDarts(npc, bloodDartType);
+
+            if (dartIds.Count > 3)
             {
-                var Owner = Main.player[projectile.owner];
-
-                if (Owner == null)
-                {
+                Player owner = Main.player[projectile.owner];
+                if (owner == null || !owner.active)
                     return;
-                }
 
-                //todo: damage calculation with diminishing returns
                 var hitInfo = new NPC.HitInfo
                 {
                     DamageType = DamageClass.Summon,
-                    Damage = dart.Count * 1000,
-                    Knockback = 0,
-                    HitDirection = npc.Center.X < Owner.Center.X ? -1 : 1
+                    Damage = dartIds.Count * 1000,
+                    Knockback = 0f,
+                    HitDirection = npc.Center.X < owner.Center.X ? -1 : 1
                 };
 
-                Owner.StrikeNPCDirect(npc, hitInfo);
-                //CombatText.NewText(npc.Hitbox, Color.Red, dart.Count * 4000);
+                owner.StrikeNPCDirect(npc, hitInfo);
 
-                foreach (var proj in dart)
+                // Dislodge/modify darts safely
+                foreach (int id in dartIds)
                 {
-                    var Dart = proj.ModProjectile as BloodDart;
-                    Dart.Time = 0;
-                    Dart.CurrentState = BloodDart.NeedleState.Dislodge;
-                    Dart.timeOffset = Main.rand.Next(0, 30);
+                    Projectile proj = Main.projectile[id];
+
+                    if (!proj.active || proj.type != bloodDartType)
+                        continue;
+
+                    if (proj.ModProjectile is not BloodDart dart)
+                        continue;
+
+                    dart.Time = 0;
+                    dart.CurrentState = BloodDart.NeedleState.Dislodge;
+                    dart.timeOffset = Main.rand.Next(0, 30);
+
                     proj.damage = (int)(proj.damage * 1.4f);
                 }
 
-                dart.Clear();
+                dartIds.Clear();
             }
 
+            // Tag damage
             if (projectile.minion && npc.HasBuff(ModContent.BuffType<BloodwhipBuff>()))
             {
-                var extraDamage = BloodwhipBuff.TagDamage;
+                int extraDamage = BloodwhipBuff.TagDamage;
                 npc.SimpleStrikeNPC(extraDamage, 0, noPlayerInteraction: true);
                 CombatText.NewText(npc.Hitbox, Color.Red, extraDamage);
             }
@@ -66,9 +79,32 @@ internal class DartNPC : GlobalNPC
         }
     }
 
-    public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+    private void CleanupDarts(NPC npc, int bloodDartType)
     {
-        //if(dart!=null)
-        //Utils.DrawBorderString(spriteBatch, "Darts stuck: " + dart.Count, npc.Center - screenPos + new Vector2(0, -40), Color.Red, 1f);
+        if (dartIds.Count == 0)
+            return;
+
+        // Remove entries that are dead, recycled, or no longer "stuck"
+        dartIds.RemoveWhere(id =>
+        {
+            if (id < 0 || id >= Main.maxProjectiles)
+                return true;
+
+            Projectile p = Main.projectile[id];
+            if (!p.active || p.type != bloodDartType)
+                return true;
+
+            if (p.ModProjectile is not BloodDart dart)
+                return true;
+
+            // Optional but recommended: only count darts still lodged
+            if (dart.CurrentState != BloodDart.NeedleState.StuckInEnemy)
+                return true;
+
+            // Optional: if BloodDart tracks its target NPC, enforce it here:
+            // return dart.StuckNpcWhoAmI != npc.whoAmI;
+
+            return false;
+        });
     }
 }

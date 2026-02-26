@@ -54,8 +54,8 @@ internal class DebugPlayer : PlayerDrawLayer
             + $"{Owner.Calamity().stealthGenMoving}";
         
         //msg += $"{Owner.GetModPlayer<MedusaPlayer>().MedusaStacks}\n{Owner.GetModPlayer<MedusaPlayer>().MedusaTimer}";
-        // msg += $"{Owner.GetModPlayer<PlaceholderName>().blood}";
-        // if(Owner.HeldItem.type == ModContent.ItemType<ViscousWhip_Item>())
+        // msg += $"{Owner.GetModPlayer<BloodWhip_Player>().blood}";
+        // if(Owner.HeldItem.type == ModContent.ItemType<BloodySting_Item>())
         //msg += $"{Owner.Center.ToTileCoordinates()}";
         // msg += $"Authority: {Owner.GetModPlayer<Aoe_Rifle_Player>().Authority}\n AuthorityTimer: {Owner.GetModPlayer<Aoe_Rifle_Player>().AuthorityTimer}\n {Owner.GetModPlayer<Aoe_Rifle_Player>().BulletCount}";
       

@@ -82,7 +82,8 @@ internal class ArtilleryCrab : BaseBloodMoonNPC
         NPC.value = 10000;
         NPC.aiStyle = -1;
         NPC.npcSlots = 3f;
-        NPC.knockBackResist = 0f;
+        NPC.knockBackResist = 0.4f;
+
 
         SpawnModBiomes =
         [
@@ -90,7 +91,7 @@ internal class ArtilleryCrab : BaseBloodMoonNPC
         ];
     }
 
-    public override void SetStaticDefaults()
+    public override void SetStaticDefaults2()
     {
         Main.npcFrameCount[Type] = 13;
     }
@@ -581,6 +582,11 @@ public class BloodMortar : ModNPC
 
     public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/BigCrab/Bloodproj";
 
+    public int Variant
+    {
+        get => (int)NPC.ai[3];
+        set => NPC.ai[3] = value;
+    }
     public ref float Xcoord => ref NPC.ai[1];
 
     public ref float Ycoord => ref NPC.ai[2];
@@ -610,6 +616,10 @@ public class BloodMortar : ModNPC
         NPC.defDefense = 4000;
         NPC.noGravity = true;
         NPC.noTileCollide = false;
+    }
+    public override void OnSpawn(IEntitySource source)
+    {
+        Variant = Main.rand.Next(3);
     }
 
     public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
@@ -642,22 +652,23 @@ public class BloodMortar : ModNPC
         var glowScale = new Vector2(1f, 1f);
         var Gorigin = new Vector2(texture.Size().X / 2, texture.Size().Y / 2);
         var DrawPos = NPC.Center - Main.screenPosition;
+        Rectangle Frame = texture.Frame(1, 3, 0, Variant);
+        Main.EntitySpriteDraw(Glowball, DrawPos, null, Color.Crimson with { A= 0 }, NPC.velocity.ToRotation(), Glowball.Size() * 0.5f, glowScale * 0.1f, SpriteEffects.None);
 
         Main.spriteBatch.Draw
         (
             texture,
             DrawPos,
-            null,
+            Frame,
             lightColor,
-            NPC.velocity.ToRotation(),
-            Gorigin,
+            NPC.velocity.ToRotation() - MathHelper.PiOver2,
+            Frame.Size()/2f,
             glowScale,
             SpriteEffects.None,
             0f
         );
 
-        Main.EntitySpriteDraw(Glowball, DrawPos, null, Color.Crimson, NPC.velocity.ToRotation(), Glowball.Size() * 0.5f, glowScale * 0.2f, SpriteEffects.None);
-
+        
         return false;
     }
 

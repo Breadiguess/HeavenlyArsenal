@@ -11,7 +11,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassi
     {
         public override string Texture => this.GetPath();
 
-        public override void SetStaticDefaults()
+        public override void SetStaticDefaults2()
         {
             Main.npcFrameCount[NPC.type] = 30;
             NPCID.Sets.CantTakeLunchMoney[Type] = true;

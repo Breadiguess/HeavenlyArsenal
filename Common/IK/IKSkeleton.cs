@@ -1,9 +1,22 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Buffers;
+using System.Runtime.CompilerServices;
 
 namespace HeavenlyArsenal.Common.IK;
-
-public struct IKSkeleton
+public sealed class IKSkeleton
 {
+    public readonly struct JointSetup
+    {
+        public readonly float Length;
+        public readonly float CenterDeg;
+        public readonly float SwingDeg;
+
+        public JointSetup(float length, float centerDeg, float swingDeg)
+        {
+            Length = length;
+            CenterDeg = centerDeg;
+            SwingDeg = swingDeg;
+        }
+    }
     public struct Constraints()
     {
         public float MinAngle = -MathF.PI;
@@ -21,9 +34,9 @@ public struct IKSkeleton
 
     public float FinalDistance { get; private set; }
 
-    public readonly int JointCount => _options.Length;
+    public int JointCount => _options.Length;
 
-    public readonly int PositionCount => JointCount + 1;
+    public int PositionCount => JointCount + 1;
 
     private const int MaxJointCount = 16;
 
@@ -35,8 +48,7 @@ public struct IKSkeleton
 
     public float _maxDistance;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly Vector2 Position(int index)
+    public Vector2 Position(int index)
     {
         return _positions[index];
     }
@@ -55,10 +67,31 @@ public struct IKSkeleton
             _maxDistance += length;
         }
     }
+    public IKSkeleton(params JointSetup[] joints)
+    {
+        if (joints.Length > MaxJointCount)
+            throw new Exception($"MaxJointCount is less than provided options ({joints.Length}).");
+
+        _options = new (float, Constraints)[joints.Length];
+
+        for (int i = 0; i < joints.Length; i++)
+        {
+            var j = joints[i];
+            var c = FromCentered(j.CenterDeg, j.SwingDeg);
+
+            _options[i] = (j.Length, c);
+            _maxDistance += j.Length;
+        }
+    }
+
 
     // http://www.andreasaristidou.com/FABRIK.html 
     public void Update(Vector2 startPosition, Vector2 targetEndPosition)
     {
+        if (_positions[0] == default)
+        {
+            InitializePositions(startPosition);
+        }
         _previousPositions = _positions;
         SolveFailed = false;
 
@@ -214,5 +247,98 @@ public struct IKSkeleton
             SetConstraint(i, angle, angle);
         }
     }
+    private static Constraints FromCentered(float centerDeg, float swingDeg)
+    {
+        float center = MathHelper.ToRadians(centerDeg);
+        float swing = MathHelper.ToRadians(swingDeg);
 
+        return new Constraints
+        {
+            MinAngle = center - swing,
+            MaxAngle = center + swing
+        };
+    }
+    /// <summary>
+    /// attempts to set the position of the leg upon first being created, inorder to fight potential 0,0.
+    /// </summary>
+    /// <param name="origin"></param>
+    private void InitializePositions(Vector2 origin)
+    {
+        _positions[0] = origin;
+
+        float angle = 0f;
+
+        for (int i = 0; i < JointCount; i++)
+        {
+            angle += (_options[i].constraints.MinAngle +
+                      _options[i].constraints.MaxAngle) * 0.5f;
+
+            _positions[i + 1] =
+                _positions[i] +
+                angle.ToRotationVector2() * _options[i].length;
+        }
+
+        _previousPositions = _positions;
+    }
+
+   
+    public bool CanReachConstrained(Vector2 root, Vector2 target, float tolerance = 1f)
+    {
+        // quick reject by total length
+        if (root.Distance(target) > _maxDistance + tolerance)
+            return false;
+
+        int n = PositionCount;
+
+        // Snapshot ALL state that Update() mutates.
+        Vector2[] posBackup = ArrayPool<Vector2>.Shared.Rent(n);
+        Vector2[] prevBackup = ArrayPool<Vector2>.Shared.Rent(n);
+        bool solveFailedBackup = SolveFailed;
+        float finalDistanceBackup = FinalDistance;
+
+        try
+        {
+            // copy inline arrays into rented arrays
+            for (int i = 0; i < n; i++)
+            {
+                posBackup[i] = _positions[i];
+                prevBackup[i] = _previousPositions[i];
+            }
+
+           //try updating from this fake little clone
+            Update(root, target);
+
+            if (SolveFailed)
+            {
+                // restore and return false
+                for (int i = 0; i < n; i++)
+                {
+                    _positions[i] = posBackup[i];
+                    _previousPositions[i] = prevBackup[i];
+                }
+                SolveFailed = solveFailedBackup;
+                FinalDistance = finalDistanceBackup;
+                return false;
+            }
+
+            float err = Vector2.Distance(_positions[n - 1], target);
+            bool ok = err <= tolerance;
+
+            // restore original state
+            for (int i = 0; i < n; i++)
+            {
+                _positions[i] = posBackup[i];
+                _previousPositions[i] = prevBackup[i];
+            }
+            SolveFailed = solveFailedBackup;
+            FinalDistance = finalDistanceBackup;
+
+            return ok;
+        }
+        finally
+        {
+            ArrayPool<Vector2>.Shared.Return(posBackup, clearArray: false);
+            ArrayPool<Vector2>.Shared.Return(prevBackup, clearArray: false);
+        }
+    }
 }

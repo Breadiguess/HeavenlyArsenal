@@ -147,6 +147,16 @@ Summon: {
 			after enough daggers have been impaled in an enemy, strike them again with the whip to rip out the daggers
 			'''
 	}
+
+	BloodySting_Item: {
+		DisplayName: Bloody Sting
+		Tooltip:
+			'''
+			Minion hits while holding this item generate blood
+			<right> when enough blood has been stockpiled to rapidly throw daggers that home in on nearby enemies
+			after enough daggers have been impaled in an enemy, strike them again with the whip to rip out the daggers
+			'''
+	}
 }
 
 KnifeItem: {
@@ -157,6 +167,11 @@ KnifeItem: {
 Rogue: {
 	AvatarRogue: {
 		DisplayName: Avatar Rogue
+		Tooltip: ""
+	}
+
+	GongItem: {
+		DisplayName: Echoes of Scarlet Skies
 		Tooltip: ""
 	}
 }

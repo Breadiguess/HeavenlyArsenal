@@ -1,9 +1,9 @@
-﻿using CalamityMod;
+﻿using InfernumMode.Content.Buffs;
 
 namespace HeavenlyArsenal.Core.Systems;
-
 internal class LineAlgorithm
 {
+    
     public static bool RaytraceTo(int x0, int y0, int x1, int y1, bool ignoreHalfTiles = false)
     {
         //Bresenham's algorithm
@@ -18,7 +18,7 @@ internal class LineAlgorithm
 
         while (true)
         {
-            if (Main.tile[x, y].IsTileSolid() && (!ignoreHalfTiles || !Main.tile[x, y].IsHalfBlock))
+            if ((!ignoreHalfTiles || !Main.tile[x, y].IsHalfBlock))
             {
                 return false;
             }
@@ -54,7 +54,7 @@ internal class LineAlgorithm
         }
     }
 
-    public static Point? RaycastTo(Vector2 start, Vector2 end, bool ignoreHalfTiles = false, bool debug = false)
+    public static Point? RaycastTo(Vector2 start, Vector2 end, bool ignoreHalfTiles = false, bool debug = false, bool ShouldCountWater = false)
     {
         // Convert world coordinates → tile coordinates
         var x0 = (int)(start.X / 16f);
@@ -62,10 +62,10 @@ internal class LineAlgorithm
         var x1 = (int)(end.X / 16f);
         var y1 = (int)(end.Y / 16f);
 
-        return RaycastTo(x0, y0, x1, y1, ignoreHalfTiles, debug);
+        return RaycastTo(x0, y0, x1, y1, ignoreHalfTiles, debug, ShouldCountWater);
     }
 
-    public static Point? RaycastTo(int x0, int y0, int x1, int y1, bool ignoreHalfTiles = false, bool spawnDebugDust = false)
+    public static Point? RaycastTo(int x0, int y0, int x1, int y1, bool ignoreHalfTiles = false, bool debug = false, bool ShouldCountWater = false)
     {
         // Clamp the start and end points to prevent out-of-range crashes.
         x0 = Utils.Clamp(x0, 0, Main.maxTilesX - 1);
@@ -90,35 +90,45 @@ internal class LineAlgorithm
                 break;
             }
 
-            if (spawnDebugDust)
-            {
-                // World coordinates of this tile’s center
-                var basePos = new Vector2(x * 16 + 8, y * 16 + 8);
-
-                // Spawn multiple dust points per tile to increase sampling resolution
-                const int density = 4; // increase if needed
-
-                for (var i = 0; i < density; i++)
-                {
-                    // Evenly spread dust across 16px tile area horizontally and vertically
-                    var lerpX = i / (float)(density - 1);
-                    var lerpY = i / (float)(density - 1);
-
-                    var dustPos = basePos + new Vector2(lerpX, lerpY);
-                    Dust.NewDustPerfect(dustPos, DustID.Cloud, Vector2.Zero, 0, Color.White);
-                }
-            }
+         
 
             var tile = Main.tile[x, y];
 
-            if (tile != null &&
-                tile.HasTile &&
-                tile.IsTileSolid() &&
-                (!ignoreHalfTiles || !tile.IsHalfBlock))
+            // Water hit check
+            if (ShouldCountWater &&
+                tile != null &&
+                tile.LiquidAmount > 0) // optional: restrict to water only
             {
-                // Return the first solid tile hit
-                return new Point(x, y);
+                int surfaceY = y;
+
+                // Move upward until we reach the top of the liquid column
+                while (surfaceY > 0)
+                {
+                    Tile above = Main.tile[x, surfaceY - 1];
+
+                    if (above == null ||
+                        above.LiquidAmount == 0 ||
+                        above.LiquidType != tile.LiquidType)
+                        break;
+
+                    surfaceY--;
+                }
+                if(debug)
+                RayCastVisualizer.Raycasts.Add(new Raycast(new Vector2(x0, y0).ToWorldCoordinates(), new Vector2(x, surfaceY).ToWorldCoordinates(), Color.Blue));
+                return new Point(x, surfaceY);
             }
+            Point current = new(x, y);
+
+            if (TileIsGround(current))
+            {
+                int surfaceY = y;
+
+               
+                if(debug)
+                    RayCastVisualizer.Raycasts.Add(new Raycast(new Vector2(x0, y0).ToWorldCoordinates(), new Vector2(x, surfaceY).ToWorldCoordinates(), Color.Blue));
+                return new Point(x, surfaceY);
+            }
+
 
             if (x == x1 && y == y1)
             {
@@ -142,5 +152,19 @@ internal class LineAlgorithm
 
         // No tile hit
         return null;
+    }
+
+
+    private static bool TileIsGround(Point p)
+    {
+        if (!WorldGen.SolidTile(p))
+            return false;
+
+        Tile tile = Main.tile[p];
+
+        if (tile == null || !tile.HasTile || tile.IsActuated)
+            return false;
+
+        return WorldGen.SolidOrSlopedTile(p.X, p.Y);
     }
 }

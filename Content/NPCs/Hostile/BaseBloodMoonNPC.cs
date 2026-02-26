@@ -91,16 +91,23 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
             get => (int)NPC.ai[0];
             set => NPC.ai[0] = value;
         }
-        protected virtual void SetStaticDefaults2()
+        public virtual void SetStaticDefaults2()
         {
 
         }
-        public override void SetStaticDefaults()
+        public sealed override void SetStaticDefaults()
         {
             base.SetStaticDefaults();
+            SetStaticDefaults2();
             NPCID.Sets.MustAlwaysDraw[NPC.type] = true;
-
+            NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[NPC.type] = true;
         }
+
+        public override bool CheckActive()
+        {
+            return false;
+        }
+
         /// <summary>
         /// Alternate method to set defaults since its sealed to prevent issues.
         /// </summary>

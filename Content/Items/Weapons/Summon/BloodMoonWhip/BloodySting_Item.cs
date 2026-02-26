@@ -11,7 +11,8 @@ public class ViscousWhip_Player : ModPlayer
     public override void PostUpdate() { }
 }
 
-public class ViscousWhip_Item : ModItem
+[LegacyName("ViscousWhip_Item")]
+public class BloodySting_Item : ModItem
 {
     public int SwingStage;
 
@@ -34,6 +35,11 @@ public class ViscousWhip_Item : ModItem
 
     public override void SetDefaults()
     {
+        Item.DefaultToWhip(ModContent.ProjectileType<BloodySting_Projectile>(), Item.damage, Item.knockBack, 6.31f, 42);
+        Item.shootSpeed = 6.31f;
+        Item.UseSound = null;
+        Item.autoReuse = true;
+
         Item.channel = true;
         Item.DamageType = DamageClass.SummonMeleeSpeed;
         Item.noMelee = true;
@@ -41,19 +47,13 @@ public class ViscousWhip_Item : ModItem
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTime = 30;
         Item.useAnimation = 30;
-        Item.shootSpeed = 40f;
         Item.knockBack = 3f;
         Item.reuseDelay = 2;
         Item.rare = ModContent.RarityType<BloodMoonRarity>();
         Item.value = Item.buyPrice(0, 46, 30, 2);
-        Item.shoot = ModContent.ProjectileType<ViscousWhip_Proj>();
+        Item.shoot = ModContent.ProjectileType<BloodySting_Projectile>();
         Item.damage = 1200;
         Item.Size = new Vector2(40, 40);
-
-        Item.DefaultToWhip(ModContent.ProjectileType<ViscousWhip_Proj>(), Item.damage, Item.knockBack, 6.31f, 42);
-        Item.shootSpeed = 6.31f;
-        Item.UseSound = null;
-        Item.autoReuse = true;
 
         Item.crit = 12;
     }
@@ -125,7 +125,7 @@ public class ViscousWhip_Item : ModItem
         }
         else
         {
-            PlaceholderName bloodPlayer;
+            BloodWhip_Player bloodPlayer;
             player.TryGetModPlayer(out bloodPlayer);
 
             if (bloodPlayer.blood >= 30)
@@ -149,9 +149,9 @@ public class ViscousWhip_Item : ModItem
 
     public override bool AltFunctionUse(Player player)
     {
-        if (player.ownedProjectileCounts[ModContent.ProjectileType<ViscousWhip_Proj>()] < 1)
+        if (player.ownedProjectileCounts[ModContent.ProjectileType<BloodySting_Projectile>()] < 1)
         {
-            PlaceholderName bloodPlayer;
+            BloodWhip_Player bloodPlayer;
             player.TryGetModPlayer(out bloodPlayer);
 
             if (bloodPlayer.blood >= 30)

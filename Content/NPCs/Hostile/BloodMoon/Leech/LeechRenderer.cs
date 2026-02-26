@@ -290,14 +290,14 @@ partial class newLeech : BaseBloodMoonNPC
 
                 verts[vIndex++] = new VertexPositionColorTexture
                 (
-                    new Vector3(left, 0f),
+                    new Vector3(left, -400),
                     thing,
                     uvBottom
                 );
 
                 verts[vIndex++] = new VertexPositionColorTexture
                 (
-                    new Vector3(right, 0f),
+                    new Vector3(right, 400 ),
                     thing,
                     uvTop
                 );

@@ -49,7 +49,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
     public override int MaxBlood => 100;
 
 
-    public override void SetStaticDefaults()
+    public override void SetStaticDefaults2()
     {
         Main.npcFrameCount[NPC.type] = 1;
         NPCID.Sets.CantTakeLunchMoney[NPC.type] = true;

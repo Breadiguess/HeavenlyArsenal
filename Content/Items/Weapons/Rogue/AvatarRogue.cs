@@ -1,4 +1,5 @@
-﻿using Luminance.Assets;
+﻿using CalamityMod;
+using Luminance.Assets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue
         public override void SetDefaults()
         {
             Item.damage = 30;
+            Item.DamageType = ModContent.GetInstance<RogueDamageClass>();
             Item.shoot = ModContent.ProjectileType<AvatarRogue_Projectile>();
             Item.useStyle = ItemUseStyleID.HiddenAnimation;
             Item.useTime = 30;

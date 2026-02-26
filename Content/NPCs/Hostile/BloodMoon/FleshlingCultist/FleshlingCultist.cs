@@ -52,7 +52,7 @@ internal partial class FleshlingCultist : BaseBloodMoonNPC
     }
 
    
-    public override void SetStaticDefaults()
+    public override void SetStaticDefaults2()
     {
         NPCID.Sets.ReflectStarShotsInForTheWorthy[Type] = true;
 

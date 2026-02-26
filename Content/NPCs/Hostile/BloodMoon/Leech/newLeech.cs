@@ -71,7 +71,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
         return ref _ExtraHitBoxes;
     }
 
-    public override void SetStaticDefaults()
+    public override void SetStaticDefaults2()
     {
         Main.npcFrameCount[Type] = 1;
         NPCID.Sets.UsesMultiplayerProximitySyncing[Type] = true;
@@ -377,7 +377,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
 
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
-        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<ViscousWhip_Item>(), 36, 24));
+        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<BloodySting_Item>(), 36, 24));
         npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<UmbralLeechDropItem>(), 3, 2));
         npcLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<newLeech>()));
 

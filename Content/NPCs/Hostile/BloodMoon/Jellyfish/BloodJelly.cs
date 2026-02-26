@@ -146,7 +146,7 @@ internal partial class BloodJelly : BaseBloodMoonNPC
 
     #region Setup
 
-    public override void SetStaticDefaults()
+    public override void SetStaticDefaults2()
     {
         NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
         NPCID.Sets.MustAlwaysDraw[Type] = true;

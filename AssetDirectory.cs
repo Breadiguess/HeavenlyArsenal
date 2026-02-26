@@ -142,6 +142,12 @@ public static class AssetDirectory
             {
                 internal static class BloodMoon
                 {
+                    internal static class BloodCrab
+                    {
+                        public static readonly SoundStyle Step = new("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/BloodCrab/BloodCrabStep", 2);
+                        public static readonly SoundStyle TempStep = new("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/BloodCrab/CrabulonStep", 4);
+
+                    }
                     internal static class UmbralLeech
                     {
                         public static readonly SoundStyle Bash = new("HeavenlyArsenal/Assets/Sounds/NPCs/Hostile/BloodMoon/UmbralLeech/UmbralLeech_Bash_", 3);
