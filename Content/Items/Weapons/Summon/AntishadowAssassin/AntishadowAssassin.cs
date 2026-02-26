@@ -1494,7 +1494,15 @@ public class AntishadowAssassin : ModProjectile
             katanaPositions[i] += orthogonalOffset * completionRatio.Squared();
         }
 
+        // A dumb Luminance quirk causes the scissor rectangle to
+        // be re-initialized to its "default" based on Main.screenWidth and
+        // Main.screenHeight. This, unfortunately, does not respect render
+        // target viewports and can cause weird cutoff leakage
+        // later in a render. I really need to fix this someday; It was
+        // a problem in WotG1 development too.
+        Rectangle previousCutoffRectangle = Main.instance.GraphicsDevice.ScissorRectangle;
         PrimitiveRenderer.RenderTrail(katanaPositions, katanaPrimitiveSettings, 40);
+        Main.instance.GraphicsDevice.ScissorRectangle = previousCutoffRectangle;
     }
 
     /// <summary>
@@ -1791,8 +1799,8 @@ public class AntishadowAssassin : ModProjectile
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 
-            Main.spriteBatch.Draw
-                (outlineTarget, center, null, edgeColor * Projectile.Opacity * ArmOutlineOpacity, 0f, outlineTarget.Size() * 0.5f, Projectile.scale, Projectile.spriteDirection.ToSpriteDirection(), 0);
+            Color armOutlineColor = edgeColor * Projectile.Opacity * ArmOutlineOpacity;
+            Main.spriteBatch.Draw(outlineTarget, center, null, armOutlineColor, 0f, outlineTarget.Size() * 0.5f, Projectile.scale, Projectile.spriteDirection.ToSpriteDirection(), 0);
 
             DrawMask(center);
             DrawBeads(center);
