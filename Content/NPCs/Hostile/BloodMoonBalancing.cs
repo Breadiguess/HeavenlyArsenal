@@ -60,7 +60,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
             if (DownedBossSystem.downedGuardians)
             {
                 DamageMultiplier = 0.55f;
-                HealthMultiplier = 0.3f;
+                HealthMultiplier = 0.4f;
+                DefenseMultiplier = 0.42f;
+                return;
+            }
+            else
+            {
+                DamageMultiplier = 0.55f;
+                HealthMultiplier = 0.4f;
                 DefenseMultiplier = 0.42f;
                 return;
             }

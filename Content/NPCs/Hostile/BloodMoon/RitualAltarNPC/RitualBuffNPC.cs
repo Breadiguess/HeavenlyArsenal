@@ -63,7 +63,7 @@ public class RitualBuffNPC : GlobalNPC
 
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
-        if (entity.ModNPC != null && entity.ModNPC is BloodMoonBaseNPC)
+        if (entity.ModNPC != null && entity.ModNPC is  BaseBloodMoonNPC)
         {
             return lateInstantiation && true;
         }
@@ -325,7 +325,7 @@ public class RitualBuffNPC : GlobalNPC
                 //Utils.DrawBorderString(spriteBatch, i.ToString(), DrawPos, Color.AntiqueWhite);
             }
 
-            var Ba = npc.GetGlobalNPC<RitualBuffNPC>();
+            //var Ba = npc.GetGlobalNPC<RitualBuffNPC>();
 
             // spriteBatch.End();
             // spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.AnisotropicWrap, default, RasterizerState.CullNone, default, Main.GameViewMatrix.ZoomMatrix);
@@ -358,7 +358,7 @@ public class RitualBuffNPC : GlobalNPC
 
     public void ApplyRitualBuff(NPC npc, int Tier)
     {
-        //CombatText.NewText(npc.Hitbox, Color.Red, "Buffed!", true);
+        //CombatText.NewText(npc.Collider, Color.Red, "Buffed!", true);
         var buffType = Main.rand.Next(1, 6);
         hasRitualBuff = true;
         RitualSystem.AddNPC(npc);

@@ -141,8 +141,24 @@ internal partial class FleshlingCultist : BaseBloodMoonNPC
         {
             FindPlayer();
         }
+        float moveSpeed = 9;
+        float accel = 0.4f;
 
-        NPC.velocity.X = float.Lerp(NPC.velocity.X, NPC.AngleTo(Target.Center).ToRotationVector2().X * 6, 0.2f);
+        // where we WANT to be going
+        float desiredVelX =
+            NPC.DirectionTo(Target.Center).X * moveSpeed;
+
+        // steering force toward that velocity
+        float steering =
+            desiredVelX - NPC.velocity.X;
+
+        // apply limited acceleration
+        steering = MathHelper.Clamp(steering, -accel, accel);
+
+        // now ADD — do not overwrite
+        NPC.velocity.X += steering;
+        NPC.spriteDirection = desiredVelX.NonZeroSign();
+
         Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
         var horizontalRange = 100f;
 

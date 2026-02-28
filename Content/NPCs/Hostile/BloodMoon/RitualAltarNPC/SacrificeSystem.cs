@@ -231,7 +231,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
     private void DoDeathAnimation()
     {
-            NPC.Opacity = 1-LumUtils.InverseLerp(0, 120, Time);
+        NPC.Opacity = 1-LumUtils.InverseLerp(0, 120, Time);
         
         if(NPC.Opacity<=0.001f)
         {
@@ -338,8 +338,8 @@ internal partial class RitualAltar : BaseBloodMoonNPC
         (
             (a, b) =>
             {
-                var aPrio = a.ModNPC is BloodMoonBaseNPC ab ? ab.buffPrio : 0f;
-                var bPrio = b.ModNPC is BloodMoonBaseNPC bb ? bb.buffPrio : 0f;
+                var aPrio = a.ModNPC is BaseBloodMoonNPC ab ? 0 : 0f;
+                var bPrio = b.ModNPC is BaseBloodMoonNPC bb ? 0 : 0f;
 
                 var prioCompare = bPrio.CompareTo(aPrio);
 
@@ -495,8 +495,24 @@ internal partial class RitualAltar : BaseBloodMoonNPC
             playerTarget = Main.player[NPC.FindClosestPlayer()];
         }
 
-        NPC.velocity.X = NPC.AngleTo(playerTarget.Center).ToRotationVector2().X * SpeedMulti * MathF.Tanh(Vector2.Distance(NPC.Center, Main.MouseWorld));
+        float moveSpeed = 2 * SpeedMulti;
+        float accel = 0.12f;
 
+        // where we WANT to be going
+        float desiredVelX =
+            NPC.DirectionTo(playerTarget.Center).X * moveSpeed;
+
+        // steering force toward that velocity
+        float steering =
+            desiredVelX - NPC.velocity.X;
+
+        // apply limited acceleration
+        steering = MathHelper.Clamp(steering, -accel, accel);
+
+        // now ADD — do not overwrite
+        NPC.velocity.X += steering;
+        NPC.spriteDirection = desiredVelX.NonZeroSign();
+       
         if (Sacrifices.Count > 0)
         {
             currentAIState = AltarAI.LookingForSacrifice;

@@ -19,32 +19,38 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
     private short[] maskIndices;
 
-    private void DrawArm(ref RitualAltarLimb RitualAltarLimb, Color drawColor, SpriteEffects effects)
+    private void DrawArm(ref RitualAltarLimb limb, Color drawColor, SpriteEffects effects)
     {
         var armTexture = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/RitualAltarNPC/RitualAltarArm").Value;
         var defaultForearmFrame = new Rectangle(0, 0, 84, 32);
         var anchoredForearmFrame = new Rectangle(0, 32, 84, 32);
 
-        var currentFrame = RitualAltarLimb.IsAnchored ? anchoredForearmFrame : defaultForearmFrame;
+        var currentFrame =  defaultForearmFrame;
 
         Vector2 StartPos;
 
         if (NPC.IsABestiaryIconDummy)
         {
-            StartPos = RitualAltarLimb.Skeleton.Position(0);
+            StartPos = limb.Skeleton.Position(0);
         }
         else
         {
-            StartPos = RitualAltarLimb.Skeleton.Position(0) - Main.screenPosition;
+            StartPos = limb.Skeleton.Position(0) - Main.screenPosition;
         }
 
+        for(int i = 0; i< limb.Skeleton.PositionCount - 1; i++)
+        {
+            NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(Main.spriteBatch, limb.Skeleton.Position(i), limb.Skeleton.Position(i + 1), Color.Red, 3);
+        }
+
+        /*
         Main.spriteBatch.Draw
         (
             armTexture,
             StartPos,
             new Rectangle(94, 0, 48, 24),
             drawColor,
-            (RitualAltarLimb.Skeleton.Position(0) - RitualAltarLimb.Skeleton.Position(1)).ToRotation(),
+            (limb.Skeleton.Position(0) - limb.Skeleton.Position(1)).ToRotation(),
             new Vector2(134 - 94, 12),
             1f,
             effects,
@@ -53,11 +59,11 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
         if (NPC.IsABestiaryIconDummy)
         {
-            StartPos = RitualAltarLimb.Skeleton.Position(1);
+            StartPos = limb.Skeleton.Position(1);
         }
         else
         {
-            StartPos = RitualAltarLimb.Skeleton.Position(1) - Main.screenPosition;
+            StartPos = limb.Skeleton.Position(1) - Main.screenPosition;
         }
 
         Main.spriteBatch.Draw
@@ -66,12 +72,13 @@ internal partial class RitualAltar : BaseBloodMoonNPC
             StartPos,
             currentFrame,
             drawColor,
-            (RitualAltarLimb.Skeleton.Position(1) - RitualAltarLimb.Skeleton.Position(2)).ToRotation(),
+            (limb.Skeleton.Position(1) - limb.Skeleton.Position(2)).ToRotation(),
             new Vector2(72, 14),
             1f,
             effects,
             0f
         );
+        */
     }
 
     public static VertexPositionColor[] Generate(float size, Color color)
@@ -441,24 +448,6 @@ internal partial class RitualAltar : BaseBloodMoonNPC
                 DrawArm(ref _limbs[i], drawColor, a);
             }
         }
-        else
-        {
-            if (_limbs == null)
-            {
-                CreateLimbs();
-            }
-
-            for (var i = 0; i < _limbs.Length; i++)
-            {
-                var a = NPC.direction == 1 ? 0 : SpriteEffects.FlipHorizontally;
-                a = Math.Sign((_limbs[i].EndPosition - _limbs[i].TargetPosition).Length()) == 1 ? 0 : SpriteEffects.FlipVertically;
-                _limbs[i].TargetPosition = new Vector2(-20 + i * 10, 40) + NPC.Center;
-                _limbs[i].EndPosition = _limbs[i].TargetPosition;
-                DrawArm(ref _limbs[i], drawColor, a);
-
-                UpdateLimbState(ref _limbs[i], _limbBaseOffsets[i], 0.2f, 5, i);
-            }
-        }
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
@@ -494,18 +483,6 @@ internal partial class RitualAltar : BaseBloodMoonNPC
        // Utils.DrawBorderString(spriteBatch, currentAIState.ToString(), NPC.Center - screenPos, Color.AntiqueWhite);
         Texture2D Debug = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
 
-        for (var i = 0; i < _limbs.Length; i++)
-        {
-            if (_limbs[i].GrabPosition.HasValue)
-            {
-                var DrawPos2 = _limbs[i].GrabPosition.Value - screenPos;
-                var DrawPos3 = _limbs[i].PreviousGrabPosition.Value - screenPos;
-                //spriteBatch.Draw(Debug, DrawPos2, new Rectangle(0, 0, 5, 5), Color.LimeGreen);
-                //spriteBatch.Draw(Debug, DrawPos3, new Rectangle(0, 0, 5, 5), Color.Orange);
-            }
-
-           //spriteBatch.Draw(Debug, NPC.Center + _limbBaseOffsets[i] - screenPos, Color.AntiqueWhite);
-        }
 
         Vector2 anchor;
 

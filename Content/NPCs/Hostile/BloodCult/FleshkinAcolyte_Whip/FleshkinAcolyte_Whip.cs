@@ -5,7 +5,7 @@ using Luminance.Common.Easings;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Whip
 {
-    public class FleshkinAcolyte_Whip : BloodMoonBaseNPC
+    public class FleshkinAcolyte_Whip : BaseBloodMoonNPC
     {
         #region tendril
         private Vector2 tendrilTarget;
@@ -52,11 +52,16 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Whip
             set => NPC.ai[0] = value;
         }
         public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodCult/FleshkinAcolyte_Whip/FleshkinAcolyte_Whip";
-        public override void SetStaticDefaults()
+
+        public override int MaxBlood => 1;
+
+        public override BloodMoonBalanceStrength Strength => new();
+
+        public override void SetStaticDefaults2()
         {
             Main.npcFrameCount[Type] = 31;
         }
-        public override void SetDefaults()
+        protected override void SetDefaults2()
         {
             NPC.friendly = false;
             NPC.lifeMax = 40;
@@ -344,5 +349,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Whip
                 );
             }
         }
+
+      
     }
 }

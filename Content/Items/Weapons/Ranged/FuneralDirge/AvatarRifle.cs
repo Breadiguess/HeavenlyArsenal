@@ -218,7 +218,7 @@ public class AvatarRifleGlobalNPC : GlobalNPC
 
     public override bool PreAI(NPC npc)
     {
-        //CombatText.NewText(npc.Hitbox, Color.Gray, $"Shotcount: {shotcount}");
+        //CombatText.NewText(npc.Collider, Color.Gray, $"Shotcount: {shotcount}");
         if (Shredding)
         {
             if (shredTimer > 0)

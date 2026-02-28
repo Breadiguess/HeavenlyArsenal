@@ -14,188 +14,143 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
     private bool IsFalling => NPC.velocity.Y > 1f;
 
-    private void ApplyStanceHeightAdjustment()
-    {
-        var totalError = 0f;
-        var groundedCount = 0;
-
-        for (var i = 0; i < LimbCount; i++)
-        {
-            var limb = _limbs[i];
-            var basePos = NPC.Center + _limbBaseOffsets[i];
-
-            if (!IsLimbGrounded(limb))
-            {
-                continue;
-            }
-
-            var dist = Vector2.Distance(basePos, limb.EndPosition);
-
-            var max = limb.skeletonMaxLength;
-            var stance = max * 0.75f;
-
-            totalError += dist - stance;
-            groundedCount++;
-        }
-
-        if (groundedCount == 0)
-        {
-            NPC.noGravity = false;
-
-            return;
-        }
-
-        NPC.noGravity = true;
-        var avgError = totalError / groundedCount;
-
-        var correction = MathHelper.Clamp(avgError, -10f, 10f);
-
-        var strength = 0.15f;
-
-        //Main.NewText(correction * strength);
-
-        NPC.position.Y += correction * strength;
-    }
 
     private Vector2 FindNewGrabPoint(Vector2 basePos, int index)
     {
-        // Determine a base maximum reach from the skeleton
-        var maxDist = _limbs[index].skeletonMaxLength * 0.75f;
+        ref var limb = ref _limbs[index];
 
-        // Determine whether this leg origin is behind (+) or ahead (-) of the NPC center.
-        var sideRelative = basePos.X - NPC.Center.X;
+        float maxReach = limb.skeletonMaxLength;
+        float bestScore = float.MinValue;
+        Vector2 bestPoint = basePos + Vector2.UnitY * 80f;
 
-        // Scale factor from horizontal speed (0..1)
-        var velocityFactor = MathHelper.Clamp(MathF.Abs(NPC.velocity.X) / 10f, 0f, 1f);
+        bool isLeft = basePos.X < NPC.Center.X;
+        float side = isLeft ? -1f : 1f;
 
-        // If the leg is behind the NPC, reduce forward reach when moving fast.
-        // If the leg is ahead, allow it to reach further when moving fast.
-        if (sideRelative > 0f)
+        Vector2 moveDir =
+            Math.Abs(NPC.velocity.X) > 0.2f
+            ? NPC.velocity.SafeNormalize(Vector2.UnitX * side)
+            : Vector2.UnitX * side;
+
+        float lateralSpacing = 36f;
+
+        for (int s = -6; s <= 6; s++)
         {
-            // behind: more conservative reach, reduce with speed
-            maxDist *= MathHelper.Lerp(0.5f, 1f, 1f - velocityFactor);
-        }
-        else
-        {
-            // ahead: allow an extended reach proportional to speed
-            maxDist *= MathHelper.Lerp(1f, 1.5f, velocityFactor);
-        }
+            float forward = s * lateralSpacing * 0.5f;
 
-        // Compute a horizontal offset for the raycast; bias it depending on whether the leg is behind/ahead.
-        var bias = sideRelative > 0f ? 0.6f : 1.2f;
-        var sideOffset = MathHelper.Clamp(NPC.velocity.X * 90f * bias, -250f, 250f);
+            Vector2 rayStart =
+                basePos + new Vector2(forward, -100f);
 
-        // Ensure the horizontal offset does not exceed the allowed maximum reach.
-        sideOffset = MathHelper.Clamp(sideOffset, -maxDist * 2, 2 * maxDist);
+            Vector2 rayEnd =
+                rayStart + Vector2.UnitY * 300f;
 
-        var hit = LineAlgorithm.RaycastTo
-        (
-            NPC.Top + new Vector2(0, -100).RotatedBy(NPC.rotation + MathHelper.PiOver2) + _limbBaseOffsets[index],
-            basePos + new Vector2(sideOffset, 300) //.RotatedBy((NPC.rotation + MathHelper.PiOver2)*0.5f)
-        );
+            Point? hit = LineAlgorithm.RaycastTo(rayStart, rayEnd, debug: false);
+            if (!hit.HasValue)
+                continue;
 
-        if (!hit.HasValue)
-        {
-            return NPC.Center + _limbBaseOffsets[index] + new Vector2(0, 80); // FindNewGrabPoint(basePos + new Vector2(Main.rand.Next(-1, 1), 0), index); // fallback
-        }
+            Vector2 candidate = hit.Value.ToWorldCoordinates();
 
-        if (!WorldGen.SolidTile(hit.Value))
-        {
-            return FindFallingGrabPoint(basePos + new Vector2(Main.rand.Next(-1, 1), 0));
-        }
 
-        var world = hit.Value.ToWorldCoordinates();
 
-        for (var i = 0; i < LimbCount; i++)
-        {
-            if (world.Distance(_limbs[i].EndPosition) < 30)
+            // --------------------------------------------------
+            // HARD BODY SIDE BARRIER
+            // Limb is not allowed to select points
+            // across the body's vertical midline.
+            // --------------------------------------------------
+
+            bool hipIsLeft = basePos.X < NPC.Center.X;
+            bool candidateIsLeft = candidate.X < NPC.Center.X;
+
+            if (hipIsLeft != candidateIsLeft)
             {
-                // _limbs[i].StepCooldown++;
+                continue; // immediately discard
+            }
+
+            // --- Constrained reach filter ---
+            if (!limb.Skeleton.CanReachConstrained(basePos, candidate))
+                continue;
+
+            float dist = Vector2.Distance(candidate, basePos);
+            float reachNorm = dist / maxReach;
+
+            // --- Directional preference ---
+            Vector2 dir = (candidate - basePos).SafeNormalize(Vector2.Zero);
+            float directionalScore = Vector2.Dot(dir, moveDir);
+
+            // --- Distance penalty ---
+            float distancePenalty = reachNorm * 0.8f;
+
+            float bodyRejectPenalty = 0f;
+
+            // --- Radial exclusion field ---
+            float bodyRadius = NPC.width * 0.55f;
+            Vector2 bodyCenter = NPC.Center;
+
+            // Offset slightly downward so feet don't clip underside
+            bodyCenter.Y += NPC.height * 0.1f;
+
+            float distToBody = Vector2.Distance(candidate, bodyCenter);
+
+            // Hard reject if inside body radius
+            if (distToBody < bodyRadius)
+            {
+                bodyRejectPenalty = 2000f;
+            }
+
+            // Extra penalty for directly beneath
+            if (candidate.Y > NPC.Center.Y &&
+                Math.Abs(candidate.X - NPC.Center.X) < bodyRadius * 0.8f)
+            {
+                bodyRejectPenalty += 2000f;
+            }
+
+
+            float separationPenalty = 0f;
+
+            const float PreferredSeparation = 32f;
+
+            for (int j = 0; j < LimbCount; j++)
+            {
+                if (j == index)
+                    continue;
+
+                if (_limbs[j].IsStepping)
+                    continue;
+
+                float d = Vector2.Distance(_limbs[j].PlantLocation, candidate);
+
+                if (d < PreferredSeparation)
+                {
+                    float t = 1f - (d / PreferredSeparation);
+                    separationPenalty += t * t;
+                }
+            }
+          
+
+            separationPenalty *= 120f;
+
+            float score =
+                directionalScore * 1.5f
+                - distancePenalty
+                - bodyRejectPenalty
+                - separationPenalty;
+            Color scoreColor = Color.Lerp(Color.Red, Color.LimeGreen, MathHelper.Clamp((score + 1f) * 0.5f, 0f, 1f));
+
+            RayCastVisualizer.Texts.Add(new($"{index} \n {score.ToString("0.0")}"
+                          
+                          ,
+                          candidate + new Vector2(0, index * 20),
+                          scoreColor
+                      ));
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestPoint = candidate;
             }
         }
 
-        //Main.NewText(basePos - world);
-        return world;
+        return bestPoint;
     }
 
-    private bool IsLimbGrounded(RitualAltarLimb limb)
-    {
-        if (!limb.GrabPosition.HasValue)
-        {
-            return false;
-        }
-
-        if (limb.StepProgress > 0f)
-        {
-            return false; // stepping legs don't support body weight
-        }
-
-        var foot = limb.GrabPosition.Value;
-
-        // Raycast a short distance downward
-        var hit = LineAlgorithm.RaycastTo
-        (
-            foot,
-            foot + new Vector2(0, 24f) // 24px downward tolerance
-        );
-
-        if (!hit.HasValue)
-        {
-            return false;
-        }
-
-        var t = Framing.GetTileSafely(hit.Value);
-
-        return t.HasTile && Main.tileSolid[t.TileType];
-    }
-
-    private bool ShouldRelease(int limbIndex, RitualAltarLimb limb, Vector2 basePos)
-    {
-        // Never release if stepping
-        if (limb.StepProgress > 0f)
-        {
-            return false;
-        }
-
-        var thing = NPC.Center + NPC.rotation.ToRotationVector2();
-
-        //Main.NewText(thing.X - basePos.X);
-        if (basePos.X < thing.X && !AngleBetween(NPC.rotation, MathHelper.ToRadians(-115), MathHelper.ToRadians(-60)))
-        {
-            //don't capsize, idiot
-            //Main.NewText(!AngleBetween(NPC.rotation,  MathHelper.ToRadians(-135), MathHelper.ToRadians(-30)));
-            //return true;
-        }
-        //float difference = limb.GrabPosition.Value.X - basePos.X;
-        //difference *= NPC.velocity.X != 0 ? Math.Sign(NPC.velocity.X) : NPC.direction;
-
-        // Must have a foothold to release FROM
-        if (!limb.GrabPosition.HasValue)
-        {
-            return true; // needs to find one immediately
-        }
-
-        var opposite = GetOppositeLeg(limbIndex);
-        var other = _limbs[opposite];
-
-        // If the paired leg is NOT grounded, this leg must WAIT.
-        if (!IsLimbGrounded(other))
-        {
-            return false;
-        }
-
-        var maxDist = limb.skeletonMaxLength * 0.87f;
-        var dist = Vector2.Distance(basePos, limb.GrabPosition.Value);
-
-        var tolerance = 0f;
-
-        if (dist > maxDist + tolerance)
-        {
-            return true;
-        }
-
-        return false;
-    }
 
     public static bool AngleBetween(float angle, float min, float max)
     {
@@ -231,48 +186,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
         return angle >= min || angle <= max;
     }
 
-    private Vector2 FindFallingGrabPoint(Vector2 basePos)
-    {
-        // Raycast straight down under the leg's origin
-        var hit = LineAlgorithm.RaycastTo
-        (
-            basePos,
-            basePos + new Vector2(0, 300f) // long ray down
-        );
-
-        if (hit.HasValue)
-        {
-            return hit.Value.ToWorldCoordinates() + new Vector2(0, -8f);
-        }
-
-        // If no ground found, keep leg fully extended downward
-        return basePos + new Vector2(0, 250f);
-    }
-
-    private int GetOppositeLeg(int i)
-    {
-        if (i == 0)
-        {
-            return 2;
-        }
-
-        if (i == 2)
-        {
-            return 0;
-        }
-
-        if (i == 1)
-        {
-            return 3;
-        }
-
-        if (i == 3)
-        {
-            return 1;
-        }
-
-        return i;
-    }
+  
 
     #endregion
 }

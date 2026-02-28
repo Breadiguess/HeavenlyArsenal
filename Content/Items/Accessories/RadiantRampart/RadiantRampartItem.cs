@@ -1,13 +1,11 @@
 ﻿using CalamityMod;
 using CalamityMod.Items;
 using CalamityMod.Items.Accessories;
-using CalamityMod.Rarities;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.RadiantRampart;
 
-[LegacyName("Acessory_Thing")]
 [AutoloadEquip(EquipType.Shield)]   
 public class RadiantRampartItem : ModItem
 {
@@ -35,7 +33,7 @@ public class RadiantRampartItem : ModItem
         var recipe = CreateRecipe()
             .AddIngredient(ModContent.ItemType<RampartofDeities>())
             .AddIngredient(ModContent.ItemType<Radiance>())
-
+            
             .AddTile(ModContent.TileType<DraedonsForge>());
 
         recipe.Register();

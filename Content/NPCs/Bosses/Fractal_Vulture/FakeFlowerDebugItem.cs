@@ -28,15 +28,4 @@ public class FakeFlowerDebugItem : ModItem
         Item.DefaultToPlaceableTile(ModContent.TileType<FakeFlowerTile>());
         Item.Wrath().GenesisComponent = true;
     }
-
-    [JITWhenModsEnabled(CalamityCompatibility.ModName)]
-    public override void AddRecipes()
-    {
-        CreateRecipe()
-            .AddTile(TileID.WorkBenches)
-            .AddIngredient<ExoPrism>(5)
-            .AddIngredient(ItemID.Seed)
-            .AddCondition(Language.GetText("Mods.NoxusBoss.Conditions.ObtainedBefore"), BossDownedSaveSystem.HasDefeated<MarsBody>)
-            .Register();
-    }
 }

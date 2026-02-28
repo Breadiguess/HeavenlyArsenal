@@ -400,9 +400,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
                 };
 
             WingEffect.TextureEnabled = true;
-                    WingEffect.Texture = wingTex;
+            WingEffect.Texture = wingTex;
             WingEffect.World = Matrix.Identity;
-                gd.RasterizerState = new RasterizerState { CullMode = CullMode.None, FillMode = FillMode.WireFrame };
+            gd.RasterizerState = new RasterizerState { CullMode = CullMode.None, FillMode = FillMode.WireFrame };
 
             gd.SamplerStates[0] = SamplerState.PointClamp;
             gd.RasterizerState = new RasterizerState { CullMode = CullMode.None };
@@ -489,8 +489,8 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-          
-          
+
+
             Texture2D debug = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
             //RenderBody(spriteBatch, screenPos, drawColor);
             spriteBatch.ResetToDefault();
@@ -501,6 +501,7 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             });
             spriteBatch.ResetToDefault();
             drawTail();
+
             DrawLegs(drawColor);
             if (!NPC.IsABestiaryIconDummy)
                 for (int i = 0; i < 2; i++)
@@ -523,16 +524,16 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
             //RenderHead();
             mask(spriteBatch, drawColor);
             DateTime date = DateTime.Now;
-            if (date.Month == 12 && (date.Day ==24 || date.Day == 25))
+            if (date.Month == 12 && (date.Day == 24 || date.Day == 25))
             {
                 float hatScale = 0.1f;
-                Vector2 hatDrawPosition = HeadPos - Main.screenPosition + new Vector2(0,-20);
+                Vector2 hatDrawPosition = HeadPos - Main.screenPosition + new Vector2(0, -20);
                 Texture2D santaHat = GennedAssets.Textures.NamelessDeity.SantaHat;
 
                 Main.EntitySpriteDraw(santaHat, hatDrawPosition, null, Color.White * NPC.Opacity, 0f, santaHat.Size() * 0.5f, hatScale, 0);
             }
 
-           
+
             string msg = "";
             msg += $"Time: {Time}\n Currenstate: {currentState.ToString()}\nprevious state: {previousState.ToString()}\n DashesUsed: {DashesUsed}\n Damage: {NPC.damage}\n dash timer: {DashTimer}\n second phase: {HasSecondPhaseTriggered}\n StaggerTimer: {StaggerTimer}\n Direction: {NPC.direction}";
             //Utils.DrawBorderString(spriteBatch, msg, NPC.Center - screenPos, Color.AliceBlue, anchory: -1);
@@ -671,6 +672,9 @@ namespace HeavenlyArsenal.Content.NPCs.Bosses.Fractal_Vulture
         void DrawLegs(Color DrawColor)
         {
             if (Main.netMode == NetmodeID.Server)
+                return;
+
+            if (_LeftLeg.Skeleton == null || _rightLeg.Skeleton == null)
                 return;
             for (int i = 0; i < 2; i++)
             {

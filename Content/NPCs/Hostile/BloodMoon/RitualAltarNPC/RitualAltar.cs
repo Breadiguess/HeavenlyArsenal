@@ -1,10 +1,11 @@
-﻿using System.IO;
-using System.Linq;
-using CalamityMod;
+﻿using CalamityMod;
 using CalamityMod.Items.Materials;
 using HeavenlyArsenal.Content.Items.Materials.BloodMoon;
+using HeavenlyArsenal.Core.Systems;
 using Luminance.Common.Utilities;
 using NoxusBoss.Content.Biomes;
+using System.IO;
+using System.Linq;
 using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -48,6 +49,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
     public override int MaxBlood => 100;
 
+    private Vector2 MotionIntent;
 
     public override void SetStaticDefaults2()
     {
@@ -68,22 +70,13 @@ internal partial class RitualAltar : BaseBloodMoonNPC
     {
         base.SendExtraAI(writer);
 
-        foreach (var limb in _limbs)
-        {
-            writer.WriteVector2(limb.TargetPosition);
-        }
     }
 
     public override void ReceiveExtraAI2(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
 
-        for (var i = 0; i < _limbs.Length; i++)
-        {
-            var limb = _limbs[i];
-            limb.TargetPosition = reader.ReadVector2();
-            _limbs[i] = limb;
-        }
+       
     }
 
     public override void OnSpawn(IEntitySource source)
@@ -176,119 +169,35 @@ internal partial class RitualAltar : BaseBloodMoonNPC
     {
         var d = Vector2.Zero;
 
-        for (var i = 0; i < _limbs.Count(); i++)
-        {
-            d += _limbs[i].EndPosition;
+        EstimateSurfaceFrame(NPC.Center, out normal, out tangent);
 
-            if (_limbs[i] == default)
-            {
-                CreateLimbs();
-            }
-        }
 
-        d /= 4;
-        var width = NPC.width * 0.3f;
-        NPC.rotation = NPC.rotation.AngleLerp(d.AngleTo(NPC.Center), interp);
-        _limbBaseOffsets[0] = new Vector2(-width, NPC.height / 2 - 20).RotatedBy(NPC.rotation + MathHelper.PiOver2);
-        _limbBaseOffsets[1] = new Vector2(width, NPC.height / 2 - 20).RotatedBy(NPC.rotation + MathHelper.PiOver2);
-        _limbBaseOffsets[2] = new Vector2(-width * 0.5f, NPC.height / 2 - 10).RotatedBy(NPC.rotation + MathHelper.PiOver2);
-        _limbBaseOffsets[3] = new Vector2(width * 0.5f, NPC.height / 2 - 10).RotatedBy(NPC.rotation + MathHelper.PiOver2);
+        // Tilt based on horizontal velocity only:
+        // - referenceSpeed defines how fast it must move to reach full tilt.
+        // - maxTilt limits the tilt angle (in radians).
+        var referenceSpeed = 1f;
+        var maxTilt = MathHelper.ToRadians(20f);
+        var normalized = MathHelper.Clamp(NPC.velocity.X / referenceSpeed, -1f, 1f);
+        var targetRotation = normalized * maxTilt + tangent.ToRotation() - MathHelper.PiOver2;
+
+        // Slightly lerp rotation toward the horizontal-velocity-based target.
+        NPC.rotation = NPC.rotation.AngleLerp(targetRotation, 0.1f);
     }
 
     public override void PostAI()
     {
-        var isIdle = Math.Abs(NPC.velocity.X) < 0.5f;
 
-        for (var i = 0; i < LimbCount; i++)
+
+        balanceHead(0.025f);
+
+        Levitate();
+        for(int i = 0; i< LimbCount; i++)
         {
             var limb = _limbs[i];
 
-            //fallbacks
-            if (limb.GrabPosition.HasValue)
-            {
-                //don't grab above body
-                if (limb.GrabPosition.Value.Distance(NPC.Top) < 4 && MathF.Round(limb.GrabPosition.Value.Y) >= MathF.Round(NPC.Top.Y))
-                {
-                    limb.StepCooldown = 0;
-                    limb.StepProgress = 0;
-                    limb.ShouldStep = true;
-                }
-
-                if (limb.GrabPosition.Value.Distance(NPC.Center + _limbBaseOffsets[i]) < 30)
-                {
-                    //limb.ShouldStep = true;
-                    //limb.StepCooldown = 0;
-                    //limb.StepProgress = 0;
-                }
-            }
-
-            var basePos = NPC.Center + _limbBaseOffsets[i];
-
-            /* if (isIdle && limb.StepProgress <= 0f)
-             {
-                 Vector2 idlePos = GetIdleRestPosition(i, basePos);
-
-                 // distance from current foothold to ideal idle spot
-                 float idleError = Vector2.Distance(limb.GrabPosition ?? limb.EndPosition, idlePos);
-
-                 // threshold: if leg is too far from where it *should* rest
-                 if (idleError > 50f) // tune this
-                 {
-                     limb.PreviousGrabPosition = limb.GrabPosition ?? limb.EndPosition;
-                     limb.GrabPosition = idlePos;
-                     limb.StepProgress = 1f;
-                     limb.StepCooldown = 10; // small so settling is quick
-
-                     _limbs[i] = limb;
-                     UpdateLimbState(ref _limbs[i], basePos, 0.4f, 15, i);
-                     continue;
-                 }
-             }*/
-
-            var distToGround = Vector2.Distance(basePos, limb.GrabPosition.HasValue ? limb.GrabPosition.Value : limb.EndPosition);
-            var max = limb.skeletonMaxLength;
-            var stanceLength = max * 0.75f;
-
-            if (limb.StepProgress <= 0f && ShouldRelease(i, limb, basePos))
-            {
-                limb.PreviousGrabPosition = limb.GrabPosition ?? limb.EndPosition;
-                limb.GrabPosition = FindNewGrabPoint(basePos, i);
-                limb.StepProgress = 1f;
-            }
-
-            // 2. Animate step
-            if (limb.StepProgress > 0f)
-            {
-                //float t = 1f - limb.StepProgress;
-                //Vector2 start = limb.PreviousGrabPosition ?? limb.EndPosition;
-                //Vector2 end = limb.GrabPosition ?? start;
-
-                //float arc = (float)Math.Sin(t * MathHelper.Pi) * 402f;
-                //limb.TargetPosition = Vector2.Lerp(start, end, t) + new Vector2(0, -arc);
-
-                limb.StepProgress -= 0.1f;
-
-                if (limb.StepProgress <= 0f)
-                {
-                    limb.StepProgress = 0f;
-                    //limb.EndPosition = end;
-                }
-            }
-            else
-            {
-                if (limb.GrabPosition.HasValue)
-                {
-                    limb.TargetPosition = limb.GrabPosition.Value;
-                }
-            }
-
-            _limbs[i] = limb; // always write back
-            UpdateLimbState(ref _limbs[i], basePos, 0.4f, 15, i);
+            UpdateLimbState(ref limb, NPC.Center+ _limbBaseOffsets[i], i);
         }
-
-        balanceHead(0.025f);
-        ApplyStanceHeightAdjustment();
-
+        
         Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
 
         if (NPCTarget != null)
@@ -299,5 +208,133 @@ internal partial class RitualAltar : BaseBloodMoonNPC
         {
             currentTarget = playerTarget;
         }
+    }
+    private void Levitate()
+    {
+
+        float maxCheck = 170f;
+        int hitCount = 0;
+        float accumulatedHeight = 0f;
+
+        for (int i = 0; i < 3; i++)
+        {
+            Vector2 start = NPC.Center;
+            Vector2 end = start + Vector2.UnitY.RotatedBy(MathHelper.PiOver2 * i / 3f - MathHelper.PiOver2 / 3f - NPC.rotation - MathHelper.PiOver2) * maxCheck;
+
+            Point? hit = LineAlgorithm.RaycastTo(start, end, debug: false);
+
+            if (!hit.HasValue)
+                continue;
+
+            float height =
+                hit.Value.ToWorldCoordinates().Y - NPC.Center.Y;
+
+            accumulatedHeight += height;
+            hitCount++;
+        }
+
+        if (hitCount < 2)
+        {
+            NPC.noGravity = false;
+            return;
+        }
+
+        float actualHeight = accumulatedHeight / hitCount;
+        float desiredHeight = 90f;
+        float tolerance = 1.5f;
+
+        float error = desiredHeight - actualHeight;
+
+        if (MathF.Abs(error) < tolerance)
+        {
+            NPC.velocity.Y = 0f;
+            NPC.noGravity = true;
+            return;
+        }
+
+        float correctionStrength = 0.08f;
+
+        float moveAmount = error * correctionStrength;
+        moveAmount = MathHelper.Clamp(moveAmount, -2f, 2f);
+
+        NPC.position.Y -= moveAmount;
+        NPC.noGravity = true;
+        NPC.velocity.Y = 0f;
+    }
+
+
+
+    public Vector2 normal;
+    public Vector2 tangent;
+    private Vector2 _lastBodyPos;
+
+    public static bool EstimateSurfaceFrame(Vector2 origin, out Vector2 normal, out Vector2 tangent)
+    {
+        const int samples = 5;       // must be odd
+        const float spacing = 63 * 3f;
+        const float depth = 300f;
+
+        int half = samples / 2;
+
+        float sumX = 0f;
+        float sumY = 0f;
+        float sumXX = 0f;
+        float sumXY = 0f;
+
+        int valid = 0;
+
+        for (int i = 0; i < samples; i++)
+        {
+            float x = (i - half) * spacing;
+
+            Vector2 start = origin + new Vector2(x, -120);
+            Vector2 end = start + Vector2.UnitY * depth;
+
+            Point? hit = LineAlgorithm.RaycastTo(
+                start,
+                end,
+                ShouldCountWater: false,
+                debug: false);
+
+            if (!hit.HasValue)
+                continue;
+
+            Vector2 world = hit.Value.ToWorldCoordinates();
+
+            float y = world.Y;
+
+            sumX += x;
+            sumY += y;
+            sumXX += x * x;
+            sumXY += x * y;
+
+            valid++;
+        }
+
+        if (valid < 2)
+        {
+            tangent = Vector2.UnitX;
+            normal = Vector2.UnitY;
+            return false;
+        }
+
+        float denom = valid * sumXX - sumX * sumX;
+
+        if (Math.Abs(denom) < 0.001f)
+        {
+            tangent = Vector2.UnitX;
+            normal = Vector2.UnitY;
+            return false;
+        }
+
+        float slope = (valid * sumXY - sumX * sumY) / denom;
+
+        tangent = new Vector2(1f, slope).SafeNormalize(Vector2.UnitX);
+        normal = new Vector2(-tangent.Y, tangent.X);
+
+        if (normal.Y < 0)
+            normal *= -1f;
+
+        return true;
     }
 }

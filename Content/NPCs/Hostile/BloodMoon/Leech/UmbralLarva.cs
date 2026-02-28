@@ -299,10 +299,7 @@ public class UmbralLarva : BaseBloodMoonNPC
 
 
 
-        for(int i = 0; i< spine.Length-1; i++)
-        {
-            Utils.DrawLine(spriteBatch, spine[i], spine[i + 1], Color.White);
-        }
+     
         return false;
     }
     public override bool CheckActive()

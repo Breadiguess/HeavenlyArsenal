@@ -7,13 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
+      <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
-      <Compile Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
-      <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
+      <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
-      <None Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
+      <None Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <None Remove="Content\Projectiles\Weapons\Rogue\**" />
     </ItemGroup>
 
@@ -32,6 +32,11 @@
       <Compile Remove="Content\Items\Misc\AncientCoin.cs" />
       <Compile Remove="Content\Items\Misc\ChaliceOfFunItem.cs" />
       <Compile Remove="Content\Items\Misc\ChaliceOfFunProjectile.cs" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\Artillery_Crab\BloodCrab - Copy.IK.cs" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPC.cs" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPCLimb.cs" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPCRenderer.cs" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech.cs" />
       <Compile Remove="Core\Systems\VoidTradingSystem.cs" />
     </ItemGroup>
 
@@ -63,10 +68,6 @@
         <Reference Include="SubworldLibrary">
             <HintPath>ModReferences\SubworldLibrary.dll</HintPath>
         </Reference>
-    </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Content\NPCs\Hostile\BloodMoon\Temp\" />
     </ItemGroup>
 
 </Project>

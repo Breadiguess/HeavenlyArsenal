@@ -92,7 +92,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
     protected override void SetDefaults2()
     {
         NPC.lifeMax = 50_000;
-        NPC.damage = 160;
+        NPC.damage = 90;
         NPC.defense = 145;
         NPC.noGravity = true;
         NPC.aiStyle = -1;
@@ -101,7 +101,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
         NPC.noTileCollide = true;
 
         NPC.Size = new Vector2(30, 30);
-        NPC.knockBackResist = 0.1f;
+        NPC.knockBackResist = 0.6f;
 
         NPC.DeathSound = AssetDirectory.Sounds.NPCs.Hostile.BloodMoon.UmbralLeech.DyingNoise;
         NPC.HitSound = SoundID.NPCHit1;

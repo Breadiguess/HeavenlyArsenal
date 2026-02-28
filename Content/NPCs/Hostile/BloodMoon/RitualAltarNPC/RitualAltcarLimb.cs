@@ -9,98 +9,100 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 // thanks bozo :3
 internal partial class RitualAltar
 {
-    public class RitualAltarLimb
+    public sealed class RitualAltarLimb
     {
         public RitualAltarLimb Sister;
 
         public RitualAltarLimb Paired;
 
         public IKSkeleton Skeleton;
-
-        public Vector2 TargetPosition = Vector2.Zero;
-
-        public Vector2 EndPosition = Vector2.Zero;
-
-        public bool IsAnchored;
-
-        public Vector2 DesiredGrabPosition;
-
-        public Vector2? GrabPosition;
-
-        public Vector2? PreviousGrabPosition;
+        public Vector2 DesiredLocation;     // foothold planner output
+        public Vector2 PlantLocation;       // locked stance foot
+        public Vector2 StepStartLocation;
+        public Vector2 StepDestination;
 
         public float StepProgress;
+        public bool IsStepping;
 
-        public float StepCooldown;
-
-        public bool ShouldStep;
+        public float Phase;
 
         public float skeletonMaxLength => Skeleton._maxDistance;
 
         public RitualAltarLimb(IKSkeleton skeleton, RitualAltarLimb sister, RitualAltarLimb paired, bool anchored = false, bool hasTarget = false)
         {
             Skeleton = skeleton;
-            IsAnchored = anchored;
             Sister = sister;
             Paired = paired;
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void UpdateLimbState(ref RitualAltarLimb limb, Vector2 basePos, float lerpSpeed, float anchorThreshold, int i)
+    private void UpdateLimbState(ref RitualAltarLimb limb, Vector2 basePos, int i)
     {
-        limb.ShouldStep = false;
+        float stepThreshold = limb.skeletonMaxLength * 0.5f;
+        float stepSpeed = 0.09f;
+        float stepHeight = 26f;
 
-        if (limb.GrabPosition.HasValue)
+        Vector2 desired = FindNewGrabPoint(basePos, i);
+
+        if (!limb.Skeleton.CanReachConstrained(basePos, desired))
+            return;
+
+        limb.DesiredLocation = desired;
+
+        if (limb.PlantLocation == Vector2.Zero)
         {
-            var bell = Convert01To010(limb.StepProgress); //(float)Math.Sin((1 - limb.StepProgress) * MathHelper.Pi);
-
-            if (limb.GrabPosition.Value.Distance(limb.PreviousGrabPosition.Value) < 3)
-            {
-                bell = 0;
-            }
-
-            limb.EndPosition = Vector2.Lerp(limb.EndPosition, limb.GrabPosition.Value, 0.2f) - new Vector2(0, 10) * bell;
+            limb.PlantLocation = desired;
+            limb.StepDestination = desired;
+            limb.StepStartLocation = desired;
+            limb.IsStepping = false;
+            limb.StepProgress = 0f;
         }
 
-        //Dust.NewDustPerfect(limb.EndPosition, DustID.Cloud, Vector2.Zero);
-        limb.Skeleton.Update(basePos, limb.EndPosition);
-        limb.IsAnchored = Vector2.Distance(limb.EndPosition, limb.TargetPosition) < anchorThreshold;
+        float dist = Vector2.Distance(limb.PlantLocation, limb.DesiredLocation);
 
-        var maxDist = limb.skeletonMaxLength * 0.9f;
+        int groundedCount = 0;
+        for (int j = 0; j < LimbCount; j++)
+            if (!_limbs[j].IsStepping)
+                groundedCount++;
 
-        if (limb.GrabPosition.HasValue)
+        bool enoughSupport = groundedCount >= 2;
+
+        float phaseTime = (Main.GameUpdateCount * 0.05f + limb.Phase) % 1f;
+        bool inPhaseWindow = phaseTime < 0.5f;
+
+        if (!limb.IsStepping &&
+            enoughSupport &&
+            Math.Abs(NPC.velocity.X) > 0.4f &&
+            inPhaseWindow &&
+            dist > stepThreshold)
         {
-            if (Vector2.Distance(basePos, limb.GrabPosition.Value) > maxDist)
+            limb.IsStepping = true;
+            limb.StepProgress = 0f;
+            limb.StepStartLocation = limb.PlantLocation;
+            limb.StepDestination = limb.DesiredLocation;
+        }
+
+        if (limb.IsStepping)
+        {
+            limb.StepProgress += stepSpeed;
+            float t = MathHelper.Clamp(limb.StepProgress, 0f, 1f);
+
+            Vector2 flat = Vector2.Lerp(limb.StepStartLocation, limb.StepDestination, t);
+            float arc = MathF.Sin(t * MathF.PI) * stepHeight;
+
+            limb.PlantLocation = flat - Vector2.UnitY * arc;
+
+            if (t >= 1f)
             {
-                limb.ShouldStep = true;
+                limb.PlantLocation = limb.StepDestination;
+                limb.IsStepping = false;
+                limb.StepProgress = 0f;
             }
         }
 
-        if (limb.StepCooldown > 0)
-        {
-            limb.StepCooldown--;
-            limb.ShouldStep = false;
-        }
-
-        if (limb.ShouldStep && limb.StepCooldown <= 0)
-        {
-            limb.PreviousGrabPosition = limb.GrabPosition;
-
-            if (IsFalling)
-            {
-                limb.GrabPosition = FindFallingGrabPoint(basePos);
-            }
-            else
-            {
-                limb.GrabPosition = FindNewGrabPoint(basePos, i);
-            }
-
-            limb.StepProgress = 1f; // start stride animation
-            limb.StepCooldown = 30;
-        }
+        limb.Skeleton.Update(basePos, limb.PlantLocation);
     }
-
     private void CreateLimbs()
     {
         _limbs = new RitualAltarLimb[LimbCount];
@@ -123,8 +125,8 @@ internal partial class RitualAltar
             (
                 new IKSkeleton
                 (
-                    (36f, new IKSkeleton.Constraints()),
-                    (60f, new IKSkeleton.Constraints
+                    (46f, new IKSkeleton.Constraints()),
+                    (70f, new IKSkeleton.Constraints
                     {
                         MinAngle = i % 2 == 0 ? -MathHelper.Pi : 0,
                         MaxAngle = i % 2 == 0 ? 0 : MathHelper.Pi
@@ -133,19 +135,10 @@ internal partial class RitualAltar
                 default,
                 default
             );
+            _limbs[i].Phase = i / (float)LimbCount;
 
-            _limbs[i].TargetPosition = NPC.Center + _limbBaseOffsets[i] + new Vector2(0, 40);
-            _limbs[i].EndPosition = _limbs[i].TargetPosition;
         }
 
-        for (var i = 0; i < 4; i++)
-        {
-            var set = i < 2 ? 0 : 2;
-            var otherSisterOffset = i % 2 == 0 ? 1 : 0;
-            var pairedleg = i == 3 ? 0 : i == 0 ? 3 : i == 1 ? 2 : 1;
-
-            _limbs[i].Paired = _limbs[pairedleg];
-            _limbs[i].Sister = _limbs[set + otherSisterOffset];
-        }
+        
     }
 }

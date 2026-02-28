@@ -181,6 +181,7 @@ public static class AssetDirectory
         {
             public static class Misc
             {
+                public static readonly SoundStyle Bobulous = new(AssetPath + "Sounds/Items/Plushies/BobulousPlush");
                 public static readonly SoundStyle OrigamiPlush = new(AssetPath + "Sounds/Items/Plushies/idolbellv1origamiskies");
 
                 public static readonly SoundStyle PlayMyMod = new(AssetPath + "Sounds/Items/Plushies/PlayMyMod");

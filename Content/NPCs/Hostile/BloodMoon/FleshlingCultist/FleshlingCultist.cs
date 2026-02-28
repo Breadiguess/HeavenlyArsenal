@@ -68,14 +68,10 @@ internal partial class FleshlingCultist : BaseBloodMoonNPC
         NPC.lifeMax = 10_000;
         NPC.damage = 70;
         NPC.defense = 27;
-        NPC.knockBackResist = 0.6f;
+        NPC.knockBackResist = 0.4f;
         NPC.Size = new Vector2(32, 50);
         NPC.HitSound = SoundID.NPCHit1;
 
-        SpawnModBiomes =
-        [
-            ModContent.GetInstance<RiftEclipseBiome>().Type
-        ];
     }
 
     public override void OnSpawn(IEntitySource source)

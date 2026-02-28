@@ -194,7 +194,25 @@ public partial class newLeech
     {
         if (currentTarget != null)
         {
-            NPC.velocity = NPC.AngleTo(currentTarget.Center).ToRotationVector2() * 9.99f;
+
+
+            float moveSpeed = 9.99f;
+            float accel = 0.12f;
+
+            // where we WANT to be going
+            var desiredVel =
+                NPC.DirectionTo(currentTarget.Center) * moveSpeed;
+
+            // steering force toward that velocity
+            var steering =
+                desiredVel - NPC.velocity;
+
+
+            NPC.velocity+= steering;
+
+
+
+            //NPC.velocity = NPC.AngleTo(currentTarget.Center).ToRotationVector2() * 9.99f;
 
             if (Main.rand.NextBool(3) && currentTarget is Player && Time % 160 == 0)
             {

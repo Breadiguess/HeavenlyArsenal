@@ -1,4 +1,4 @@
-Mods: {
+﻿Mods: {
 	HeavenlyArsenal: {
 		Keybinds: {
 			"Quick Dash.DisplayName": Quick  Dash
@@ -124,7 +124,14 @@ Mods: {
 
 			TaxidermyBook: {
 				DisplayName: Taxidermy Book
-				Tooltip: Contains a frighteningly in-depth analysis of how to-
+				ObtainmentHint: Dropped by Aberrations born from the blood of an eldritch horror.
+				Tooltip:
+					'''
+					Contains a frighteningly in-depth analysis of how to dissect, preserve, and repurpose hostile organisms.
+					every diagram is labeled in immaculate detail
+					Some specimens are listed as “still viable.”
+					A true collector’s volume.
+					'''
 			}
 
 			UncannyDye: {

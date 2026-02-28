@@ -266,7 +266,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ColdFusion
             Texture2D BubblyNoise = ModContent.Request<Texture2D>("NoxusBoss/Assets/Textures/Extra/Noise/BubblyNoise").Value;
             Texture2D DendriticNoiseZoomedOut = ModContent.Request<Texture2D>("NoxusBoss/Assets/Textures/Extra/Noise/DendriticNoiseZoomedOut").Value;
 
-            Rectangle viewBox = Projectile.Hitbox;
+            Rectangle viewBox = Projectile.Collider;
             Rectangle screenBox = new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
             viewBox.Inflate(540, 540);
             if (!viewBox.Intersects(screenBox))

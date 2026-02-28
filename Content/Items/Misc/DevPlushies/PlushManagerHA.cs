@@ -34,7 +34,7 @@ namespace HeavenlyArsenal.Content.Misc.DevPlushies
             LoadPlush("Pil", 3, sound: AssetDirectory.Sounds.NPCs.Hostile.BloodMoon.UmbralLeech.Bash);
             LoadPlush("Sumii", 3, sound: GennedAssets.Sounds.NamelessDeity.Chuckle);
             LoadPlush("Vertis", 3, sound: AssetDirectory.Sounds.NPCs.Hostile.BloodMoon.UmbralLeech.Explode);
-            LoadPlush("Bobulous",3);
+            LoadPlush("Bobulous",3, sound: AssetDirectory.Sounds.Items.Misc.Bobulous);
         }
 
     

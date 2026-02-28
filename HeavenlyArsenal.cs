@@ -111,7 +111,7 @@ public sealed partial class HeavenlyArsenal : Mod
 
                         for (var i = 0; i < extrahitboxes.Count; i++)
                         {
-                            //if (self.Distance(extrafhitboxes[i].Hitbox.Center()) < 100)
+                            //if (self.Distance(extrafhitboxes[i].Collider.Center()) < 100)
                             //    Main.NewText(self.ToString());
                             if (extrahitboxes[i].Active)
                             {
@@ -208,7 +208,7 @@ public sealed partial class HeavenlyArsenal : Mod
                         {
                             //for(int y = 0; y < 40;y++)
                             // {
-                            //     Vector2 pos = Vector2.Lerp(self.WhipPointsForCollision[x], box.Hitbox.Center(), y/40f);
+                            //     Vector2 pos = Vector2.Lerp(self.WhipPointsForCollision[x], box.Collider.Center(), y/40f);
                             //     Dust a = Dust.NewDustPerfect(pos, DustID.Blood, Vector2.Zero, 0, Color.Red);
                             //     a.noGravity = true;
                             //     a.scale = 3;

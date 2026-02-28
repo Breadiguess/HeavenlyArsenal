@@ -504,7 +504,7 @@ internal partial class BloodJelly
         if (Time >= maxTime && !HasExploded)
         {
             SoundEngine.PlaySound(GennedAssets.Sounds.Enemies.DismalLanternExplode);
-            var Type = ModContent.NPCType<JellyBloom>();
+          
 
             var Pos = NPC.Center + new Vector2(0, 60).RotatedBy(NPC.rotation); //Tendrils[tendrilCount].Item1[Tendrils[tendrilCount].Item1.Length - 1];
             var explosion = Projectile.NewProjectileDirect(NPC.GetSource_FromThis(), Pos, Vector2.Zero, ModContent.ProjectileType<JellyExplosion>(), 1000, 10);

@@ -21,6 +21,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
     }
     public abstract class BaseBloodMoonNPC : ModNPC
     {
+        public bool _StatsHaveBeenAdjusted = false;
         public override void Load()
         {
             On_NPC.SetDefaults += ApplyBloodMoonBalancingRule;
@@ -31,6 +32,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
             orig(self, Type, spawnparams);
             if(self.ModNPC!=null && self.ModNPC is BaseBloodMoonNPC bloodMoonNPC)
             {
+                if(self.As<BaseBloodMoonNPC>()._StatsHaveBeenAdjusted)
+                    return;
+                
                 float h = BloodMoonBalancing.HealthMultiplier;
                 float d = BloodMoonBalancing.DamageMultiplier;
                 float def = BloodMoonBalancing.DefenseMultiplier;
@@ -50,6 +54,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
                 self.defense = (int)(self.defense * def);
 
                 self.life = self.lifeMax;
+                string text = $"{self.FullName}\n" + 
+                    $"{s.HealthMulti_Influence}\n" +
+                    $"{hScale}\n" +
+                    $"{self.life}";
+                //Main.NewText(text);
+                self.As<BaseBloodMoonNPC>()._StatsHaveBeenAdjusted = true;
             }
 
         }
@@ -82,6 +92,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
         public override string LocalizationCategory => "NPCs";
 
         public Entity Target;
+        /// <summary>
+        /// common shared resource between all BaseBloodmoon npcs.
+        /// </summary>
+        /// <remarks>Automatically netsynced.</remarks>
         public int Blood;
         public bool CanBeSacrificed;
         public abstract int MaxBlood { get; }
@@ -114,7 +128,19 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
         protected abstract void SetDefaults2();
         public sealed override void SetDefaults()
         {
-            
+            NPC.buffImmune[BuffID.OnFire] = true;
+            NPC.buffImmune[BuffID.OnFire3] = true;
+            NPC.buffImmune[BuffID.CursedInferno] = true;
+            NPC.buffImmune[BuffID.Ichor] = true;
+            NPC.buffImmune[BuffID.Frostburn2] = true;
+            NPC.buffImmune[BuffID.ShadowFlame] = true;
+            NPC.buffImmune[ModContent.BuffType<CalamityMod.Buffs.DamageOverTime.AstralInfectionDebuff>()] = true;
+            NPC.buffImmune[ModContent.BuffType<CalamityMod.Buffs.DamageOverTime.Daybroken>()] = true;
+
+            NPC.buffImmune[ModContent.BuffType<CalamityMod.Buffs.DamageOverTime.BurningBlood>()] = true;
+
+            NPC.buffImmune[ModContent.BuffType<CalamityMod.Buffs.DamageOverTime.HeavyBleeding>()] = true;
+
             SetDefaults2();
             SpawnModBiomes =
             [

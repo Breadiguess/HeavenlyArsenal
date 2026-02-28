@@ -402,7 +402,7 @@ partial class newLeech : BaseBloodMoonNPC
 
                     for(int i = 0; i < _ExtraHitBoxes.Count; i++)
                 {
-                         //Utils.DrawRectangle(spriteBatch, _ExtraHitBoxes[i].Hitbox.TopLeft(), _ExtraHitBoxes[i].Hitbox.BottomRight(), Color.AntiqueWhite, Color.AntiqueWhite, 2);
+                         //Utils.DrawRectangle(spriteBatch, _ExtraHitBoxes[i].Collider.TopLeft(), _ExtraHitBoxes[i].Collider.BottomRight(), Color.AntiqueWhite, Color.AntiqueWhite, 2);
                 }
             }
 

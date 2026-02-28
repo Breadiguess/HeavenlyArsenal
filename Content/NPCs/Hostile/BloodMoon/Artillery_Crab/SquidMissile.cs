@@ -18,8 +18,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
         public const int LaunchTime = 60;
 
-        // ai[0] = time
-        // ai[1] = targetPlayerIndex (set this when spawning!)
         public int Time
         {
             get => (int)Projectile.ai[0];
@@ -184,7 +182,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             }
 
             Rectangle frame = tex.Frame(1, 7, 0, frameY: Time%7);
-
+            if(!HasImpacted)
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation + MathHelper.PiOver2, frame.Size() / 2f, 1, 0); 
             return false;
         }

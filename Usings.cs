@@ -11,6 +11,8 @@ global using static Microsoft.Xna.Framework.MathHelper;
 global using static NoxusBoss.Assets.GennedAssets.Textures.GreyscaleTextures;
 global using static NoxusBoss.Assets.GennedAssets.Textures.Noise;
 global using static NoxusBoss.Core.Utilities.Utilities;
+
+using static HeavenlyArsenal.Common.IK.IKSkeleton;
 using Luminance.Core.ModCalls;
 using NoxusBoss.Core.Netcode;
 using Terraria.ModLoader;

@@ -12,4 +12,6 @@ internal partial class PerversionOfFaith
     }
 
     public Behavior CurrentState;
+
+    
 }

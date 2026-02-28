@@ -1,10 +1,14 @@
 ﻿using CalamityMod;
+using HeavenlyArsenal.Common;
 using HeavenlyArsenal.Core.Systems;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 {
     public partial class BloodCrab
     {
+
+       
+
         public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers)
         {
 
@@ -73,8 +77,8 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
 
 
-            Main.NewText(dot);
-            RayCastVisualizer.Raycasts.Add(new(NPC.Center, NPC.Center + impactDir * 1200, Color.White, 30));
+            //Main.NewText(dot);
+            //RayCastVisualizer.Raycasts.Add(new(NPC.Center, NPC.Center + impactDir * 1200, Color.White, 30));
 
             const float shellThresholdStart = -0.5f;
             if (dot > shellThresholdStart)
@@ -86,6 +90,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                 NPC.life++;
                 NPC.ForceNetUpdate();
             }
+            modifiers.ScalingArmorPenetration = AddableFloat.Zero+ 0.4f;
+            modifiers.DefenseEffectiveness = MultipliableFloat.One;
+
+            //Main.NewText(modifiers.DefenseEffectiveness.Value);
 
         }
         public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers)

@@ -1,9 +1,6 @@
-﻿using CalamityEntropy.Content.ArmorPrefixes;
-using HeavenlyArsenal.Common.IK;
+﻿using HeavenlyArsenal.Common.IK;
 using HeavenlyArsenal.Core.Systems;
 using Luminance.Core.Graphics;
-using NoxusBoss.Content.Particles.Metaballs;
-using Terraria;
 using Terraria.Audio;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
@@ -15,10 +12,10 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
         public Vector2[] LimbOffsets = new Vector2[4]
         {
-            new Vector2(-60, -14),
-            new Vector2(-40, 10),
-            new Vector2(40, 10),
-            new Vector2(60, -14)
+            new Vector2(-90, -14),
+            new Vector2(-70, 10),
+            new Vector2(70, 10),
+            new Vector2(90, -14)
         };
         public Vector2[] ActualLimbOffsets = new Vector2[4];
         public BloodCrabLeg[] _bloodCrabLegs = new BloodCrabLeg[4];
@@ -32,7 +29,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
             for (int i = 0; i < MAX_LIMBS; i++)
             {
-                float scale = i == 0 || i == 3 ? 4 : 3.6f;
+                float scale = i == 0 || i == 3 ? 5 : 4.2f;
 
                 bool isLeft = i < MAX_LIMBS / 2;
 
@@ -40,12 +37,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
                 IKSkeleton skeleton = new IKSkeleton
                 (
-                    ((7 * scale), new IKSkeleton.Constraints
+                    ((2 * scale), new IKSkeleton.Constraints
                     {
                         MinAngle = i < 2 ? MathHelper.ToRadians(70) : MathHelper.ToRadians(80),
                         MaxAngle = i < 2 ? MathHelper.ToRadians(110) : MathHelper.ToRadians(120)
                     }),
-                    ((17 * scale), new IKSkeleton.Constraints
+                    ((20 * scale), new IKSkeleton.Constraints
                     {
                         // This bone bends downward from the hip joint
                         MinAngle = i < 2
@@ -60,17 +57,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                     {
 
                         MinAngle = i < 2 ? -MathHelper.Pi : MathHelper.ToRadians(-40),
-                        MaxAngle = i < 2 ? MathHelper.ToRadians(60) : MathHelper.Pi
+                        MaxAngle = i < 2 ? MathHelper.ToRadians(60) : MathHelper.Pi     
                     })
                 );
 
                 _bloodCrabLegs[i] = new(skeleton, i);
             }
-
-            _bloodCrabLegs[0].Phase = 0.5f;
-            _bloodCrabLegs[1].Phase = 0f;
-            _bloodCrabLegs[2].Phase = 0.5f;
-            _bloodCrabLegs[3].Phase = 0.0f;
         }
         public sealed class BloodCrabLeg
         {
@@ -112,8 +104,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                     Vector2 End = leg.Skeleton.Position(i + 1);
                     NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(spritebatch, Start, End, Color.White, 5);
                 }
-
-                //NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(spritebatch, leg.Skeleton.Position(0), leg.PreviousIdealPlantLocation, Color.Purple, 5);
+                //Core.Utilities.Utilities.DrawLineBetter(spritebatch, leg.Skeleton.Position(0), leg.PlantLocation, Color.Purple, 5);
 
                 Texture2D tex = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
 
@@ -123,13 +114,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             }
         }
 
-        public record struct BloodCrabArm(IKSkeleton _skeleton, int _index)
-        {
-            public IKSkeleton Skeleton = _skeleton;
-            public int Index = _index;
-            public Vector2 Tip => Skeleton.Position(Skeleton.PositionCount - 1);
-            public Vector2 DesiredLocation;
-        }
+      
         public void BloodCrabLegUpdate()
         {
             for (int i = 0; i < _bloodCrabLegs.Length; i++)
@@ -138,8 +123,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                 bool isLeft = i < 2;
                 float side = isLeft ? -1f : 1f;
 
-                limb.Phase = i % 2 == 0 ? 0 : 0.5f;
+                limb.Phase = i / (float)_bloodCrabLegs.Length * 2;
                 limb.Phase *= side;
+                limb.Phase += NPC.whoAmI * 0.2f;
                 float lateralSpacing = 36f * (i == 0 || i == 3 ? 2f : 0.7f);
                 float stepThreshold = 107f * (i == 0 || i == 3 ? 1.1f : 0.7f);
 
@@ -168,7 +154,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
 
 
-               
+
                 Vector2 desired = hip;
 
                 Vector2 moveDir = MotionIntent.SafeNormalize(Vector2.UnitX * side);
@@ -180,9 +166,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
                 float maxReach = limb.Skeleton._maxDistance;
 
-                for (int s = -6 + (int)side * 2; s <= 6 + (int)side * 2; s++)
+                for (int s = -6 + (int)side * 2; s <= 6 + (int)side * 2; s += 2)
                 {
-                    float forward = s * 16f;
+                    float forward = s * lateralSpacing;
 
                     Vector2 start =
                         hip + new Vector2(hipOffset.X + forward, -60f);
@@ -191,7 +177,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                         start +
                         Vector2.UnitY * 260f;
 
-                    Point? ray = LineAlgorithm.RaycastTo(start, end, debug: false);// i == 1 || i == 3);
+                    Point? ray = LineAlgorithm.RaycastTo(start, end, debug: false);//  i == 1 || i == 2);
 
                     if (!ray.HasValue)
                         continue;
@@ -204,13 +190,13 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
                     if (!limb.Skeleton.CanReachConstrained(hip, candidate))
                         continue;
-                    
+
                     float distancePenalty = (distance / maxReach) * 0.7f;
                     float reachBonus = Vector2.Distance(candidate, hip) / 20;
 
                     float RejectCadidatesBeneathBody = 0f;
 
-                    float bodyRejectThreshold = NPC.width * 0.76f;
+                    float bodyRejectThreshold = NPC.width * 0.36f;
 
                     if (Math.Abs(candidate.X - NPC.Center.X) < bodyRejectThreshold)
                     {
@@ -244,7 +230,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                     float score = -directionalScore + distancePenalty / 2 + reachBonus * Convert01To010(s / 12f - moveDir.X) - RejectCadidatesBeneathBody - separationPenalty;
                     Color scoreColor = Color.Lerp(Color.Red, Color.LimeGreen, MathHelper.Clamp((score + 1f) * 0.5f, 0f, 1f));
 
-                    if (false)//i == 1 || i == 3)
+                    if (false)//i == 1 || i == 2)
                         RayCastVisualizer.Texts.Add(new($"{limb.Index} \n {score.ToString("0.0")}" +
                             $"\n {directionalScore.ToString("0.0")}" +
                             $"\n {separationPenalty.ToString("0.0")}" +
@@ -263,11 +249,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
                 if (grounded)
                     desired = bestPoint;
-                else
-                {
-                    //assume that the limb has not found a location, and thus, we're probably falling.
-                    return;
-                }
+
 
                 if (limb.PlantLocation == Vector2.Zero)
                 {
@@ -285,6 +267,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                 // If we didn't find ground this frame, keep the foot planted and skip stepping logic.
                 if (!grounded && limb.Skeleton.CanReachConstrained(limb.Skeleton.Position(0), desired))
                     continue;
+                else
+                {
+                    //assume that the limb has not found a location, and thus, we're probably falling.
+                    //TODO: limb assumes a falling state
+                }
 
                 limb.DesiredLocation = desired;
 
@@ -345,13 +332,13 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                     }
                 }
 
-
+                _bloodCrabLegs[i].Skeleton.Update(NPC.Center + ActualLimbOffsets[i], _bloodCrabLegs[i].PlantLocation);
             }
         }
 
         void PlayStepEffect(ref BloodCrabLeg limb)
         {
-            SoundEngine.PlaySound(AssetDirectory.Sounds.NPCs.Hostile.BloodMoon.BloodCrab.TempStep with { Pitch = -1, PitchVariance = 0.4f,Volume = 1, MaxInstances = 0 }, (NPC.Center + limb.PlantLocation) / 2).WithVolumeBoost(3);
+            SoundEngine.PlaySound(AssetDirectory.Sounds.NPCs.Hostile.BloodMoon.BloodCrab.TempStep with { Pitch = -1, PitchVariance = 0.4f, Volume = 1f, MaxInstances = 0 }, (NPC.Center + limb.PlantLocation) / 2).WithVolumeBoost(1);
             foreach (var player in Main.ActivePlayers)
             {
                 if (!player.active || player.dead)
@@ -392,14 +379,14 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             }
             //ModContent.GetInstance<TileDistortionMetaball>().CreateParticle(limb.PlantLocation, Vector2.Zero, 10f);
         }
-      
-       
+
+
         public Vector2 normal;
         public Vector2 tangent;
         public static bool EstimateSurfaceFrame(Vector2 origin, out Vector2 normal, out Vector2 tangent)
         {
-            const int samples = 13;       // must be odd
-            const float spacing = 32f;
+            const int samples = 5;       // must be odd
+            const float spacing = 63 * 3f;
             const float depth = 300f;
 
             int half = samples / 2;

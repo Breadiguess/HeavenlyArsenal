@@ -3,15 +3,13 @@ using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.ShieldGuy;
 
-internal partial class PerversionOfFaith : BloodMoonBaseNPC
+internal partial class PerversionOfFaith : BaseBloodMoonNPC
 {
     public override string Texture => "HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/ShieldGuy/PerversionOfFaith";
+    public override int MaxBlood => 3;
 
-    public override bool canBeSacrificed => false;
-
-    public override int bloodBankMax => 100;
-
-    public override void SetDefaults()
+    public override BloodMoonBalanceStrength Strength => new();
+    protected override void SetDefaults2()
     {
         NPC.aiStyle = -1;
         NPC.noTileCollide = true;
@@ -29,12 +27,5 @@ internal partial class PerversionOfFaith : BloodMoonBaseNPC
 
     public override void OnSpawn(IEntitySource source) { }
 
-    public override void AI()
-    {
-        playerTarget = Main.player[NPC.FindClosestPlayer()];
-        NPC.velocity = NPC.Center.AngleTo(playerTarget.Center).ToRotationVector2();
-        //NPC.velocity += new Vector2(0, MathF.Sin(Time));
-
-        Time++;
-    }
+  
 }
