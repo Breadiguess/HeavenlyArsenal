@@ -95,7 +95,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             DrawGunAndArm();
             DrawDebugButterflyAttachPoints();
 
-            Utils.DrawBorderString(spriteBatch, (Time).ToString(), NPC.Center - screenPos, Color.White);
+            Utils.DrawBorderString(spriteBatch, (Blood).ToString(), NPC.Center - screenPos, Color.White);
             return false;//base.PreDraw(spriteBatch, screenPos, drawColor);
         }
     }

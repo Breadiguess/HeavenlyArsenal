@@ -152,3 +152,12 @@ BobulousPlush.DisplayName: Bobulous Plush
 AvatarRogue_Projectile.DisplayName: Avatar Rogue_ Projectile
 BloodySting_Projectile.DisplayName: Bloody Sting_ Projectile
 SquidMissile.DisplayName: Squid Missile
+Typeless.OmegaBlueTentacle.DisplayName: Omega Blue Tentacle
+
+Summon: {
+	AtzirisDisfavor.DisplayName: Atziris Disfavor
+	Paradoxica.DisplayName: Paradoxica
+	CelestialAxeMinion.DisplayName: Celestial Axe Minion
+}
+
+RefractedAxe.DisplayName: Refracted Axe

@@ -34,7 +34,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             jacobian.MaxAngles[1] = MathHelper.ToRadians(20f);
 
 
-             GunArm = new BloodCrabClawGun(clawHitRect, jacobian);
+            // GunArm = new BloodCrabClawGun(clawHitRect, jacobian);
         }
 
         public sealed class BloodCrabClawGun(ExtraNPCSegment extraNPCSegment, IKSkeletonJacobian _skeleton)

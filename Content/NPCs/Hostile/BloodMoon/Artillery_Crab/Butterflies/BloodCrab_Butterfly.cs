@@ -1,5 +1,6 @@
 ﻿using CalamityMod;
 using Luminance.Assets;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
         public int CooldownTime = 180;
         public bool ParentNeedsBlood = false;
 
+        public static Asset<Texture2D> Tex;
         public enum ButterflyState
         {
             Attached,
@@ -28,7 +30,15 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
             Extracting,
             Returning,
         }
+        public override void SetStaticDefaults2()
+        {
 
+            Main.npcFrameCount[Type] = 4;
+            if (!Main.dedServ)
+            {
+                Tex = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Artillery_Crab/Butterflies/BloodCrab_Butterfly");
+            }
+        }
         public ButterflyState State
         {
             get => (ButterflyState)NPC.ai[2];
@@ -56,7 +66,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
         public override string Texture =>  MiscTexturesRegistry.PixelPath;
         public override int MaxBlood => 50;
 
-        public override BloodMoonBalanceStrength Strength => new(0.2f, 1.3f, 0);
+        public override BloodMoonBalanceStrength Strength => new(0.0f, 1.3f, 0);
 
         protected override void SetDefaults2()
         {
@@ -74,9 +84,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
             {
                 case ButterflyState.Attached:
                     Attached();
-                    break;
-                case ButterflyState.FindTarget:
-                    FindTarget();
                     break;
                 case ButterflyState.Detach:
                     Detach();
@@ -129,10 +136,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
 
         }
 
-        private void FindTarget()
-        {
-          
-        }
         private void Detach()
         {
             Owner.As<BloodCrab>().ButterflyAttachPoints[SocketIndex].Filled = false;
@@ -149,7 +152,12 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
         private void MoveToTarget()
         {
             //lazy rn
-            NPC.velocity = NPC.Center.DirectionTo(Target.Center).RotatedBy(Cos(Time/10f)) * 10;
+            if(!Target.active)
+            {
+                Target = null;
+                State = ButterflyState.Returning;
+            }
+            NPC.velocity = NPC.Center.DirectionTo(Target.Center)*10;
             //NPC.Center = Vector2.Lerp(NPC.Center, Target.Center, 0.05f);
             if(NPC.Center.Distance(Target.Center)<20)
             {
@@ -164,17 +172,20 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
         {
             NPC.Center = Target.Hitbox.Top();
 
-            if(Target.active)
-            if (Time > 120)
+            if (Target.active)
             {
-                this.Blood += 50;
-                NPC npc = Target as NPC;
-                npc.SimpleStrikeNPC(NPC.damage, 0);
-                State = ButterflyState.Returning;
-                NPC.netUpdate = true;
-                Target = null;
-                return;
+                if (Time > 120)
+                {
+                    this.Blood += 50;
+                    NPC npc = Target as NPC;
+                    npc.SimpleStrikeNPC(NPC.damage, 0);
+                    State = ButterflyState.Returning;
+                    NPC.netUpdate = true;
+                    Target = null;
+                    return;
+                }
             }
+           
                 else
                 {
                     State = ButterflyState.Returning;
@@ -226,7 +237,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            //Utils.DrawBorderString(spriteBatch, State.ToString(), NPC.Center - Main.screenPosition, Color.White);
+            Texture2D tex = Tex.Value;
+            Rectangle frame = Tex.Frame(1, 4, 0, 0);
+            Main.EntitySpriteDraw(Tex.Value, NPC.Center - screenPos, frame, drawColor, NPC.rotation, frame.Size() / 2, NPC.scale, 0);
+
+            //zUtils.DrawBorderString(spriteBatch, State.ToString(), NPC.Center - Main.screenPosition, Color.White);
             return base.PreDraw(spriteBatch, screenPos, drawColor);
         }
     }

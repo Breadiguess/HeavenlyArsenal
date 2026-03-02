@@ -56,6 +56,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
         }
 
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        {
+            if (Time < LaunchTime)
+                behindNPCs.Add(index);
+        }
         public override void OnSpawn(IEntitySource source)
         {
             Time = -1;

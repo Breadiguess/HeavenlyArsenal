@@ -11,6 +11,7 @@ using Luminance.Assets;
 using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
 using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.SwagRain;
+using NoxusBoss.Core.Graphics.UI.Books;
 using System.Collections.Generic;
 using System.IO;
 using Terraria.ModLoader.Utilities;
@@ -153,7 +154,6 @@ public class SolynBookDropNPC : GlobalNPC
 {
     public override void OnKill(NPC npc)
     {
-
         if (SolynBookRegistry.SolynBookItemType <= 0)
             return;
 
