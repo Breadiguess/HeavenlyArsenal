@@ -9,7 +9,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
         public override void FindFrame(int frameHeight) { }
 
         private void RenderSquidLauncher(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) { }
-
         
         private void DrawClawAndArm()
         {
@@ -26,17 +25,22 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
             GunArm.DrawClaw();
         }
+
         private void DrawBody(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, default, default, null, Main.GameViewMatrix.ZoomMatrix);
+
             Texture2D tex = TextureAssets.Npc[Type].Value;
-
             float rot = NPC.rotation + tangent.ToRotation()*0.2f;
-
             SpriteEffects flip = NPC.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             Vector2 DrawPos = NPC.Center - screenPos + new Vector2(0, -12);
-            
+            PrepareReflectEffect(tex, flip);
+
             Main.EntitySpriteDraw(tex, DrawPos, null, drawColor, rot, tex.Size() / 2, NPC.scale, flip);
+            Main.spriteBatch.ResetToDefault();
         }
+
         private void DrawDebugRectangles()
         {
             foreach(var rect in _ExtraHitBoxes)
@@ -48,6 +52,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                     Utils.DrawRectangle(Main.spriteBatch, rect.Hitbox.TopLeft(), rect.Hitbox.BottomRight(), Color.White, Color.White, 4);
             }
         }
+
         private void DrawDebugButterflyAttachPoints()
         {
             if(ButterflyAttachPoints is null)
@@ -65,6 +70,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                 Main.EntitySpriteDraw(tex, attach.Position- Main.screenPosition, null, Color.Pink.MultiplyRGB(Lighting.GetColor(attach.Position.ToTileCoordinates())), 0, tex.Size() / 2, 10, 0);
             }
         }
+
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (NPC.IsABestiaryIconDummy)

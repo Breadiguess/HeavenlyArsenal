@@ -1,18 +1,11 @@
 ﻿using CalamityMod;
-using HeavenlyArsenal.Common;
-using HeavenlyArsenal.Core.Systems;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 {
     public partial class BloodCrab
     {
-
-       
-
         public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers)
         {
-
-
             Vector2 shellNormal = -Vector2.UnitY;
             Vector2 impactDir = (player.Center - NPC.Center).SafeNormalize(Vector2.Zero);
             float dot = Vector2.Dot(impactDir, shellNormal);
@@ -23,12 +16,32 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                 modifiers.FinalDamage *= 0f;
                 modifiers.HideCombatText();
                 modifiers.DisableCrit();
-                if(item.type != ItemID.SlapHand)
-                modifiers.DisableKnockback();
+                if (item.type != ItemID.SlapHand)
+                    modifiers.DisableKnockback();
                 NPC.life++;
                 NPC.ForceNetUpdate();
             }
         }
+
+        public override bool PreAI()
+        {
+            for (int i = reflects.Count - 1; i >= 0; i--)
+            {
+                ReflectionEffect reflect = reflects[i];
+                reflect.Lifetime = Math.Max(0f, reflect.Lifetime - 1f);
+                if (reflect.Lifetime <= 0f)
+                {
+                    reflects.RemoveAt(i);
+                }
+                else
+                {
+                    reflects[i] = reflect;
+                }
+            }
+
+            return base.PreAI();
+        }
+
         public override void ModifyHitByProjectile(Projectile projectile, ref NPC.HitModifiers modifiers)
         {
             Player attacker = Main.player[projectile.owner];
@@ -51,31 +64,24 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             //3. if the weapon is a minion, take reduced damage if it strikes the underside.
             bool isWhip = ProjectileID.Sets.IsAWhip[projectile.type] || projectile.DamageType == DamageClass.MeleeNoSpeed || attacker.heldProj == projectile.whoAmI;
 
-
             if (projectile.IsMinionOrSentryRelated)
             {
-
                 modifiers.FinalDamage *= 0.72f;
                 modifiers.Knockback *= 0.3f;
-
             }
             //GO FUCK YOURSELF LASERSSS
-            if( isWhip || attacker.Distance(projectile.Center )< 120)
+            if (isWhip || attacker.Distance(projectile.Center) < 120)
             {
                 //here we'reassuming that this is evil and being spawned inside, so we're just gonna ask for the dot of the player and replace eit with this one.
 
                 if (attacker.active)
                 {
-
                     float playerDot =
                         Vector2.Dot(playerImpact, -Vector2.UnitY);
 
                     dot = -playerDot;
-
                 }
             }
-
-
 
             //Main.NewText(dot);
             //RayCastVisualizer.Raycasts.Add(new(NPC.Center, NPC.Center + impactDir * 1200, Color.White, 30));
@@ -83,27 +89,27 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             const float shellThresholdStart = -0.5f;
             if (dot > shellThresholdStart)
             {
-                if(projectile.ModProjectile is not null)
-                {
-                    projectile.ModProjectile.OnTileCollide(projectile.velocity);
-                }
                 modifiers.FinalDamage *= 0f;
                 modifiers.HideCombatText();
                 modifiers.DisableCrit();
                 modifiers.DisableKnockback();
                 NPC.life++;
                 NPC.ForceNetUpdate();
+                AddReflectData(impactDir, 3.2f, new Color(255, 255, 102));
+
+                if (projectile.ModProjectile is not null)
+                {
+                    projectile.ModProjectile.OnTileCollide(projectile.velocity);
+                }
             }
-            modifiers.ScalingArmorPenetration = AddableFloat.Zero+ 0.4f;
+            modifiers.ScalingArmorPenetration = AddableFloat.Zero + 0.4f;
             modifiers.DefenseEffectiveness = MultipliableFloat.One;
 
             //Main.NewText(modifiers.DefenseEffectiveness.Value);
-
         }
+
         public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers)
         {
-
-
         }
     }
 }
