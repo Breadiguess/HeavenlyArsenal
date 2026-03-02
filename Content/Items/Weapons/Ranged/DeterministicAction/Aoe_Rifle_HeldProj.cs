@@ -1,6 +1,7 @@
 ﻿
 using CalamityMod;
 using CalamityMod.DataStructures;
+using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Core;
 using Luminance.Common.Easings;
@@ -10,6 +11,7 @@ using NoxusBoss.Core.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using BezierCurve = HeavenlyArsenal.Core.BezierCurve;
 
@@ -78,8 +80,18 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         Vector2[] RopeAnchors = new Vector2[]
         {
             new Vector2(90, 0),
-            new Vector2(0, 0)
+            new Vector2(4, 0)
         };
+        public override void OnSpawn(IEntitySource source)
+        {
+            if(rope is not null)
+            {
+                for(int i = 0; i< rope.segments.Length; i++)
+                {
+                    rope.segments[i].position = Vector2.Lerp(RopeAnchors[0] + Projectile.Center, RopeAnchors[1] + Projectile.Center, i / (float)rope.segments.Length);
+                }
+            }
+        }
         public override void SetDefaults()
         {
             rope = new Rope(RopeAnchors[0] + Projectile.Center, RopeAnchors[1] + Projectile.Center, 37, 1, Vector2.One);
@@ -123,7 +135,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             new Vector2(90, 0),
             new Vector2(-20, 20 * Owner.direction)
             };
-            Recoil = float.Lerp(Recoil, 0, 0.2f);
+            Recoil = float.Lerp(Recoil, 0, 0.1f);
             rope.damping = 0.4f;
             rope.segments[0].position = RopeAnchors[0].RotatedBy(Projectile.rotation + RotationOffset) + Projectile.Center + new Vector2(Recoil, 0);
             rope.segments[^1].position = RopeAnchors[1].RotatedBy(Projectile.rotation + RotationOffset) + Projectile.Center + new Vector2(Recoil, 0);
@@ -136,13 +148,15 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         public override bool PreDraw(ref Color lightColor)
         {
             float GlowOpacity = LumUtils.InverseLerp(3, 8, RiflePlayer.Authority);
+
+            const int Iterations = 24;
             if (RiflePlayer.Authority > 4)
             {
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, default, default, null, Main.GameViewMatrix.ZoomMatrix);
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < Iterations; i++)
                 {
-                    Main.EntitySpriteDraw(RopeTarget, Owner.Center - Main.screenPosition + new Vector2(3, 0).RotatedBy(Projectile.rotation + MathHelper.TwoPi * i / 6f + MathF.Cos(Main.GlobalTimeWrappedHourly)), null, Color.Crimson with { A = 0 } * GlowOpacity, 0, RopeTarget.Size() / 2, 2, 0);
+                    Main.EntitySpriteDraw(RopeTarget, Owner.Center - Main.screenPosition + new Vector2(3, 0).RotatedBy(Projectile.rotation + MathHelper.TwoPi * i /(float)Iterations+ MathF.Cos(Main.GlobalTimeWrappedHourly)), null, Color.Crimson with { A = 0 } * GlowOpacity, 0, RopeTarget.Size() / 2, 2, 0);
                 }
             }
 
@@ -167,10 +181,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Vector2 Origin = new Vector2(30 + Recoil, Frame.Height / 2);
 
             if (RiflePlayer.Authority > 4)
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < Iterations; i++)
                 {
 
-                    Main.EntitySpriteDraw(tex, DrawPos + new Vector2(3, 0).RotatedBy(Projectile.rotation + MathHelper.TwoPi * i / 6f + Main.GlobalTimeWrappedHourly), Frame, Color.Red with { A = 0 } * GlowOpacity, Projectile.rotation + RotationOffset, Origin, 1f, flip);
+                    Main.EntitySpriteDraw(tex, DrawPos + new Vector2(3, 0).RotatedBy(Projectile.rotation + MathHelper.TwoPi * i / (float)Iterations + Main.GlobalTimeWrappedHourly), Frame, Color.Red with { A = 0 } * GlowOpacity, Projectile.rotation + RotationOffset, Origin, 1f, flip);
                 }
            Main.EntitySpriteDraw(tex, DrawPos, Frame, lightColor, Projectile.rotation + RotationOffset, Origin, 1f, flip);
 
@@ -290,13 +304,18 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             a.As<Aoe_Rifle_Laser>().PowerShot = RiflePlayer.BulletCount == 1;
             a.timeLeft += RiflePlayer.BulletCount == 1 ? 2 : 0;
 
+            Vector2 Tip = Projectile.Center + Projectile.rotation.ToRotationVector2() * 97;
+
+            MuzzleFlashParticle particle = new MuzzleFlashParticle();
+            particle.Prepare(Tip, Projectile.rotation, 30);
+            ParticleEngine.ShaderParticles.Add(particle);
            
             if (RiflePlayer.BulletCount > 1)
                 SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundStrong with { Volume = 2, Pitch = 0.7f * (1 - LumUtils.InverseLerp(1, 9, RiflePlayer.BulletCount)), Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(8);
             else
                 SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundSuper with { Volume = 2 , Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(13);
             
-            Recoil += 30;
+            Recoil += 60;
             for (int x = 0; x < 2; x++)
             {
                 var clip = clips[x];
@@ -319,10 +338,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Owner.SetDummyItemTime(2);
             int finishRecoiling = 40 * Projectile.extraUpdates;
 
-            if (Time == 0)
-                RotationOffset += MathHelper.ToRadians(30 * -Owner.direction);
-            else
-                RotationOffset = RotationOffset.AngleLerp(0, 0.1f);
+         
 
             if (Time % 6 == 0 && RiflePlayer.Authority > 3)
             {
@@ -479,7 +495,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             if (Time > StartReloadClip1 && Time <= EndReloadClip1)
             {
                 Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, Owner.MountedCenter.AngleTo(clipPos[1] + Owner.MountedCenter) - MathHelper.PiOver2 + Projectile.rotation);
-                clipPos[1] = reloadMovement.Evaluate(LumUtils.InverseLerp(StartReloadClip1, EndReloadClip1, Time));
+                clipPos[1] = reloadMovement.Evaluate(LumUtils.InverseLerp(StartReloadClip1, EndReloadClip1+1, Time));
                 if (Time == EndReloadClip1)
                 {
                     int loaded = Owner.HeldItem.GetGlobalItem<Aoe_Rifle_ClipItem>().AssembleClip(Owner, 0);
@@ -526,7 +542,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
             return thing;
         }
-
+        #endregion
 
 
         #region ribbon
@@ -950,6 +966,5 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         }
         #endregion
 
-        #endregion
     }
 }

@@ -17,6 +17,9 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
     private Vector2 FindNewGrabPoint(Vector2 basePos, int index)
     {
+
+        if (Main.LocalPlayer.Distance(basePos) >1700)
+            return Vector2.One;
         ref var limb = ref _limbs[index];
 
         float maxReach = limb.skeletonMaxLength;
@@ -135,12 +138,12 @@ internal partial class RitualAltar : BaseBloodMoonNPC
                 - separationPenalty;
             Color scoreColor = Color.Lerp(Color.Red, Color.LimeGreen, MathHelper.Clamp((score + 1f) * 0.5f, 0f, 1f));
 
-            RayCastVisualizer.Texts.Add(new($"{index} \n {score.ToString("0.0")}"
+           /* RayCastVisualizer.Texts.Add(new($"{index} \n {score.ToString("0.0")}"
                           
                           ,
                           candidate + new Vector2(0, index * 20),
                           scoreColor
-                      ));
+                      ));*/
             if (score > bestScore)
             {
                 bestScore = score;

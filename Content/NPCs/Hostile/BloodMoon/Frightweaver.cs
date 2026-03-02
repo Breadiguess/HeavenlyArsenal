@@ -347,7 +347,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon
             Vector2 scale = new(Vector2.Distance(start, end) / legTexture.Width, width);
             start.Y += 2f;
 
-            NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(spriteBatch, start+Main.screenPosition, end+Main.screenPosition, Color.White, 4);
+            NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(spriteBatch, start+Main.screenPosition, end+Main.screenPosition, color, 4);
 
             //spriteBatch.Draw(legTexture, start, null, color, rotation, legTexture.Size() * Vector2.UnitY * 0.5f, scale, direction, 0f);
         }

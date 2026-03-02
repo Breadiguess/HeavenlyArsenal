@@ -14,7 +14,6 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
 internal partial class RitualAltar : BaseBloodMoonNPC
 {
-    public override BloodMoonBalanceStrength Strength => new(0.2f,0.2f,0.2f);
     public enum AltarAI
     {
         LookingForSacrifice,
@@ -78,7 +77,34 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
        
     }
+    public override int SpawnNPC(int tileX, int tileY)
+    {
+        int type = Type;
 
+        int worldSurfaceY = (int)Main.worldSurface;
+
+        // Move upward until:
+        // - We're above world surface
+        // - And the tile is not solid
+        while (tileY > worldSurfaceY ||
+               WorldGen.SolidTile(tileX, tileY))
+        {
+            tileY--;
+
+            // Safety break to prevent infinite loop
+            if (tileY <= 10)
+                break;
+        }
+
+        Vector2 spawnPos = new Vector2(tileX * 16f, tileY * 16f);
+
+        return NPC.NewNPC(
+            NPC.GetSource_NaturalSpawn(),
+            (int)spawnPos.X,
+            (int)spawnPos.Y,
+            type
+        );
+    }
     public override void OnSpawn(IEntitySource source)
     {
         NPC.rotation = -MathHelper.PiOver2;
@@ -120,14 +146,15 @@ internal partial class RitualAltar : BaseBloodMoonNPC
         npcLoot.Add(ModContent.ItemType<BloodOrb>(), 1, 10, 18);
     }
 
+    public override BloodMoonBalanceStrength Strength => new(0.5f, 0.7f, 0.25f);
     protected override void SetDefaults2()
     {
         Variant = Main.rand.Next(1, 5);
         NPC.width = 80;
         NPC.height = 80;
-        NPC.lifeMax = 350_000;
+        NPC.lifeMax = 260_000;
         NPC.damage = 300;
-        NPC.defense = 120;
+        NPC.defense = 180;
         NPC.npcSlots = 4f;
         NPC.knockBackResist = 0f;
         NPC.noGravity = false;

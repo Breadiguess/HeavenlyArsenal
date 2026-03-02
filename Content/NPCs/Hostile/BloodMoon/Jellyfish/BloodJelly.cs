@@ -72,6 +72,23 @@ internal partial class BloodJelly : BaseBloodMoonNPC
         }
     }
 
+    public override int SpawnNPC(int tileX, int tileY)
+    {
+        const int PushUpTiles = 12; // how many tiles to lift it
+
+        // Check if there is solid ground directly below spawn tile
+        if (WorldGen.SolidTile(tileX, tileY + 1))
+        {
+            tileY -= PushUpTiles;
+        }
+
+        return NPC.NewNPC(
+            NPC.GetSource_NaturalSpawn(),
+            tileX * 16,
+            tileY * 16,
+            Type
+        );
+    }
     private void manageTendrils()
     {
         var BodyRot = (NPC.rotation + MathHelper.PiOver2).ToRotationVector2();

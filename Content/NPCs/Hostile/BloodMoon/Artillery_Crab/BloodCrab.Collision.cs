@@ -82,7 +82,11 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
             const float shellThresholdStart = -0.5f;
             if (dot > shellThresholdStart)
-            { 
+            {
+                if(projectile.ModProjectile is not null)
+                {
+                    projectile.ModProjectile.OnTileCollide(projectile.velocity);
+                }
                 modifiers.FinalDamage *= 0f;
                 modifiers.HideCombatText();
                 modifiers.DisableCrit();

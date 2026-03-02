@@ -40,7 +40,8 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
         for(int i = 0; i< limb.Skeleton.PositionCount - 1; i++)
         {
-            NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(Main.spriteBatch, limb.Skeleton.Position(i), limb.Skeleton.Position(i + 1), Color.Red, 3);
+            Color limbColor = Color.Lerp(Color.Black, Color.Red, i / (float)limb.Skeleton.PositionCount);
+            NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(Main.spriteBatch, limb.Skeleton.Position(i), limb.Skeleton.Position(i + 1),limbColor* NPC.Opacity, 10);
         }
 
         /*
@@ -195,7 +196,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
             //TextureEnabled = true
         };
 
-        var vertices = Generate(100f, DrawColor);
+        var vertices = Generate(100f, DrawColor * NPC.Opacity);
 
         isohedronBuffer ??= new VertexBuffer(gd, typeof(VertexPositionColor), vertices.Length, BufferUsage.WriteOnly);
         isohedronBuffer.SetData(vertices);
@@ -445,6 +446,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
             {
                 var a = NPC.direction == 1 ? 0 : SpriteEffects.FlipHorizontally;
                 a = Math.Sign((_limbBaseOffsets[i] - NPC.Center).Length()) == 1 ? 0 : SpriteEffects.FlipVertically;
+                
                 DrawArm(ref _limbs[i], drawColor, a);
             }
         }
@@ -475,7 +477,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
             rot -= MathHelper.PiOver2;
         }
 
-        Main.EntitySpriteDraw(BodyTexture, DrawPos, null, drawColor, rot, Origin, 1, sp);
+        Main.EntitySpriteDraw(BodyTexture, DrawPos, null, drawColor * NPC.Opacity, rot, Origin, 1, sp);
 
         mask(spriteBatch, drawColor);
 

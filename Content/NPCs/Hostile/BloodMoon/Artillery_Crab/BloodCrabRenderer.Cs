@@ -62,7 +62,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                 if (attach is null)
                     continue;
 
-                Main.EntitySpriteDraw(tex, attach.Position- Main.screenPosition, null, Color.Pink, 0, tex.Size() / 2, 10, 0);
+                Main.EntitySpriteDraw(tex, attach.Position- Main.screenPosition, null, Color.Pink.MultiplyRGB(Lighting.GetColor(attach.Position.ToTileCoordinates())), 0, tex.Size() / 2, 10, 0);
             }
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
@@ -83,7 +83,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             Texture2D tex = GennedAssets.Textures.GreyscaleTextures.WhitePixel;
             for (int i = 0; i < ActualLimbOffsets.Length; i++)
             {
-                Main.EntitySpriteDraw(tex, NPC.Center + ActualLimbOffsets[i] - screenPos, null, Color.Blue, 0, tex.Size() / 2,5, 0);
+                //Main.EntitySpriteDraw(tex, NPC.Center + ActualLimbOffsets[i] - screenPos, null, Color.Blue, 0, tex.Size() / 2,5, 0);
             }
             //Utils.DrawBorderString(spriteBatch, NPC.noGravity.ToString(), NPC.Center - screenPos, Color.AntiqueWhite);
 

@@ -18,7 +18,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
 {
 
 
-    public override BloodMoonBalanceStrength Strength => new(0.3f, 0.7f, 1.3f);
+    public override BloodMoonBalanceStrength Strength => new(0.7f, 0.9f, 1f);
 
     private static readonly Vector2[] WhiskerAnchors = new[]
     {
@@ -52,7 +52,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
 
     public int variant { get; set; }
 
-    public override int MaxBlood => 50;
+    public override int MaxBlood => 70;
 
     //temporary debug ai slot
     public ref float Debug => ref NPC.ai[1];
@@ -91,7 +91,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
 
     protected override void SetDefaults2()
     {
-        NPC.lifeMax = 50_000;
+        NPC.lifeMax = 40_000;
         NPC.damage = 90;
         NPC.defense = 145;
         NPC.noGravity = true;

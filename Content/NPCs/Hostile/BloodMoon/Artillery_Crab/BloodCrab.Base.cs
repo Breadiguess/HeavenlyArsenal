@@ -21,6 +21,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
         protected override void SetDefaults2()
         {
+            CanBeSacrificed = false;
             NPC.width = 200;
             NPC.height = 75;
             NPC.damage = 200;

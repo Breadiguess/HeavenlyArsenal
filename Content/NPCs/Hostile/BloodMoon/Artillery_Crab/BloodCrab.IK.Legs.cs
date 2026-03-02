@@ -102,7 +102,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                 {
                     Vector2 Start = leg.Skeleton.Position(i);
                     Vector2 End = leg.Skeleton.Position(i + 1);
-                    NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(spritebatch, Start, End, Color.White, 5);
+                    NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(spritebatch, Start, End, Color.White.MultiplyRGB(Lighting.GetColor(Vector2.Lerp(Start,End,0.5f).ToTileCoordinates())), 5);
                 }
                 //Core.Utilities.Utilities.DrawLineBetter(spritebatch, leg.Skeleton.Position(0), leg.PlantLocation, Color.Purple, 5);
 
@@ -110,7 +110,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
 
 
-                Utils.DrawBorderString(spritebatch, leg.Index.ToString(), leg.Skeleton.Position(0) - Main.screenPosition, Color.White);
+                //Utils.DrawBorderString(spritebatch, leg.Index.ToString(), leg.Skeleton.Position(0) - Main.screenPosition, Color.White.MultiplyRGB(Lighting.GetColor(leg.Skeleton.Position(0).ToTileCoordinates())));
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Items.Misc;
+using HeavenlyArsenal.Content.Items.Weapons.CCR_Weapon;
 using NoxusBoss.Core.Autoloaders.SolynBooks;
 using NoxusBoss.Core.Graphics.UI.Books;
 using System;
@@ -34,14 +35,21 @@ namespace HeavenlyArsenal.Core.Systems
                 {
                     taxidermyReward = new SolynReward()
                     {
-                        ItemName = "TaxidermyBook",
-                        MinStack = 1,
-                        MaxStack = 1
+                        ItemName = "CombatStimItem",
+                        MinStack = 30,
+                        MaxStack = 30
 
                     };
                 }
 
+                SolynReward e = new SolynReward()
+                {
+                    ItemName = "BloodyTear",
+                    MinStack = 1,
+                    MaxStack = 3
+                };
                 SolynBookRewardsSystem.AddRewardForBook(taxidermyBook, taxidermyReward);
+                SolynBookRewardsSystem.AddRewardForBook(taxidermyBook, e);
             }
         }
     }
