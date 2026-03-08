@@ -1,7 +1,9 @@
-﻿using HeavenlyArsenal.Common.Graphics;
+﻿using CalRemix.Content.NPCs.Bosses.Origen;
+using HeavenlyArsenal.Common.Graphics;
 using Luminance.Assets;
 using Luminance.Common.Easings;
 using NoxusBoss.Assets;
+using NoxusBoss.Core.Graphics.Automators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +15,12 @@ using Terraria.Localization;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 {
-    internal class Aoe_Rifle_Laser : ModProjectile
+    internal class Aoe_Rifle_Laser : ModProjectile, IDrawSubtractive
     {
         public PiecewiseCurve ShrinkCurve;
         public bool PowerShot = false;
+        public static Texture2D tex => GennedAssets.Textures.GreyscaleTextures.BloomLine2;
+        private Vector2 Origin => new Vector2(tex.Width / 2, 0);
         public override string Texture =>  MiscTexturesRegistry.InvisiblePixelPath;
         public const int LASER_RANGE = 6_000;
         #region pixelation
@@ -59,8 +63,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         void DrawLaser(Aoe_Rifle_Laser laser)
         {
-            Texture2D tex = GennedAssets.Textures.GreyscaleTextures.BloomLine2;
-            Vector2 Origin = new Vector2(tex.Width / 2, 0);
             Color color = Color.Lerp(Color.Red, Color.Crimson, 1 - LumUtils.InverseLerp(0, 20, laser.Projectile.timeLeft));
             float scalar = laser.ShrinkCurve.Evaluate(LumUtils.InverseLerp(0, 20, laser.Projectile.timeLeft));
 
@@ -68,13 +70,15 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             if (laser.PowerShot)
             {
                 Scale = new Vector2(5f * scalar, 30);
-                Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, Color.White, -MathHelper.PiOver2, Origin, Scale * 0.4f, 0);
+                Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, Color.White, laser.Projectile.rotation -MathHelper.PiOver2, Origin, Scale * 0.4f, 0);
 
-                Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, Color.Purple, -MathHelper.PiOver2, Origin, Scale * 0.6f, 0);
+                Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, Color.Blue, laser.Projectile.rotation - MathHelper.PiOver2, Origin, Scale * 0.1f, 0);
+
+                Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, Color.LightGoldenrodYellow with { A = 240 }, laser.Projectile.rotation - MathHelper.PiOver2, Origin, Scale * 0.6f, 0);
 
             }
-            Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, color, -MathHelper.PiOver2, Origin, Scale, 0);
-          
+            Main.EntitySpriteDraw(tex, laser.Projectile.Center - Main.screenPosition, null, color, laser.Projectile.rotation - MathHelper.PiOver2, Origin, Scale, 0);
+
 
         }
         #endregion
@@ -136,7 +140,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
             Aoe_Rifle_HitParticle particle = new Aoe_Rifle_HitParticle();
-            particle.Prepare(target.Center, target.AngleTo(Projectile.Center), 60);
+            particle.Prepare(target.Center, target.AngleTo(Projectile.Center), 40);
             float damageMulti = 1.2f;
             if (PowerShot)
             {
@@ -209,11 +213,25 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, default, default, null, Main.GameViewMatrix.ZoomMatrix);
-            Main.EntitySpriteDraw(LaserTarget, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, LaserTarget.Size() / 2, 2, 0);
+            Main.EntitySpriteDraw(LaserTarget, Projectile.Center - Main.screenPosition, null, Color.White, 0, LaserTarget.Size() / 2, 2, 0);
             Main.spriteBatch.ResetToDefault();
 
 
             return false;
+        }
+
+        void IDrawSubtractive.DrawSubtractive(SpriteBatch spriteBatch)
+        {
+            Color color = Color.Lerp(Color.Red, Color.Crimson, 1 - LumUtils.InverseLerp(0, 20, Projectile.timeLeft));
+            float scalar = ShrinkCurve.Evaluate(LumUtils.InverseLerp(0, 20, Projectile.timeLeft));
+
+            Vector2 Scale = new Vector2(1 * scalar, 30);
+            if (PowerShot)
+            {
+                Scale = new Vector2(5f * scalar, 30);
+            }
+                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation-MathHelper.PiOver2, Origin, scalar*2, 0);
+
         }
     }
 }

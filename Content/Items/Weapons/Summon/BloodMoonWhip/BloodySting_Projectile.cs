@@ -25,7 +25,7 @@ public class BloodySting_Projectile : BaseWhipProjectile
     protected override void SetupModifiers(ModularWhipController controller)
     {
 
-        controller.AddModifier(new WhipModifiers.FloppyModifier(0));
+       
     }
     public override void SetDefaults()
     {

@@ -34,10 +34,22 @@ internal class Bloodproj : ModProjectile
         Projectile.damage = 100;
         Projectile.width = Projectile.height = 20;
     }
+    public override void OnSpawn(IEntitySource source)
+    {
+        Time = -1;
 
+        for (int i = 0; i < ProjectileID.Sets.TrailCacheLength[Type]; i++)
+        {
+            Projectile.oldPos[i] = Projectile.Center - Projectile.Size / 2;
+        }
+        Projectile.netUpdate = true;
+    }
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.CanHitPastShimmer[Projectile.type] = true;
+
+        ProjectileID.Sets.TrailCacheLength[Type] = 30;
+        ProjectileID.Sets.TrailingMode[Type] = 2;
     }
 
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
@@ -144,6 +156,13 @@ internal class Bloodproj : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
+
+
+        for (int i = 0; i < Projectile.oldPos.Length - 3; i++)
+        {
+            NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(Main.spriteBatch, Projectile.oldPos[i] + Projectile.Size / 2, Projectile.oldPos[i + 1] + Projectile.Size / 2, Color.Crimson * (1 - i / (float)Projectile.oldPos.Length), 3 * (1 - i / (float)Projectile.oldPos.Length));
+        }
+
         var value = (int)(Main.GlobalTimeWrappedHourly * 10.1f) % 3;
         var FrameCount = 7;
 

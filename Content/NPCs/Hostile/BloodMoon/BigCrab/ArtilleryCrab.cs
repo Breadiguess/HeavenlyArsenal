@@ -34,7 +34,7 @@ public enum HemocrabAI
 
 internal class ArtilleryCrab : BaseBloodMoonNPC
 {
-    public override BloodMoonBalanceStrength Strength => new(1,1, 0.2f);
+    public override BloodMoonBalanceStrength Strength => new(1.2f, 1, 0.2f);
     public const int totalFrameCount = 13;
 
     public const int WalkFrameCount = 6;
@@ -418,6 +418,7 @@ internal class ArtilleryCrab : BaseBloodMoonNPC
         mortar.velocity = launchV;
         mortar.localAI[0] = targetPos.X;
         mortar.localAI[1] = targetPos.Y;
+        mortar.damage =(int)( mortar.damage* 0.8f);
 
         SoundEngine.PlaySound(SoundID.Item62, NPC.Center);
     }

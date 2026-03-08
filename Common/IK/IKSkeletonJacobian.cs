@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HeavenlyArsenal.Common.IK
 {
-    public sealed class IKSkeletonJacobian
+    public class IKSkeletonJacobian
     {
         public Vector2 Root;
 

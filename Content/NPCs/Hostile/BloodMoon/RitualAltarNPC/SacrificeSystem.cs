@@ -238,7 +238,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
             NPC.life = 0;
             NPC.checkDead();
             NPC.active = false;
-            SoundEngine.PlaySound(SoundID.NPCDeath52, NPC.position);
+            SoundEngine.PlaySound(SoundID.NPCDeath52 with { Pitch = -1 }, NPC.position).WithVolumeBoost(2);
             for (int i = 0; i < 30; i++)
             {
                 Dust.NewDustPerfect(NPC.Center + Main.rand.NextVector2Circular(40, 40), DustID.Blood, Main.rand.NextVector2Circular(3, 3), Scale: 1.5f);

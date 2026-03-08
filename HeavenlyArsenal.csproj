@@ -36,7 +36,8 @@
       <Compile Remove="Content\Items\Misc\AncientCoin.cs" />
       <Compile Remove="Content\Items\Misc\ChaliceOfFunItem.cs" />
       <Compile Remove="Content\Items\Misc\ChaliceOfFunProjectile.cs" />
-      <Compile Remove="Content\Items\Misc\IdolSummoner.cs" />
+      <Compile Remove="Content\NPCs\DebugTendrilNPC.cs" />
+      <Compile Remove="Content\NPCs\FileName.cs" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\Artillery_Crab\BloodCrab - Copy.IK.cs" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPC.cs" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPCLimb.cs" />

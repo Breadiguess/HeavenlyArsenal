@@ -21,6 +21,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
 
         protected override void SetDefaults2()
         {
+            CanBeSacrificed = false;
             NPC.width = 200;
             NPC.height = 75;
             NPC.damage = 200;
@@ -117,6 +118,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
             NPC.rotation = NPC.rotation.AngleLerp(targetRotation, 0.2f);
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
             Time++;
+            
 
         }
 

@@ -52,7 +52,7 @@ public class BloodySting_Item : ModItem
         Item.rare = ModContent.RarityType<BloodMoonRarity>();
         Item.value = Item.buyPrice(0, 46, 30, 2);
         Item.shoot = ModContent.ProjectileType<BloodySting_Projectile>();
-        Item.damage = 1200;
+        Item.damage = 600;
         Item.Size = new Vector2(40, 40);
 
         Item.crit = 12;

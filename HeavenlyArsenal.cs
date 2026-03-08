@@ -31,6 +31,7 @@ public sealed partial class HeavenlyArsenal : Mod
         On_Projectile.Damage += MultisegmentCollideEnabler;
         On_Projectile.CanHitWithMeleeWeapon += MultisegmentCheckSetter;
         On_Projectile.Colliding += ExtraHitboxCollide;
+
     }
    
     #region MultiSegmentNPC

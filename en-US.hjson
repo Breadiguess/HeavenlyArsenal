@@ -125,7 +125,7 @@ Mods: {
 
 			TaxidermyBook: {
 				DisplayName: Taxidermy Book
-				ObtainmentHint: Dropped by Aberrations born from the blood of an eldritch horror.
+				ObtainmentHint: "[c/F79BC6:Dropped by Aberrations born from the blood of an eldritch horror.]"
 				Tooltip:
 					'''
 					Contains a frighteningly in-depth analysis of how to dissect, preserve, and repurpose hostile organisms.

@@ -11,6 +11,10 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 {
     public class Aoe_Rifle_RealityTear : ModProjectile
     {
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        {
+            behindNPCs.Add(index);
+        }
         public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
         struct TearSegment
         {
@@ -152,15 +156,14 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         public override bool PreDraw(ref Color lightColor)
         {
 
-            Color color = Color.White * Projectile.Opacity;
+            Color color = Color.Crimson * Projectile.Opacity;
             foreach (var s in segments)
             {
-                Utils.DrawLine(
+                NoxusBoss.Core.Utilities.Utilities.DrawLineBetter(
                     Main.spriteBatch,
                     s.Start,
                     s.End,
                    color,
-                    color,
                     s.Thickness*3
                 );
             }

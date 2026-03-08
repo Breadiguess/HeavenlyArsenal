@@ -3,7 +3,9 @@ using CalamityMod.NPCs.NormalNPCs;
 using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Goreca;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
@@ -11,6 +13,7 @@ using Luminance.Assets;
 using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
 using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.SwagRain;
+using NoxusBoss.Core.Graphics.UI.Books;
 using System.Collections.Generic;
 using System.IO;
 using Terraria.ModLoader.Utilities;
@@ -55,6 +58,8 @@ public class BloodmoonSpawnControl : GlobalNPC
         //spawnRangeY = (int)(Main.worldSurface * 0.2f);
     }
 
+    private const int RitualAltarMax = 3; // your cap
+
     public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
     {
         if (Main.bloodMoon && !Main.dayTime && RiftEclipseBloodMoonRainSystem.EffectActive)
@@ -63,25 +68,47 @@ public class BloodmoonSpawnControl : GlobalNPC
             {
                 pool.Clear();
 
-                // The float value is the spawn weight relative to others in the pool stupid
-                pool[ModContent.NPCType<ArtilleryCrab>()] = SpawnCondition.OverworldNightMonster.Chance * 0.14f;
-                pool[ModContent.NPCType<newLeech>()] = SpawnCondition.OverworldNightMonster.Chance * 0.074f;
+                pool[ModContent.NPCType<ArtilleryCrab>()] =
+                    SpawnCondition.OverworldNightMonster.Chance * 0.14f;
 
-                if (spawnInfo.SpawnTileY < Main.worldSurface * 0.5f)
+                pool[ModContent.NPCType<newLeech>()] =
+                    SpawnCondition.OverworldNightMonster.Chance * 0.074f;
+
+                    pool[ModContent.NPCType<BloodJelly>()] =
+                        SpawnCondition.OverworldNightMonster.Chance * 0.005f;
+
+                int gorecaCount = NPC.CountNPCS(ModContent.NPCType<Goreca.Goreca>());
+                if (gorecaCount < 1)
                 {
-                    pool[ModContent.NPCType<BloodJelly>()] = SpawnCondition.OverworldNightMonster.Chance * 0.04f;
+                    pool[ModContent.NPCType<Goreca.Goreca>()] =
+                  SpawnCondition.OverworldNightMonster.Chance * 0.002f;
+
                 }
-                pool[ModContent.NPCType<FleshkinAcolyte_Assassin>()] = SpawnCondition.OverworldNightMonster.Chance * 0.05f;
-                pool[ModContent.NPCType<RitualAltar>()] = SpawnCondition.OverworldNightMonster.Chance * 0.035f;
-                pool[ModContent.NPCType<FleshlingCultist.FleshlingCultist>()] = SpawnCondition.OverworldNightMonster.Chance * 0.42f;
+
+
+
+                pool[ModContent.NPCType<BloodCrab>()] =
+                    SpawnCondition.OverworldNightMonster.Chance * 0.01f;
+                pool[ModContent.NPCType<FleshkinAcolyte_Assassin>()] =
+                    SpawnCondition.OverworldNightMonster.Chance * 0.05f;
+                pool[ModContent.NPCType<Frightweaver>()] =
+                 SpawnCondition.OverworldNightMonster.Chance * 0.1f;
+                int altarCount = NPC.CountNPCS(ModContent.NPCType<RitualAltar>());
+
+                if (altarCount < RitualAltarMax)
+                {
+                    pool[ModContent.NPCType<RitualAltar>()] =
+                        SpawnCondition.OverworldNightMonster.Chance * 0.035f;
+                }
+
+                pool[ModContent.NPCType<FleshlingCultist.FleshlingCultist>()] =
+                    SpawnCondition.OverworldNightMonster.Chance * 0.42f;
             }
-            else if (spawnInfo.Player.ZoneSkyHeight && !spawnInfo.PlayerInTown)
+            else if (spawnInfo.Player.ZoneSkyHeight)
             {
-                //if (spawnInfo.SpawnTileY < Main.worldSurface * 0.5f)
-                {
-                    pool.Clear();
-                    pool[ModContent.NPCType<BloodJelly>()] = SpawnCondition.Sky.Chance * 1.17f;
-                }
+                pool.Clear();
+                pool[ModContent.NPCType<BloodJelly>()] =
+                    SpawnCondition.Sky.Chance * 1.17f;
             }
         }
     }
@@ -153,7 +180,6 @@ public class SolynBookDropNPC : GlobalNPC
 {
     public override void OnKill(NPC npc)
     {
-
         if (SolynBookRegistry.SolynBookItemType <= 0)
             return;
 
