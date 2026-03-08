@@ -1,5 +1,4 @@
 ﻿using CalamityMod.Cooldowns;
-using HeavenlyArsenal.Content.Items.Armor;
 using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;

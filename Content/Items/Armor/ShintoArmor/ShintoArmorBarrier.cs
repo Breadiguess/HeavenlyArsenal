@@ -2,7 +2,6 @@
 using CalamityMod.Cooldowns;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.Ui.Cooldowns;
-using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 using HeavenlyArsenal.Content.Particles;
 using HeavenlyArsenal.Content.Particles.Metaballs;
 using Luminance.Core.Graphics;
@@ -12,10 +11,28 @@ using System.Collections.Generic;
 using Terraria.Audio;
 using Terraria.Graphics.Effects;
 
-namespace HeavenlyArsenal.Content.Items.Armor;
+namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 
 internal class ShintoArmorBarrier : ModPlayer
 {
+    public enum ShieldState
+    {
+        //there isn't a shield on the player, do nothing
+        None,
+        // Progress from 0->1 progress wise to fulfill the animation
+        Forming,
+
+        //when shield is active but not forming, this is the default state
+        Formed,
+
+        //when this is the current state, 
+        TakeDamage,
+
+        //do a breaking animation before hiding the effect until forming is the state.
+        Breaking
+    }
+
+
 
     public bool HealingShield;
     public bool BarrierActive;
@@ -38,7 +55,6 @@ internal class ShintoArmorBarrier : ModPlayer
 
     public float barrierSizeInterp;
 
-    public Dictionary<string, CooldownInstance> cooldowns;
 
     public override void Load()
     {
@@ -55,7 +71,7 @@ internal class ShintoArmorBarrier : ModPlayer
     {
         if (self.GetModPlayer<ShintoArmorBarrier>().HealingShield && self.GetModPlayer<ShintoArmorBarrier>().BarrierActive)
         {
-            ShintoArmorBarrier armor = self.GetModPlayer<ShintoArmorBarrier>();
+            var armor = self.GetModPlayer<ShintoArmorBarrier>();
             armor.HealingShield = false;
             CombatText.NewText(self.Hitbox, Color.Red, healAmount, false, false);
             return;
@@ -83,8 +99,8 @@ internal class ShintoArmorBarrier : ModPlayer
          if (self.HasBuff(BuffID.PotionSickness))
              return;
 
-        Item ChosenPotion = self.QuickHeal_GetItemToUse();
-        int healAmount = ChosenPotion.healLife;
+        var ChosenPotion = self.QuickHeal_GetItemToUse();
+        var healAmount = ChosenPotion.healLife;
 
         self.Heal(healAmount);
         self.ConsumeItem(ChosenPotion.type);
@@ -102,13 +118,13 @@ internal class ShintoArmorBarrier : ModPlayer
             return;
         }
 
-        ShintoArmorBarrier armor = self.GetModPlayer<ShintoArmorBarrier>();
+        var armor = self.GetModPlayer<ShintoArmorBarrier>();
 
 
-        int healAmount = amount;
-        int missingLife = self.statLifeMax2 - self.statLife;
-        int healToLife = Math.Min(missingLife, healAmount);
-        int overflow = healAmount - healToLife;
+        var healAmount = amount;
+        var missingLife = self.statLifeMax2 - self.statLife;
+        var healToLife = Math.Min(missingLife, healAmount);
+        var overflow = healAmount - healToLife;
         //Main.NewText("originated from On_Player_Heal");
         /*Main.NewText($"healAmount: {healAmount}\n " +
             $"missing life: {missingLife}\n " +
@@ -121,7 +137,7 @@ internal class ShintoArmorBarrier : ModPlayer
             armor.HealingShield = true;
             self.HealEffect(Math.Max(overflow - armor.barrier, 0));
             //todo: get the difference between barrier and shield durability max to produce the amount that the barrier is healed by
-            int thing = (int)Utils.Remap(overflow, 0, amount, 0, ShintoArmorBreastplate.ShieldDurabilityMax);
+            var thing = (int)Utils.Remap(overflow, 0, amount, 0, ShintoArmorBreastplate.ShieldDurabilityMax);
             armor.barrier = Math.Min(armor.barrier + overflow, ShintoArmorBreastplate.ShieldDurabilityMax);
             
         }
@@ -204,7 +220,6 @@ internal class ShintoArmorBarrier : ModPlayer
 
     public override void Initialize()
     {
-        cooldowns = new Dictionary<string, CooldownInstance>();
         maxBarrier = ShintoArmorBreastplate.ShieldDurabilityMax;
         barrier = 0;
         timeSinceLastHit = 0;
@@ -278,10 +293,10 @@ internal class ShintoArmorBarrier : ModPlayer
         if (barrier > 0 && BarrierActive)
         {
 
-            int incoming = info.SourceDamage;
+            var incoming = info.SourceDamage;
             if (Iframe <= 0)
             {
-                int taken = (int)Math.Round(incoming * barrierDamageReduction);
+                var taken = (int)Math.Round(incoming * barrierDamageReduction);
                 if (taken > 0)
                     timeSinceLastHit = 0;
                 Iframe = (int)(Player.ComputeHitIFrames(info) * 1.25f);
@@ -317,7 +332,7 @@ internal class ShintoArmorBarrier : ModPlayer
                 Player.Calamity().cooldowns.Remove(BarrierDurability.ID);
             }
 
-            if (barrier > 0 && !cooldowns.ContainsKey(BarrierDurability.ID))
+            if (barrier > 0 && !Player.Calamity().cooldowns.ContainsKey(BarrierDurability.ID))
             {
                 barrierSizeInterp = float.Lerp(barrierSizeInterp, 1, 0.1f);
 
@@ -340,15 +355,15 @@ internal class ShintoArmorBarrier : ModPlayer
         Player.Calamity().SpongeShieldDurability = -1;
         Player.Calamity().cooldowns.Remove(BarrierDurability.ID);
         Player.Calamity().cooldowns.Remove(BarrierRecharge.ID);
-        cooldowns.Clear();
+        Player.Calamity().cooldowns.Clear();
         barrier = 0;
         timeSinceLastHit = 0;
     }
     public void BarrierTakeDamageVFX()
     {
-        for (int i = 0; i < Main.rand.Next(1, 5); i++)
+        for (var i = 0; i < Main.rand.Next(1, 5); i++)
         {
-            Vector2 lightningPos = Player.Center + Main.rand.NextVector2Circular(24, 24);
+            var lightningPos = Player.Center + Main.rand.NextVector2Circular(24, 24);
             var particle = HeatLightning.pool.RequestParticle();
             particle.Prepare(lightningPos, Player.velocity + Main.rand.NextVector2Circular(10, 10), Main.rand.NextFloat(-2f, 2f), 10 + i * 3, Main.rand.NextFloat(0.5f, 1f));
             ParticleEngine.Particles.Add(particle);
@@ -390,25 +405,25 @@ internal class ShintoArmorBarrier : ModPlayer
             // Determine if the shield should be rendered
             // Use modPlayer.active (or another appropriate flag) and check that the barrier value is positive.
 
-            bool shieldExists = modPlayer.barrier > 0;
+            var shieldExists = modPlayer.barrier > 0;
             if (!shieldExists)
                 continue;
 
             // Scale the shield as drawn. The shield gently grows and shrinks; it should be largely imperceptible.
             // The "i" parameter is to desync each player's shield animation.
-            int i = player.whoAmI;
-            float baseScale = 1f;
-            float maxExtraScale = 0.055f;
-            float extraScalePulseInterpolant = MathF.Pow(4f, MathF.Sin(Main.GlobalTimeWrappedHourly * 0.791f + i) - 1);
-            float scale = (baseScale + maxExtraScale * extraScalePulseInterpolant) * modPlayer.barrierSizeInterp;
-            float ShieldHealthInterpolant = (float)player.GetModPlayer<ShintoArmorBarrier>().barrier / ShintoArmorBreastplate.ShieldDurabilityMax;
+            var i = player.whoAmI;
+            var baseScale = 1f;
+            var maxExtraScale = 0.055f;
+            var extraScalePulseInterpolant = Pow(4f, Sin(Main.GlobalTimeWrappedHourly * 0.791f + i) - 1);
+            var scale = (baseScale + maxExtraScale * extraScalePulseInterpolant) * modPlayer.barrierSizeInterp;
+            var ShieldHealthInterpolant = (float)player.GetModPlayer<ShintoArmorBarrier>().barrier / ShintoArmorBreastplate.ShieldDurabilityMax;
 
             if (!alreadyDrawnShieldForPlayer)
             {
                 var visualShieldStrength = ShieldHealthInterpolant;
 
                 // The scale used for the noise overlay also grows and shrinks
-                var noiseScale = MathHelper.Lerp(0.28f, 0.38f, 5f + 0.5f * MathF.Sin(Main.GlobalTimeWrappedHourly * 0.347f + i)) * modPlayer.barrierSizeInterp;
+                var noiseScale = Lerp(0.28f, 0.38f, 5f + 0.5f * Sin(Main.GlobalTimeWrappedHourly * 0.347f + i)) * modPlayer.barrierSizeInterp;
 
                 var shieldEffect = Filters.Scene["CalamityMod:RoverDriveShield"].GetShader().Shader;
                 shieldEffect.Parameters["time"].SetValue(Main.GlobalTimeWrappedHourly * 0.0813f);
@@ -421,7 +436,7 @@ internal class ShintoArmorBarrier : ModPlayer
                 //(float)Utils.Lerp(0, 1, Math.Clamp((MathF.Sin(Main.GlobalTimeWrappedHourly * 0.95f)),0,1));//(0.2f) + 0.2f * (player.statLife / player.statLifeMax) * MathF.Sin(Main.GlobalTimeWrappedHourly * 0.76f);
 
                 var minShieldStrengthOpacityMultiplier = 1f;
-                var finalShieldOpacity = baseShieldOpacity * MathHelper.Lerp(minShieldStrengthOpacityMultiplier, 1f, visualShieldStrength);
+                var finalShieldOpacity = baseShieldOpacity * Lerp(minShieldStrengthOpacityMultiplier, 1f, visualShieldStrength);
                 shieldEffect.Parameters["shieldOpacity"].SetValue(finalShieldOpacity);
                 shieldEffect.Parameters["shieldEdgeBlendStrenght"].SetValue(1f);
 
@@ -439,25 +454,25 @@ internal class ShintoArmorBarrier : ModPlayer
 
                 var rotation = Utils.AngleLerp(0, (float)Math.Sin(Main.GlobalTimeWrappedHourly * 0.02f), 0.4f);
                 //Texture2D ShieldNoise = AssetDirectory.Textures.VoidLake.Value;
-                Texture2D glow = GennedAssets.Textures.Noise.MoltenNoise;
+                Texture2D glow = MoltenNoise;
                 Texture2D ogg = GennedAssets.Textures.Extra.Ogscule;
                 Main.spriteBatch.End();
 
 
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, shieldEffect, Main.GameViewMatrix.TransformationMatrix);
                 // Fetch shield noise overlay texture (this is the polygon texture fed to the shader)
-                Vector2 pos = player.MountedCenter + player.gfxOffY * Vector2.UnitY - Main.screenPosition;
-                Color color = Color.AntiqueWhite;
+                var pos = player.MountedCenter + player.gfxOffY * Vector2.UnitY - Main.screenPosition;
+                var color = Color.AntiqueWhite;
 
                 if (Main.remixWorld)
                 {
                     Main.EntitySpriteDraw(ogg, pos, null, Color.AntiqueWhite, rotation, ogg.Size() / 2f, 0.05f, 0, 0);
                 }
                 else
-                    Main.EntitySpriteDraw(glow, pos, null, Color.AntiqueWhite, rotation, glow.Size() / 2f, modPlayer.barrierSizeInterp * ((baseShieldOpacity / 20) + 0.1f), 0);
+                    Main.EntitySpriteDraw(glow, pos, null, Color.AntiqueWhite, rotation, glow.Size() / 2f, modPlayer.barrierSizeInterp * (baseShieldOpacity / 20 + 0.1f), 0);
 
 
-                ManagedScreenFilter suctionShader = ShaderManager.GetFilter("HeavenlyArsenal.SuctionSpiralShader");
+                var suctionShader = ShaderManager.GetFilter("HeavenlyArsenal.SuctionSpiralShader");
                 suctionShader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly / 10.1f);
 
                 suctionShader.TrySetParameter("suctionCenter", Vector2.Transform(player.Center - Main.screenPosition, Main.GameViewMatrix.TransformationMatrix));
@@ -466,7 +481,7 @@ internal class ShintoArmorBarrier : ModPlayer
                 suctionShader.TrySetParameter("suctionOpacity", 1 * (player.GetModPlayer<ShintoArmorBarrier>().barrierSizeInterp - AvatarRiftSuckVisualsManager.ZoomInInterpolant) * 0.12f);
                 suctionShader.TrySetParameter("suctionBaseRange", 27f);
                 suctionShader.TrySetParameter("suctionFadeOutRange", 10f);
-                suctionShader.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1, SamplerState.AnisotropicWrap);
+                suctionShader.SetTexture(PerlinNoise, 1, SamplerState.AnisotropicWrap);
                 suctionShader.Activate();
 
                 Main.spriteBatch.End();

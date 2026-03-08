@@ -135,11 +135,7 @@ internal class ShintoArmorCapePlayer : ModPlayer
         return new DrawData(RobeTarget, Vector2.Zero + new Vector2(0, Player.gfxOffY), null, Color.White, -Player.fullRotation, RobeTarget.Size() * 0.5f, 1f, 0);
     }
 
-    public override void PostUpdateMiscEffects()
-    {
-        ExistenceTimer++;
-    }
-
+   
     private static void UpdateCloth(Player player)
     {
         if (player == null)

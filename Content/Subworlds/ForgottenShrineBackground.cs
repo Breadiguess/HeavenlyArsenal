@@ -147,6 +147,7 @@ public class ForgottenShrineBackground : Background
 
         Main.QueueMainThreadAction(() =>
         {
+            if(!Main.dedServ)
             lanternSystem = new FramedFastParticleSystem(5, 8192, PrepareLanternParticleRendering, UpdateLanternParticles);
         });
 

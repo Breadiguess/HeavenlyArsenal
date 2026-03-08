@@ -63,7 +63,7 @@ public class BezierCurve
     /// <param name="step">The step value (0 to 1) along the curve.</param>
     /// <param name="totalCurveLentgh">The total arc length of the curve.</param>
     /// <returns>The interpolant value corresponding to the given step.</returns>
-    public float ArcLentghParametrize(float step, float totalCurveLentgh)
+    public float ArcLengthParametrize(float step, float totalCurveLentgh)
     {
         var pointAtLentgh = step * totalCurveLentgh;
 
@@ -131,7 +131,7 @@ public class BezierCurve
 
         for (var step = 0; step < totalPoints; step++)
         {
-            points.Add(Evaluate(ArcLentghParametrize(step / (float)(totalPoints - 1), totalCurveLentgh)));
+            points.Add(Evaluate(ArcLengthParametrize(step / (float)(totalPoints - 1), totalCurveLentgh)));
         }
 
         return points;

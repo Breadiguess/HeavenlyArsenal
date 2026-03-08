@@ -2,8 +2,10 @@
 using Luminance.Common.Utilities;
 using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
+using NoxusBoss.Content.Items.Accessories.VanityEffects;
 using NoxusBoss.Core.Graphics.RenderTargets;
 using Terraria.DataStructures;
+using Terraria.Graphics.Shaders;
 using static NoxusBoss.Core.Utilities.Utilities;
 
 namespace HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
@@ -15,18 +17,28 @@ public class Voidcrest_DrawLayer : PlayerDrawLayer
     /// </summary>
     /// <remarks> directly stolen from portal skirt. thanks, Lucille!!</remarks>
     public static InstancedRequestableTarget HaloTarget { get; private set; }
+    public static Dictionary<int, int> HaloDyeMappings
+    {
+        get;
+        private set;
+    } = new Dictionary<int, int>(Main.maxPlayers);
 
     public override bool IsHeadLayer => true;
 
     public override void Load()
     {
         On_PlayerDrawLayers.DrawPlayer_08_Backpacks += What;
-        //On_Player.UpdateItemDye += FindSkirtItemDyeShader;
+        On_Player.UpdateItemDye += FindSkirtItemDyeShader;
 
         HaloTarget = new InstancedRequestableTarget();
         Main.ContentThatNeedsRenderTargets.Add(HaloTarget);
     }
-
+    private void FindSkirtItemDyeShader(On_Player.orig_UpdateItemDye orig, Player self, bool isNotInVanitySlot, bool isSetToHidden, Item armorItem, Item dyeItem)
+    {
+        orig(self, isNotInVanitySlot, isSetToHidden, armorItem, dyeItem);
+        if (armorItem.type == ModContent.ItemType<PortalSkirt>())
+            HaloDyeMappings[self.whoAmI] = GameShaders.Armor.GetShaderIdFromItemId(dyeItem.type);
+    }
     /// <summary>
     ///     I love code!
     /// </summary>
@@ -187,9 +199,11 @@ public class Voidcrest_DrawLayer : PlayerDrawLayer
         var val = (float)Math.Sin(Main.GlobalTimeWrappedHourly / 2) * 2;
         var Rot = drawInfo.drawPlayer.fullRotation + MathHelper.ToRadians(drawInfo.drawPlayer.direction * -45);
         var position = drawInfo.GetHeadDrawPosition() + new Vector2(0, -20f + val).RotatedBy(Rot);
+        HaloDyeMappings.TryGetValue(drawInfo.drawPlayer.whoAmI, out int dyeShaderIndex);
 
         var rift = new DrawData(portalTexture, position, null, Color.White, Rot + MathHelper.Pi, portalTexture.Size() * 0.5f, 1f, 0);
-        //drawInfo.DrawDataCache.Add(rift);
+        rift.shader = dyeShaderIndex;
+        drawInfo.DrawDataCache.Add(rift);
         drawRift(ref drawInfo);
     }
 }

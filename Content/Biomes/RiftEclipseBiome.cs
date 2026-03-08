@@ -4,6 +4,7 @@ namespace HeavenlyArsenal.Content.Biomes;
 
 public sealed class RiftEclipseBiome : ModBiome
 {
+    
     public override Color? BackgroundColor { get; } = Color.Black;
 
     public override string BestiaryIcon { get; } = $"{nameof(HeavenlyArsenal)}/Content/Biomes/RiftEclipseBiome";

@@ -71,7 +71,6 @@ public class ShintoArmorHelmetAll : ModItem
 
     public override void UpdateArmorSet(Player player)
     {
-        player.GetModPlayer<ShintoArmorIKArms>().Active = true;
         player.GetModPlayer<ShintoWingManager>().Active = true;
         player.GetModPlayer<ShintoArmorBarrier>().BarrierActive = true;
         player.GetModPlayer<ShintoArmorAvatarFall>().Active = true;

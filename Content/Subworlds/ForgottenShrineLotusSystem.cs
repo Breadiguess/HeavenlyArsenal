@@ -2,15 +2,10 @@
 using HeavenlyArsenal.Content.Subworlds.Generation;
 using HeavenlyArsenal.Content.Subworlds.Generation.Bridges;
 using Luminance.Core.Graphics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using NoxusBoss.Core.Graphics.FastParticleSystems;
 using NoxusBoss.Core.Graphics.LightingMask;
 using ReLogic.Content;
 using SubworldLibrary;
-using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace HeavenlyArsenal.Content.Subworlds;
 
@@ -24,13 +19,15 @@ public class ForgottenShrineLotusSystem : ModSystem
 
     public override void OnModLoad()
     {
-        if (Main.netMode != NetmodeID.Server)
+
+        Main.QueueMainThreadAction(() =>
         {
-            Main.QueueMainThreadAction(() =>
+            if (Main.netMode != NetmodeID.Server)
             {
                 lotusParticleSystem = new FramedFastParticleSystem(8, LotusCount, PrepareLotusParticleRendering, UpdateLotusParticles);
-            });
-        }
+            }
+        });
+
 
         On_Main.DrawProjectiles += RenderLotuses;
         ForgottenShrineSystem.OnEnter += ScatterLotusesIfNecessary;

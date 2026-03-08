@@ -163,7 +163,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
             (
                 new IBestiaryInfoElement[]
                 {
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
+                //BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
 
 
                 }

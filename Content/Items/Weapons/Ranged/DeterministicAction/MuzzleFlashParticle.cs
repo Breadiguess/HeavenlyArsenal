@@ -50,13 +50,19 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             spritebatch.End();
             spritebatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, default, DefaultRasterizerScreenCull, null, Main.GameViewMatrix.TransformationMatrix);
+
+            Texture2D GlowTex = AssetDirectory.Textures.HalfHollowEdge.Value;
+            
             Texture2D tex = ModContent.Request<Texture2D>("HeavenlyArsenal/Content/Items/Weapons/Ranged/DeterministicAction/MuzzleFlash").Value;
 
             Vector2 DrawPos = position - Main.screenPosition;
             Rectangle Frame = tex.Frame(1, 8, 0, FramePos);
             Vector2 Origin = new Vector2(0, Frame.Height / 2);
-            Main.EntitySpriteDraw(tex, DrawPos, Frame, Color.Crimson, Rotation, Origin, 1, 0);
+            Vector2 CircleScale = new Vector2(0.2f, 0.7f) * (1-LumUtils.InverseLerp(MaxTime, 0, TimeLeft));
+            Main.EntitySpriteDraw(GlowTex, DrawPos + new Vector2(40, 0).RotatedBy(Rotation), null, Color.Red, Rotation, GlowTex.Size() / 2, CircleScale, 0);
+            Main.EntitySpriteDraw(tex, DrawPos, Frame, Color.White, Rotation, Origin, 1, 0);
 
+            Main.EntitySpriteDraw(GlowTex, DrawPos + new Vector2(40,0).RotatedBy(Rotation), null, Color.Red, Rotation + MathHelper.Pi, GlowTex.Size() / 2, CircleScale, 0);
             spritebatch.ResetToDefault();
         }
 
@@ -67,7 +73,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Vector2 DrawPos = position - Main.screenPosition;
             Rectangle Frame = tex.Frame(1, 8, 0, FramePos);
             Vector2 Origin = new Vector2(0, Frame.Height / 2);
-            Main.EntitySpriteDraw(tex, DrawPos, Frame, Color.Crimson, Rotation, Origin, 1, 0);
+            Main.EntitySpriteDraw(tex, DrawPos, Frame, Color.White, Rotation, Origin, 2, 0);
 
         }
     }

@@ -77,13 +77,6 @@ public class BloodmoonSpawnControl : GlobalNPC
                     pool[ModContent.NPCType<BloodJelly>()] =
                         SpawnCondition.OverworldNightMonster.Chance * 0.005f;
 
-                int gorecaCount = NPC.CountNPCS(ModContent.NPCType<Goreca.Goreca>());
-                if (gorecaCount < 1)
-                {
-                    pool[ModContent.NPCType<Goreca.Goreca>()] =
-                  SpawnCondition.OverworldNightMonster.Chance * 0.002f;
-
-                }
 
 
 

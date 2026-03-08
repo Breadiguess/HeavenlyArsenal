@@ -1,6 +1,7 @@
 ﻿
 using CalamityMod;
 using CalamityMod.DataStructures;
+using CalamityMod.Projectiles.Ranged;
 using HeavenlyArsenal.Common.Graphics;
 using HeavenlyArsenal.Common.utils;
 using HeavenlyArsenal.Core;
@@ -169,7 +170,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             SpriteEffects flip = Owner.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp, default, default, null, Main.GameViewMatrix.ZoomMatrix);
-            Main.EntitySpriteDraw(ClipTarget, Owner.Center - Main.screenPosition, null, Color.White, Projectile.rotation, ClipTarget.Size() / 2 , 2, flip);
+            Main.EntitySpriteDraw(ClipTarget, Owner.Center - Main.screenPosition, null, Color.White, Projectile.rotation + RotationOffset, ClipTarget.Size() / 2 , 2, flip);
             Main.spriteBatch.ResetToDefault();
 
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
@@ -231,7 +232,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
             AttackStage++;
             Time = -1;
-            if (AmmoStored <= 0 && (CurrentState == RifleState.Recoil || CurrentState == RifleState.Idle))
+            if (AmmoStored <= 0 && (CurrentState == RifleState.Cycle || CurrentState == RifleState.Idle))
                 nextState = RifleState.Reload;
 
             return nextState;
@@ -315,7 +316,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             else
                 SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundSuper with { Volume = 2 , Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(13);
             
-            Recoil += 60;
             for (int x = 0; x < 2; x++)
             {
                 var clip = clips[x];
@@ -338,8 +338,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Owner.SetDummyItemTime(2);
             int finishRecoiling = 40 * Projectile.extraUpdates;
 
-         
 
+            if (Time == 6)
+            Recoil += 60;
             if (Time % 6 == 0 && RiflePlayer.Authority > 3)
             {
 
@@ -363,10 +364,13 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.CycleSound with { PitchVariance = 0.1f, Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(0.4f);
             RotationOffset = MathHelper.ToRadians(20 * Owner.direction) * LumUtils.InverseLerpBump(0, finishCycling / 3, finishCycling / 2, finishCycling, Time);
 
-            if(Projectile.frame == 6)
+            if(Time == finishCycling/3)
             {
-                Dust a = Dust.NewDustDirect(Projectile.Center, 40, 40, DustID.Torch, 0, 0);
-                a.velocity = Projectile.rotation.ToRotationVector2() * -10;
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(40,0).RotatedBy(Projectile.rotation+RotationOffset), Projectile.velocity.RotatedBy(Main.rand.NextFloat(2.5f, 2.65f) * -Projectile.direction) * 5f, ModContent.ProjectileType<M1GarandBulletCasing>(), 0, 0, Projectile.owner);
+                if(AmmoStored <= 0)
+
+                    CurrentState = PickNextAction();
+
             }
             Projectile.frame = (int)(15 * LumUtils.InverseLerp(0, finishCycling - 5, Time));
             if (Time >= finishCycling)
@@ -472,7 +476,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
                 Projectile.frame = 15+ (int)(9 * LumUtils.InverseLerp(0, StartReloadClip0, Time));
 
             if(Time > EndReloadClip1)
-                Projectile.frame = 7 + (int)(3 * LumUtils.InverseLerp(EndReloadClip1, FinishReload, Time));
+                Projectile.frame = 7 + (int)(6 * LumUtils.InverseLerp(EndReloadClip1, FinishReload, Time));
             if (Time > StartReloadClip0 && Time <= EndReloadClip0)
             {
                 Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, Owner.MountedCenter.AngleTo(clipPos[0] + Owner.MountedCenter) - MathHelper.PiOver2 + Projectile.rotation);
@@ -511,6 +515,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             if (Time > FinishReload)
             {
 
+                RotationOffset = 0;
                 Time = -1;
                 CurrentState = RifleState.Idle;
                 AttackStage = 0;

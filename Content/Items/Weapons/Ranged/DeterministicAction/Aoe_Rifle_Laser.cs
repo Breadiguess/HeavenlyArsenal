@@ -31,32 +31,36 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         public static RenderTarget2D LaserTarget;
         private void PixelateLaser(On_Main.orig_CheckMonoliths orig)
         {
-            if (LaserTarget == null || LaserTarget.IsDisposed)
-                LaserTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
-            else if (LaserTarget.Size() != new Vector2(Main.screenWidth / 2, Main.screenHeight / 2))
+            if (!Main.dedServ)
             {
-                Main.QueueMainThreadAction(() =>
-                {
-                    LaserTarget.Dispose();
+                if (LaserTarget == null || LaserTarget.IsDisposed)
                     LaserTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
-                });
-                return;
+                else if (LaserTarget.Size() != new Vector2(Main.screenWidth / 2, Main.screenHeight / 2))
+                {
+                    Main.QueueMainThreadAction(() =>
+                    {
+                        LaserTarget.Dispose();
+                        LaserTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth / 2, Main.screenHeight / 2);
+                    });
+                    return;
+                }
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+
+                Main.graphics.GraphicsDevice.SetRenderTarget(LaserTarget);
+                Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+
+                foreach (Projectile projectile in Main.projectile.Where(n => n.active && n.type == ModContent.ProjectileType<Aoe_Rifle_Laser>()))
+                {
+                    DrawLaser(projectile.ModProjectile as Aoe_Rifle_Laser);
+
+
+                }
+
+                Main.graphics.GraphicsDevice.SetRenderTarget(null);
+
+                Main.spriteBatch.End();
             }
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
-
-            Main.graphics.GraphicsDevice.SetRenderTarget(LaserTarget);
-            Main.graphics.GraphicsDevice.Clear(Color.Transparent);
-
-            foreach (Projectile projectile in Main.projectile.Where(n => n.active  && n.type == ModContent.ProjectileType<Aoe_Rifle_Laser>()))
-            {
-               DrawLaser(projectile.ModProjectile as Aoe_Rifle_Laser);
-
-
-            }
-
-            Main.graphics.GraphicsDevice.SetRenderTarget(null);
-
-            Main.spriteBatch.End();
+           
 
             orig();
         }
@@ -222,7 +226,6 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         void IDrawSubtractive.DrawSubtractive(SpriteBatch spriteBatch)
         {
-            Color color = Color.Lerp(Color.Red, Color.Crimson, 1 - LumUtils.InverseLerp(0, 20, Projectile.timeLeft));
             float scalar = ShrinkCurve.Evaluate(LumUtils.InverseLerp(0, 20, Projectile.timeLeft));
 
             Vector2 Scale = new Vector2(1 * scalar, 30);

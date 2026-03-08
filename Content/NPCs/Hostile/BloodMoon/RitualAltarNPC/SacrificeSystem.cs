@@ -365,6 +365,8 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
         RitualBuffNPC tgtGN;
         NPCTarget.TryGetGlobalNPC(out tgtGN);
+        if (tgtGN is null)
+            return false;
         var alreadyBuffed = tgtGN.hasRitualBuff || RitualSystem.BuffedNPCs.Contains(NPCTarget);
 
         if (!alreadyBuffed)

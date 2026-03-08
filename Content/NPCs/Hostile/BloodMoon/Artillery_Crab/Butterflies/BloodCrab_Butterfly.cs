@@ -156,7 +156,9 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab.Butterfl
             {
                 Target = null;
                 State = ButterflyState.Returning;
+                return;
             }
+            
             NPC.velocity = NPC.Center.DirectionTo(Target.Center)*10;
             //NPC.Center = Vector2.Lerp(NPC.Center, Target.Center, 0.05f);
             if(NPC.Center.Distance(Target.Center)<20)

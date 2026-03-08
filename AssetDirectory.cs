@@ -80,6 +80,7 @@ public static class AssetDirectory
         public static readonly Asset<Texture2D> GlowCone = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/Glow_2");
 
         #region blockaroz stuff
+        public static readonly Asset<Texture2D> HalfHollowEdge = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/HalfHollowSoftEdge");
 
         public static readonly Asset<Texture2D> BigGlowball = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/BigGlowball");
 

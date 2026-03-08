@@ -1,6 +1,4 @@
-﻿using HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
-
-namespace HeavenlyArsenal.Content.Items.Armor;
+﻿namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 
 internal class ShintoWingManager : ModPlayer
 {

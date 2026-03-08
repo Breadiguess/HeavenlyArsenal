@@ -194,7 +194,7 @@ internal class BloodNeedle : ModProjectile
         {
             Target = null;
         }
-
+    
         // Compute home position
         var SignFromOwner = Math.Sign(FromOwner.X);
         var sideOffset = Player.direction * (Index % 2 == 0 ? -90f : 100f);

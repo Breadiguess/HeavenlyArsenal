@@ -58,6 +58,9 @@
         <Reference Include="CalRemix">
           <HintPath>..\..\ModReader\CalRemix\CalRemix.dll</HintPath>
         </Reference>
+        <Reference Include="Daybreak">
+          <HintPath>..\..\ModReader\Daybreak\Daybreak.dll</HintPath>
+        </Reference>
         <Reference Include="InfernumMode">
           <HintPath>..\..\ModReader\InfernumMode\InfernumMode.dll</HintPath>
         </Reference>

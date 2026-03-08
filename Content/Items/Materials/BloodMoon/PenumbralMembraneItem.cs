@@ -11,7 +11,7 @@ public class PenumbralMembrane : VariantItemBase
     public override void SetDefaults()
     {
         Item.maxStack = Item.CommonMaxStack;
-        Item.Size = ModContent.Request<Texture2D>(Texture).Value.Size();
+        Item.Size = new Vector2(40, 40);
         Item.rare = ModContent.RarityType<BloodMoonRarity>();
         Item.sellPrice(0, 38, 20, 5);
         

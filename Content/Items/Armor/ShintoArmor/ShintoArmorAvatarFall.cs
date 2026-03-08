@@ -10,7 +10,7 @@ using NoxusBoss.Core.GlobalInstances;
 using Terraria.Audio;
 using static Luminance.Common.Utilities.Utilities;
 
-namespace HeavenlyArsenal.Content.Items.Armor;
+namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 
 public class ShintoArmorAvatarFall : ModPlayer
 {
@@ -24,7 +24,7 @@ public class ShintoArmorAvatarFall : ModPlayer
 
     /// The looped sound used for FALLING at a 'normal' pace.
     /// </summary>
-    public LoopedSoundInstance? FastFallLoop { get; set; }
+    public LoopedSoundInstance FastFallLoop { get; set; }
 
     public override void ResetEffects()
     {
@@ -59,7 +59,7 @@ public class ShintoArmorAvatarFall : ModPlayer
                 FastFallLoop = LoopedSoundManager.CreateNew(GennedAssets.Sounds.Avatar.GravitySlamFallLoop);
             }
 
-            SlamPower = MathHelper.Clamp(SlamPower, 0, 40);
+            SlamPower = Clamp(SlamPower, 0, 40);
 
             if (SlamPower > 3)
             {
@@ -118,7 +118,7 @@ public class ShintoArmorAvatarFall : ModPlayer
             {
                 //a bit silly, but very fun!
                 var downwardVel = CachedVelocity;
-                var radius = MathHelper.Clamp(downwardVel / 60, 1f, 5f);
+                var radius = Clamp(downwardVel / 60, 1f, 5f);
                 var baseDamage = (int)(Player.statLifeMax2 + Math.Pow(downwardVel, 4));
 
                 var slam = Projectile.NewProjectileDirect

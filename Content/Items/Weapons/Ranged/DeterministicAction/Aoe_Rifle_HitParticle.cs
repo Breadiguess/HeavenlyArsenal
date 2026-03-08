@@ -41,8 +41,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             
             if(TimeLeft % 10 == 0)
             {
-                Aoe_Rifle_DeathParticle particle = new Aoe_Rifle_DeathParticle();
-                particle.Prepare(position + Main.rand.NextVector2CircularEdge(30, 30), 0, 120, null, Main.rand.Next(Aoe_Rifle_DeathParticle.SymbolList.Length));
+                //Aoe_Rifle_DeathParticle particle = new Aoe_Rifle_DeathParticle();
+                //particle.Prepare(position + Main.rand.NextVector2CircularEdge(30, 30), 0, 120, null, Main.rand.Next(Aoe_Rifle_DeathParticle.SymbolList.Length));
                 //ParticleEngine.BehindProjectiles.Add(particle);
             }
             TimeLeft--;
@@ -56,6 +56,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             Texture2D tex = AssetDirectory.Textures.GlowCone.Value;
             Texture2D glow = GennedAssets.Textures.GreyscaleTextures.HollowCircleSoftEdge;
+            Texture2D glow2 = GennedAssets.Textures.GreyscaleTextures.Corona;
             Texture2D ting = GennedAssets.Textures.GreyscaleTextures.ChromaticBurst;
             float Rot = Rotation + MathHelper.Pi;
             Color thing = Color.Lerp(Color.Transparent, Color.Crimson, LumUtils.InverseLerp(0, MaxTime, TimeLeft));
@@ -67,9 +68,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             }
             Main.EntitySpriteDraw(tex, DrawPos, null, thing with { A = 0 }, Rotation, new Vector2(0, tex.Height / 2), new Vector2(1, 0.05f), 0);
             Main.EntitySpriteDraw(glow, DrawPos - new Vector2(-20,0).RotatedBy(Rotation), null, thing with { A = 0 }, Rotation, glow.Size() / 2, new Vector2(0.4f, 1f) * 0.05f * LumUtils.InverseLerp(0, MaxTime, TimeLeft), 0);
+            Main.EntitySpriteDraw(glow2, DrawPos - new Vector2(-20, 0).RotatedBy(Rotation), null, thing with { A = 0 }, Rotation, glow2.Size() / 2, new Vector2(0.4f, 1f) * 0.1f * LumUtils.InverseLerp(0, MaxTime, TimeLeft), 0);
 
-            Main.EntitySpriteDraw(glow, DrawPos, null, thing with { A = 0 }, Rotation, glow.Size() / 2, new Vector2(0.4f, 1f)*0.12f * LumUtils.InverseLerp(0, MaxTime, TimeLeft), 0);
-         //   Main.EntitySpriteDraw(ting, DrawPos, null, thing with { A = 0 }, Rotation, ting.Size() / 2, 0.2f+0.2f * (1 - LumUtils.InverseLerp(0, MaxTime, TimeLeft)), 0);
+            Main.EntitySpriteDraw(glow, DrawPos - new Vector2(-10, 0).RotatedBy(Rotation), null, thing with { A = 0 }*0.5f, Rotation, glow.Size() / 2, new Vector2(0.4f, 1f)*0.12f * LumUtils.InverseLerp(0, MaxTime, TimeLeft), 0);
+            Main.EntitySpriteDraw(glow2, DrawPos - new Vector2(-10, 0).RotatedBy(Rotation), null, thing with { A = 0 }, Rotation, glow2.Size() / 2, new Vector2(0.4f, 1f) * 0.28f * LumUtils.InverseLerp(0, MaxTime, TimeLeft), 0);
+
+            //   Main.EntitySpriteDraw(ting, DrawPos, null, thing with { A = 0 }, Rotation, ting.Size() / 2, 0.2f+0.2f * (1 - LumUtils.InverseLerp(0, MaxTime, TimeLeft)), 0);
         }
     }
 }

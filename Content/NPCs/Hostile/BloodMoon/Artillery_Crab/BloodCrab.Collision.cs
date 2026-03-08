@@ -95,7 +95,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab
                 modifiers.DisableKnockback();
                 NPC.life++;
                 NPC.ForceNetUpdate();
-                AddReflectData(impactDir, 3.2f, new Color(255, 255, 102));
+                AddReflectData(impactDir, 3.2f, Color.Crimson);
 
                 if (projectile.ModProjectile is not null)
                 {
