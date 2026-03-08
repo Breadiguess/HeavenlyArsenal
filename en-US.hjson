@@ -1,4 +1,4 @@
-﻿Mods: {
+Mods: {
 	HeavenlyArsenal: {
 		Keybinds: {
 			"Quick Dash.DisplayName": Quick  Dash
@@ -10,6 +10,7 @@
 			"Swirl Cloak.DisplayName": Swirl  Cloak
 			"Blood Armor Parry.DisplayName": Blood  Armor  Parry
 			"Blood Blight Purge.DisplayName": Blood  Blight  Purge
+			"Activete Dual Mode.DisplayName": Activete  Dual  Mode
 		}
 
 		Items: {

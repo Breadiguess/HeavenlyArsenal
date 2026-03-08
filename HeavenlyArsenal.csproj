@@ -7,12 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <AdditionalFiles Remove="Content\NPCs\Bosses\Idol\**" />
       <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <Compile Remove="Content\NPCs\Bosses\Idol\**" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <EmbeddedResource Remove="Content\NPCs\Bosses\Idol\**" />
       <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <None Remove="Content\NPCs\Bosses\Idol\**" />
       <None Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <None Remove="Content\Projectiles\Weapons\Rogue\**" />
     </ItemGroup>

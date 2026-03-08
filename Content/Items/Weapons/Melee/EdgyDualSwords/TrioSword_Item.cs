@@ -2,10 +2,6 @@
 using HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData;
 using Luminance.Assets;
 using NoxusBoss.Content.Rarities;
-using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.DataStructures;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords
