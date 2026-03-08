@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
+﻿namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
 {
     public enum SwordAttackID
     {
         Small_Light1,
         Small_Light2,
+        Small_Light3,
+        Small_Light4,
         Small_Shadowfy,
         Small_Counter,
 

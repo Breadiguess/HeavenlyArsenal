@@ -7,12 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <AdditionalFiles Remove="Content\NPCs\Bosses\Idol\**" />
       <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <Compile Remove="Content\NPCs\Bosses\Idol\**" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <EmbeddedResource Remove="Content\NPCs\Bosses\Idol\**" />
       <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <None Remove="Content\NPCs\Bosses\Idol\**" />
       <None Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <None Remove="Content\Projectiles\Weapons\Rogue\**" />
     </ItemGroup>
@@ -32,6 +36,7 @@
       <Compile Remove="Content\Items\Misc\AncientCoin.cs" />
       <Compile Remove="Content\Items\Misc\ChaliceOfFunItem.cs" />
       <Compile Remove="Content\Items\Misc\ChaliceOfFunProjectile.cs" />
+      <Compile Remove="Content\Items\Misc\IdolSummoner.cs" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\Artillery_Crab\BloodCrab - Copy.IK.cs" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPC.cs" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPCLimb.cs" />

@@ -11,7 +11,9 @@ public sealed class KeybindSystem : ModSystem
     public static ModKeybind BloodArmorParry { get; private set; }
         
     public static ModKeybind BloodBlightPurge { get; private set; }
-        
+
+    public static ModKeybind DualModeActivete { get; private set; }
+
     public override void Load()
     {
         base.Load();
@@ -21,6 +23,7 @@ public sealed class KeybindSystem : ModSystem
         ShadowTeleport = KeybindLoader.RegisterKeybind(Mod, "Shadow Teleport", "F");
         BloodArmorParry = KeybindLoader.RegisterKeybind(Mod, "Blood Armor Parry", "T");
         BloodBlightPurge = KeybindLoader.RegisterKeybind(Mod, "Blood Blight Purge", "V");
+        DualModeActivete = KeybindLoader.RegisterKeybind(Mod, "Activete Dual Mode", "X");
     }
 
     public override void Unload()
@@ -32,5 +35,6 @@ public sealed class KeybindSystem : ModSystem
         ShadowTeleport = null;
         BloodArmorParry = null;
         BloodBlightPurge = null;
+        DualModeActivete = null;
     }
 }
