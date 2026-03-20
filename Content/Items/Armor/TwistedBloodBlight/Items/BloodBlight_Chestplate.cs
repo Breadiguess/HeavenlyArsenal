@@ -27,8 +27,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Items
 
         protected override void ApplyEquipStats(Player player)
         {
-            Stats.AddDamage(player, 0.10f,
-        locOverride: "Mods.HeavenlyArsenal.Armor.BloodBlight.BloodBlight_Helmet.Crit");
+            Stats.AddDamage(player, 0.10f, locOverride: "Mods.HeavenlyArsenal.Armor.BloodBlight.BloodBlight_Helmet.Crit");
             Stats.AddCrit(player, 6, color: Color.Crimson);
             Stats.AddMoveSpeed(player, -0.15f);
         }

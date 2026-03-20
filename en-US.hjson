@@ -449,6 +449,16 @@ Mods: {
 				DisplayName: Avatar Rogue
 				Tooltip: ""
 			}
+
+			TwistedBloodBlightChestplateItem: {
+				DisplayName: Twisted Blood Blight Chestplate Item
+				Tooltip: ""
+			}
+
+			TwistedBloodBlightLeggingsItem: {
+				DisplayName: Twisted Blood Blight Leggings Item
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {
