@@ -5,7 +5,6 @@ using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
-using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Goreca;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;

@@ -51,31 +51,31 @@
       <None Remove="Content\Items\Misc\ChaliceOfFunItem.png" />
       <None Remove="Content\Items\Misc\ChaliceOfFunProjectile.png" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <Reference Include="CalamityEntropy">
-            <HintPath>..\..\ModReader\CalamityEntropy\CalamityEntropy.dll</HintPath>
+            <HintPath>lib\CalamityEntropy.dll</HintPath>
         </Reference>
         <Reference Include="CalamityMod">
-            <HintPath>ModReferences\CalamityMod.dll</HintPath>
+            <HintPath>lib\CalamityMod.dll</HintPath>
         </Reference>
         <Reference Include="CalRemix">
-          <HintPath>..\..\ModReader\CalRemix\CalRemix.dll</HintPath>
+            <HintPath>lib\CalRemix.dll</HintPath>
         </Reference>
         <Reference Include="Daybreak">
-          <HintPath>..\..\ModReader\Daybreak\Daybreak.dll</HintPath>
+            <HintPath>lib\Daybreak.dll</HintPath>
         </Reference>
         <Reference Include="InfernumMode">
-          <HintPath>..\..\ModReader\InfernumMode\InfernumMode.dll</HintPath>
+            <HintPath>lib\InfernumMode.dll</HintPath>
         </Reference>
         <Reference Include="Luminance">
-            <HintPath>ModReferences\Luminance.dll</HintPath>
+            <HintPath>lib\Luminance.dll</HintPath>
         </Reference>
         <Reference Include="NoxusBoss">
-          <HintPath>..\..\ModReader\NoxusBoss\NoxusBoss.dll</HintPath>
+            <HintPath>lib\NoxusBoss.dll</HintPath>
         </Reference>
         <Reference Include="SubworldLibrary">
-            <HintPath>ModReferences\SubworldLibrary.dll</HintPath>
+            <HintPath>lib\SubworldLibrary.dll</HintPath>
         </Reference>
     </ItemGroup>
 

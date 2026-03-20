@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Content.NPCs.Bosses.Idol;
+﻿// using HeavenlyArsenal.Content.NPCs.Bosses.Idol;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -30,10 +30,13 @@ namespace HeavenlyArsenal.Content.Items.Misc
             if (Main.myPlayer == NetmodeID.MultiplayerClient || p.itemAnimation != p.itemAnimationMax - 1)
                 return false;
 
-            if (ModContent.GetInstance<IdolSummoningRitualSystem>().IsActive)
+    /*
+     *             if (ModContent.GetInstance<IdolSummoningRitualSystem>().IsActive)
                 ModContent.GetInstance<IdolSummoningRitualSystem>().Reset();
             else
                 ModContent.GetInstance<IdolSummoningRitualSystem>().Start();
+            
+     */
             return null;
         }
     }
