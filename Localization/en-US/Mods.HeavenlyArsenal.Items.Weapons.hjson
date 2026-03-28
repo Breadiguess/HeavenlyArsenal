@@ -1,27 +1,27 @@
-Ranged: {
+﻿Ranged: {
 	FusionRifle: {
 		ShiftTooltip:
 			'''
-			Teeth,sharper than your own.
+			Teeth, sharper than your own
 			"This is my destiny too!" 
 			'''
 		DisplayName: Cold Fusion
 		Tooltip:
 			'''
-			Hold <left> to charge the weapon.
-			It will automatically fire upon reaching max charge.
-			landing consecutive hits grants a stacking charge rate and damage increase 
-			additionally, after a certain amount of hits, shots will apply volatile to enemies.
-			any hit afterwards will trigger volatile.
+			Hold <left> to charge the weapon
+			It will automatically fire upon reaching max charge
+			Landing consecutive hits grants a stacking charge rate and damage increase 
+			Additionally, after a certain amount of hits, shots will apply volatile to enemies
+			Any hit afterwards will trigger volatile
 			'''
 	}
 
 	AvatarRifle2: {
-		DisplayName: Funeral Dirge of a dead world
+		DisplayName: Funeral Dirge of a Dead World
 		Tooltip:
 			'''
-			every 7 shots will empower the rifle
-			every 4th bullet landed on an enemy will shred them, reducing their defense and causing nearby enemies to suffer
+			Every 7 shots will empower the rifle
+			Every 4th bullet landed on an enemy will shred them, reducing their defense and causing nearby enemies to suffer
 			'''
 	}
 
@@ -29,7 +29,7 @@ Ranged: {
 		DisplayName: Breath the of the Last God
 		Tooltip:
 			'''
-			Hold <left> to draw the bow, and release to fire a powerful arrow of crystalized entropy.
+			Hold <left> to draw the bow, and release to fire a powerful arrow of crystalized entropy
 			Press <right> to detonate all crystals
 			'''
 	}
@@ -38,10 +38,10 @@ Ranged: {
 		DisplayName: Deterministic Causality
 		Tooltip:
 			'''
-			An ancient rifle from a long dead civilization.
-			Despite the extreme passage of time, its still in relatively good condition.
+			An ancient rifle from a long dead civilization
+			Despite the extreme passage of time, its still in relatively good condition
 			(wip)
-			         Stores up to two clips within the item that it draws from to fire.
+			         Stores up to two clips within the item that it draws from to fire
 			'''
 		Lore:
 			'''
@@ -86,12 +86,12 @@ Melee: {
 		EmpoweredName: Unending Cycle of Retribution
 		Tooltip:
 			'''
-			<left> Cycles through several extremely fast attacks.
-			as you attack, you build up Heat. At max Heat, the Spear awakens and gains a new set of attacks
+			<left> Cycles through several extremely fast attacks
+			As you attack, you build up Heat. At max Heat, the Spear awakens and gains a new set of attacks
 			<right> at any point will throw the spear
 			The spear can pass through blocks, and will attempt to drag you to its location
 			If thrown with over 50% Heat, you will create a small glowing orb that rapidly rakes into the hit target
-			Once the orb collides, you teleport inside of the target, dealing massive damage.
+			Once the orb collides, you teleport inside of the target, dealing massive damage
 			'''
 	}
 
@@ -101,7 +101,7 @@ Melee: {
 			'''
 			Coming soon to a town near you!
 
-			activate setbonus to clear the empowered form for now.
+			Activate setbonus to clear the empowered form for now
 
 			'''
 	}
@@ -122,7 +122,7 @@ Summon: {
 		DisplayName: Scroll of Brightest Shadow
 		Tooltip:
 			'''
-			Summons a warrior blanketed in Antishadow to slash at your foes.
+			Summons a warrior blanketed in Antishadow to slash at your foes
 			bound by blood and seal, it shall always be by your side
 
 			[c/ff4dff:There can be only one.]

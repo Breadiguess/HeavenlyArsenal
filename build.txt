@@ -1,6 +1,6 @@
 ﻿displayName = Heavenly Arsenal
-author = Bread, Lucille Karma, Blockaroz, Naka
-version = 0.729
+author = Bread, Lucille Karma, Blockaroz, Naka, Yumeiru
+version = 0.730
 
 includeSource = true
 
