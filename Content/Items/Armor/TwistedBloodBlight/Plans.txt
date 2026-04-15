@@ -17,6 +17,7 @@ Band	State	Description
 70–100%	Ascension	Extreme power, heavy risk
 
 Remaining at high saturation for too long causes a Crash, forcibly weakening the player.
+
 Class Morphs
 Twisted Bloodblight adapts to the player’s dominant damage class:
 

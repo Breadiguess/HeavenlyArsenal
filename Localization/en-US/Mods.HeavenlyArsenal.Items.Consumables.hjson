@@ -1,8 +1,8 @@
-﻿CombatStimItem: {
+CombatStimItem: {
 	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStimItem.StimDuration
 	DisplayName: Experimental Combat Stim
-	Tooltip: 
-        '''
+	Tooltip:
+		'''
 		A cocktail of blood and phoenix flame
 		Grants powerful buffs at the cost of life
 		May cause addiction and subsequent withdrawal if overused

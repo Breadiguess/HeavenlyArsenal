@@ -1,4 +1,4 @@
-﻿Materials: {
+Materials: {
 	AuricCatalystItem: {
 		DisplayName: Auric Catalyst
 		Tooltip: ""
@@ -7,7 +7,7 @@
 	ShadowspecGunPartsItem: {
 		DisplayName: Shadowspec Gun Parts
 		Tooltip:
-            '''
+			'''
 			The ultimate culmination of gunsmithing
 			Years of the craft have gone into this, and the end result lies before you
 			These parts are capable of creating a weapon of unimaginable power...

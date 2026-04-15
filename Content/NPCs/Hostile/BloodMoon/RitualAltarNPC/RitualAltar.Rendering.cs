@@ -3,7 +3,7 @@ using NoxusBoss.Assets;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
-internal partial class RitualAltar : BaseBloodMoonNPC
+public partial class RitualAltar : BaseBloodMoonNPC
 {
     private VertexBuffer isohedronBuffer;
 

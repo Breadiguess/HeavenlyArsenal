@@ -1,4 +1,4 @@
-﻿ShintoArmor: {
+ShintoArmor: {
 	ShintoArmorHelmetRogue: {
 		SetBonus: Mods.HeavenlyArsenal.Items.Armor.ShintoArmor.ShintoArmorHelmetRogue.SetBonus
 		DisplayName: Darkened Cap
@@ -112,7 +112,7 @@ ScavSona: {
 
 	ScavSona_Helmet: {
 		DisplayName: Visage of the Faded Spirit
-		Tooltip: "A fragment of a now deceased Spirit's light, now tied to you."
+		Tooltip: A fragment of a now deceased Spirit's light, now tied to you.
 	}
 }
 

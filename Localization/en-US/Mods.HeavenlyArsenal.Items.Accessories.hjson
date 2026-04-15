@@ -1,4 +1,4 @@
-﻿ElectricVambrace: {
+ElectricVambrace: {
 	DisplayName: Vambrace of Otonilou
 	Tooltip:
 		'''
@@ -7,7 +7,7 @@
 		Effects of Amadias' Spark
 		33% reduced dash cooldown
 		20% reduced damage taken while dashing
-        "Empowered by the storm"
+		      "Empowered by the storm"
 		'''
 }
 

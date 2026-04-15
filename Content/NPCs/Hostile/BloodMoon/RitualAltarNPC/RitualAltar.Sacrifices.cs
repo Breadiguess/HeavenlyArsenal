@@ -6,7 +6,7 @@ using Terraria.Audio;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
-internal partial class RitualAltar : BaseBloodMoonNPC
+public partial class RitualAltar : BaseBloodMoonNPC
 {
     public List<NPC> Sacrifices = new(Main.npc.Length);
 
