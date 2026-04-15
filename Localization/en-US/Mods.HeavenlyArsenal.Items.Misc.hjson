@@ -1,27 +1,17 @@
-Materials: {
-	Auric_Catalyst: {
+﻿Materials: {
+	AuricCatalystItem: {
 		DisplayName: Auric Catalyst
 		Tooltip: ""
 	}
 
-	shadowspec_GunParts: {
+	ShadowspecGunPartsItem: {
 		DisplayName: Shadowspec Gun Parts
 		Tooltip:
-			'''
-			the ultimate culmination of gunsmithing.
+            '''
+			The ultimate culmination of gunsmithing
 			Years of the craft have gone into this, and the end result lies before you
-			these parts are capable of creating a weapon of unimaginable power...
+			These parts are capable of creating a weapon of unimaginable power...
 			'''
-	}
-
-	AuricCatalystItem: {
-		DisplayName: Auric Catalyst Item
-		Tooltip: ""
-	}
-
-	ShadowspecGunPartsItem: {
-		DisplayName: Shadowspec Gun Parts Item
-		Tooltip: ""
 	}
 }
 
@@ -29,13 +19,13 @@ AncientCoin: {
 	DisplayName: Corroded Coin
 	Tooltip:
 		'''
-		it might be more rust than metal at this point
-		perhaps you could trade it somewhere?
+		It might be more rust than metal at this point
+		Perhaps you could trade it somewhere?
 		'''
 }
 
 ChaliceOfFun: {
-	DisplayName: Chalice Of Fun
+	DisplayName: Chalice of Fun
 	Tooltip: ""
 }
 
@@ -45,24 +35,23 @@ Incomplete_gun: {
 	TooltipPostNamelessDiety: Go on. Claim Your Destiny.
 }
 
-UmbralLeechDrop: {
+UmbralLeechDropItem: {
 	DisplayName: Bloody Tendril
 	Tooltip:
 		'''
-		severed from the fearsome umbral leech
-		its still wiggling...
-
+		Severed from the fearsome umbral leech
+		It's still wiggling...
 		'''
 }
 
-ShellFragment: {
+ShellFragmentItem: {
 	DisplayName: Shell Fragment
-	Tooltip: a thick fragment of keratin, laced with red veins and still warm to the touch
+	Tooltip: A thick fragment of keratin, laced with red veins and still warm to the touch
 }
 
 PenumbralMembrane: {
 	DisplayName: Penumbral Membrane
-	Tooltip: a thin, dark membrane of an unknown origin
+	Tooltip: A thin, dark membrane of an unknown origin
 }
 
 AvatarMaterial: {
@@ -129,15 +118,5 @@ VertisPlush: {
 
 BobulousPlush: {
 	DisplayName: Bobulous Plush
-	Tooltip: ""
-}
-
-ShellFragmentItem: {
-	DisplayName: Shell Fragment Item
-	Tooltip: ""
-}
-
-UmbralLeechDropItem: {
-	DisplayName: Umbral Leech Drop Item
 	Tooltip: ""
 }

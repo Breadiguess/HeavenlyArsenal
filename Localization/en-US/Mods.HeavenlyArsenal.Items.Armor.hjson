@@ -1,4 +1,4 @@
-ShintoArmor: {
+﻿ShintoArmor: {
 	ShintoArmorHelmetRogue: {
 		SetBonus: Mods.HeavenlyArsenal.Items.Armor.ShintoArmor.ShintoArmorHelmetRogue.SetBonus
 		DisplayName: Darkened Cap
@@ -6,24 +6,24 @@ ShintoArmor: {
 	}
 
 	ShintoArmorHelmetAll: {
-		DisplayName: Sight Of Bygone Shadow
+		DisplayName: Sight of Bygone Shadow
 		Tooltip:
 			'''
 			Effects of Occult Skull Crown
 			20% increased damage
 			15% increased crit chance
-			15% increased attackspeed
+			15% increased attack speed
 
 			'''
 		SetBonus:
 			'''
-			Grants an additional 10 minion slots.
-			Grants an additional 15% damage to all classes.
+			Grants an additional 10 minion slots
+			Grants an additional 15% damage to all classes
 			An antishadow barrier is forged around you that absorbs most of the damage you would've taken
 			Standing still calls upon the shadows to regenerate your physical form
-			While no other wings are equipped, a powerful pair of wings are braided into existence.
-			While no other dash accessories are equipped, provides a powerful dash that allows you to phase through enemies.
-			Hold down while falling to accelerate at astronomical speeds.
+			While no other wings are equipped, a powerful pair of wings are braided into existence
+			While no other dash accessories are equipped, provides a powerful dash that allows you to phase through enemies
+			Hold down while falling to accelerate at astronomical speeds
 			'''
 		LoreTip: ""
 		LoreTipGFB: ""
@@ -33,7 +33,7 @@ ShintoArmor: {
 		DisplayName: Plate of Bygone Shadow
 		Tooltip:
 			'''
-			increases max life by 300 and max mana by 200
+			Increases max life by 300 and max mana by 200
 			15% increased damage
 			18% increased crit chance
 			25% increased attack speed
@@ -46,8 +46,8 @@ ShintoArmor: {
 			'''
 			20% increased damage
 			50% increased movement speed
-			provides a chance to dodge attacks
-			provides a fast dash that renders you immune to damage for a short time
+			Provides a chance to dodge attacks
+			Provides a fast dash that renders you immune to damage for a short time
 
 			'''
 	}
@@ -58,14 +58,14 @@ AwakenedBloodArmor: {
 		DisplayName: Sanguine Helm
 		SetBonus:
 			'''
-			covers you in a sentient amalgam of flesh and bone
+			Covers you in a sentient amalgam of flesh and bone
 			Press <f> to toggle between two distinct variants
-			while in offense form, gain two needles that constantly lash out at nearby enemies
-			while in defense form, activating your set bonus will launch a harpoon to impale and drain enemies, as well as providing a massive defense boost.
+			While in offense form, gain two needles that constantly lash out at nearby enemies
+			While in defense form, activating your set bonus will launch a harpoon to impale and drain enemies, as well as providing a massive defense boost.
 			 
-			both of these actions grant blood.
-			blood will eventually decay into clot- while in offense form, reaching max blood will send you into a frenzy where you deal increased damage.
-			while in defense form, clot will be consumed to grant healing.
+			Both of these actions grant blood.
+			Blood will eventually decay into clot- while in offense form, reaching max blood will send you into a frenzy where you deal increased damage.
+			While in defense form, clot will be consumed to grant healing.
 			'''
 		Tooltip: ... weak...
 		AltTooltip: ""
@@ -112,7 +112,7 @@ ScavSona: {
 
 	ScavSona_Helmet: {
 		DisplayName: Visage of the Faded Spirit
-		Tooltip: "A fragment of a now deceased Spirit's light, now tied to you. "
+		Tooltip: "A fragment of a now deceased Spirit's light, now tied to you."
 	}
 }
 

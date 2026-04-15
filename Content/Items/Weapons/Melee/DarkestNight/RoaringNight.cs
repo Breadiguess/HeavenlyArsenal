@@ -383,7 +383,7 @@ public class RoaringNight : ModProjectile
             JoustProgress = float.Lerp(JoustProgress, 1.1f, 0.01f);
         }
 
-        Main.NewText(JoustProgress);
+        //Main.NewText(JoustProgress);
     }
 
     public void CreateBlackGlass()

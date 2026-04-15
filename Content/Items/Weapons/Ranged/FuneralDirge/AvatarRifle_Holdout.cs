@@ -227,7 +227,7 @@ public class AvatarRifle_Holdout : ModProjectile
         CreateMuzzleFlash(MuzzleFlash, Projectile.velocity);
 
         var AmmoDifference = MaxAmmo - AmmoCount;
-        Main.NewText(AmmoCount);
+        //Main.NewText(AmmoCount);
         RecoilRotation += Projectile.spriteDirection * MathHelper.ToRadians(34f);
 
         var shot = Projectile.NewProjectileDirect

@@ -1,15 +1,13 @@
-ElectricVambrace: {
+﻿ElectricVambrace: {
 	DisplayName: Vambrace of Otonilou
 	Tooltip:
 		'''
-		"Empowered by the storm"
-		lightning shreds any enemies nearby
-		effects of the transformer
-		effects of amadias' spark
+		Lightning shreds any enemies nearby
+		Effects of The Transformer
+		Effects of Amadias' Spark
 		33% reduced dash cooldown
 		20% reduced damage taken while dashing
-
-
+        "Empowered by the storm"
 		'''
 }
 
@@ -17,8 +15,8 @@ VoidCrestOath: {
 	DisplayName: Foreign Halo of Deep Void
 	Tooltip:
 		'''
-		A rudimentary necklace forged from a crude piece of iron and given a basic defensive enchantment.
-		Though it might seem fragile, the persistence this object represents makes it capable of warding against all but the most dangerous of blows.
+		A rudimentary necklace forged from a crude piece of iron and given a basic defensive enchantment
+		Though it might seem fragile, the persistence this object represents makes it capable of warding against all but the most dangerous of blows
 
 		'''
 	GFBtooltip:
@@ -32,11 +30,11 @@ ChiUpgrade: {
 	DisplayName: Strange Trinket
 	Tooltip:
 		'''
-		effects of the chi trinket
-		hitting an enemy summons a floating orb around them
-		upon reaching 9 orbs, they drift outwards and then strike that enemy
+		Effects of the Chi Trinket
+		Hitting an enemy summons a floating orb around them
+		Upon reaching 9 orbs, they drift outwards and then strike that enemy
 
-		additionally, you gain increased crit chance based on the total damage you've dealt recently
+		Additionally, you gain increased crit chance based on the total damage you've dealt recently
 		"Now, you are balanced."
 		'''
 }
@@ -67,9 +65,9 @@ RadiantRampartItem: {
 		'''
 }
 
-EvilCard: {
-	DisplayName: Debit card of Emptiness
-	Tooltip: the economy...
+EvilCardItem: {
+	DisplayName: Debit Card of Emptiness
+	Tooltip: The economy...
 }
 
 Cloak: {
@@ -77,7 +75,7 @@ Cloak: {
 	Tooltip:
 		'''
 		Press <KEY> to conjure a swirling vortex around yourself
-		the vortex grabs and spins nearby projectiles, before converting them into stars and being launched towards the cursor.
+		The vortex grabs and spins nearby projectiles, before converting them into stars and being launched towards the cursor
 		'''
 }
 
@@ -91,7 +89,7 @@ ShintoArmorWings: {
 		'''
 }
 
-LeechScarf_Item: {
+LeechScarfItem: {
 	DisplayName: Bloody Leech Scarf
 	Tooltip:
 		'''
@@ -100,16 +98,6 @@ LeechScarf_Item: {
 		Tendrils protect your back and siphon life
 		After several strikes, they solidify and break
 		Dealing damage up close restores them faster
-		Swapping off this accessory kills the leeches.
+		Swapping off this accessory kills the leeches
 		'''
-}
-
-EvilCardItem: {
-	DisplayName: Evil Card Item
-	Tooltip: ""
-}
-
-LeechScarfItem: {
-	DisplayName: Leech Scarf Item
-	Tooltip: ""
 }

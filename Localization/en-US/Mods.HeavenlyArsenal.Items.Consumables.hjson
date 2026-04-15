@@ -1,18 +1,12 @@
-CombatStim: {
+﻿CombatStimItem: {
+	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStimItem.StimDuration
 	DisplayName: Experimental Combat Stim
-	Tooltip:
-		'''
+	Tooltip: 
+        '''
 		A cocktail of blood and phoenix flame
 		Grants powerful buffs at the cost of life
 		May cause addiction and subsequent withdrawal if overused
 		"Do not worry, according to a study Stims are not addictive!*"
 		*Study funded by Permacura. Permacura: Put your life in our hands.
 		'''
-	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStim.StimDuration
-}
-
-CombatStimItem: {
-	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStimItem.StimDuration
-	DisplayName: Combat Stim Item
-	Tooltip: ""
 }

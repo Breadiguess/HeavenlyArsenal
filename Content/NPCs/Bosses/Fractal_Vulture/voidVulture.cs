@@ -373,7 +373,7 @@ partial class voidVulture : ModNPC
 
         if (currentState == Behavior.placeholder2 && Time > 40)
         {
-            Main.NewText(letGOcount);
+            //Main.NewText(letGOcount);
 
             if (HitTimer <= 0)
             {

@@ -1588,6 +1588,7 @@ public class AntishadowAssassin : ModProjectile
         var ropeColor = new Color(210, 13, 16) * Projectile.Opacity;
         var drawOffset = center - Projectile.Center;
 
+        Rectangle previousCutoffRectangle = Main.instance.GraphicsDevice.ScissorRectangle;
         BeadRopeA?.DrawProjection
         (
             whitePixel,
@@ -1659,6 +1660,7 @@ public class AntishadowAssassin : ModProjectile
             var beadRotation = (BeadRopeD.Rope[^2].Position - BeadRopeD.Rope[^1].Position).ToRotation() + MathHelper.PiOver2;
             Main.spriteBatch.Draw(beadTextureD, BeadRopeD.Rope[^4].Position + drawOffset, null, Color.White * Projectile.Opacity, beadRotation, new Vector2(17f, 46f), Projectile.scale * 0.1f, 0, 0f);
         }
+        Main.instance.GraphicsDevice.ScissorRectangle = previousCutoffRectangle;
     }
 
     /// <summary>
