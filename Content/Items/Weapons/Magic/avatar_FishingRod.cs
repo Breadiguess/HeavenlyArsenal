@@ -51,14 +51,7 @@ public class avatar_FishingRod : ModItem
         return Color.White;
     }
 
-    public override void AddRecipes()
-    {
-        CreateRecipe()
-            .AddIngredient(ItemID.Coral, 2)
-            .AddTile<GardenFountainTile>()
-            .Register();
-    }
-
+   
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         // Find the fishing power tooltip from localization

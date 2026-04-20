@@ -3,7 +3,7 @@ using Terraria.GameInput;
 
 namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
 {
-    public class SwordCombatPlayer : ModPlayer
+    public partial class SwordCombatPlayer : ModPlayer
     {
         public SwordMode CurrentMode;
         public SwordAttackID? CurrentAttack;
@@ -32,19 +32,20 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                 return;
             }
 
+            if (Player.itemTime > 0)
+                return;
+
             // Mode Switch
-            if (Player.controlUseTile && !IsCharging && CurrentMode == SwordMode.Small)
+            if (Player.controlUseTile && !IsCharging)
             {
                 // Debug Text
+                CurrentMode = CurrentMode == SwordMode.Small? SwordMode.Large: SwordMode.Small;
+
                 Main.NewText($"CurrentMode: {CurrentMode}");
-                CurrentMode = SwordMode.Large;
+                QueuedAttack = null;
+                return;
             }
-            else if (Player.controlUseTile && !IsCharging && CurrentMode == SwordMode.Large)
-            {
-                // Debug Text
-                Main.NewText($"CurrentMode: {CurrentMode}");
-                CurrentMode = SwordMode.Small;
-            }
+           
 
             if (CurrentResource == MaxResource && KeybindSystem.DualModeActivete.JustPressed && CurrentMode == SwordMode.Large)
             {
@@ -64,6 +65,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                 if (Player.controlUseItem)
                 {
                     // Debug Text
+                    QueueAttack(SwordAttackID.Small_Light1);
+                    CurrentAttack = SwordAttackID.Small_Light1;
                     Main.NewText($"QueuedAttack: {QueuedAttack}\nCurrentAttack: {CurrentAttack}\nAttackTimer: {AttackTimer}");
                     if (CurrentAttack == null)
                     {
@@ -71,6 +74,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                         CurrentAttack = SwordAttackID.Small_Light1;
                         AttackTimer = 30;
                     }
+                    /*
                     else if (CurrentAttack == SwordAttackID.Small_Light1)
                     {
                         QueueAttack(SwordAttackID.Small_Light2);
@@ -90,6 +94,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                         CurrentAttack = SwordAttackID.Small_Light4;
                         AttackTimer = 90;
                     }
+                    else if(CurrentAttack == SwordAttackID.Small_Light4)
+                    {
+
+                        QueueAttack(SwordAttackID.Small_Light1);
+                        CurrentAttack = SwordAttackID.Small_Light1;
+                    }
                     // Shadowfy
                     else if (Player.controlUseTile && CanShadowfy())
                     {
@@ -97,14 +107,14 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                         CanCounter = true;
                         AttackTimer = 90;
                         CounterWindow = 60;
-                    }
+                    }*/
                 }
             }
 
             if (CurrentMode == SwordMode.Large)
             {
                 // Debug Text
-                Main.NewText($"QueuedAttack: {QueuedAttack}\nCurrentAttack: {CurrentAttack}\nAttackTimer: {AttackTimer}");
+                //Main.NewText($"QueuedAttack: {QueuedAttack}\nCurrentAttack: {CurrentAttack}\nAttackTimer: {AttackTimer}");
 
                 // Large mode attacks
                 if (Player.controlUseItem && !IsCharging)
@@ -114,6 +124,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                         QueueAttack(SwordAttackID.Large_Light);
                         CurrentAttack = SwordAttackID.Large_Light;
                         AttackTimer = 60;
+                        return;
                     }
                 }
 
@@ -175,6 +186,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
             {
                 QueuedAttack = null;
             }
+        }
+
+        public void SwapSword()
+        {
+            CurrentMode = CurrentMode == SwordMode.Small ? SwordMode.Large : SwordMode.Small;
+
         }
 
         private bool CanShadowfy()

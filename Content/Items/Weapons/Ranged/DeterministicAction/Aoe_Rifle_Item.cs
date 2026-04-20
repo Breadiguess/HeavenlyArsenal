@@ -73,8 +73,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             if (player.ownedProjectileCounts[Item.shoot] <1)
             {
-                Projectile.NewProjectileDirect(player.GetSource_FromThis(), player.Center, Vector2.Zero, Item.shoot, 0, 0);
-
+               int proj = Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, Vector2.Zero, Item.shoot, 0, 0);
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                    NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, proj);
             }
         }
         public override bool CanUseItem(Player player) => false;

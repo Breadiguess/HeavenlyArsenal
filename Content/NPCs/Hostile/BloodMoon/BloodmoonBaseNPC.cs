@@ -5,7 +5,6 @@ using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
-using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Goreca;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
@@ -75,7 +74,7 @@ public class BloodmoonSpawnControl : GlobalNPC
                     SpawnCondition.OverworldNightMonster.Chance * 0.074f;
 
                     pool[ModContent.NPCType<BloodJelly>()] =
-                        SpawnCondition.OverworldNightMonster.Chance * 0.005f;
+                        SpawnCondition.OverworldNightMonster.Chance * 0.009f;
 
 
 
@@ -84,8 +83,7 @@ public class BloodmoonSpawnControl : GlobalNPC
                     SpawnCondition.OverworldNightMonster.Chance * 0.01f;
                 pool[ModContent.NPCType<FleshkinAcolyte_Assassin>()] =
                     SpawnCondition.OverworldNightMonster.Chance * 0.05f;
-                pool[ModContent.NPCType<Frightweaver>()] =
-                 SpawnCondition.OverworldNightMonster.Chance * 0.1f;
+
                 int altarCount = NPC.CountNPCS(ModContent.NPCType<RitualAltar>());
 
                 if (altarCount < RitualAltarMax)
@@ -95,7 +93,7 @@ public class BloodmoonSpawnControl : GlobalNPC
                 }
 
                 pool[ModContent.NPCType<FleshlingCultist.FleshlingCultist>()] =
-                    SpawnCondition.OverworldNightMonster.Chance * 0.42f;
+                    SpawnCondition.OverworldNightMonster.Chance * 0.32f;
             }
             else if (spawnInfo.Player.ZoneSkyHeight)
             {

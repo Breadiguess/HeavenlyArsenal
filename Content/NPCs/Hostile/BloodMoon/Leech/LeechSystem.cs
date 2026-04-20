@@ -11,6 +11,7 @@ public class LeechSystem : ModSystem
 
     private static readonly List<NPC> ActiveLeeches = new(Main.maxNPCs);
 
+    public static bool AnyLeeches => ActiveLeeches.Count > 0;
     public static int MaxLeeches => ActiveLeeches.Count > 0 ? ActiveLeeches.Count : 0;
 
     public static int ActiveIndex(NPC npc)

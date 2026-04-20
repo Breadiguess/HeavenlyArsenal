@@ -112,54 +112,7 @@ partial class newLeech : BaseBloodMoonNPC, IMultiSegmentNPC
         ];
     }
 
-    public override void SendExtraAI2(BinaryWriter writer)
-    {
-        base.SendExtraAI(writer);
-        var hasHitboxes = AdjHitboxes != null && AdjHitboxes.Length > 0;
-        writer.Write(hasHitboxes);
-
-        if (hasHitboxes)
-        {
-            writer.Write(AdjHitboxes.Length);
-
-            for (var i = 0; i < AdjHitboxes.Length; i++)
-            {
-                writer.WriteVector2(AdjHitboxes[i].Location.ToVector2());
-            }
-        }
-
-        writer.Write((int)CurrentState);
-        writer.Write(variant);
-    }
-
-    public override void ReceiveExtraAI2(BinaryReader reader)
-    {
-        base.ReceiveExtraAI(reader);
-        var hasHitboxes = reader.ReadBoolean();
-
-        if (hasHitboxes)
-        {
-            var length = reader.ReadInt32();
-
-            if (AdjHitboxes == null || AdjHitboxes.Length != length)
-            {
-                AdjHitboxes = new Rectangle[length];
-            }
-
-            for (var i = 0; i < length; i++)
-            {
-                AdjHitboxes[i].Location = reader.ReadVector2().ToPoint();
-            }
-        }
-        else
-        {
-            AdjHitboxes = null;
-        }
-
-        CurrentState = (Behavior)reader.ReadInt32();
-        variant = reader.ReadInt32();
-    }
-
+   
     public override void OnSpawn(IEntitySource source)
     {
         variant = Main.rand.Next(0, 3);

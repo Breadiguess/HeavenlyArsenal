@@ -17,6 +17,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 {
     internal class Aoe_Rifle_Laser : ModProjectile, IDrawSubtractive
     {
+        public ref Player Owner => ref Main.player[Projectile.owner];
         public PiecewiseCurve ShrinkCurve;
         public bool PowerShot = false;
         public static Texture2D tex => GennedAssets.Textures.GreyscaleTextures.BloomLine2;
@@ -149,6 +150,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             if (PowerShot)
             {
                 damageMulti = 1.6f;
+                //Projectile.NewProjectileDirect(Owner.GetSource_FromThis(), target.Center, target.AngleFrom(Owner.Center).ToRotationVector2(), ModContent.ProjectileType<Aoe_Rifle_RealityTear>(), 10_000, 0);
+
             }
             Projectile.damage = (int)(Projectile.damage * damageMulti);
             
@@ -228,12 +231,12 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
         {
             float scalar = ShrinkCurve.Evaluate(LumUtils.InverseLerp(0, 20, Projectile.timeLeft));
 
-            Vector2 Scale = new Vector2(1 * scalar, 30);
+            Vector2 Scale = new Vector2(1 * scalar, 40);
             if (PowerShot)
             {
                 Scale = new Vector2(5f * scalar, 30);
             }
-                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation-MathHelper.PiOver2, Origin, scalar*2, 0);
+                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation-MathHelper.PiOver2, new Vector2(tex.Width/2,0), Scale, 0);
 
         }
     }

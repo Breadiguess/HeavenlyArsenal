@@ -9,6 +9,7 @@ using System.Linq;
 using Terraria.DataStructures;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
+using Terraria.ModLoader.IO;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
@@ -68,13 +69,18 @@ internal partial class RitualAltar : BaseBloodMoonNPC
     public override void SendExtraAI2(BinaryWriter writer)
     {
         base.SendExtraAI(writer);
+        writer.Write(isSacrificing);
+        writer.Write7BitEncodedInt(Variant);
+        writer.WriteVector2(MotionIntent);
 
     }
 
     public override void ReceiveExtraAI2(BinaryReader reader)
     {
         base.ReceiveExtraAI(reader);
-
+        isSacrificing = reader.ReadBoolean();
+        Variant = reader.Read7BitEncodedInt();
+        MotionIntent = reader.ReadVector2();
        
     }
     public override int SpawnNPC(int tileX, int tileY)
@@ -123,6 +129,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
             var offset = new Vector2(10 * thing * i, 0);
             //NPC.NewNPCDirect(NPC.GetSource_FromThis(), NPC.Center, ModContent.NPCType<FleshlingCultist.FleshlingCultist>());
         }
+        NPC.ForceNetUpdate(true);
     }
 
 
@@ -140,7 +147,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
     }
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
-        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<PenumbralMembrane>(), 4, 1));
+        npcLoot.Add(ItemDropRule.NormalvsExpert(ModContent.ItemType<PenumbralMembrane>(), 6, 12));
         npcLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<RitualAltar>()));
 
         npcLoot.Add(ModContent.ItemType<BloodOrb>(), 1, 10, 18);
@@ -163,11 +170,24 @@ internal partial class RitualAltar : BaseBloodMoonNPC
         CanBeSacrificed = false;
        
     }
-
+    public override bool PreAI()
+    {
+        if (Main.netMode == NetmodeID.Server)
+        {
+            if (_limbs is null)
+            {
+                CreateLimbs();
+            }
+        }
+        return base.PreAI();
+    }
     public override void AI()
     {
         // NPC.Center = Main.MouseWorld;
         //NPC.velocity.X = NPC.AngleTo(Main.LocalPlayer.Calamity().mouseWorld).ToRotationVector2().X * 10;//* NPC.Distance(Main.MouseWorld) ;
+
+       
+
 
         NPC.velocity.X = 0;
         //return;

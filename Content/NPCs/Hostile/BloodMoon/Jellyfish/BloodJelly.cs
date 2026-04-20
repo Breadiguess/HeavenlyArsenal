@@ -37,6 +37,39 @@ internal partial class BloodJelly : BaseBloodMoonNPC
         Target = thing;
     }
 
+    public override void SendExtraAI2(BinaryWriter writer)
+    {
+
+        writer.Write(nextBeepTime);
+        writer.Write(HasExploded);
+        writer.Write(recoilInterp);
+
+        writer.Write(OpenInterpolant);
+        writer.Write(warningPulseSpeed);
+
+        writer.Write(ThreatIndicies.Count);
+        for (int i = 0; i < ThreatIndicies.Count; i++)
+            writer.Write(ThreatIndicies[i]);
+    }
+
+    public override void ReceiveExtraAI2(BinaryReader reader)
+    {
+
+        nextBeepTime = reader.ReadInt32();
+        HasExploded = reader.ReadBoolean();
+        recoilInterp = reader.ReadSingle();
+
+        OpenInterpolant = reader.ReadSingle();
+        warningPulseSpeed = reader.ReadSingle();
+
+        ThreatIndicies.Clear();
+        int threatCount = reader.ReadInt32();
+        for (int i = 0; i < threatCount; i++)
+            ThreatIndicies.Add(reader.ReadInt32());
+    }
+
+
+
     public override void PostAI()
     {
         if (OpenInterpolant > 0 && CurrentState != Behavior.Railgun)
@@ -74,7 +107,7 @@ internal partial class BloodJelly : BaseBloodMoonNPC
 
     public override int SpawnNPC(int tileX, int tileY)
     {
-        const int PushUpTiles = 12; // how many tiles to lift it
+        const int PushUpTiles = 18; // how many tiles to lift it
 
         // Check if there is solid ground directly below spawn tile
         if (WorldGen.SolidTile(tileX, tileY + 1))
@@ -262,28 +295,7 @@ internal partial class BloodJelly : BaseBloodMoonNPC
         }
     }
 
-    public override void SendExtraAI2(BinaryWriter writer)
-    {
-        base.SendExtraAI(writer);
-        //writer.Write(MaxCapacity);
-
-        //for(int i = 0; i< ThreatIndicies.Capacity;i++)
-        //   writer.Write(ThreatIndicies[i]);
-    }
-
-    public override void ReceiveExtraAI2(BinaryReader reader)
-    {
-        base.ReceiveExtraAI(reader);
-        //MaxCapacity = reader.ReadInt32();
-
-        //ThreatIndicies.Clear();
-
-        // for (int i = 0; i < ThreatIndicies.Capacity; i++)
-        //{
-        //    Main.NewText(reader.ReadInt32());
-        //     ThreatIndicies.Add(reader.ReadInt32());
-        // }
-    }
+  
 
     #endregion
 }

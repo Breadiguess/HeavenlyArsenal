@@ -1,159 +1,265 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
 
-namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
-
-/// <summary>
-///     Datastructure for cults.
-/// </summary>
-public class Cult
+namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC
 {
-    public int CultID;
-
-    public NPC Leader;
-
-    public List<NPC> Cultists;
-
-    public int MaxCultists;
-
-    public bool IsValid => Leader != null && Leader.active;
-
     /// <summary>
-    ///     Constructor of the data Structure.
+    /// Datastructure for cults.
+    /// Server owns the authoritative state.
+    /// Clients keep a mirrored copy for reads/visual logic.
     /// </summary>
-    /// <param name="id">
-    ///     the ID of the cult. this is managed with a static number, so hopefully there
-    ///     should never be repeats.
-    /// </param>
-    /// <param name="leader"></param>
-    /// <param name="maxCultists"></param>
-    public Cult(int id, NPC leader, int maxCultists)
+    public class Cult
     {
-        CultID = id;
-        Leader = leader;
-        MaxCultists = maxCultists;
-        Cultists = new List<NPC>(maxCultists);
-    }
-}
+        public int CultID;
+        public NPC Leader;
+        public List<NPC> Cultists;
+        public int MaxCultists;
 
-internal class CultistCoordinator : GlobalNPC
-{
-    public static readonly Dictionary<int, Cult> Cults = new();
+        public bool IsValid => Leader != null && Leader.active;
 
-    private static int nextCultID;
-
-    /// <summary>
-    ///     Creates a new cult with the given leader npc.
-    /// </summary>
-    /// <param name="leader"> the "Leader" of the cult. this will always be a ritual altar.</param>
-    /// <param name="maxCultists">The maximum amount of cultists this cult can have.</param>
-    /// <returns></returns>
-    /// <exception cref="Exception">Invalid Cult Leader</exception>
-    public static int CreateNewCult(NPC leader, int maxCultists = 3)
-    {
-        if (leader == null || !leader.active)
+        public Cult(int id, NPC leader, int maxCultists)
         {
-            throw new Exception("Invalid cult leader.");
+            CultID = id;
+            Leader = leader;
+            MaxCultists = maxCultists;
+            Cultists = new List<NPC>(maxCultists);
         }
-
-        var id = nextCultID++;
-        var cult = new Cult(id, leader, maxCultists);
-        Cults[id] = cult;
-
-        return id;
     }
 
-    /// <summary>
-    ///     Attaches an instance of an npc to a cult.
-    /// </summary>
-    /// <param name="id">
-    ///     The ID of the cult to attach to. see <see cref="GetCultOfNPC(NPC)" /> to get the
-    ///     ID.
-    /// </param>
-    /// <param name="npc"> The NPC to attach to this cult.</param>
-    /// <exception cref="Exception"></exception>
-    public static void AttachToCult(int id, NPC npc)
+    internal static class CultistCoordinator
     {
-        if (!Cults.TryGetValue(id, out var cult))
+        public static readonly Dictionary<int, Cult> Cults = new();
+
+        private static int nextCultID;
+
+        public static void Clear()
         {
-            throw new Exception($"Cult with ID {id} not found!");
+            Cults.Clear();
+            nextCultID = 0;
         }
 
-        if (!cult.Cultists.Contains(npc))
+        public static int CreateNewCult(NPC leader, int maxCultists = 3)
         {
+            if (leader == null || !leader.active)
+                throw new Exception("Invalid cult leader.");
+
+            // In multiplayer, only server should mutate NPC-owned world state.
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                return -1;
+
+            int id = nextCultID++;
+            Cult cult = new(id, leader, maxCultists);
+            Cults[id] = cult;
+
+            SyncFull();
+            return id;
+        }
+
+        public static void AttachToCult(int id, NPC npc)
+        {
+            if (!Cults.TryGetValue(id, out var cult))
+                throw new Exception($"Cult with ID {id} not found!");
+
+            if (npc == null || !npc.active)
+                return;
+
+            if (cult.Cultists.Contains(npc))
+                return;
+
+            if (cult.Cultists.Count >= cult.MaxCultists)
+                return;
+
             cult.Cultists.Add(npc);
-        }
-    }
 
-    public static void RemoveFromCult(int id, NPC npc)
-    {
-        if (!Cults.TryGetValue(id, out var cult))
-        {
-            throw new Exception($"Cult with ID {id} not found!");
+            if (Main.netMode == NetmodeID.Server)
+                SyncFull();
         }
 
-        cult.Cultists.Remove(npc);
-    }
-
-    /// <summary>
-    ///     Returns the value of the cult that the given npc is a part of.
-    ///     returns null if not in a cult.
-    /// </summary>
-    /// <param name="npc"> this npc. </param>
-    /// <returns></returns>
-    public static Cult GetCultOfNPC(NPC npc)
-    {
-        foreach (var cult in Cults.Values)
+        public static void RemoveFromCult(int id, NPC npc)
         {
-            if (cult.Leader == npc || cult.Cultists.Contains(npc))
+            if (!Cults.TryGetValue(id, out var cult))
+                return;
+
+            if (npc == null)
+                return;
+
+            if (cult.Cultists.Remove(npc) && Main.netMode == NetmodeID.Server)
+                SyncFull();
+        }
+
+        public static Cult GetCultOfNPC(NPC npc)
+        {
+            foreach (var cult in Cults.Values)
             {
-                return cult;
-            }
-        }
-
-        return null;
-    }
-
-    public static void UpdateCults()
-    {
-        if (Cults.Count <= 0)
-        {
-            return;
-        }
-
-        List<int> invalid = new();
-
-        foreach (var kvp in Cults)
-        {
-            if (!kvp.Value.IsValid)
-            {
-                invalid.Add(kvp.Key);
+                if (cult.Leader == npc || cult.Cultists.Contains(npc))
+                    return cult;
             }
 
-            kvp.Value.Cultists.RemoveAll(id => !id.active || id == null);
+            return null;
         }
 
-        foreach (var id in invalid)
+        public static void UpdateCults()
         {
-            for (var i = 0; i < Cults[id].Cultists.Count; i++)
-            {
-                var cultist = Cults[id].Cultists[i];
+            if (Cults.Count == 0)
+                return;
 
-                if (cultist != null && cultist.active)
+            List<int> invalidCults = new();
+            bool changed = false;
+
+            foreach (var kvp in Cults)
+            {
+                Cult cult = kvp.Value;
+
+                if (!cult.IsValid)
                 {
-                    RemoveFromCult(id, cultist);
+                    invalidCults.Add(kvp.Key);
+                    continue;
                 }
+
+                // Null check first.
+                int removed = cult.Cultists.RemoveAll(npc => npc == null || !npc.active);
+                if (removed > 0)
+                    changed = true;
             }
 
-            Cults.Remove(id);
-            nextCultID--;
+            foreach (int id in invalidCults)
+            {
+                Cults.Remove(id);
+                changed = true;
+            }
+
+            if (changed && Main.netMode == NetmodeID.Server)
+                SyncFull();
+        }
+
+        /// <summary>
+        /// Server -> clients full snapshot.
+        /// </summary>
+        public static void SyncFull(int toClient = -1, int ignoreClient = -1)
+        {
+            if (Main.netMode != NetmodeID.Server)
+                return;
+
+            ModPacket packet = ModContent.GetInstance<HeavenlyArsenal>().GetPacket();
+            packet.Write((byte)CultMessageType.FullSync);
+
+            packet.Write(nextCultID);
+            packet.Write(Cults.Count);
+
+            foreach (var kvp in Cults)
+            {
+                Cult cult = kvp.Value;
+
+                packet.Write(cult.CultID);
+                packet.Write(cult.MaxCultists);
+                packet.Write(cult.Leader?.whoAmI ?? -1);
+
+                // Only send valid cultists.
+                List<NPC> validCultists = new();
+                foreach (NPC npc in cult.Cultists)
+                {
+                    if (npc != null && npc.active)
+                        validCultists.Add(npc);
+                }
+
+                packet.Write(validCultists.Count);
+                foreach (NPC npc in validCultists)
+                    packet.Write(npc.whoAmI);
+            }
+
+            packet.Send(toClient, ignoreClient);
+        }
+
+        /// <summary>
+        /// Client rebuild from server snapshot.
+        /// </summary>
+        public static void ReceiveFullSync(BinaryReader reader)
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                return;
+
+            Clear();
+
+            nextCultID = reader.ReadInt32();
+            int cultCount = reader.ReadInt32();
+
+            for (int i = 0; i < cultCount; i++)
+            {
+                int cultID = reader.ReadInt32();
+                int maxCultists = reader.ReadInt32();
+                int leaderWhoAmI = reader.ReadInt32();
+
+                NPC leader = leaderWhoAmI >= 0 && leaderWhoAmI < Main.maxNPCs ? Main.npc[leaderWhoAmI] : null;
+                Cult cult = new(cultID, leader, maxCultists);
+
+                int cultistCount = reader.ReadInt32();
+                for (int j = 0; j < cultistCount; j++)
+                {
+                    int cultistWhoAmI = reader.ReadInt32();
+                    if (cultistWhoAmI >= 0 && cultistWhoAmI < Main.maxNPCs)
+                    {
+                        NPC npc = Main.npc[cultistWhoAmI];
+                        if (npc != null && npc.active)
+                            cult.Cultists.Add(npc);
+                    }
+                }
+
+                Cults[cultID] = cult;
+            }
+        }
+
+        /// <summary>
+        /// Client -> server asks for current cult snapshot.
+        /// </summary>
+        public static void RequestFullSync()
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                return;
+
+            ModPacket packet = ModContent.GetInstance<HeavenlyArsenal>().GetPacket();
+            packet.Write((byte)CultMessageType.RequestFullSync);
+            packet.Send();
         }
     }
-}
 
-internal class CultSystem : ModSystem
-{
-    public override void PostUpdateEverything()
+    internal enum CultMessageType : byte
     {
-        CultistCoordinator.UpdateCults();
+        RequestFullSync,
+        FullSync
+    }
+
+    internal class CultSystem : ModSystem
+    {
+        public override void OnWorldLoad()
+        {
+            CultistCoordinator.Clear();
+        }
+
+        public override void OnWorldUnload()
+        {
+            CultistCoordinator.Clear();
+        }
+
+        public override void PostUpdateEverything()
+        {
+            // Only server should do authoritative updates in MP.
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                return;
+
+            CultistCoordinator.UpdateCults();
+        }
+    }
+
+    internal class CultSyncPlayer : ModPlayer
+    {
+        public override void OnEnterWorld()
+        {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                CultistCoordinator.RequestFullSync();
+        }
     }
 }

@@ -1,4 +1,4 @@
-ShintoArmor: {
+﻿ShintoArmor: {
 	ShintoArmorHelmetRogue: {
 		SetBonus: Mods.HeavenlyArsenal.Items.Armor.ShintoArmor.ShintoArmorHelmetRogue.SetBonus
 		DisplayName: Darkened Cap
@@ -34,7 +34,7 @@ ShintoArmor: {
 		Tooltip:
 			'''
 			increases max life by 300 and max mana by 200
-			15% increased damage
+			20% increased damage
 			18% increased crit chance
 			25% increased attack speed
 			'''

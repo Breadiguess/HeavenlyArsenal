@@ -1,4 +1,5 @@
 ﻿using CalamityMod;
+using HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.Projectiles;
 using HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData;
 using Luminance.Assets;
 using NoxusBoss.Content.Rarities;
@@ -8,8 +9,11 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords
 {
     public class TrioSword_Item: ModItem
     {
-        public override string Texture => MiscTexturesRegistry.InvisiblePixelPath;
         public override string LocalizationCategory => "Items.Weapons.Melee";
+        public override void SetStaticDefaults()
+        {
+            ItemID.Sets.gunProj[Type] = true;
+        }
         public override void SetDefaults()
         {
             Item.rare = ModContent.RarityType<AvatarRarity>();
@@ -19,41 +23,75 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords
 
             Item.crit = 6;
 
-            Item.useTime = 1;
+            Item.useAnimation = 10;
+            Item.useTime = 10;
             Item.noUseGraphic = true;
             Item.noMelee = true;
-            Item.shoot = ProjectileID.None; 
+            //gets replaced in the shoot code but 
+            Item.shoot = 1;
+            Item.shootSpeed = 12;
+            Item.useStyle = ItemUseStyleID.HiddenAnimation;
         }
 
+        public override float UseSpeedMultiplier(Player player)
+        {
+            if (player.TryGetModPlayer<SwordCombatPlayer>(out var swordPlayer))
+            {
+                if (swordPlayer.QueuedAttack is SwordAttackID attackID)
+                {
+                    var attack = SwordAttackDatabase.Attacks[attackID];
 
-       
+
+
+                    return attack.UseTimeMultiplier;
+                }
+
+
+
+                
+            }
+            return base.UseSpeedMultiplier(player);
+        }
+
         public override void HoldItem(Player player)
         {
             player.GetModPlayer<SwordCombatPlayer>().Active = true;
         }
-        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage,float knockback)
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
-            var swordPlayer = player.GetModPlayer<SwordCombatPlayer>();
+            if (player.TryGetModPlayer<SwordCombatPlayer>(out var swordPlayer))
+            {
+                if (swordPlayer.QueuedAttack is not SwordAttackID attackID)
+                    return false;
 
-            if (swordPlayer.QueuedAttack is not SwordAttackID attackID)
-                return false;
+                var attack = SwordAttackDatabase.Attacks[attackID];
 
-            var attack = SwordAttackDatabase.Attacks[attackID];
+                Projectile proj = Projectile.NewProjectileDirect(
+                    source,
+                    player.Center,
+                    Vector2.Zero,
+                    ModContent.ProjectileType<TrioSwordProjectile>(),
+                    damage,
+                    knockback,
+                    player.whoAmI
+                );
 
-            Projectile.NewProjectile(
-                source,
-                player.Center,
-                Vector2.Zero,
-                attack.ProjectileType,
-                damage,
-                knockback,
-                player.whoAmI,
-                ai0: (float)attackID
-            );
+                float attackSpeed = player.GetWeaponAttackSpeed(Item);
 
-            swordPlayer.QueuedAttack = null;
-            return false; 
+                float adjustedAttackSpeed = MathF.Max(attackSpeed * 0.6f, 1);
+                Main.NewText($"base:{attackSpeed}, Adjusted: {adjustedAttackSpeed}");
+                int adjustedLifetime = Math.Max(1, (int)(attack.ProjectileLifeTime / adjustedAttackSpeed));
+
+
+                Main.NewText(adjustedLifetime);
+                proj.timeLeft = adjustedLifetime;
+
+                var swordProj = proj.As<TrioSwordProjectile>();
+                swordProj.AttackDef = attack;
+                swordProj.CurrentID = attackID;
+            }
+
+            return false;
         }
-
     }
 }

@@ -1,5 +1,6 @@
-﻿using System.IO;
-using HeavenlyArsenal.Common.Networking;
+﻿using HeavenlyArsenal.Common.Networking;
+using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
+using System.IO;
 
 namespace HeavenlyArsenal;
 
@@ -13,5 +14,24 @@ public sealed partial class HeavenlyArsenal : Mod
         base.HandlePacket(reader, whoAmI);
         
         ModPacketLoader.Handle(in reader, whoAmI);
+
+
+
+        CultMessageType msgType = (CultMessageType)reader.ReadByte();
+
+        switch (msgType)
+        {
+            case CultMessageType.RequestFullSync:
+                // Client asked server for current cult state.
+                if (Main.netMode == NetmodeID.Server)
+                    CultistCoordinator.SyncFull(toClient: whoAmI);
+                break;
+
+            case CultMessageType.FullSync:
+                // Server sent the authoritative cult snapshot.
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                    CultistCoordinator.ReceiveFullSync(reader);
+                break;
+        }
     }
 }

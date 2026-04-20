@@ -1,4 +1,4 @@
-sampler uImage0 : register(s0);
+﻿sampler uImage0 : register(s0);
 sampler uImage1 : register(s1);
 
 float time;
@@ -39,25 +39,33 @@ VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    float2 coords = input.TextureCoordinates;
-    
-    // Apply smoothening to the visual by adjusting the y-coordinate
+    float2 coords = input.TextureCoordinates.xy;
     coords.y = (coords.y - 0.5) / input.TextureCoordinates.z + 0.5;
-    
-    // Sample the first texture with adjusted coordinates
+
     float4 color = tex2D(uImage0, float2(coords.x - frac(time), coords.y - coords.x * spin));
-    
-    // Sample the second texture to create a glow effect
     float4 glow = tex2D(uImage1, float2(coords.x - frac(time * 2), coords.y - frac(time) * spin));
-    
-    // Calculate the main color intensity using smoothstep and other factors
-    float mainColor = smoothstep(0.1, 0.22, length(color.rgb) * pow((1 - coords.x), 4) * (1 - coords.x));
-    
-    // Calculate the glow color intensity
+
+    float mainColor = smoothstep(0.1, 0.62, length(color.rgb) * pow((1 - coords.x), 4) * (1 - coords.x));
     float glowColor = pow(length(glow.rgb), 0.5 + coords.x * 3) * (1 - coords.x);
-    
-    // Combine the main color and glow color, apply a sine wave modulation, and adjust brightness
-    return (pow((mainColor + glowColor), 2) + sin(coords.y * 3.14) * (1 - coords.x * 1.5)) * input.Color * brightness;
+
+    float trail = (pow(mainColor + glowColor, 2) + sin(coords.y * 3.14159) * (1 - coords.x * 1.5));
+
+    float alphaMask = 1.0;
+
+    float capStart = 0.18;
+    if (coords.x > capStart)
+    {
+        float localX = (coords.x - capStart) / (1.0 - capStart); // 0 to 1 across cap
+        float2 capUV = float2(localX, coords.y);
+
+        float2 p = float2(capUV.x - 0.0, capUV.y - 0.5);
+        float dist = length(p);
+
+        // semicircle centered on left-middle of cap region
+        alphaMask *= 1.0 - smoothstep(0.5, 0.52, dist);
+    }
+
+    return trail * input.Color * brightness * alphaMask;
 }
 technique Technique1
 {

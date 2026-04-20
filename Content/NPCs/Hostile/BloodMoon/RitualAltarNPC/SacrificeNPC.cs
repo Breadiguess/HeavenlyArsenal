@@ -1,78 +1,155 @@
 ﻿using NoxusBoss.Assets;
+using System.IO;
+using Terraria.ModLoader.IO;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
 internal class SacrificeNPC : GlobalNPC
 {
     public bool isSacrificed;
-
     public int SacrificeTimer;
-
     public int SacrificeDuration = 60 * 3;
-
     public Vector2 OriginalPosition;
 
+    // Runtime reference only. Sync this through PriestWhoAmI.
     public RitualAltar Priest;
+    public int PriestWhoAmI = -1;
 
     public override bool InstancePerEntity => true;
 
+    public void StartSacrifice(NPC npc, RitualAltar priest, int duration = 60 * 3)
+    {
+        isSacrificed = true;
+        SacrificeTimer = 0;
+        SacrificeDuration = duration;
+        OriginalPosition = npc.Center;
+
+        Priest = priest;
+        PriestWhoAmI = priest?.NPC?.whoAmI ?? -1;
+
+        npc.netUpdate = true;
+    }
+
+    public void StopSacrifice(NPC npc)
+    {
+        isSacrificed = false;
+        SacrificeTimer = 0;
+        Priest = null;
+        PriestWhoAmI = -1;
+
+        npc.netUpdate = true;
+    }
+
     public override bool PreAI(NPC npc)
     {
+        // Rebuild Priest reference from whoAmI if needed.
+        if (Priest == null && PriestWhoAmI >= 0 && PriestWhoAmI < Main.maxNPCs)
+        {
+            NPC priestNPC = Main.npc[PriestWhoAmI];
+            if (priestNPC != null && priestNPC.active && priestNPC.ModNPC is RitualAltar altar)
+                Priest = altar;
+        }
+
         if (isSacrificed)
         {
             if (RitualSystem.IsNPCBuffed(npc))
             {
-                isSacrificed = false;
+                StopSacrifice(npc);
+                return true;
             }
 
-            var a = npc.ModNPC as BaseBloodMoonNPC;
+            BaseBloodMoonNPC a = npc.ModNPC as BaseBloodMoonNPC;
 
             if (!npc.noGravity)
-            {
-                npc.noGravity = false;
-            }
+                npc.noGravity = true;
 
-            npc.Center = Vector2.Lerp(OriginalPosition, OriginalPosition + new Vector2(0, -75), SacrificeTimer / (float)SacrificeDuration);
+            npc.velocity = Vector2.Zero;
+            npc.Center = Vector2.Lerp(
+                OriginalPosition,
+                OriginalPosition + new Vector2(0f, -75f),
+                SacrificeTimer / (float)SacrificeDuration
+            );
 
+            // Only the server should do authoritative completion logic.
             if (SacrificeTimer >= SacrificeDuration)
             {
-                // SoundEngine.PlaySound(GennedAssets.Sounds.Avatar.BloodCry with { MaxInstances = 0 }, npc.Center);
-                npc.StrikeInstantKill();
-
-                if (npc.life > 0)
+                if (Main.netMode != Terraria.ID.NetmodeID.MultiplayerClient)
                 {
-                    npc.active = false;
+                    npc.StrikeInstantKill();
+
+                    if (npc.life > 0)
+                        npc.active = false;
+
+                    if (Priest != null)
+                    {
+                        Priest.Blood += a.Blood;
+                        Priest.SacrificeCooldown = 60 * 5;
+
+                        if (Priest.NPC.life < Priest.NPC.lifeMax)
+                        {
+                            int healAmount = npc.lifeMax / 4;
+                            Priest.NPC.life = Math.Clamp(Priest.NPC.life + healAmount, 0, Priest.NPC.lifeMax);
+                            CombatText.NewText(Priest.NPC.Hitbox, Color.Crimson, "+" + healAmount);
+
+                            // If the altar's health matters visually/gameplay-wise, sync it too.
+                            Priest.NPC.netUpdate = true;
+                        }
+
+                        Priest.NPCTarget = null;
+
+                        if (a.Blood <= 0)
+                            Priest.Blood += Priest.MaxBlood / 5;
+
+                        Priest.isSacrificing = false;
+                    }
+
+                    StopSacrifice(npc);
                 }
 
-                Priest.Blood += a.Blood;
-                Priest.SacrificeCooldown = 60 * 5;
-
-                if (Priest.NPC.life < Priest.NPC.lifeMax)
-                {
-                    Priest.NPC.life = Math.Clamp(Priest.NPC.life + npc.lifeMax / 4, 0, Priest.NPC.lifeMax);
-                    CombatText.NewText(Priest.NPC.Hitbox, Color.Crimson, "+" + npc.lifeMax / 4);
-                }
-
-                Priest.NPCTarget = null;
-
-                if (a.Blood <= 0)
-                {
-                    Priest.Blood += Priest.MaxBlood/ 5;
-                }
-
-                Priest.isSacrificing = false;
-                SacrificeTimer = 0;
-                isSacrificed = false;
+                return false;
             }
 
-            SacrificeTimer++;
+            // Timer should only advance on the server in MP.
+            if (Main.netMode != Terraria.ID.NetmodeID.MultiplayerClient)
+            {
+                SacrificeTimer++;
 
-            return false; //lambs don't fight the slaughter
+                npc.netUpdate = true;
+            }
+
+            return false;
         }
 
         OriginalPosition = npc.Center;
-
         return base.PreAI(npc);
+    }
+
+    public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter)
+    {
+        bitWriter.WriteBit(isSacrificed);
+
+        binaryWriter.Write(SacrificeTimer);
+        binaryWriter.Write(SacrificeDuration);
+        binaryWriter.WriteVector2(OriginalPosition);
+        binaryWriter.Write(PriestWhoAmI);
+    }
+
+    public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader)
+    {
+        isSacrificed = bitReader.ReadBit();
+
+        SacrificeTimer = binaryReader.ReadInt32();
+        SacrificeDuration = binaryReader.ReadInt32();
+        OriginalPosition = binaryReader.ReadVector2();
+        PriestWhoAmI = binaryReader.ReadInt32();
+
+        Priest = null;
+        if (PriestWhoAmI >= 0 && PriestWhoAmI < Main.maxNPCs)
+        {
+            NPC priestNPC = Main.npc[PriestWhoAmI];
+            if (priestNPC != null && priestNPC.active && priestNPC.ModNPC is RitualAltar altar)
+                Priest = altar;
+        }
     }
 
     public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

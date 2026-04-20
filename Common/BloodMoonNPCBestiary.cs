@@ -1,14 +1,7 @@
-﻿using Daybreak.Common.Assets;
-using HeavenlyArsenal.Content.NPCs.Hostile;
+﻿using HeavenlyArsenal.Content.NPCs.Hostile;
 using Luminance.Core.Graphics;
-using NoxusBoss.Content.NPCs.Bosses.Avatar.FirstPhaseForm;
 using NoxusBoss.Core.Graphics.RenderTargets;
-using NoxusBoss.Core.Graphics.SpecificEffectManagers;
 using NoxusBoss.Core.Graphics.SwagRain;
-using NoxusBoss.Core.World.GameScenes.AvatarAppearances;
-using ReLogic.Content;
-using Terraria.GameContent.Bestiary;
-using Terraria.GameContent.UI.Elements;
 
 namespace HeavenlyArsenal.Common
 {
@@ -27,12 +20,12 @@ namespace HeavenlyArsenal.Common
             Main.ContentThatNeedsRenderTargets.Add(BestiaryTarget);
         }
 
-     
+
         public override void Load()
         {
 
             base.Load();
-            
+
         }
 
         public override bool InstancePerEntity => true;
@@ -55,14 +48,14 @@ namespace HeavenlyArsenal.Common
                 {
                     Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
 
-                   
+
                     npc.position -= npc.Size * 0.5f;
 
                     float backglowScale = npc.scale * (0.74f);
-                    float backglowOpacity =  1f;
+                    float backglowOpacity = 1f;
                     Vector2 drawPosition = npc.Center - screenPos;
 
-                  
+
 
                     if (npc.IsABestiaryIconDummy)
                     {
@@ -84,7 +77,7 @@ namespace HeavenlyArsenal.Common
                         Main.spriteBatch.Draw(BloomCircleSmall, drawPosition, null, npc.GetAlpha(Color.Crimson) with { A = 0 } * backglowOpacity * 0.12f, 0f, BloomCircleSmall.Size() * 0.5f, backglowScale * 12f, 0, 0f);
                     }
 
-                 
+
                     Texture2D riftTexture = WavyBlotchNoise;
                     Vector2 riftScale = npc.Size / riftTexture.Size() * 2f;
                     float vanishInterpolant = 0f;

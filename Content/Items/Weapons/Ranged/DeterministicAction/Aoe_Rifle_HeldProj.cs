@@ -10,6 +10,7 @@ using Luminance.Core.Graphics;
 using NoxusBoss.Assets;
 using NoxusBoss.Core.Utilities;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -110,6 +111,25 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             Projectile.frame = 0;
             Projectile.ContinuouslyUpdateDamageStats = true;
             Projectile.Size = Vector2.One;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write((byte)AttackStage);
+            writer.Write(RotationOffset);
+            writer.Write(Recoil);
+
+            writer.WriteVector2(clipPos[0]);
+            writer.WriteVector2(clipPos[1]);
+        }
+
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            AttackStage = reader.ReadByte();
+            RotationOffset = reader.ReadSingle();
+            Recoil = reader.ReadSingle();
+
+            clipPos[0] = reader.ReadVector2();
+            clipPos[1] = reader.ReadVector2();
         }
         public override void AI()
         {
@@ -235,6 +255,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
             if (AmmoStored <= 0 && (CurrentState == RifleState.Cycle || CurrentState == RifleState.Idle))
                 nextState = RifleState.Reload;
 
+            Projectile.netUpdate = true;
+
+
             return nextState;
         }
 
@@ -285,46 +308,49 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.DeterministicAction
 
         private void HandleFire()
         {
-            Owner.SetDummyItemTime(2);
-            Item ChosenBullet = GetBulletFromClip();
-            int baseDamage = Owner.GetWeaponDamage(Owner.HeldItem);
-            float knockback = Owner.GetWeaponKnockback(Owner.HeldItem, Owner.HeldItem.knockBack);
-
-            int finalDamage = baseDamage + ChosenBullet.damage;
-            float finalKnockback = knockback + ChosenBullet.knockBack;
-            int damage = finalDamage;
-            if (RiflePlayer.BulletCount == 1)
+            if (Owner.whoAmI == Main.myPlayer)
             {
-                damage *= 2;
-            }
-            float screenshakeStrength = 1 - LumUtils.InverseLerp(0, 10, RiflePlayer.BulletCount) + (RiflePlayer.BulletCount == 1 ? 2 : 1);
-            ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 7f * screenshakeStrength, shakeStrengthDissipationIncrement: RiflePlayer.BulletCount != 1 ? 0.4f : 0.2f);
-            Projectile a = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center,
-            Projectile.velocity * 120, ModContent.ProjectileType<Aoe_Rifle_Laser>(), damage, finalKnockback);
+                Owner.SetDummyItemTime(2);
+                Item ChosenBullet = GetBulletFromClip();
+                int baseDamage = Owner.GetWeaponDamage(Owner.HeldItem);
+                float knockback = Owner.GetWeaponKnockback(Owner.HeldItem, Owner.HeldItem.knockBack);
 
-            a.As<Aoe_Rifle_Laser>().PowerShot = RiflePlayer.BulletCount == 1;
-            a.timeLeft += RiflePlayer.BulletCount == 1 ? 2 : 0;
-
-            Vector2 Tip = Projectile.Center + Projectile.rotation.ToRotationVector2() * 97;
-
-            MuzzleFlashParticle particle = new MuzzleFlashParticle();
-            particle.Prepare(Tip, Projectile.rotation, 30);
-            ParticleEngine.ShaderParticles.Add(particle);
-           
-            if (RiflePlayer.BulletCount > 1)
-                SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundStrong with { Volume = 2, Pitch = 0.7f * (1 - LumUtils.InverseLerp(1, 9, RiflePlayer.BulletCount)), Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(8);
-            else
-                SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundSuper with { Volume = 2 , Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(13);
-            
-            for (int x = 0; x < 2; x++)
-            {
-                var clip = clips[x];
-
-                if (clip.BulletCount > 0)
+                int finalDamage = baseDamage + ChosenBullet.damage;
+                float finalKnockback = knockback + ChosenBullet.knockBack;
+                int damage = finalDamage;
+                if (RiflePlayer.BulletCount == 1)
                 {
-                    clip.Bullets.RemoveAt(0);
-                    clips[x] = clip;
-                    break;
+                    damage *= 2;
+                }
+                float screenshakeStrength = 1 - LumUtils.InverseLerp(0, 10, RiflePlayer.BulletCount) + (RiflePlayer.BulletCount == 1 ? 2 : 1);
+                ScreenShakeSystem.StartShakeAtPoint(Projectile.Center, 7f * screenshakeStrength, shakeStrengthDissipationIncrement: RiflePlayer.BulletCount != 1 ? 0.4f : 0.2f);
+                Projectile a = Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), Projectile.Center,
+                Projectile.velocity * 120, ModContent.ProjectileType<Aoe_Rifle_Laser>(), damage, finalKnockback);
+
+                a.As<Aoe_Rifle_Laser>().PowerShot = RiflePlayer.BulletCount == 1;
+                a.timeLeft += RiflePlayer.BulletCount == 1 ? 2 : 0;
+
+                Vector2 Tip = Projectile.Center + Projectile.rotation.ToRotationVector2() * 97;
+
+                MuzzleFlashParticle particle = new MuzzleFlashParticle();
+                particle.Prepare(Tip, Projectile.rotation, 30, Projectile.direction);
+                ParticleEngine.ShaderParticles.Add(particle);
+
+                if (RiflePlayer.BulletCount > 1)
+                    SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundStrong with { Volume = 2, Pitch = 0.7f * (1 - LumUtils.InverseLerp(1, 9, RiflePlayer.BulletCount)), Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(8);
+                else
+                    SoundEngine.PlaySound(AssetDirectory.Sounds.Items.Weapons.AvatarRifle.FireSoundSuper with { Volume = 2, Type = SoundType.Sound }, Owner.Center).WithVolumeBoost(13);
+
+                for (int x = 0; x < 2; x++)
+                {
+                    var clip = clips[x];
+
+                    if (clip.BulletCount > 0)
+                    {
+                        clip.Bullets.RemoveAt(0);
+                        clips[x] = clip;
+                        break;
+                    }
                 }
             }
 

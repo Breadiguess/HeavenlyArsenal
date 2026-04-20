@@ -499,7 +499,9 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
         renderIsohedron(anchor, drawColor);
         DateTime date = DateTime.Now;
-        if (date.Month == 12 || (date.Day == 24 || date.Day == 25))
+        bool christmasOrChristmasEve = date.Month == 12 && (date.Day == 24 || date.Day == 25);
+
+        if (christmasOrChristmasEve)
         {
             Vector2 hatScale = new Vector2(0.2f, 0.4f);
             Vector2 hatDrawPosition = anchor;

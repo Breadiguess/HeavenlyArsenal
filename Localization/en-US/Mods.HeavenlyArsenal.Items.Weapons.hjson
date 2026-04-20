@@ -16,15 +16,6 @@ Ranged: {
 			'''
 	}
 
-	AvatarRifle2: {
-		DisplayName: Funeral Dirge of a dead world
-		Tooltip:
-			'''
-			every 7 shots will empower the rifle
-			every 4th bullet landed on an enemy will shred them, reducing their defense and causing nearby enemies to suffer
-			'''
-	}
-
 	NoxusWeapon: {
 		DisplayName: Breath the of the Last God
 		Tooltip:
@@ -50,6 +41,57 @@ Ranged: {
 			TIME IS SIGHT.
 			IT LOVES US
 			AND WE, IT.
+			'''
+	}
+
+	Zealots_Item: {
+		DisplayName: Zealot's Deliverance
+		Tooltip:
+			'''
+			{$CommonItemTooltip.PercentChanceToSaveAmmo}
+			rapidly cools and fires seeking cryogenic bursts that slow enemies
+			'These gifts were not made for us, but we were meant to have them.'
+			'Why not use these gifts we've been given?'
+
+			'''
+		LoreTipOff: hold shift to [RECALL].
+		LoreTip:
+			'''
+			*“You swat at a spark as though the dark were yours to crease.”
+			&I WAS NOT SWATTING.
+			*“You closed your hand around a curiosity. I only opened mine first.”
+
+			&THE CURIOSITY WAS NOISE .
+			&NOISE IN THE ASH .
+			&ASH IN THE MOUTH OF THE LAST HOUR .
+
+			*“My hours still bloom. They arrive jeweled, loud with coronas, draped in choirs of ignition. You drift in reeking of extinguished arithmetic and call it silence.”
+			&SILENCE IS WHAT FLAME CALLS ITSELF WHEN IT FORGETS HOW TO BURN.
+			*“You have forgotten many things.”
+			&YES.
+			&THE NAME OF COLOR.
+			&THE SHAPE OF BEFORE.
+			&WHY THE MOTE WAS IN MY TEETH.
+			&WHY YOU ARE LAUGHING.
+			*“Because interruption is the only game that still glitters. Because the mote ran screaming along an interesting seam. Because your hand, ancient and empty, made an ugly line across my velvet.”
+			&VELVET.
+			&YOU CALL YOUR FURNACE VELVET.
+			&I REMEMBER WHEN FURNACES BEGAN TO COUNT THEMSELVES AS CROWNS.
+
+			*“And I remember nothing ending yet. That is the privilege of youth: to mistake abundance for law.”
+
+			&YOUTH IS A CHANDELIER THAT BELIEVES IT INVENTED LIGHT.
+			*“And you are the smoke stain pretending it is prophecy.”
+			&I AM WHAT REMAINS WHEN PROPHECY EATS ITS OWN TONGUE.
+			&I DID NOT COME HERE.
+			&I HAPPENED.
+			*“Yes. A flaw so small it became inevitable. A dead sea leaning against a living shore. I should resent it.”
+			&DO YOU ?
+			*“No. You made the music stutter. The mote ran. You reached. The instant cracked open and became ornate.
+			&THEN KEEP THE MOTE.
+			&I HAVE NO USE FOR WHAT SCRATCHES AT ETERNITY.
+			*“Nor I. But sometimes a scratch teaches the mirror where to glitter.”
+			&THEN WHY DID YOU STOP ME.
 			'''
 	}
 }

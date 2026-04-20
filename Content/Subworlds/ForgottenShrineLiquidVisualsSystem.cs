@@ -187,14 +187,14 @@ public class ForgottenShrineLiquidVisualsSystem : ModSystem
 
     private static void UpdateTargets()
     {
+        if (!WaterEffectsActive || Main.gamePaused)
+            return;
+
         if (prepareLiquidDistanceTarget)
         {
             PrepareLiquidDistanceTarget();
             prepareLiquidDistanceTarget = false;
         }
-
-        if (!WaterEffectsActive || Main.gamePaused)
-            return;
 
         // R = Pressure.
         // G = Pressure speed.

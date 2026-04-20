@@ -170,11 +170,9 @@ internal partial class BloodJelly
             for (var i = 0; i < ThreatCount; i++)
             {
                 var uuid = ThreatIndicies[i];
-                //Main.NewText(uuid);
-                var threat = Main.projectile[uuid]; //Main.projectile[ThreatIndicies[i]];
+                var threat = Main.projectile[uuid]; 
 
-                //Main.NewText("success!");
-                if (threat == null)
+                if (threat == null|| threat.type!= ModContent.ProjectileType<TheThreat>())
                 {
                     ThreatIndicies.RemoveAt(i);
                     i--;
@@ -184,7 +182,12 @@ internal partial class BloodJelly
 
                 if (Main.rand.NextBool(ThreatCount * 4))
                 {
+
+                    
                     var theThreat = threat.ModProjectile as TheThreat;
+                    if (theThreat is null)
+                        return;
+
 
                     theThreat.Target = Target;
                     theThreat.Time = 0;
@@ -233,24 +236,26 @@ internal partial class BloodJelly
 
         if (attackCycleTime == lockOnDuration + chargeDuration - 1)
         {
-            var velocity = (NPC.rotation - MathHelper.PiOver2).ToRotationVector2() * 10;
-
-            var shot = Projectile.NewProjectileDirect
-            (
-                NPC.GetSource_FromThis(),
-                NPC.Center,
-                velocity,
-                ModContent.ProjectileType<JellyRailProjectile>(),
-                100,
-                0
-            );
-
-            if (shot.ModProjectile is JellyRailProjectile rail)
+            if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                rail.OwnerIndex = NPC.whoAmI;
+                var velocity = (NPC.rotation - MathHelper.PiOver2).ToRotationVector2() * 10;
+
+                var shot = Projectile.NewProjectileDirect(
+                    NPC.GetSource_FromThis(),
+                    NPC.Center,
+                    velocity,
+                    ModContent.ProjectileType<JellyRailProjectile>(),
+                    100,
+                    0
+                );
+
+                if (shot.ModProjectile is JellyRailProjectile rail)
+                    rail.OwnerIndex = NPC.whoAmI;
+
+                NPC.netUpdate = true;
             }
 
-            recoilInterp = 1;
+            recoilInterp = 1f;
         }
 
         if (Time > attackEnd + 20)
@@ -500,21 +505,30 @@ internal partial class BloodJelly
         }
 
         warningPulseSpeed = float.Lerp(warningPulseSpeed, 0, 0.2f);
-
         if (Time >= maxTime && !HasExploded)
         {
             SoundEngine.PlaySound(GennedAssets.Sounds.Enemies.DismalLanternExplode);
-          
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                var pos = NPC.Center + new Vector2(0, 60).RotatedBy(NPC.rotation);
+                Projectile.NewProjectileDirect(
+                    NPC.GetSource_FromThis(),
+                    pos,
+                    Vector2.Zero,
+                    ModContent.ProjectileType<JellyExplosion>(),
+                    1000,
+                    10
+                );
 
-            var Pos = NPC.Center + new Vector2(0, 60).RotatedBy(NPC.rotation); //Tendrils[tendrilCount].Item1[Tendrils[tendrilCount].Item1.Length - 1];
-            var explosion = Projectile.NewProjectileDirect(NPC.GetSource_FromThis(), Pos, Vector2.Zero, ModContent.ProjectileType<JellyExplosion>(), 1000, 10);
-
-            HasExploded = true;
+                HasExploded = true;
+                NPC.netUpdate = true;
+            }
         }
 
         if (Time >= maxTime + 100)
         {
-            NPC.StrikeInstantKill();
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                NPC.StrikeInstantKill();
         }
     }
 

@@ -9,10 +9,8 @@
         public int EnergyCost;
         public int EnergyGain;
 
-        // Timing
-        public int StartupFrames;
-        public int ActiveFrames;
-        public int RecoveryFrames;
+
+        public int ProjectileLifeTime;
 
         // Movement
         public float DashSpeed;
@@ -23,8 +21,15 @@
         public bool IsChargeAttack;
         public bool CanParry;
         public bool IsCounter;
+
+        public int ParryStartWindow;
+        public int ParryEndWindow;
+
+
         public float DamageMultiplier;
         public float KnockbackMultiplier;
+        public float UseTimeMultiplier = 1;
+
 
         // Projectile
         public int ProjectileType;

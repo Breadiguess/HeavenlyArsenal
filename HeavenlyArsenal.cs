@@ -5,7 +5,7 @@ global using NoxusBoss.Assets;
 using CalamityMod.Projectiles.Enemy;
 using CalamityMod.UI.CalamitasEnchants;
 using HeavenlyArsenal.Common;
-using HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
+//using HeavenlyArsenal.Content.Items.Accessories.BloodyLeechScarf;
 using HeavenlyArsenal.Content.Items.Accessories.VoidCrestOath;
 using NoxusBoss.Content.Items;
 using System.IO;

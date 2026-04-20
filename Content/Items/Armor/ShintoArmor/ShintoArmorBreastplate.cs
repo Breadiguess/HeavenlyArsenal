@@ -14,7 +14,7 @@ namespace HeavenlyArsenal.Content.Items.Armor.ShintoArmor;
 public class ShintoArmorBreastplate : ModItem
 {
     // public new string LocalizationCategory => "Items.Armor";
-    // public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MaxManaIncrease, MaxMinionIncrease, MaxLifeIncrease);
+    // public override LocalizedText Tooltip => base.Tooltip.WithFormatArgs(MaxManaIncrease, ConserveAmmoChance, MaxLifeIncrease);
 
     // gonna keep it real chief, this chestplate code is a mess lmao.
 
@@ -43,7 +43,7 @@ public class ShintoArmorBreastplate : ModItem
 
         player.statLifeMax2 += MaxLifeIncrease;
         player.statManaMax2 += MaxManaIncrease;
-        player.GetDamage<GenericDamageClass>() += 0.15f;
+        player.GetDamage<GenericDamageClass>() += 0.20f;
         player.GetCritChance<GenericDamageClass>() += 18;
         player.GetAttackSpeed<GenericDamageClass>() += 0.25f;
         player.GetModPlayer<ShintoArmorPlayer>().ChestplateEquipped = true;

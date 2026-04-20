@@ -1,10 +1,11 @@
-﻿using HeavenlyArsenal.Content.Biomes;
+﻿
+using HeavenlyArsenal.Content.Biomes;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon;
 using NoxusBoss.Content.NPCs.Bosses.Avatar.SecondPhaseForm;
 using System.IO;
 using Terraria.GameContent.Bestiary;
 using Terraria.ModLoader.IO;
-
+using static HeavenlyArsenal.Content.Biomes.RiftEclipseBiome;
 namespace HeavenlyArsenal.Content.NPCs.Hostile
 {
     public readonly struct BloodMoonBalanceStrength
@@ -64,6 +65,49 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
 
         }
 
+        public enum SyncedTargetKind : byte
+        {
+            None,
+            Player,
+            NPC
+        }
+        public SyncedTargetKind TargetKind;
+        public int TargetWhoAmI = -1;
+
+        public Entity Target
+        {
+            get
+            {
+                return TargetKind switch
+                {
+                    SyncedTargetKind.Player when TargetWhoAmI >= 0 && TargetWhoAmI < Main.maxPlayers => Main.player[TargetWhoAmI],
+                    SyncedTargetKind.NPC when TargetWhoAmI >= 0 && TargetWhoAmI < Main.maxNPCs => Main.npc[TargetWhoAmI],
+                    _ => null
+                };
+            }
+            set
+            {
+                switch (value)
+                {
+                    case Player p:
+                        TargetKind = SyncedTargetKind.Player;
+                        TargetWhoAmI = p.whoAmI;
+                        break;
+
+                    case NPC n:
+                        TargetKind = SyncedTargetKind.NPC;
+                        TargetWhoAmI = n.whoAmI;
+                        break;
+
+                    default:
+                        TargetKind = SyncedTargetKind.None;
+                        TargetWhoAmI = -1;
+                        break;
+                }
+            }
+        }
+
+
         public virtual void SendExtraAI2(BinaryWriter writer)
         {
         }
@@ -76,22 +120,30 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
             SendExtraAI2(writer);
             writer.Write(Blood);
             writer.Write(CanBeSacrificed);
+            writer.Write(_StatsHaveBeenAdjusted);
+
+            writer.Write((byte)TargetKind);
+            writer.Write(TargetWhoAmI);
 
         }
         public sealed override void ReceiveExtraAI(BinaryReader reader)
         {
             base.ReceiveExtraAI(reader);
             ReceiveExtraAI2(reader);
-            Blood = (int)reader.ReadSingle();
+
+            Blood = reader.ReadInt32();
             CanBeSacrificed = reader.ReadBoolean();
+            _StatsHaveBeenAdjusted = reader.ReadBoolean();
+
+            TargetKind = (SyncedTargetKind)reader.ReadByte();
+            TargetWhoAmI = reader.ReadInt32();
         }
 
         public float SacrificePriority;
         public virtual int BloodMoonSpawnWeight => 10;
         public virtual int BestiaryLineAmount => 1;
         public override string LocalizationCategory => "NPCs";
-
-        public Entity Target;
+        
         /// <summary>
         /// common shared resource between all BaseBloodmoon npcs.
         /// </summary>
@@ -144,6 +196,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
             SetDefaults2();
             SpawnModBiomes =
             [
+                //this is supposed tgo be the type of the biome, but is instead 
                 ModContent.GetInstance<RiftEclipseBiome>().Type
             ];
 
@@ -163,7 +216,7 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
             (
                 new IBestiaryInfoElement[]
                 {
-                //BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
+                    BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Events.BloodMoon,
 
 
                 }
@@ -177,6 +230,20 @@ namespace HeavenlyArsenal.Content.NPCs.Hostile
 
         public abstract BloodMoonBalanceStrength Strength { get; }
 
+        public void ClearTarget()
+        {
+            TargetKind = SyncedTargetKind.None;
+            TargetWhoAmI = -1;
+        }
 
+        public bool HasValidTarget()
+        {
+            return Target switch
+            {
+                Player p => p.active && !p.dead,
+                NPC n => n.active,
+                _ => false
+            };
+        }
     }
 }

@@ -81,6 +81,9 @@ public static class AssetDirectory
 
         #region blockaroz stuff
         public static readonly Asset<Texture2D> HalfHollowEdge = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/HalfHollowSoftEdge");
+        public static readonly Asset<Texture2D> ShatteredBurst = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/T_BurstSmear010");
+        public static readonly Asset<Texture2D> ShatteredBurst2 = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/T_Burst031");
+        public static readonly Asset<Texture2D> SlashEffect = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/T_Burst012");
 
         public static readonly Asset<Texture2D> BigGlowball = AssetUtilities.RequestImmediate<Texture2D>(AssetPath + "Textures/Extra/BigGlowball");
 

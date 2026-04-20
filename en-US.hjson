@@ -449,6 +449,11 @@ Mods: {
 				DisplayName: Avatar Rogue
 				Tooltip: ""
 			}
+
+			Zealots_Item: {
+				DisplayName: Zealots_ Item
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {

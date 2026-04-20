@@ -1,4 +1,5 @@
 ﻿using HeavenlyArsenal.Content.Items.Armor.Vanity.ScavSona;
+using Luminance.Core.Graphics;
 using NoxusBoss.Core.Graphics.SpecificEffectManagers;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria.DataStructures;
 using static Terraria.ModLoader.PlayerDrawLayer;
+using static tModPorter.ProgressUpdate;
 
 namespace HeavenlyArsenal.Content.Items
 {
@@ -65,7 +67,7 @@ namespace HeavenlyArsenal.Content.Items
             float rotation = Player.fullRotation;
             Texture2D texture = LocalPlayerDrawManager.PlayerTarget;
             Main.spriteBatch.Draw(texture, drawPosition, null, Color.Black, rotation, texture.Size() * 0.5f, scale, direction, 0f);
-            //Main.spriteBatch.Draw(texture, drawPosition, null, Color.White * Projectile.Opacity * MathF.Pow(1f - pulse, 2f), rotation, texture.Size() * 0.5f, scale * (1f + pulse * 0.9f), direction, 0f);
+            Main.spriteBatch.Draw(texture, drawPosition, null, Color.White * 1 * MathF.Pow(1f - MathF.Sin(Main.GlobalTimeWrappedHourly), 2f), rotation, texture.Size() * 0.5f, scale * (1f + MathF.Sin(Main.GlobalTimeWrappedHourly) * 0.9f), direction, 0f);
 
 
 
@@ -88,6 +90,7 @@ namespace HeavenlyArsenal.Content.Items
 
             if (ExampleRTPlayer._renderTarget is null || ExampleRTPlayer._renderTarget.IsDisposed)
                 return;
+
             //Main.EntitySpriteDraw(ExampleRTPlayer._renderTarget, Vector2.Zero, null, Color.White, 0, ExampleRTPlayer._renderTarget.Size()/4, 2, 0);
         }
     }

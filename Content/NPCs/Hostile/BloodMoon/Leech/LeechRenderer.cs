@@ -31,6 +31,12 @@ partial class newLeech : BaseBloodMoonNPC
     /// <param name="orig"></param>
     private void DrawLeech(On_Main.orig_CheckMonoliths orig)
     {
+        if (!LeechSystem.AnyLeeches)
+        {
+            orig();
+            return;
+        }
+
         if (leechTarget == null || leechTarget.IsDisposed)
         {
             leechTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, Main.screenWidth, Main.screenHeight);
@@ -66,64 +72,70 @@ partial class newLeech : BaseBloodMoonNPC
 
     private void ComposeLeech(NPC npc)
     {
-        var slot = npc.GetGlobalNPC<leechSystemHelper>().StripSlot;
-        var slotX = slot * LeechSystem.SlotWidth;
-        var slotY = 0;
-
-        if (slot < 0)
+        if(npc.TryGetGlobalNPC<leechSystemHelper>(out var leechSystemHelper))
         {
-            return;
+
+            var slot = leechSystemHelper.StripSlot;
+            var slotX = slot * LeechSystem.SlotWidth;
+            var slotY = 0;
+
+            if (slot < 0)
+            {
+                return;
+            }
+
+            var leech = npc.ModNPC as newLeech;
+
+            var segCount = leech.AdjHitboxes.Length;
+
+            var baseTex = ModContent.Request<Texture2D>
+                (
+                    $"HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech_{leech.variant}"
+                )
+                .Value;
+
+            var frameWidth = baseTex.Width / 5;
+            var frameHeight = baseTex.Height;
+
+            var totalWidth = segCount * frameWidth;
+
+            var offset = new Vector2(0, slot * frameHeight);
+
+            for (var i = segCount - 1; i >= 0; i--)
+            {
+                Rectangle frame;
+
+                if (i == 0)
+                {
+                    frame = baseTex.Frame(5);
+                }
+                else if (i == 1)
+                {
+                    frame = baseTex.Frame(5, 1, 1);
+                }
+                else if (i == segCount - 2)
+                {
+                    frame = baseTex.Frame(5, 1, 3);
+                }
+                else if (i == segCount - 1)
+                {
+                    frame = baseTex.Frame(5, 1, 4);
+                }
+                else
+                {
+                    frame = baseTex.Frame(5, 1, 2);
+                }
+
+                var pos = offset + new Vector2(i * frameWidth, 0);
+
+                var seg = segCount - i - 1;
+                var color = Color.White * npc.Opacity;//Lighting.GetColor((leech.AdjHitboxes[seg].Center() / 16).ToPoint()) * npc.Opacity;
+
+                Main.spriteBatch.Draw(baseTex, pos, frame, color);
+            }
         }
 
-        var leech = npc.ModNPC as newLeech;
 
-        var segCount = leech.AdjHitboxes.Length;
-
-        var baseTex = ModContent.Request<Texture2D>
-            (
-                $"HeavenlyArsenal/Content/NPCs/Hostile/BloodMoon/Leech/UmbralLeech_{leech.variant}"
-            )
-            .Value;
-
-        var frameWidth = baseTex.Width / 5;
-        var frameHeight = baseTex.Height;
-
-        var totalWidth = segCount * frameWidth;
-
-        var offset = new Vector2(0, slot * frameHeight);
-
-        for (var i = segCount - 1; i >= 0; i--)
-        {
-            Rectangle frame;
-
-            if (i == 0)
-            {
-                frame = baseTex.Frame(5);
-            }
-            else if (i == 1)
-            {
-                frame = baseTex.Frame(5, 1, 1);
-            }
-            else if (i == segCount - 2)
-            {
-                frame = baseTex.Frame(5, 1, 3);
-            }
-            else if (i == segCount - 1)
-            {
-                frame = baseTex.Frame(5, 1, 4);
-            }
-            else
-            {
-                frame = baseTex.Frame(5, 1, 2);
-            }
-
-            var pos = offset + new Vector2(i * frameWidth, 0);
-
-            var seg = segCount - i - 1;
-            var color = Color.White * npc.Opacity;//Lighting.GetColor((leech.AdjHitboxes[seg].Center() / 16).ToPoint()) * npc.Opacity;
-
-            Main.spriteBatch.Draw(baseTex, pos, frame, color);
-        }
     }
 
     /// <summary>

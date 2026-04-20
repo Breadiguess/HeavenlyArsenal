@@ -60,7 +60,7 @@ public class BarrierDurability : CooldownHandler
         (
             spriteBatch,
             FontAssets.MouseText.Value,
-            instance.timeLeft.ToString(),
+            instance.player.GetModPlayer<ShintoArmorBarrier>().barrier.ToString(),
             position + new Vector2(Xoffset, 4) * scale,
             Color.Lerp(ringColorLerpStart, Color.OrangeRed, 1 - instance.Completion),
             Color.Black,

@@ -7,16 +7,24 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <AdditionalFiles Remove="Content\Items\Accessories\BloodyLeechScarf\**" />
       <AdditionalFiles Remove="Content\NPCs\Bosses\Idol\**" />
+      <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <Compile Remove="Content\Items\Accessories\BloodyLeechScarf\**" />
       <Compile Remove="Content\NPCs\Bosses\Idol\**" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <EmbeddedResource Remove="Content\Items\Accessories\BloodyLeechScarf\**" />
       <EmbeddedResource Remove="Content\NPCs\Bosses\Idol\**" />
+      <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
+      <None Remove="Content\Items\Accessories\BloodyLeechScarf\**" />
       <None Remove="Content\NPCs\Bosses\Idol\**" />
+      <None Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <None Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <None Remove="Content\Projectiles\Weapons\Rogue\**" />
     </ItemGroup>
@@ -30,9 +38,9 @@
     <ItemGroup>
       <Compile Remove="Content\Biomes\RiftEclipseBestiaryBackgroundProvider.cs" />
       <Compile Remove="Content\Biomes\RiftEclipseBestiaryBackgroundSystem.cs" />
-      <Compile Remove="Content\Items\Accessories\BloodyLeechScarf\LeechScarfNetworkHandler.cs" />
       <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Player.cs" />
       <Compile Remove="Content\Items\Armor\Vanity\ScavSona\ScavSona_FloppyHair_Renderer.cs" />
+      <Compile Remove="Content\Items\ExampleRTPlayer.cs" />
       <Compile Remove="Content\Items\Misc\AncientCoin.cs" />
       <Compile Remove="Content\Items\Misc\ChaliceOfFunItem.cs" />
       <Compile Remove="Content\Items\Misc\ChaliceOfFunProjectile.cs" />
@@ -54,29 +62,33 @@
     
     <ItemGroup>
         <Reference Include="CalamityEntropy">
-            <HintPath>..\..\ModReader\CalamityEntropy\CalamityEntropy.dll</HintPath>
+            <HintPath>lib\CalamityEntropy.dll</HintPath>
         </Reference>
         <Reference Include="CalamityMod">
-            <HintPath>ModReferences\CalamityMod.dll</HintPath>
+            <HintPath>lib\CalamityMod.dll</HintPath>
         </Reference>
         <Reference Include="CalRemix">
-          <HintPath>..\..\ModReader\CalRemix\CalRemix.dll</HintPath>
+          <HintPath>lib\CalRemix.dll</HintPath>
         </Reference>
         <Reference Include="Daybreak">
-          <HintPath>..\..\ModReader\Daybreak\Daybreak.dll</HintPath>
+            <HintPath>lib\Daybreak.dll</HintPath>
         </Reference>
         <Reference Include="InfernumMode">
-          <HintPath>..\..\ModReader\InfernumMode\InfernumMode.dll</HintPath>
+          <HintPath>lib\InfernumMode.dll</HintPath>
         </Reference>
         <Reference Include="Luminance">
-            <HintPath>ModReferences\Luminance.dll</HintPath>
+            <HintPath>lib\Luminance.dll</HintPath>
         </Reference>
         <Reference Include="NoxusBoss">
-          <HintPath>..\..\ModReader\NoxusBoss\NoxusBoss.dll</HintPath>
+          <HintPath>lib\NoxusBoss.dll</HintPath>
         </Reference>
         <Reference Include="SubworldLibrary">
-            <HintPath>ModReferences\SubworldLibrary.dll</HintPath>
+            <HintPath>lib\SubworldLibrary.dll</HintPath>
         </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Assets\Sounds\Items\EdgySwordOfAbsoluteDarknessAndDoom\Freedom\" />
     </ItemGroup>
 
 </Project>

@@ -405,8 +405,8 @@ public class HelmetFauld : PlayerDrawLayer
         foreach (var offset in offsets)
         {
             Vector2 pos = offset + new Vector2(WotGUtils.ViewportArea.Width / 2, WotGUtils.ViewportArea.Height / 2);
-            Main.EntitySpriteDraw(facePixel, pos, null, Color.White, 0, facePixel.Size()/2, 1,0);
-            Main.EntitySpriteDraw(Glow, pos, null, Color.White with { A = 0}, 0, Glow.Size() / 2, 0.03f, 0);
+            Main.EntitySpriteDraw(facePixel, pos, null, Color.Red, 0, facePixel.Size()/2, 1,0);
+            Main.EntitySpriteDraw(Glow, pos, null, Color.Red with { A = 0}, 0, Glow.Size() / 2, 0.04f, 0);
         }
 
         Main.spriteBatch.End();
@@ -417,25 +417,28 @@ public class HelmetFauld : PlayerDrawLayer
     {
         var sPlayer = drawInfo.drawPlayer.GetModPlayer<ShintoArmorPlayer>();
 
+        var player = drawInfo.drawPlayer;
+
         //drawInfo.drawPlayer.legFrame.Y = 12 * drawInfo.drawPlayer.legFrame.Height;
 
         // drawInfo.drawPlayer.GetModPlayer<HidePlayer>().ShouldHide = true;
         //DrawFaulds(ref drawInfo, sPlayer);
-        DrawVoidEyes(ref drawInfo, sPlayer);
+         DrawVoidEyes(ref drawInfo, sPlayer);
         //DrawDeathMask(ref drawInfo, sPlayer);
-
         return;
         if (drawInfo.shadow != 0f || drawInfo.drawPlayer.dead)
         {
             return;
         }
-        HaloTarget.Request(14000, 14000, drawInfo.drawPlayer.whoAmI, RenderIntoTarget);
+        HaloTarget.Request(1400, 1400, drawInfo.drawPlayer.whoAmI, RenderIntoTarget);
 
         if (!HaloTarget.TryGetTarget(drawInfo.drawPlayer.whoAmI, out var portalTexture) || portalTexture is null)
         {
             return;
         }
-        var rift = new DrawData(portalTexture, drawInfo.GetHeadDrawPosition(), null, Color.White, 0, portalTexture.Size() * 0.5f, 2f, 0);
+        var walkOffset = player.gravDir * Main.OffsetsPlayerHeadgear[player.bodyFrame.Y / player.bodyFrame.Height];
+        SpriteEffects flip = drawInfo.drawPlayer.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+        var rift = new DrawData(portalTexture, drawInfo.GetHeadDrawPosition()+ walkOffset, null, Color.Crimson, 0, portalTexture.Size() * 0.5f, 1, flip);
         rift.shader = drawInfo.cHead;
         rift.color = drawInfo.colorArmorHead;
         drawInfo.DrawDataCache.Add(rift);

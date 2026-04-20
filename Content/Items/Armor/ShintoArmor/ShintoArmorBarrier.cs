@@ -235,6 +235,7 @@ internal class ShintoArmorBarrier : ModPlayer
             Iframe--;
         }
 
+
         if (maxBarrier > 0 && BarrierActive && timeSinceLastHit < 10000)
         {
             timeSinceLastHit++;

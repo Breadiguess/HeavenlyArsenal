@@ -17,8 +17,9 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                     Mode = SwordMode.Small,
                     EnergyGain = 4,
                     DashSpeed = 6f,
+                    ProjectileLifeTime = 70,
                     DamageMultiplier = 0.85f,
-                    ProjectileType = ModContent.ProjectileType<SmallBladeSlash>()
+                    ProjectileType = ModContent.ProjectileType<TrioSwordProjectile>()
                 },
 
                 [SwordAttackID.Small_Light2] = new SwordAttackDef
@@ -28,7 +29,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                     EnergyGain = 4,
                     DashSpeed = 6f,
                     DamageMultiplier = 0.9f,
-                    ProjectileType = ModContent.ProjectileType<SmallBladeSlash>()
+                    ProjectileType = ModContent.ProjectileType<TrioSwordProjectile>()
                 },
 
                 [SwordAttackID.Small_Light3] = new SwordAttackDef
@@ -39,7 +40,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                     DashSpeed = 3f,
                     DashDirection = Main.LocalPlayer.DirectionTo(Main.MouseWorld),
                     DamageMultiplier = 0.65f,
-                    ProjectileType = ModContent.ProjectileType<SmallBladeSlash>()
+                    ProjectileType = ModContent.ProjectileType<TrioSwordProjectile>()
                 },
 
                 [SwordAttackID.Small_Shadowfy] = new SwordAttackDef
@@ -49,7 +50,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                     EnergyCost = 0,
                     DashSpeed = -5f,
                     GrantsIFrames = true,
-                    ProjectileType = ModContent.ProjectileType<ShadowfyDash>()
+                    //ProjectileType = ModContent.ProjectileType<ShadowfyDash>()
                 },
                 #endregion
 
@@ -58,6 +59,8 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Melee.EdgyDualSwords.SwordData
                 {
                     ID = SwordAttackID.Large_Light,
                     Mode = SwordMode.Large,
+
+                    ProjectileLifeTime = 70,
                     EnergyGain = 6,
                     DamageMultiplier = 1.25f,
                     //ProjectileType = ModContent.ProjectileType<>() // Need projectile
