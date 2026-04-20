@@ -249,7 +249,7 @@ public class ShintoArmorWingsDraw : PlayerDrawLayer
 
         var d = new DrawData(texture, Position, Frame, color, 0f, new Vector2(texture.Width / 2, texture.Height / 18), 1f, drawInfo.playerEffect);
         d.color = drawInfo.colorArmorBody;
-        d.shader = drawPlayer.GetModPlayer<ShintoWingManager>().Active ?  drawInfo.cBody : drawInfo.drawPlayer.cWings;
+        d.shader = drawInfo.drawPlayer.cWings;
         drawInfo.DrawDataCache.Add(d);
     }
 }

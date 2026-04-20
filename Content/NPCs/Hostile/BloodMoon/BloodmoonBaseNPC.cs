@@ -1,6 +1,4 @@
-﻿using CalamityMod;
-using CalamityMod.NPCs.NormalNPCs;
-using HeavenlyArsenal.Content.Biomes;
+﻿using CalamityMod.NPCs.NormalNPCs;
 using HeavenlyArsenal.Content.Items.Misc;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodCult.FleshkinAcolyte_Assassin;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Artillery_Crab;
@@ -8,13 +6,9 @@ using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.BigCrab;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Jellyfish;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.Leech;
 using HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
-using Luminance.Assets;
 using NoxusBoss.Content.NPCs.Bosses.CeaselessVoid;
 using NoxusBoss.Content.NPCs.Friendly;
 using NoxusBoss.Core.Graphics.SwagRain;
-using NoxusBoss.Core.Graphics.UI.Books;
-using System.Collections.Generic;
-using System.IO;
 using Terraria.ModLoader.Utilities;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon;

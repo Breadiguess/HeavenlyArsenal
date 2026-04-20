@@ -13,7 +13,7 @@ using Terraria.ModLoader.IO;
 
 namespace HeavenlyArsenal.Content.NPCs.Hostile.BloodMoon.RitualAltarNPC;
 
-internal partial class RitualAltar : BaseBloodMoonNPC
+public partial class RitualAltar : BaseBloodMoonNPC
 {
     public enum AltarAI
     {
@@ -186,10 +186,7 @@ internal partial class RitualAltar : BaseBloodMoonNPC
         // NPC.Center = Main.MouseWorld;
         //NPC.velocity.X = NPC.AngleTo(Main.LocalPlayer.Calamity().mouseWorld).ToRotationVector2().X * 10;//* NPC.Distance(Main.MouseWorld) ;
 
-       
-
-
-        NPC.velocity.X = 0;
+        ApplyMovementIntent();
         //return;
         locateSacrifices();
         UpdateList();
@@ -233,16 +230,12 @@ internal partial class RitualAltar : BaseBloodMoonNPC
 
     public override void PostAI()
     {
-
-
         balanceHead(0.025f);
 
         Levitate();
         for(int i = 0; i< LimbCount; i++)
         {
-            var limb = _limbs[i];
-
-            UpdateLimbState(ref limb, NPC.Center+ _limbBaseOffsets[i], i);
+            UpdateLimbState(ref _limbs[i], NPC.Center + _limbBaseOffsets[i], i);
         }
         
         Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
@@ -314,6 +307,94 @@ internal partial class RitualAltar : BaseBloodMoonNPC
     public Vector2 normal;
     public Vector2 tangent;
     private Vector2 _lastBodyPos;
+    
+    private void ApplyMovementIntent()
+    {
+        var dir = Math.Sign(MotionIntent.X);
+
+        if (dir == 0)
+        {
+            NPC.velocity.X *= 0.9f;
+            return;
+        }
+
+        var speed = 1.8f * SpeedMulti;
+        NPC.velocity.X = MathHelper.Lerp(NPC.velocity.X, dir * speed, 0.08f);
+
+        if (IsBlockedAhead(dir))
+        {
+            if (CanStepUp(dir))
+            {
+                NPC.velocity.Y = -3.5f;
+            }
+            else
+            {
+                NPC.velocity.Y = -5f;
+            }
+        }
+
+        if (!IsGroundAhead(dir))
+        {
+            NPC.velocity.X *= 0.5f;
+        }
+    }
+    
+    private float GetObstacleHeight(float dir)
+    {
+        var x = (int)((NPC.Center.X + dir * 24f) / 16f);
+        var footY = (int)(NPC.Bottom.Y / 16f);
+
+        for (var i = 0; i < 6; i++)
+        {
+            if (!WorldGen.SolidTile(x, footY - i))
+            {
+                return i * 16f;
+            }
+        }
+
+        return -1f;
+    }
+    
+    private bool IsBlockedAhead(float dir)
+    {
+        var checkX = (int)((NPC.Center.X + dir * 20f) / 16f);
+        var footY = (int)((NPC.Bottom.Y - 4f) / 16f);
+        var headY = (int)((NPC.Top.Y + 8f) / 16f);
+
+        for (var y = footY; y >= headY; y--)
+        {
+            if (WorldGen.SolidTile(checkX, y))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool CanStepUp(float dir)
+    {
+        var x = (int)((NPC.Center.X + dir * 20f) / 16f);
+        var footY = (int)(NPC.Bottom.Y / 16f);
+
+        if (WorldGen.SolidTile(x, footY))
+        {
+            if (!WorldGen.SolidTile(x, footY - 1))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsGroundAhead(float dir)
+    {
+        var x = (int)((NPC.Center.X + dir * 24f) / 16f);
+        var y = (int)((NPC.Bottom.Y + 4f) / 16f);
+
+        return WorldGen.SolidTile(x, y);
+    }
 
     public static bool EstimateSurfaceFrame(Vector2 origin, out Vector2 normal, out Vector2 tangent)
     {

@@ -1,4 +1,5 @@
-CombatStim: {
+CombatStimItem: {
+	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStimItem.StimDuration
 	DisplayName: Experimental Combat Stim
 	Tooltip:
 		'''
@@ -8,11 +9,4 @@ CombatStim: {
 		"Do not worry, according to a study Stims are not addictive!*"
 		*Study funded by Permacura. Permacura: Put your life in our hands.
 		'''
-	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStim.StimDuration
-}
-
-CombatStimItem: {
-	StimDuration: Mods.HeavenlyArsenal.Items.Consumables.CombatStimItem.StimDuration
-	DisplayName: Combat Stim Item
-	Tooltip: ""
 }
