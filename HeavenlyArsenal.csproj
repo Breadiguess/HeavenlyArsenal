@@ -8,21 +8,25 @@
 
     <ItemGroup>
       <AdditionalFiles Remove="Content\Items\Accessories\BloodyLeechScarf\**" />
+      <AdditionalFiles Remove="Content\Items\Armor\TwistedBloodBlight\**" />
       <AdditionalFiles Remove="Content\NPCs\Bosses\Idol\**" />
       <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <AdditionalFiles Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <AdditionalFiles Remove="Content\Projectiles\Weapons\Rogue\**" />
       <Compile Remove="Content\Items\Accessories\BloodyLeechScarf\**" />
+      <Compile Remove="Content\Items\Armor\TwistedBloodBlight\**" />
       <Compile Remove="Content\NPCs\Bosses\Idol\**" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <Compile Remove="Content\Projectiles\Weapons\Rogue\**" />
       <EmbeddedResource Remove="Content\Items\Accessories\BloodyLeechScarf\**" />
+      <EmbeddedResource Remove="Content\Items\Armor\TwistedBloodBlight\**" />
       <EmbeddedResource Remove="Content\NPCs\Bosses\Idol\**" />
       <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <EmbeddedResource Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
       <EmbeddedResource Remove="Content\Projectiles\Weapons\Rogue\**" />
       <None Remove="Content\Items\Accessories\BloodyLeechScarf\**" />
+      <None Remove="Content\Items\Armor\TwistedBloodBlight\**" />
       <None Remove="Content\NPCs\Bosses\Idol\**" />
       <None Remove="Content\NPCs\Hostile\BloodMoon\Goreca\**" />
       <None Remove="Content\NPCs\Hostile\BloodMoon\Thing\**" />
@@ -51,6 +55,7 @@
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPCLimb.cs" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\DebugNPCRenderer.cs" />
       <Compile Remove="Content\NPCs\Hostile\BloodMoon\Leech\UmbralLeech.cs" />
+      <Compile Remove="Content\NPCs\Hostile\BloodMoon\RitualAltarNPC\RitualAltar.Sacrifices.cs" />
       <Compile Remove="Core\Systems\VoidTradingSystem.cs" />
     </ItemGroup>
 

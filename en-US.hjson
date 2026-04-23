@@ -454,6 +454,16 @@ Mods: {
 				DisplayName: Zealots_ Item
 				Tooltip: ""
 			}
+
+			TwistedBloodBlightChestplateItem: {
+				DisplayName: Twisted Blood Blight Chestplate Item
+				Tooltip: ""
+			}
+
+			TwistedBloodBlightLeggingsItem: {
+				DisplayName: Twisted Blood Blight Leggings Item
+				Tooltip: ""
+			}
 		}
 
 		Biomes: {

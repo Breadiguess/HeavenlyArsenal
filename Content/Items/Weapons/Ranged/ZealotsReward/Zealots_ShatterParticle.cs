@@ -1,4 +1,4 @@
-﻿using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner;
+﻿//using HeavenlyArsenal.Content.Items.Armor.TwistedBloodBlight.Players.Summoner;
 using HeavenlyArsenal.Core;
 using Luminance.Core.Graphics;
 using System;
@@ -13,7 +13,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ZealotsReward
     internal class Zealots_ShatterParticle : BaseParticle
     {
 
-        public static ParticlePool<Zealots_ShatterParticle> pool = new(500, GetNewParticle<Zealots_ShatterParticle>);
+        public static ParticlePool<Zealots_ShatterParticle> pool = new(1500, GetNewParticle<Zealots_ShatterParticle>);
 
         Vector2 Pos;
         Vector2 Velocity;
@@ -30,16 +30,23 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ZealotsReward
 
         public override void Update(ref ParticleRendererSettings settings)
         {
-            Pos += Velocity;
+            Pos += Collision.TileCollision(Pos, Velocity, 5, 5, true);
             Velocity *= 0.98f;
 
+           
+            if(TimeLeft< TimeMax / 2)
+            {
+                Velocity.Y += 0.4f;
+            }
             if (TimeLeft-- < 0)
                 ShouldBeRemovedFromRenderer = true;
+
+            
         }
 
         public override void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch)
         {
-            var tex = GennedAssets.Textures.GreyscaleTextures.HollowCircleSoftEdge;
+            var tex = ModContent.Request<Texture2D>(this.GetPath()).Value;
 
             float interp = TimeLeft / (float)TimeMax;
             
@@ -53,14 +60,16 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ZealotsReward
             FrostBuildup.SetTexture(tex, 0);
             FrostBuildup.SetTexture(GennedAssets.Textures.Noise.PerlinNoise, 1);
             FrostBuildup.TrySetParameter("fragmentProgress", interp);
-            FrostBuildup.TrySetParameter("fragmentStrength", 0);
-            FrostBuildup.TrySetParameter("edgeWidth", 0.1f);
-            FrostBuildup.TrySetParameter("noiseScale", 0.9f);
-            FrostBuildup.TrySetParameter("edgeColor", Color.Black.ToVector4());
+            FrostBuildup.TrySetParameter("fragmentDirection", Velocity.RotatedByRandom(4));
+
+            FrostBuildup.TrySetParameter("fragmentStrength", MathF.Sin(Main.GlobalTimeWrappedHourly));
+            FrostBuildup.TrySetParameter("edgeWidth", 0.3f);
+            FrostBuildup.TrySetParameter("noiseScale", 0.49f);
+            FrostBuildup.TrySetParameter("edgeColor", Color.White.ToVector4());
             FrostBuildup.Apply();
 
-            Vector2 scale = new Vector2(1) * interp;
-            Main.EntitySpriteDraw(tex, DrawPos, null, Color.White, 0, tex.Size() / 2, scale, 0);
+            Vector2 scale = new Vector2(2) *(1- interp);
+            Main.EntitySpriteDraw(tex, DrawPos, null, Color.White, Velocity.ToRotation(), tex.Size() / 2, scale, 0);
 
 
             spritebatch.ResetToDefault();

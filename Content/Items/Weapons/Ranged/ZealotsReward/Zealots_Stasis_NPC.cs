@@ -273,11 +273,7 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ZealotsReward
 
             ClearStasis(target);
 
-
-            Zealots_ShatterParticle Particle = new();
-            Vector2 Velocity = Vector2.Zero;
-            Particle.Prepare(target.Center, Velocity, 120);
-            ParticleEngine.ShaderParticles.Add(Particle);
+           
 
 
 
@@ -327,6 +323,17 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Ranged.ZealotsReward
             Zealots_FreezeGore.AddFreezeZone(r, lifetime: 120, TimeUntilShader: 60, false);
 
             IsShattering = false;
+
+            float ShatterCount = Math.Min(30, Math.Max((target.Size.LengthSquared() / 100)/2 , 10));
+            Main.NewText(ShatterCount);
+            for (int i = 0; i < ShatterCount; i++)
+            {
+                Zealots_ShatterParticle Particle = new();
+                Vector2 Velocity = new Vector2(4, 0).RotatedBy(i / ShatterCount * MathHelper.TwoPi).RotatedByRandom(1) ;
+                Particle.Prepare(Main.rand.NextVector2FromRectangle(target.Hitbox), Velocity, 60 + Main.rand.Next(30, 120));
+                ParticleEngine.ShaderParticles.Add(Particle);
+
+            }
         }
 
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)

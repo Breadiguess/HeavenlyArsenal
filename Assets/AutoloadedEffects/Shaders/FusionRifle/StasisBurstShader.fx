@@ -33,7 +33,7 @@ float4 PixelShaderFunction(float2 uv : TEXCOORD0) : COLOR0
     
     float edgeMask = 1.0f - saturate(abs(noise - threshold) / max(edgeWidth, 0.0001f));
     
-    float dir = fragmentDirection;
+    float2 dir = fragmentDirection;
     
     float dirLen = length(dir);
     dir = dirLen > 0.0001f ? dir / dirLen : float2(0.0f, -1.0f);

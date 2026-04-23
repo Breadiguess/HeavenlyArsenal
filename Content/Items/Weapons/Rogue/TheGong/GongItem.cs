@@ -18,10 +18,13 @@ namespace HeavenlyArsenal.Content.Items.Weapons.Rogue.TheGong
         {
             Item.damage = 1000;
             Item.useStyle = ItemUseStyleID.HiddenAnimation;
+            Item.noMelee = true;
             Item.useAnimation = 40;
             Item.useTime = 40;
             Item.rare = ModContent.RarityType<AvatarRarity>();
             Item.DamageType = ModContent.GetInstance<RogueDamageClass>();
+            Item.shoot = ModContent.ProjectileType<EoSC_Held>();
+            Item.channel = true;
         }
     }
 }

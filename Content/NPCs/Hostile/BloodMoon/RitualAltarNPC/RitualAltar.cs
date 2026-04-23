@@ -209,28 +209,34 @@ public partial class RitualAltar : BaseBloodMoonNPC
         Time++;
     }
 
+    private float _smoothedHeadTargetRotation = 0f;
+
     private void balanceHead(float interp = 0.2f)
     {
-        var d = Vector2.Zero;
-
         EstimateSurfaceFrame(NPC.Center, out normal, out tangent);
 
-
-        // Tilt based on horizontal velocity only:
-        // - referenceSpeed defines how fast it must move to reach full tilt.
-        // - maxTilt limits the tilt angle (in radians).
-        var referenceSpeed = 1f;
+        var referenceSpeed = 5f;
         var maxTilt = MathHelper.ToRadians(20f);
-        var normalized = MathHelper.Clamp(NPC.velocity.X / referenceSpeed, -1f, 1f);
+        var normalized = MathHelper.SmoothStep(-1, 1, NPC.velocity.X / referenceSpeed); //MathHelper.Clamp(NPC.velocity.X / referenceSpeed, -1f, 1f);
         var targetRotation = normalized * maxTilt + tangent.ToRotation() - MathHelper.PiOver2;
 
-        // Slightly lerp rotation toward the horizontal-velocity-based target.
-        NPC.rotation = NPC.rotation.AngleLerp(targetRotation, 0.1f);
+        // Smooth target rotation across frames to reduce twitching.
+        // Compute shortest-angle difference and clamp angular velocity.
+        float delta = MathHelper.WrapAngle(targetRotation - _smoothedHeadTargetRotation);
+
+        // Max angular change per tick (radians). Tunable: smaller value = smoother but slower.
+        float maxAngularChange = MathHelper.ToRadians(6f);
+
+        delta = MathHelper.Clamp(delta, -maxAngularChange, maxAngularChange);
+
+        _smoothedHeadTargetRotation = MathHelper.WrapAngle(_smoothedHeadTargetRotation + delta);
+
+        // Interpolate the actual NPC.rotation toward the smoothed target.
+        NPC.rotation = NPC.rotation.AngleLerp(_smoothedHeadTargetRotation, interp);
     }
 
     public override void PostAI()
     {
-        balanceHead(0.025f);
 
         Levitate();
         for(int i = 0; i< LimbCount; i++)
@@ -240,6 +246,7 @@ public partial class RitualAltar : BaseBloodMoonNPC
         
         Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
 
+        balanceHead(0.25f);
         if (NPCTarget != null)
         {
             currentTarget = NPCTarget;
