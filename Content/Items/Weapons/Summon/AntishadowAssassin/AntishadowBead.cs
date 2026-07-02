@@ -49,7 +49,7 @@ public class AntishadowBead : ModItem
     {
         Item.width = 16;
         Item.height = 16;
-        Item.damage = 2075;
+        Item.damage = 2076;
         Item.mana = 19;
         Item.useTime = Item.useAnimation = 32;
         Item.useStyle = ItemUseStyleID.HoldUp;
